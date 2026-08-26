@@ -1,0 +1,14 @@
+node_modules
+dist
+.DS_Store
+uploads
+public
+whatsapp-sessions
+*.tar.gz
+*.zip
+*.md
+backups
+media
+data/wa-version.json
+.cursor/*.log
+.cursor/settings.json

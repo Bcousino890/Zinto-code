@@ -254,7 +254,7 @@ export async function createGatewayCheckoutSession(input: CheckoutSessionInput):
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: customerEmail || 'no-email@bothiveplus.local',
+          email: customerEmail || 'no-email@zinto.app',
           amount: Math.round(paystackAmount * 100),
           currency: paystackCurrency,
           reference,

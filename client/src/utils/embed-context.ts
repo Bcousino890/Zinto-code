@@ -2,7 +2,7 @@
  * Utility functions for managing embed context across the application
  */
 
-const EMBED_STORAGE_KEY = 'bothive_embed_context';
+const EMBED_STORAGE_KEY = 'zinto_embed_context';
 const EMBED_PARAM = 'embed';
 
 /**

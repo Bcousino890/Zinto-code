@@ -30,7 +30,7 @@ interface ActiveChannelProviderProps {
   children: ReactNode;
 }
 
-const ACTIVE_CHANNEL_STORAGE_KEY = 'bothive_active_channel_id';
+const ACTIVE_CHANNEL_STORAGE_KEY = 'zinto_active_channel_id';
 
 export function ActiveChannelProvider({ children }: ActiveChannelProviderProps) {
   const [activeChannelId, setActiveChannelIdState] = useState<number | null>(null);

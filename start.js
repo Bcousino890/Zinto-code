@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 process.env.NODE_ENV = 'production';
 
-console.log('🚀 Starting BotHive Pro in production mode...');
+console.log('🚀 Starting Zinto in production mode...');
 console.log('📍 Working directory:', process.cwd());
 console.log('🔧 Node.js version:', process.version);
 

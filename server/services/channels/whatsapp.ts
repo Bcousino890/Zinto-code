@@ -1505,15 +1505,15 @@ const WHATSAPP_NAMESPACE = 'whatsapp';
 
 
 
-interface BotHiveMessageTracking {
+interface ZintoMessageTracking {
   timestamp: number;
   messageId: string;
   content: string; // For debugging purposes
-  source: 'bothive';
+  source: 'zinto';
 }
 
-const recentBotHiveMessages = new Map<string, BotHiveMessageTracking>();
-const BOTHIVE_MESSAGE_TRACKING_DURATION = 30000; // 30 seconds - sufficient for echo detection
+const recentZintoMessages = new Map<string, ZintoMessageTracking>();
+const ZINTO_MESSAGE_TRACKING_DURATION = 30000; // 30 seconds - sufficient for echo detection
 const WHATSAPP_INBOUND_MEDIA_DOWNLOAD_TIMEOUT_MS = 45_000;
 
 function isAbortOrCancellationError(e: unknown): boolean {
@@ -1533,16 +1533,16 @@ setInterval(() => {
   const now = Date.now();
   const keysToDelete: string[] = [];
 
-  recentBotHiveMessages.forEach((value, key) => {
-    if (now - value.timestamp > BOTHIVE_MESSAGE_TRACKING_DURATION) {
+  recentZintoMessages.forEach((value, key) => {
+    if (now - value.timestamp > ZINTO_MESSAGE_TRACKING_DURATION) {
       keysToDelete.push(key);
     }
   });
 
-  keysToDelete.forEach(key => recentBotHiveMessages.delete(key));
+  keysToDelete.forEach(key => recentZintoMessages.delete(key));
 
 
-}, BOTHIVE_MESSAGE_TRACKING_DURATION); // Run cleanup every 30 seconds
+}, ZINTO_MESSAGE_TRACKING_DURATION); // Run cleanup every 30 seconds
 
 
 const pooledEmitter = eventEmitterPool.getEmitter(WHATSAPP_NAMESPACE);
@@ -3948,15 +3948,15 @@ async function handleIncomingMessage(
 
 
       const trackingKey = `${remoteJid}:${waMsg.key.id}`;
-      const recentBotHiveMessage = recentBotHiveMessages.get(trackingKey);
+      const recentZintoMessage = recentZintoMessages.get(trackingKey);
 
-      if (recentBotHiveMessage) {
-        const messageAge = Date.now() - recentBotHiveMessage.timestamp;
-        if (messageAge < BOTHIVE_MESSAGE_TRACKING_DURATION) {
+      if (recentZintoMessage) {
+        const messageAge = Date.now() - recentZintoMessage.timestamp;
+        if (messageAge < ZINTO_MESSAGE_TRACKING_DURATION) {
           return;
         } else {
 
-          recentBotHiveMessages.delete(trackingKey);
+          recentZintoMessages.delete(trackingKey);
         }
       }
     }
@@ -5842,21 +5842,21 @@ export async function sendWhatsAppMessage(
 
       if (whatsappMessageId) {
         const trackingKey = `${phoneNumber}:${whatsappMessageId}`;
-        const trackingEntry: BotHiveMessageTracking = {
+        const trackingEntry: ZintoMessageTracking = {
           timestamp: Date.now(),
           messageId: whatsappMessageId,
           content: message.substring(0, 100), // Store first 100 chars for debugging
-          source: 'bothive' as const
+          source: 'zinto' as const
         };
 
-        recentBotHiveMessages.set(trackingKey, trackingEntry);
+        recentZintoMessages.set(trackingKey, trackingEntry);
 
 
         setTimeout(() => {
-          if (recentBotHiveMessages.has(trackingKey)) {
-            recentBotHiveMessages.delete(trackingKey);
+          if (recentZintoMessages.has(trackingKey)) {
+            recentZintoMessages.delete(trackingKey);
           }
-        }, BOTHIVE_MESSAGE_TRACKING_DURATION);
+        }, ZINTO_MESSAGE_TRACKING_DURATION);
       }
 
     } catch (error: any) {

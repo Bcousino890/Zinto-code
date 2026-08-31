@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 function getApplicationRoot(): string {
-  const fromEnv = process.env.BOTHIVE_APP_ROOT || process.env.APP_ROOT;
+  const fromEnv = process.env.ZINTO_APP_ROOT || process.env.APP_ROOT;
   if (fromEnv != null && String(fromEnv).trim() !== '') {
     return path.resolve(String(fromEnv));
   }
@@ -11,7 +11,7 @@ function getApplicationRoot(): string {
 }
 
 function resolveTranslationsDirectory(appRoot: string): string {
-  const explicit = process.env.BOTHIVE_TRANSLATIONS_DIR;
+  const explicit = process.env.ZINTO_TRANSLATIONS_DIR;
   if (explicit != null && String(explicit).trim() !== '') {
     return path.resolve(String(explicit));
   }

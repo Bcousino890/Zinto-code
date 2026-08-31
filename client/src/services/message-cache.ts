@@ -174,7 +174,7 @@ class MessageCacheService {
 
   private async _initDatabase(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('BotHivePlusCache', this.config.version);
+      const request = indexedDB.open('ZintoCache', this.config.version);
 
       request.onerror = () => {
         console.error('Failed to open IndexedDB:', request.error);

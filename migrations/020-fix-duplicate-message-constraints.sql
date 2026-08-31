@@ -24,7 +24,7 @@ DROP INDEX IF EXISTS idx_messages_conversation_external_id;
 -- 🔧 RESULT: NO DATABASE-LEVEL DUPLICATE PREVENTION
 -- All duplicate detection is now handled purely in application logic
 -- Users can send identical messages multiple times and all will be preserved
--- BotHive echo prevention is handled by in-memory tracking only
+-- Zinto echo prevention is handled by in-memory tracking only
 
 -- 🔧 VERIFICATION QUERY
 -- Run this to verify ALL duplicate constraints have been removed:

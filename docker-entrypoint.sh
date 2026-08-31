@@ -57,8 +57,8 @@ if [ -d "$MIGRATIONS_DIR" ]; then
 
             if ! is_migration_applied "$migration_name"; then
                 echo "Applying migration: $migration_name"
-                echo "Using database: ${PGDATABASE:-bothive}"
-                if psql -h "${PGHOST:-postgres}" -p "${PGPORT:-5432}" -U "${PGUSER:-postgres}" -d "${PGDATABASE:-bothive}" -f "$migration_file"; then
+                echo "Using database: ${PGDATABASE:-zinto}"
+                if psql -h "${PGHOST:-postgres}" -p "${PGPORT:-5432}" -U "${PGUSER:-postgres}" -d "${PGDATABASE:-zinto}" -f "$migration_file"; then
                     mark_migration_applied "$migration_name"
                     echo "Migration applied successfully: $migration_name"
                 else
@@ -67,7 +67,7 @@ if [ -d "$MIGRATIONS_DIR" ]; then
                     echo "  Host: ${PGHOST:-postgres}"
                     echo "  Port: ${PGPORT:-5432}"
                     echo "  User: ${PGUSER:-postgres}"
-                    echo "  Database: ${PGDATABASE:-bothive}"
+                    echo "  Database: ${PGDATABASE:-zinto}"
                     exit 1
                 fi
             else

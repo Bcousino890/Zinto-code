@@ -33,7 +33,7 @@ END$$;
 DO $$
 DECLARE
     affected_count INTEGER;
-    default_grace_days INTEGER := 15; -- BotHive's 15-day grace period
+    default_grace_days INTEGER := 15; -- Zinto's 15-day grace period
 BEGIN
     -- Add grace period end date for companies with expired subscriptions but no grace period set
     UPDATE companies 

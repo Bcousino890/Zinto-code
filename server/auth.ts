@@ -380,7 +380,7 @@ export async function setupAuth(app: Express) {
 
   const isProduction = process.env.NODE_ENV === 'production';
   const forceInsecure = process.env.FORCE_INSECURE_COOKIE === 'true';
-  const sessionSecret = process.env.SESSION_SECRET || 'bothive-secret';
+  const sessionSecret = process.env.SESSION_SECRET || 'GLWXaWqMebAK7TQZbohgvvR4Aiwgr5vNMFUqyt2Y';
   const sessionCookieSettings = buildSessionCookieSettings({ isProduction, forceInsecure });
 
 

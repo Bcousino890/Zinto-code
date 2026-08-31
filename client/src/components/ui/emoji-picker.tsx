@@ -18,7 +18,7 @@ interface RecentEmoji {
   count: number;
 }
 
-const RECENT_EMOJIS_KEY = 'bothive_recent_emojis';
+const RECENT_EMOJIS_KEY = 'zinto_recent_emojis';
 const MAX_RECENT_EMOJIS = 24;
 
 export default function EmojiPickerComponent({

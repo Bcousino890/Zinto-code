@@ -3,11 +3,11 @@ services:
   # PostgreSQL Database
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: bothive-postgres
+    container_name: zinto-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: bothive
+      POSTGRES_DB: zinto
     ports:
       - "5433:5432"
     volumes:
@@ -18,21 +18,21 @@ services:
       timeout: 5s
       retries: 5
 
-  # BotHive Application (Backend + Frontend)
+  # Zinto Application (Backend + Frontend)
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: bothive-app
+    container_name: zinto-app
     depends_on:
       postgres:
         condition: service_healthy
     environment:
       - NODE_ENV=production
       - PORT=9000
-      - DATABASE_URL=postgresql://postgres:root@postgres:5432/bothive
+      - DATABASE_URL=postgresql://postgres:root@postgres:5432/zinto
       - PGSSLMODE=disable
-      - SESSION_SECRET=bothive-docker-secret
+      - SESSION_SECRET=25a414470a38ec1d37af1bd408efdc57994fc548deba5d6ef03019a3da7f6d17
       - FORCE_INSECURE_COOKIE=true
       - ADMIN_EMAIL=admin@example.com
       - ADMIN_PASSWORD=12345678
@@ -46,10 +46,10 @@ services:
       - ./data:/app/data
       - ./migrations:/app/migrations
       # Auto-update volumes
-      - bothive_updates:/app/volumes/updates
-      - bothive_backups:/app/volumes/backups
-      - bothive_app_updates:/app/volumes/app-updates
-      - bothive_restart_signals:/app/volumes
+      - zinto_updates:/app/volumes/updates
+      - zinto_backups:/app/volumes/backups
+      - zinto_app_updates:/app/volumes/app-updates
+      - zinto_restart_signals:/app/volumes
     dns:
       - 8.8.8.8
       - 1.1.1.1
@@ -65,7 +65,7 @@ services:
 volumes:
   postgres_data:
   # Auto-update persistent volumes
-  bothive_updates:
-  bothive_backups:
-  bothive_app_updates:
-  bothive_restart_signals:
+  zinto_updates:
+  zinto_backups:
+  zinto_app_updates:
+  zinto_restart_signals:

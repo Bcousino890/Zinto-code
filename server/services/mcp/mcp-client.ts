@@ -928,7 +928,7 @@ export async function createAiSdkMcpRuntimeForServer(
 
     const nextClient = await createMCPClient({
       transport,
-      clientName: "bothive-mcp-client",
+      clientName: "zinto-mcp-client",
       version: "1.0.0",
     });
     client = nextClient;
@@ -991,7 +991,7 @@ async function withClient<T>(
       effectiveSessionId = transportContext.effectiveSessionId;
 
       client = new Client(
-        { name: "bothive-mcp-client", version: "1.0.0" },
+        { name: "zinto-mcp-client", version: "1.0.0" },
         { capabilities: {} },
       );
 

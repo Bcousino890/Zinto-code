@@ -13,4 +13,4 @@ SET subdomain = slug
 WHERE subdomain IS NULL AND slug IS NOT NULL;
 
 -- Add comment for documentation
-COMMENT ON COLUMN companies.subdomain IS 'Unique subdomain for company-specific page access (e.g., company.bothive.net)';
+COMMENT ON COLUMN companies.subdomain IS 'Unique subdomain for company-specific page access (e.g., company.zinto.app)';

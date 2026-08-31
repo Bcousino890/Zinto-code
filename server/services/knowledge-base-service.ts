@@ -672,7 +672,7 @@ export class KnowledgeBaseService {
         apiKey,
         baseURL: 'https://openrouter.ai/api/v1',
         headers: {
-          'HTTP-Referer': 'https://bothive.pro',
+          'HTTP-Referer': 'https://zinto.app',
           'X-Title': 'Zinto'
         }
       });

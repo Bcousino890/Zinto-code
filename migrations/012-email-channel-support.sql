@@ -1,5 +1,5 @@
 -- Migration: Add Email Channel Support
--- Description: Add tables and fields to support email channels in BotHivePlus
+-- Description: Add tables and fields to support email channels in Zinto
 -- Date: 2025-01-06
 
 -- Add email-specific fields to messages table

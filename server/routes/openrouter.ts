@@ -15,7 +15,7 @@ router.get('/models', async (req, res) => {
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://bothive.pro',
+      'HTTP-Referer': 'https://zinto.app',
       'X-Title': 'Zinto'
     };
 

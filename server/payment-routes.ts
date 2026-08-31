@@ -661,7 +661,7 @@ export function registerPaymentRoutes(app: Express) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          email: req.user.email || req.user.companyEmail || 'no-email@bothiveplus.local',
+          email: req.user.email || req.user.companyEmail || 'no-email@zinto.app',
           amount: Math.round(paystackAmount * 100),
           currency: paystackCurrency,
           reference,

@@ -197,7 +197,7 @@ export class BackupService {
 
 
     const extension = dumpFormat === 'custom' ? 'backup' : 'sql';
-    const filename = `bothive-backup-v${appVersion}-pg${pgVersion}-${instanceId}-${timestamp}.${extension}`;
+    const filename = `zinto-backup-v${appVersion}-pg${pgVersion}-${instanceId}-${timestamp}.${extension}`;
     const filePath = path.join(this.backupDir, filename);
 
     const backup: BackupRecord = {
@@ -1746,7 +1746,7 @@ export class BackupService {
     };
 
 
-    const tempDbName = `bothive_verify_${crypto.randomUUID().replace(/-/g, '_')}`;
+    const tempDbName = `zinto_verify_${crypto.randomUUID().replace(/-/g, '_')}`;
 
     let tempDbCreated = false;
     const { Client } = await import('pg');

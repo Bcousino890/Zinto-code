@@ -1,4 +1,4 @@
--- BotHive Pro Database Initialization
+-- Zinto Database Initialization
 -- This script sets up the initial database configuration for each instance
 
 -- Ensure UTF-8 encoding
@@ -12,7 +12,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- Set timezone
 SET timezone = 'UTC';
 
--- Optimize PostgreSQL settings for BotHive Pro
+-- Optimize PostgreSQL settings for Zinto
 ALTER SYSTEM SET max_connections = 200;  -- Adjusted for 2GB RAM
 ALTER SYSTEM SET shared_buffers = '512MB';  -- Increased for better cache usage
 ALTER SYSTEM SET effective_cache_size = '1GB';  -- Proportional to available memory
@@ -22,4 +22,4 @@ ALTER SYSTEM SET wal_buffers = '16MB';  -- No change unless needed
 ALTER SYSTEM SET default_statistics_target = 200;  -- Keep default unless performance issues arise
 
 -- Log initialization
-SELECT 'BotHive Pro database initialized successfully' as status;
+SELECT 'Zinto database initialized successfully' as status;

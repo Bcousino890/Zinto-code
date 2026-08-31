@@ -30,7 +30,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # BotHive Application (Backend + Frontend)
+  # Zinto Application (Backend + Frontend)
   app:
     build:
       context: ../..

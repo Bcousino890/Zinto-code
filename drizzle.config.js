@@ -9,7 +9,7 @@ export default defineConfig({
   out: './drizzle',
   driver: 'pg',
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/bothive',
+    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/zinto',
   },
   verbose: true,
   strict: true,

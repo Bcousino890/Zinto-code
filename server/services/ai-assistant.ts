@@ -3132,7 +3132,7 @@ async function getOpenRouterImageCapabilityIds(): Promise<Set<string>> {
   try {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://bothive.pro',
+      'HTTP-Referer': 'https://zinto.app',
       'X-Title': 'Zinto'
     };
     const openRouterApiKey = process.env.OPENROUTER_API_KEY;
@@ -4350,7 +4350,7 @@ class OpenRouterProvider implements AIProviderInterface {
       apiKey,
       baseURL: 'https://openrouter.ai/api/v1',
       headers: {
-        'HTTP-Referer': 'https://bothive.pro',
+        'HTTP-Referer': 'https://zinto.app',
         'X-Title': 'Zinto'
       }
     });

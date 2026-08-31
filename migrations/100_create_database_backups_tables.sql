@@ -87,9 +87,9 @@ COMMENT ON COLUMN database_backups.database_size IS 'Total database size in byte
 COMMENT ON COLUMN database_backups.table_count IS 'Number of tables in the database';
 COMMENT ON COLUMN database_backups.row_count IS 'Total number of rows across all tables';
 COMMENT ON COLUMN database_backups.compression_ratio IS 'Compression ratio achieved (if applicable)';
-COMMENT ON COLUMN database_backups.app_version IS 'BotHive application version at time of backup';
+COMMENT ON COLUMN database_backups.app_version IS 'Zinto application version at time of backup';
 COMMENT ON COLUMN database_backups.pg_version IS 'PostgreSQL version at time of backup';
-COMMENT ON COLUMN database_backups.instance_id IS 'Unique identifier for the BotHive instance';
+COMMENT ON COLUMN database_backups.instance_id IS 'Unique identifier for the Zinto instance';
 COMMENT ON COLUMN database_backups.dump_format IS 'Format of the backup file: sql (plain text) or custom (pg_dump custom format)';
 COMMENT ON COLUMN database_backups.schema_checksum IS 'Checksum of database schema for compatibility validation';
 

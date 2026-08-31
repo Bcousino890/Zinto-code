@@ -30,10 +30,17 @@ Stack: Node/Express server (`server/`), React client (`client/src/`), Drizzle/Po
 (`shared/schema.ts`, `migrations/`), Vite build, `npm run check` for a full-repo `tsc`
 typecheck (no separate `client`/`server` tsconfigs — one root check).
 
-Local dep note: `packages/pointer-odontogram-module` (npm scope `@bothive/...`) is a
-real, still-used dental odontogram UI package — must be built once via
+Local dep note: `packages/pointer-odontogram-module` (npm scope `@zinto/...`, renamed
+from `@bothive/...` — it's a local `file:` dependency, not a published registry
+package, so the rename was a same-repo, low-risk `npm install`) is a real,
+still-used dental odontogram UI package — must be built once via
 `npm run build:odontogram` before `tsc`/`vite` can resolve it in a fresh clone
 (no prebuilt `dist/` is committed).
+
+**Deployment**: user is provisioning a new dedicated VPS (netcup VPS-1000 G12 IV) for
+this specific Zinto deployment — no existing production server's env/DB names need to
+be preserved for compatibility, which is why the round-3 infra rename below (docker,
+env var names, DB name) was safe to do outright rather than just flagged.
 
 ## Branding system (important — read before touching "logo" or "app name" requests)
 
@@ -124,28 +131,82 @@ beyond pure cosmetics):
   data like `'Jane Doe' / '+15551234567'` — fake customer data, not a contact
   channel.)
 
+**Fixed in round 3** (new dedicated VPS being provisioned — no existing live
+deployment's env/DB names to preserve, so the infra layer was renamed too):
+- `docker-compose.yml`: container names → `zinto-postgres`/`zinto-app`, DB name
+  `bothive`→`zinto`, named volumes `bothive_*`→`zinto_*`, and the hardcoded
+  `SESSION_SECRET=bothive-docker-secret` rotated to a random value (was a
+  guessable, publicly-known-in-source session-signing secret).
+- `Dockerfile` / `Dockerfile.deploy` / `Dockerfile.simple`: `PGDATABASE` default,
+  `ADMIN_EMAIL`/`COMPANY_NAME` build-arg defaults → Zinto values. (`Dockerfile`
+  still has a `sed`-based find/replace step that swaps `BotHive`/
+  `admin@bothiveapp.net` for the `COMPANY_NAME`/`ADMIN_EMAIL` build args across
+  the built `dist` — that's the platform's *original* white-label mechanism for
+  branding each customer's build; harmless to leave, now mostly a no-op since
+  source no longer contains those literals.)
+- `drizzle.config.js`, `init-db.sql`, `migrate.sh`, `docker-entrypoint.sh`,
+  `start.js`, `.env`/`.env.development`/`server/.env` — default/local DB name
+  and startup-banner text → `zinto`/`Zinto`.
+- `server/utils/server-i18n.ts`, `server/services/erp-invoice-pdf-fonts.ts`:
+  optional env var overrides `BOTHIVE_APP_ROOT`/`BOTHIVE_TRANSLATIONS_DIR`/
+  `BOTHIVE_PDF_FONTS_DIR` → `ZINTO_*` (clean rename, no back-compat shim — these
+  are obscure advanced overrides unlikely to be set anywhere yet).
+- npm package scope `@bothive/pointer-odontogram-module` → `@zinto/...` (root
+  `package.json`, the subpackage's own `package.json` name, the import in
+  `client/src/pages/erp/dental/chart.tsx`), then `npm install` to regenerate the
+  root lockfile cleanly.
+- Misc internal-only identifiers with zero external visibility: browser
+  localStorage/IndexedDB key names (`embed-context.ts`, `message-cache.ts`,
+  `ActiveChannelContext.tsx`, `emoji-picker.tsx`), the odontogram module's UMD
+  global name, WhatsApp echo-dedup in-memory map/type names in
+  `channels/whatsapp.ts`, MCP client name, OpenRouter `HTTP-Referer` header
+  (→ `https://zinto.app`), backup filename prefix + temp verify-DB name in
+  `backup-service.ts`, a Paystack no-email fallback, and comments in a handful
+  of migration files.
+- `server/auth.ts` — the `SESSION_SECRET` fallback (used only if the env var
+  isn't set) was also a guessable hardcoded string; rotated to a random value.
+
 **Still found, deliberately NOT touched — ask before changing:**
-1. **`server/services/license-validator.ts:12`** —
+1. **`server/services/license-validator.ts:12`** and **`scripts/build-licensed.js`**
+   (same key duplicated in both) —
    `ENCRYPTION_KEY = 'bothive-license-key-2024-secur'` is a real AES-256-CBC key
    used to encrypt/decrypt license data (not just display text). Rotating it
    would make any existing encrypted license data unreadable unless it's
    re-encrypted with the new key at the same time. Also unclear whether, now that
    the user owns the code outright, they even want to keep a license-gating
    mechanism at all versus removing it — that's a product decision, not a rename.
-2. **The "BotHive" infra footprint (~90 files)**: env var *names*, `.env*` files,
-   `docker-compose*.yml`, `Dockerfile*`, deploy/migration shell scripts under
-   `scripts/`, the npm package scope `@bothive/pointer-odontogram-module`.
-   Renaming env var names in code without simultaneously updating the actual
-   values set on the live server would break the app on next restart — this
-   environment has no access to that live server config to do both sides at
-   once. Only pursue with an explicit migration plan (rename in code + deploy
-   config together), not a find-and-replace.
-3. **Committed `.env` / `.env.development` / `server/.env`** are tracked in git
-   (not gitignored). They currently hold what look like local/dev values
-   (`DATABASE_URL` points at `localhost`), not obviously live production secrets,
-   but committing secret-shaped keys (`ENCRYPTION_KEY`, `SESSION_SECRET`) at all is
-   bad practice — worth reviewing/rotating and gitignoring regardless of the
-   rebrand work.
+   **User said: revisit this in ~1 week (asked 2026-08-31); a reminder is scheduled.**
+2. **Persistent data markers already written to external state — renaming these
+   breaks recognition of anything created before the rename, not just branding:**
+   - `server/services/calendar-contact-privacy.ts` — `BOTHIVE_CONTACT_ID_PROP`
+     (`'bothiveContactId'`) / `BOTHIVE_CONTACT_PHONE_PROP` and the
+     `bothive_contact_id:`/`bothive_contact_phone:` description-text markers are
+     written onto real Google Calendar events (as both extended properties and
+     literal text in the event description) to gate which CRM contact can see a
+     booking. Renaming the key means the code stops recognizing the marker on
+     every calendar event created before the change.
+   - `server/services/google-calendar.ts` — `bothiveIdempotencyKey` extended
+     property, used to detect "did we already create this event" on retry. Same
+     risk: rename it and older events' idempotency markers become invisible to
+     the new code, risking duplicate-booking creation on retry.
+   - `server/routes.ts` (`/api/google/calendar/webhook`) — reads
+     `x-bothive-user-id` / `x-bothive-company-id` request headers (with a
+     `?userId`/`?companyId` query-param fallback). Unclear who/what actually
+     sends these headers today; treat as a possible external contract and don't
+     rename blind.
+   All three would need a migration (accept both old and new key names for some
+   period, or a data backfill) rather than a straight rename.
+3. **The multi-instance reseller tooling**: `install.sh`, `deploy-instance.sh`,
+   `manage-instance.sh`, `customize-instance.sh`, `customize-migration.sh`,
+   `quick-setup.sh`, `validate-setup.sh`, `monitor-resources.sh`,
+   `docker-restart-monitor.sh`, `start-with-monitor.sh`,
+   `test-docker-autoupdate.sh`, `backup-all.sh`, `manage-migrations.sh`,
+   `docker-compose.template.yml`. These implement the *original vendor's* model
+   of hosting many differently-branded instances on shared infrastructure
+   (per-instance container/volume/network names, a shared Docker network, etc.)
+   — almost certainly not what a single dedicated VPS deployment needs. Left
+   untouched pending confirmation of whether Zinto uses this multi-instance
+   workflow at all; if not, it's a candidate for deletion rather than rebranding.
 
 **Confirmed zero hits in this repo**: "PowerChat", "Ninnat", "Megacom" — not found
 anywhere in code/translations/config. If the user still sees these names, they're

@@ -25,12 +25,12 @@ RUN curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor
 ENV PGUSER=postgres
 ENV PGPASSWORD=root
 ENV PGHOST=postgres
-ENV PGDATABASE=bothive
+ENV PGDATABASE=zinto
 ENV APP_PORT=9000
 
 # Build arguments
-ARG ADMIN_EMAIL="admin@bothiveapp.net"
-ARG COMPANY_NAME="BotHive"
+ARG ADMIN_EMAIL="admin@zinto.app"
+ARG COMPANY_NAME="Zinto"
 ARG INSTANCE_NAME="default"
 
 # Copy package files

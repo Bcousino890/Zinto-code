@@ -20,13 +20,13 @@ export const BUNDLED_NOTO_FIXED_FILES = [
 
 /**
  * Resolves the directory containing bundled Noto TTFs for invoice PDFs.
- * Tries, in order: `BOTHIVE_PDF_FONTS_DIR`, layouts for bundled `dist/index.js`,
+ * Tries, in order: `ZINTO_PDF_FONTS_DIR`, layouts for bundled `dist/index.js`,
  * development `server/services`, and a repo checkout next to `dist`.
  *
  * @param serviceFileDirname — `__dirname` of this module, or a simulated value (e.g. `.../dist`) in tests.
  */
 export function resolveBundledNotoDirectory(serviceFileDirname: string): string | null {
-  const envDir = process.env.BOTHIVE_PDF_FONTS_DIR?.trim();
+  const envDir = process.env.ZINTO_PDF_FONTS_DIR?.trim();
   const candidates: string[] = [];
   if (envDir) candidates.push(envDir);
   candidates.push(
@@ -91,7 +91,7 @@ async function ensureCjkFontOnDisk(which: 'jp' | 'sc' | 'kr', notoDir: string | 
   if (existing) return existing;
 
   const promise = (async (): Promise<string | null> => {
-    const cacheDir = path.join(os.tmpdir(), 'bothive-noto-cjk');
+    const cacheDir = path.join(os.tmpdir(), 'zinto-noto-cjk');
     const dest = path.join(cacheDir, fileName);
     try {
       if (await fs.pathExists(dest)) return dest;

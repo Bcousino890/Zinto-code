@@ -1,4 +1,4 @@
-# BotHive Pro - Production Docker Image (Node.js 20.19.1)
+# Zinto - Production Docker Image (Node.js 20.19.1)
 
 FROM node:20.19.1-slim
 
@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
 ENV PGUSER=postgres
 ENV PGPASSWORD=root
 ENV PGHOST=postgres
-ENV PGDATABASE=bothive
+ENV PGDATABASE=zinto
 ENV APP_PORT=9000
 
 # Copy package files

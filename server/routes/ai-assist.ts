@@ -178,7 +178,7 @@ function createAssistOpenAIClient(provider: 'openai' | 'openrouter', apiKey: str
       apiKey,
       baseURL: 'https://openrouter.ai/api/v1',
       defaultHeaders: {
-        'HTTP-Referer': 'https://bothive.pro',
+        'HTTP-Referer': 'https://zinto.app',
         'X-Title': 'Zinto',
       },
     });

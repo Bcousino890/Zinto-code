@@ -33,8 +33,8 @@ import {
   importOdontogramPayload,
   onStateChange,
   type NumberingSystem,
-} from '@bothive/pointer-odontogram-module';
-import '@bothive/pointer-odontogram-module/style.css';
+} from '@zinto/pointer-odontogram-module';
+import '@zinto/pointer-odontogram-module/style.css';
 
 type OdontogramLanguage = 'hu' | 'en' | 'de' | 'es' | 'it' | 'sk' | 'pl' | 'ru' | 'pt-br';
 
@@ -50,7 +50,7 @@ const ODONTOGRAM_LANGUAGES = new Set<OdontogramLanguage>([
   'pt-br',
 ]);
 
-/** Map Bothive locale codes (e.g. es-ES, pt_BR) onto odontogram language keys. */
+/** Map Zinto locale codes (e.g. es-ES, pt_BR) onto odontogram language keys. */
 function toOdontogramLanguage(code: string | null | undefined): OdontogramLanguage {
   if (!code) return 'en';
   const normalized = code.trim().toLowerCase().replace(/_/g, '-');

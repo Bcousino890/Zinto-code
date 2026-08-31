@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
@@ -345,10 +346,7 @@ export default function EmailViewer({
           <div
             className="prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{
-              __html: email.htmlContent.replace(
-                /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, 
-                ''
-              )
+              __html: DOMPurify.sanitize(email.htmlContent),
             }}
           />
         ) : (

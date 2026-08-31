@@ -11,3 +11,7 @@ media
 data/wa-version.json
 .cursor/*.log
 .cursor/settings.json
+.env
+.env.*
+server/.env
+cookies.txt

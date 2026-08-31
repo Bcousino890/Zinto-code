@@ -1,15 +1,23 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createDecipheriv, createHash } from 'crypto';
+import { createDecipheriv, createHash, createHmac } from 'crypto';
 import os from 'os';
 import { logger } from '../utils/logger';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-const ENCRYPTION_KEY = 'bothive-license-key-2024-secur';
+// Legacy hardcoded value, kept only so licenses generated before this fix
+// keep validating. Anyone with a copy of this source (including any
+// licensed customer) can read this constant, so it must never be the only
+// thing protecting license validity — see verifySignature below, which
+// requires LICENSE_SIGNING_SECRET (kept out of source control) to sign a
+// new license, unlike the plain unsalted sha256 this used to use.
+const LEGACY_ENCRYPTION_KEY = 'bothive-license-key-2024-secur';
+const ENCRYPTION_KEY = process.env.LICENSE_ENCRYPTION_KEY || LEGACY_ENCRYPTION_KEY;
+const LEGACY_SIGNING_SECRET = 'bothive-license-key-2024-secur';
+const SIGNING_SECRET = process.env.LICENSE_SIGNING_SECRET || LEGACY_SIGNING_SECRET;
 const ALGORITHM = 'aes-256-cbc';
 
 interface LicenseData {
@@ -131,10 +139,26 @@ class LicenseValidator {
   private verifySignature(licenseData: LicenseData): boolean {
     try {
       const { signature, ...dataWithoutSignature } = licenseData;
-      const expectedSignature = createHash('sha256')
-        .update(JSON.stringify(dataWithoutSignature))
+      const payload = JSON.stringify(dataWithoutSignature);
+
+      // Accept the current HMAC-signed format...
+      const expectedHmac = createHmac('sha256', SIGNING_SECRET)
+        .update(payload)
         .digest('hex');
-      return signature === expectedSignature;
+      if (signature === expectedHmac) {
+        return true;
+      }
+
+      // Only fall back to the legacy unsalted-sha256 signature (anyone can
+      // forge this — it has no real secret) while LICENSE_SIGNING_SECRET
+      // hasn't been configured yet, so already-issued licenses keep working
+      // during migration. Once the secret is set, this branch is disabled.
+      if (!process.env.LICENSE_SIGNING_SECRET) {
+        const legacyExpected = createHash('sha256').update(payload).digest('hex');
+        return signature === legacyExpected;
+      }
+
+      return false;
     } catch (error) {
       logger.error('license', 'Failed to verify license signature:', error);
       return false;

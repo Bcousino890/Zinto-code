@@ -16,6 +16,7 @@ import { initPipelineStages } from "./init-pipeline-stages";
 import { validatePhoneNumber } from "./utils/phone-validation";
 import { buildSessionCookieSettings } from "./utils/session-cookie";
 import { runRelay } from "./services/relay";
+import { loginRateLimiter, passwordResetRateLimiter } from "./middleware/auth-rate-limit";
 
 declare global {
   namespace Express {
@@ -686,7 +687,7 @@ export async function setupAuth(app: Express) {
   });
 
 
-  app.post("/api/login", requireSubdomainAuth, (req, res, next) => {
+  app.post("/api/login", loginRateLimiter, requireSubdomainAuth, (req, res, next) => {
     passport.authenticate("local", (err: any, user: any, _info: any) => {
       if (err) {
         return next(err);
@@ -853,8 +854,11 @@ export async function setupAuth(app: Express) {
   });
 
 
-  app.post("/api/admin/return-from-impersonation", ensureAuthenticated, async (req, res, next) => {
+  app.post("/api/admin/return-from-impersonation", async (req, res, next) => {
     try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
 
       const impersonationData = (req.session as any).impersonation;
       const originalSuperAdminId = (req.session as any).originalSuperAdminId;
@@ -1533,7 +1537,7 @@ export async function setupAuth(app: Express) {
   const { PasswordResetService } = await import('./services/password-reset');
 
 
-  app.post("/api/auth/forgot-password", async (req, res) => {
+  app.post("/api/auth/forgot-password", passwordResetRateLimiter, async (req, res) => {
     try {
       const { email } = req.body;
 
@@ -1594,7 +1598,7 @@ export async function setupAuth(app: Express) {
   });
 
 
-  app.post("/api/auth/reset-password", async (req, res) => {
+  app.post("/api/auth/reset-password", passwordResetRateLimiter, async (req, res) => {
     try {
       const { token, newPassword, confirmPassword } = req.body;
 
@@ -1639,7 +1643,7 @@ export async function setupAuth(app: Express) {
 
 
 
-  app.post("/api/admin/auth/forgot-password", async (req, res) => {
+  app.post("/api/admin/auth/forgot-password", passwordResetRateLimiter, async (req, res) => {
     try {
       const { email } = req.body;
 
@@ -1701,7 +1705,7 @@ export async function setupAuth(app: Express) {
   });
 
 
-  app.post("/api/admin/auth/reset-password", async (req, res) => {
+  app.post("/api/admin/auth/reset-password", passwordResetRateLimiter, async (req, res) => {
     try {
       const { token, newPassword, confirmPassword } = req.body;
 

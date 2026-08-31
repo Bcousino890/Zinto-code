@@ -280,7 +280,12 @@ export class PasswordResetService {
     }
 
 
-    let baseUrl = requestBaseUrl || process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL;
+    // Trust the configured public URL first. `requestBaseUrl` is derived
+    // from request headers (Host / X-Forwarded-Host), which a caller can
+    // set arbitrarily — using it as the primary source let an attacker
+    // point password-reset links at a host they control. It's only a
+    // last-resort fallback for deployments that haven't set an env var.
+    let baseUrl = process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL || requestBaseUrl;
 
     if (!baseUrl) {
       const basePort = process.env.PORT || '9000';

@@ -158,6 +158,7 @@ import {
   normalizeAdminCustomPermissionsSnapshot,
 } from "./middleware";
 import { planLimitsService } from "./services/plan-limits-service";
+import { assertPublicHttpUrl } from "./utils/ssrf-guard";
 import {
   flowDefinitionWithMcpSecretsRedactedForViewer,
   normalizeFlowNodesAgentControl,
@@ -1484,18 +1485,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/debug/settings', async (req: Request, res: Response) => {
-    try {
-      const generalSettings = await storage.getAppSetting('general_settings');
-      res.json({
-        generalSettings,
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Error fetching debug settings:', error);
-      res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to fetch debug settings' });
-    }
-  });
+  // Removed: unauthenticated debug endpoint that exposed internal app
+  // settings to anyone. No frontend caller found; not needed in production.
 
 
 
@@ -23075,7 +23066,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
     }
   });
 
-  app.post('/api/n8n/list-workflows', async (req, res) => {
+  app.post('/api/n8n/list-workflows', ensureAuthenticated, async (req, res) => {
     try {
       const { instanceUrl, apiKey } = req.body;
 
@@ -23086,18 +23077,19 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         });
       }
 
+      let validatedInstanceUrl: URL;
       try {
-        new URL(instanceUrl);
-      } catch {
+        validatedInstanceUrl = await assertPublicHttpUrl(instanceUrl);
+      } catch (ssrfError: any) {
         return res.status(400).json({
           success: false,
-          error: 'Invalid URL format'
+          error: ssrfError.message || 'Invalid or disallowed URL'
         });
       }
 
 
 
-      const listUrl = `${instanceUrl}/api/v1/workflows`;
+      const listUrl = `${validatedInstanceUrl.toString().replace(/\/$/, '')}/api/v1/workflows`;
 
       const response = await axios.get(listUrl, {
         headers: {
@@ -23308,7 +23300,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
     }
   });
 
-  app.post('/api/make/list-scenarios', async (req, res) => {
+  app.post('/api/make/list-scenarios', ensureAuthenticated, async (req, res) => {
     try {
       const { apiToken, teamId, organizationId, region = 'us1' } = req.body;
 

@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import DOMPurify from 'dompurify';
 import { useState, useEffect, useRef } from 'react';
 import { Download, Loader2, Trash2, Reply, MoreHorizontal, Mail, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -652,7 +653,7 @@ export default function MessageBubble({ message, contact, channelType, onReply, 
             <div
               className="email-html-content prose prose-sm max-w-none"
               dangerouslySetInnerHTML={{
-                __html: emailHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                __html: DOMPurify.sanitize(emailHtml)
               }}
             />
           ) : emailPlainText ? (

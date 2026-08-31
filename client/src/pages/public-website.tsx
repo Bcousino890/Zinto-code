@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { useRoute } from 'wouter';
 import { Loader2 } from 'lucide-react';
 import { usePublicFrontendPage } from '@/hooks/use-public-frontend-page';
@@ -294,7 +295,7 @@ const PublicWebsite: React.FC = () => {
             <h1 className="text-3xl font-bold text-foreground mb-8">{frontendPage.title}</h1>
             <div
               className="prose prose-lg max-w-none dark:prose-invert frontend-managed-page-content"
-              dangerouslySetInnerHTML={{ __html: frontendPage.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(frontendPage.content) }}
             />
           </article>
         </main>
@@ -329,7 +330,12 @@ const PublicWebsite: React.FC = () => {
   return (
     <div
       className="published-page-content fixed inset-0 w-full min-w-full min-h-full overflow-auto bg-background"
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{
+        __html: DOMPurify.sanitize(html, {
+          ADD_TAGS: ['iframe'],
+          ADD_ATTR: ['src', 'allow', 'allowfullscreen', 'frameborder', 'target'],
+        }),
+      }}
     />
   );
 };

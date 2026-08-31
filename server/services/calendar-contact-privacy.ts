@@ -10,11 +10,18 @@ export type CalendarRequesterIdentity = {
   phoneDigits?: string | null;
 };
 
-export const BOTHIVE_CONTACT_ID_PROP = 'bothiveContactId';
-export const BOTHIVE_CONTACT_PHONE_PROP = 'bothiveContactPhone';
+export const ZINTO_CONTACT_ID_PROP = 'zintoContactId';
+export const ZINTO_CONTACT_PHONE_PROP = 'zintoContactPhone';
 
-const CONTACT_ID_DESC_RE = /(?:^|\n)\s*bothive_contact_id\s*:\s*(\d+)\s*(?:\n|$)/i;
-const CONTACT_PHONE_DESC_RE = /(?:^|\n)\s*bothive_contact_phone\s*:\s*(\d+)\s*(?:\n|$)/i;
+// Pre-rebrand key names. Events created before this change carry these on
+// their private extended properties / description text — keep reading them
+// so ownership on existing calendar bookings doesn't silently break. New
+// events are only ever written with the zinto* names above.
+const LEGACY_CONTACT_ID_PROP = 'bothiveContactId';
+const LEGACY_CONTACT_PHONE_PROP = 'bothiveContactPhone';
+
+const CONTACT_ID_DESC_RE = /(?:^|\n)\s*(?:zinto|bothive)_contact_id\s*:\s*(\d+)\s*(?:\n|$)/i;
+const CONTACT_PHONE_DESC_RE = /(?:^|\n)\s*(?:zinto|bothive)_contact_phone\s*:\s*(\d+)\s*(?:\n|$)/i;
 
 export function normalizePhoneDigits(raw?: string | null): string | null {
   if (raw == null) return null;
@@ -54,10 +61,10 @@ export function buildContactOwnershipPrivateProps(
 ): Record<string, string> {
   const props: Record<string, string> = {};
   if (identity.contactId != null && Number(identity.contactId) > 0) {
-    props[BOTHIVE_CONTACT_ID_PROP] = String(identity.contactId);
+    props[ZINTO_CONTACT_ID_PROP] = String(identity.contactId);
   }
   if (identity.phoneDigits) {
-    props[BOTHIVE_CONTACT_PHONE_PROP] = identity.phoneDigits;
+    props[ZINTO_CONTACT_PHONE_PROP] = identity.phoneDigits;
   }
   return props;
 }
@@ -68,10 +75,10 @@ export function buildContactOwnershipDescriptionSuffix(
 ): string {
   const lines: string[] = [];
   if (identity.contactId != null && Number(identity.contactId) > 0) {
-    lines.push(`bothive_contact_id:${identity.contactId}`);
+    lines.push(`zinto_contact_id:${identity.contactId}`);
   }
   if (identity.phoneDigits) {
-    lines.push(`bothive_contact_phone:${identity.phoneDigits}`);
+    lines.push(`zinto_contact_phone:${identity.phoneDigits}`);
   }
   return lines.join('\n');
 }
@@ -85,7 +92,10 @@ export function appendOwnershipToDescription(
   const base = description == null ? '' : String(description).trimEnd();
   if (
     (identity.contactId != null && CONTACT_ID_DESC_RE.test(base)) ||
-    (identity.phoneDigits && base.includes(`bothive_contact_phone:${identity.phoneDigits}`))
+    (identity.phoneDigits && (
+      base.includes(`zinto_contact_phone:${identity.phoneDigits}`) ||
+      base.includes(`bothive_contact_phone:${identity.phoneDigits}`)
+    ))
   ) {
     return base;
   }
@@ -125,17 +135,19 @@ export function eventBelongsToContact(
   if (!event || !hasUsableRequesterIdentity(identity)) return false;
 
   const privateProps = readPrivateProps(event);
+  const eventContactId = privateProps[ZINTO_CONTACT_ID_PROP] ?? privateProps[LEGACY_CONTACT_ID_PROP];
+  const eventContactPhone = privateProps[ZINTO_CONTACT_PHONE_PROP] ?? privateProps[LEGACY_CONTACT_PHONE_PROP];
   if (
     identity.contactId != null &&
-    privateProps[BOTHIVE_CONTACT_ID_PROP] &&
-    String(privateProps[BOTHIVE_CONTACT_ID_PROP]) === String(identity.contactId)
+    eventContactId &&
+    String(eventContactId) === String(identity.contactId)
   ) {
     return true;
   }
   if (
     identity.phoneDigits &&
-    privateProps[BOTHIVE_CONTACT_PHONE_PROP] &&
-    String(privateProps[BOTHIVE_CONTACT_PHONE_PROP]) === identity.phoneDigits
+    eventContactPhone &&
+    String(eventContactPhone) === identity.phoneDigits
   ) {
     return true;
   }

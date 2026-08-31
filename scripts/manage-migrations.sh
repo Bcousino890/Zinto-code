@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# BotHivePlus Migration Management Script
+# Zinto Migration Management Script
 # This script manages database migrations for instances with execution tracking
 # Usage: ./scripts/manage-migrations.sh <instance_name> <command>
 

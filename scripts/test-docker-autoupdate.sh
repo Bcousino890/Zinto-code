@@ -168,12 +168,12 @@ test_directory_structure() {
 
 # Main test execution
 main() {
-    log "BotHivePlus Docker Auto-Update Test Suite"
+    log "Zinto Docker Auto-Update Test Suite"
     log "==========================================="
     
     # Check if Docker Compose is running
-    if ! docker-compose ps | grep -q "bothive-app.*Up"; then
-        log_error "BotHivePlus is not running. Please start it first:"
+    if ! docker-compose ps | grep -q "zinto-app.*Up"; then
+        log_error "Zinto is not running. Please start it first:"
         log "  docker-compose up -d"
         exit 1
     fi

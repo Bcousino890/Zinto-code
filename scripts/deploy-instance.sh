@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# BotHivePlus Multi-Instance Deployment Script
+# Zinto Multi-Instance Deployment Script
 # Usage: ./scripts/deploy-instance.sh <instance_name> [options]
 
 set -e
@@ -124,7 +124,7 @@ create_docker_compose() {
     export INSTANCE_NAME="$instance_name"
     export APP_PORT="$app_port"
     export DB_PORT="$db_port"
-    export DB_NAME="bothive_${instance_name}"
+    export DB_NAME="zinto_${instance_name}"
     export DB_USER="${DB_USER:-postgres}"
     export DB_PASSWORD="${DB_PASSWORD:-root}"
     export NODE_ENV="${NODE_ENV:-production}"
@@ -159,7 +159,7 @@ create_env_file() {
     sed -i "s/INSTANCE_NAME=.*/INSTANCE_NAME=$instance_name/" "$env_file"
     sed -i "s/APP_PORT=.*/APP_PORT=$app_port/" "$env_file"
     sed -i "s/DB_PORT=.*/DB_PORT=$db_port/" "$env_file"
-    sed -i "s/DB_NAME=.*/DB_NAME=bothive_${instance_name}/" "$env_file"
+    sed -i "s/DB_NAME=.*/DB_NAME=zinto_${instance_name}/" "$env_file"
     sed -i "s/SESSION_SECRET=.*/SESSION_SECRET=$session_secret/" "$env_file"
 
     if [ -n "$company_name" ]; then
@@ -189,7 +189,7 @@ deploy_instance() {
     local admin_email=$5
     local admin_password=$6
 
-    print_status "Deploying BotHivePlus instance: $instance_name"
+    print_status "Deploying Zinto instance: $instance_name"
 
     # Validate instance name
     validate_instance_name "$instance_name"

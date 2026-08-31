@@ -22,7 +22,7 @@ print_header() {
     cat << EOF
 ${PURPLE}
 ╔═══════════════════════════════════════════════════════════════╗
-║              BotHive Pro - Multi-Instance Deploy          ║
+║              Zinto - Multi-Instance Deploy          ║
 ║                                                               ║
 ║  Deploy multiple isolated instances using production build   ║
 ║  with automatic port detection and conflict resolution.      ║
@@ -437,7 +437,7 @@ verify_deployment_files() {
     if [ ${#missing_files[@]} -gt 0 ]; then
         print_error "Missing required files: ${missing_files[*]}"
         echo
-        echo "This script must be run from the BotHive Pro share directory"
+        echo "This script must be run from the Zinto share directory"
         echo "containing the pre-compiled production build."
         echo
         echo "Required files:"
@@ -468,7 +468,7 @@ verify_deployment_files() {
 }
 
 collect_instance_config() {
-    print_step "Configuring new BotHive Pro instance..."
+    print_step "Configuring new Zinto instance..."
     echo
 
     prompt_with_default "Instance name (3-30 chars, alphanumeric, hyphens, underscores)" "" INSTANCE_NAME validate_instance_name
@@ -519,7 +519,7 @@ collect_instance_config() {
 }
 
 confirm_deployment() {
-    echo -n "Deploy this BotHive Pro instance? (Y/n): "
+    echo -n "Deploy this Zinto instance? (Y/n): "
     read -r confirm
     if [[ $confirm =~ ^[Nn]$ ]]; then
         print_status "Deployment cancelled by user."
@@ -535,9 +535,9 @@ create_instance_files() {
 
     cat > "$instance_dir/.env" << EOF
 
-DATABASE_URL=postgresql://bothive:$DB_PASSWORD@postgres-$INSTANCE_NAME:5432/$DATABASE_NAME
+DATABASE_URL=postgresql://zinto:$DB_PASSWORD@postgres-$INSTANCE_NAME:5432/$DATABASE_NAME
 POSTGRES_DB=$DATABASE_NAME
-POSTGRES_USER=bothive
+POSTGRES_USER=zinto
 POSTGRES_PASSWORD=$DB_PASSWORD
 PGSSLMODE=disable
 
@@ -567,11 +567,11 @@ EOF
 services:
   postgres-$INSTANCE_NAME:
     image: pgvector/pgvector:pg16
-    container_name: bothive-postgres-$INSTANCE_NAME
+    container_name: zinto-postgres-$INSTANCE_NAME
     restart: unless-stopped
     environment:
       POSTGRES_DB: $DATABASE_NAME
-      POSTGRES_USER: bothive
+      POSTGRES_USER: zinto
       POSTGRES_PASSWORD: $DB_PASSWORD
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
     volumes:
@@ -579,7 +579,7 @@ services:
     ports:
       - "$DB_PORT:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bothive -d $DATABASE_NAME"]
+      test: ["CMD-SHELL", "pg_isready -U zinto -d $DATABASE_NAME"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -588,7 +588,7 @@ services:
     build:
       context: ../../
       dockerfile: Dockerfile.simple
-    container_name: bothive-app-$INSTANCE_NAME
+    container_name: zinto-app-$INSTANCE_NAME
     restart: unless-stopped
     depends_on:
       postgres-$INSTANCE_NAME:
@@ -610,21 +610,21 @@ services:
 networks:
   default:
     external: true
-    name: bothive-shared-network
+    name: zinto-shared-network
 
 volumes:
   postgres_data_$INSTANCE_NAME:
     driver: local
-    name: bothive-postgres-data-$INSTANCE_NAME
+    name: zinto-postgres-data-$INSTANCE_NAME
   app_uploads_$INSTANCE_NAME:
     driver: local
-    name: bothive-app-uploads-$INSTANCE_NAME
+    name: zinto-app-uploads-$INSTANCE_NAME
   app_whatsapp_sessions_$INSTANCE_NAME:
     driver: local
-    name: bothive-app-whatsapp-sessions-$INSTANCE_NAME
+    name: zinto-app-whatsapp-sessions-$INSTANCE_NAME
   app_data_$INSTANCE_NAME:
     driver: local
-    name: bothive-app-data-$INSTANCE_NAME
+    name: zinto-app-data-$INSTANCE_NAME
 EOF
 
     cat > "$instance_dir/manage.sh" << 'EOF'
@@ -687,20 +687,20 @@ BACKUP_PATH="\$BACKUP_DIR/backup_\$TIMESTAMP"
 
 # Postgres details
 DB_NAME="$DATABASE_NAME"
-DB_USER="bothive"
+DB_USER="zinto"
 
 # Docker volumes to backup
 VOLUMES=(
-  "bothive-postgres-data-$INSTANCE_NAME"
-  "bothive-app-uploads-$INSTANCE_NAME"
-  "bothive-app-whatsapp-sessions-$INSTANCE_NAME"
-  "bothive-app-data-$INSTANCE_NAME"
+  "zinto-postgres-data-$INSTANCE_NAME"
+  "zinto-app-uploads-$INSTANCE_NAME"
+  "zinto-app-whatsapp-sessions-$INSTANCE_NAME"
+  "zinto-app-data-$INSTANCE_NAME"
 )
 
 # Docker containers to save images
 CONTAINERS=(
-  "bothive-postgres-$INSTANCE_NAME"
-  "bothive-app-$INSTANCE_NAME"
+  "zinto-postgres-$INSTANCE_NAME"
+  "zinto-app-$INSTANCE_NAME"
 )
 
 mkdir -p "\$BACKUP_DIR"
@@ -738,7 +738,7 @@ backup() {
   docker compose up -d "postgres-$INSTANCE_NAME"
 
   echo "⏳ Waiting for PostgreSQL to be ready..."
-  POSTGRES_CONTAINER="bothive-postgres-$INSTANCE_NAME"
+  POSTGRES_CONTAINER="zinto-postgres-$INSTANCE_NAME"
   until docker exec \$POSTGRES_CONTAINER pg_isready -U \$DB_USER -d \$DB_NAME >/dev/null 2>&1; do
     sleep 2
   done
@@ -828,7 +828,7 @@ restore() {
   docker compose up -d
 
   # Drop & recreate DB before restoring
-  POSTGRES_CONTAINER="bothive-postgres-$INSTANCE_NAME"
+  POSTGRES_CONTAINER="zinto-postgres-$INSTANCE_NAME"
   echo "⏳ Waiting for PostgreSQL to be fully ready..."
   until docker exec -i \$POSTGRES_CONTAINER pg_isready -U \$DB_USER -d \$DB_NAME >/dev/null 2>&1; do
       sleep 2
@@ -871,7 +871,7 @@ EOF
 
 # Function to create shared network
 create_shared_network() {
-    local network_name="bothive-shared-network"
+    local network_name="zinto-shared-network"
 
     # Helper function for docker network commands
     local docker_network_cmd="docker"
@@ -881,7 +881,7 @@ create_shared_network() {
     
     # Check if shared network exists
     if ! $docker_network_cmd network inspect "$network_name" >/dev/null 2>&1; then
-        print_status "Creating shared BotHive network..."
+        print_status "Creating shared Zinto network..."
         $docker_network_cmd network create "$network_name" --driver bridge --subnet=172.20.0.0/16 2>/dev/null || {
             print_warning "Failed to create network with custom subnet, trying default..."
             $docker_network_cmd network create "$network_name" --driver bridge 2>/dev/null || {
@@ -916,11 +916,11 @@ cleanup_docker_resources() {
     print_status "Removing unused Docker networks..."
     $docker_cmd network prune -f 2>/dev/null || true
 
-    # Remove any orphaned BotHive networks that might be stuck
-    print_status "Removing orphaned BotHive networks..."
-    $docker_cmd network ls --format "{{.Name}}" | grep -E "(bothive-network-|_default)" | while read network; do
+    # Remove any orphaned Zinto networks that might be stuck
+    print_status "Removing orphaned Zinto networks..."
+    $docker_cmd network ls --format "{{.Name}}" | grep -E "(zinto-network-|_default)" | while read network; do
         # Skip the shared network
-        if [ "$network" != "bothive-shared-network" ]; then
+        if [ "$network" != "zinto-shared-network" ]; then
             # Check if network is actually in use
             if ! $docker_cmd network inspect "$network" --format "{{.Containers}}" 2>/dev/null | grep -q "."; then
                 print_status "Removing unused network: $network"
@@ -936,7 +936,7 @@ cleanup_docker_resources() {
 }
 
 deploy_instance() {
-    print_step "Deploying BotHive Pro instance '$INSTANCE_NAME'..."
+    print_step "Deploying Zinto instance '$INSTANCE_NAME'..."
 
     local instance_dir="$INSTANCES_DIR/$INSTANCE_NAME"
 
@@ -999,12 +999,12 @@ run_migrations() {
     if needs_sudo_docker; then
         docker_cmd="sudo docker"
     fi
-    local postgres_container="bothive-postgres-$INSTANCE_NAME"
+    local postgres_container="zinto-postgres-$INSTANCE_NAME"
     print_step "Running SQL migrations from $migrations_dir..."
     for file in "$migrations_dir"/*.sql; do
         [ -f "$file" ] || continue
         echo "Running $file..."
-        if $docker_cmd exec -i "$postgres_container" psql -U bothive -d "$DATABASE_NAME" < "$file"; then
+        if $docker_cmd exec -i "$postgres_container" psql -U zinto -d "$DATABASE_NAME" < "$file"; then
             print_success "Applied $(basename "$file")"
         else
             print_error "Failed to apply $(basename "$file")"
@@ -1019,7 +1019,7 @@ show_deployment_results() {
 
     cat << EOF
 
-${GREEN}🎉 BotHive Pro instance '$INSTANCE_NAME' deployed successfully!${NC}
+${GREEN}🎉 Zinto instance '$INSTANCE_NAME' deployed successfully!${NC}
 
 ${BLUE}Access Information:${NC}
   🌐 Application URL: ${YELLOW}http://localhost:$APP_PORT${NC}
@@ -1054,7 +1054,7 @@ EOF
 }
 
 list_instances() {
-    print_step "Listing BotHive Pro instances..."
+    print_step "Listing Zinto instances..."
 
     if [ ! -d "$INSTANCES_DIR" ] || [ -z "$(ls -A "$INSTANCES_DIR" 2>/dev/null)" ]; then
         print_status "No instances found."
@@ -1112,7 +1112,7 @@ main() {
 case "${1:-}" in
     "help"|"-h"|"--help")
         cat << EOF
-BotHive Pro Multi-Instance Docker Deployment
+Zinto Multi-Instance Docker Deployment
 
 Usage: $0 [command]
 
@@ -1177,7 +1177,7 @@ EOF
         exit 0
         ;;
     "stop")
-        print_step "Stopping all BotHive Pro instances..."
+        print_step "Stopping all Zinto instances..."
         if [ ! -d "$INSTANCES_DIR" ] || [ -z "$(ls -A "$INSTANCES_DIR" 2>/dev/null)" ]; then
             print_status "No instances found."
         else
@@ -1193,7 +1193,7 @@ EOF
         exit 0
         ;;
     "clean")
-        print_warning "This will remove ALL BotHive Pro instances and their data!"
+        print_warning "This will remove ALL Zinto instances and their data!"
         echo "This action cannot be undone."
         echo
         if [ ! -d "$INSTANCES_DIR" ] || [ -z "$(ls -A "$INSTANCES_DIR" 2>/dev/null)" ]; then

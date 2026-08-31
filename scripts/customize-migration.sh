@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# BotHivePlus Migration Customization Script
+# Zinto Migration Customization Script
 # This script customizes database migration files with instance-specific values
 # Usage: ./scripts/customize-migration.sh <instance_name>
 
@@ -48,8 +48,8 @@ Arguments:
     instance_name    Name of the instance to customize migrations for
 
 Customizations performed:
-    admin@bothiveapp.net → ADMIN_EMAIL from .env
-    BotHive              → COMPANY_NAME from .env
+    admin@zintoapp.net → ADMIN_EMAIL from .env
+    Zinto              → COMPANY_NAME from .env
 
 Examples:
     $0 cbl
@@ -97,7 +97,7 @@ load_instance_env() {
     
     if [ -z "$COMPANY_NAME" ]; then
         print_warning "COMPANY_NAME not found in .env file, using default"
-        COMPANY_NAME="BotHive"
+        COMPANY_NAME="Zinto"
     fi
     
     print_status "Loaded configuration:"
@@ -148,15 +148,15 @@ customize_migration_file() {
     local escaped_company_name=$(echo "$company_name" | sed 's/[[\.*^$()+?{|]/\\&/g')
     
     # Perform string replacements
-    print_status "Replacing 'admin@bothiveapp.net' with '$admin_email'..."
-    sed -i "s/admin@bothiveapp\\.net/${escaped_admin_email}/g" "$target_file"
+    print_status "Replacing 'admin@zintoapp.net' with '$admin_email'..."
+    sed -i "s/admin@zintoapp\\.net/${escaped_admin_email}/g" "$target_file"
     
-    print_status "Replacing 'BotHive' with '$company_name'..."
-    sed -i "s/BotHive/${escaped_company_name}/g" "$target_file"
+    print_status "Replacing 'Zinto' with '$company_name'..."
+    sed -i "s/Zinto/${escaped_company_name}/g" "$target_file"
     
     # Verify replacements
-    local admin_placeholders=$(grep -c "admin@bothiveapp\.net" "$target_file" 2>/dev/null || echo "0")
-    local company_placeholders=$(grep -c "BotHive" "$target_file" 2>/dev/null || echo "0")
+    local admin_placeholders=$(grep -c "admin@zintoapp\.net" "$target_file" 2>/dev/null || echo "0")
+    local company_placeholders=$(grep -c "Zinto" "$target_file" 2>/dev/null || echo "0")
     
     if [ "$admin_placeholders" -eq 0 ]; then
         print_success "✓ All admin email placeholders replaced"

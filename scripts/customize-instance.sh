@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# BotHivePlus Instance Customization Script
+# Zinto Instance Customization Script
 # This script performs post-build string replacements for instance-specific branding
 # Usage: ./scripts/customize-instance.sh <instance_name> [container_name]
 
@@ -40,7 +40,7 @@ show_usage() {
     cat << EOF
 Usage: $0 <instance_name> [container_name]
 
-This script customizes a BotHivePlus instance by replacing placeholder strings
+This script customizes a Zinto instance by replacing placeholder strings
 with instance-specific values from the .env file.
 
 Arguments:
@@ -48,8 +48,8 @@ Arguments:
     container_name   Optional: specific container name (default: {instance_name}-app)
 
 Replacements performed:
-    admin@bothiveapp.net → ADMIN_EMAIL from .env
-    BotHive              → COMPANY_NAME from .env
+    admin@zintoapp.net → ADMIN_EMAIL from .env
+    Zinto              → COMPANY_NAME from .env
 
 Examples:
     $0 cbl
@@ -132,10 +132,10 @@ customize_container() {
     local escaped_company_name=$(echo "$company_name" | sed 's/[[\.*^$()+?{|]/\\&/g')
     
     # Define replacement commands
-    local admin_email_replacement="s/admin@bothiveapp\\.net/${escaped_admin_email}/g"
-    local company_name_replacement="s/BotHive/${escaped_company_name}/g"
+    local admin_email_replacement="s/admin@zintoapp\\.net/${escaped_admin_email}/g"
+    local company_name_replacement="s/Zinto/${escaped_company_name}/g"
     
-    print_status "Replacing 'admin@bothiveapp.net' with '$admin_email'..."
+    print_status "Replacing 'admin@zintoapp.net' with '$admin_email'..."
     
     # Replace in server-side built files
     docker exec "$container_name" find /app/dist -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" \) \
@@ -145,7 +145,7 @@ customize_container() {
     docker exec "$container_name" find /app/client/dist -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" \) \
         -exec sed -i "$admin_email_replacement" {} \; 2>/dev/null || true
     
-    print_status "Replacing 'BotHive' with '$company_name'..."
+    print_status "Replacing 'Zinto' with '$company_name'..."
     
     # Replace in server-side built files
     docker exec "$container_name" find /app/dist -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" \) \
@@ -188,21 +188,21 @@ verify_replacements() {
     
     # Check for remaining placeholder strings
     local remaining_admin_placeholders=$(docker exec "$container_name" find /app/dist -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" \) \
-        -exec grep -l "admin@bothiveapp\.net" {} \; 2>/dev/null | wc -l)
+        -exec grep -l "admin@zintoapp\.net" {} \; 2>/dev/null | wc -l)
     
     local remaining_company_placeholders=$(docker exec "$container_name" find /app/dist -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" \) \
-        -exec grep -l "BotHive" {} \; 2>/dev/null | wc -l)
+        -exec grep -l "Zinto" {} \; 2>/dev/null | wc -l)
     
     if [ "$remaining_admin_placeholders" -eq 0 ]; then
         print_success "All admin email placeholders replaced"
     else
-        print_warning "$remaining_admin_placeholders files still contain 'admin@bothiveapp.net'"
+        print_warning "$remaining_admin_placeholders files still contain 'admin@zintoapp.net'"
     fi
     
     if [ "$remaining_company_placeholders" -eq 0 ]; then
         print_success "All company name placeholders replaced"
     else
-        print_warning "$remaining_company_placeholders files still contain 'BotHive'"
+        print_warning "$remaining_company_placeholders files still contain 'Zinto'"
     fi
     
     # Check for successful replacements

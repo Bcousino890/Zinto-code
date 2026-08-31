@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# BotHivePlus Multi-Instance Backup Script
+# Zinto Multi-Instance Backup Script
 # Usage: ./scripts/backup-all.sh [options]
 
 set -e
@@ -211,7 +211,7 @@ create_backup_manifest() {
     local manifest_file="$backup_path/BACKUP_MANIFEST.txt"
     
     cat > "$manifest_file" << EOF
-BotHivePlus Multi-Instance Backup
+Zinto Multi-Instance Backup
 ===================================
 
 Backup Date: $(date)

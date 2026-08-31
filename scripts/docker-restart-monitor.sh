@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 RESTART_SIGNAL_PATH="$PROJECT_DIR/volumes/restart-signal"
 APP_UPDATES_PATH="$PROJECT_DIR/volumes/app-updates"
-CONTAINER_NAME="bothive-app"
+CONTAINER_NAME="zinto-app"
 
 # Colors for output
 RED='\033[0;31m'
@@ -132,7 +132,7 @@ setup_directories() {
 
 # Main execution
 main() {
-    log "BotHivePlus Docker Restart Monitor"
+    log "Zinto Docker Restart Monitor"
     log "===================================="
     
     # Check if docker-compose is available

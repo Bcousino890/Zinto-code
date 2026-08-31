@@ -169,22 +169,20 @@ class GoogleCalendarService {
     }
   }
 
-  private async findExistingEventByIdempotencyKey(
+  private async findEventByIdempotencyPropertyName(
     calendar: calendar_v3.Calendar,
     userId: number,
     companyId: number,
     calendarId: string,
+    propertyName: 'zintoIdempotencyKey' | 'bothiveIdempotencyKey',
     idempotencyKey: string,
-    startDate: Date,
-    endDate: Date
+    recoveryWindowStart: Date,
+    recoveryWindowEnd: Date
   ): Promise<calendar_v3.Schema$Event | null> {
-    const recoveryWindowStart = new Date(startDate.getTime() - 24 * 60 * 60 * 1000);
-    const recoveryWindowEnd = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
-
     const response = await this.withRetry(() =>
       calendar.events.list({
         calendarId,
-        privateExtendedProperty: [`bothiveIdempotencyKey=${idempotencyKey}`],
+        privateExtendedProperty: [`${propertyName}=${idempotencyKey}`],
         timeMin: recoveryWindowStart.toISOString(),
         timeMax: recoveryWindowEnd.toISOString(),
         singleEvents: true,
@@ -198,13 +196,38 @@ class GoogleCalendarService {
       if (
         event.id &&
         event.status !== 'cancelled' &&
-        event.extendedProperties?.private?.bothiveIdempotencyKey === idempotencyKey
+        event.extendedProperties?.private?.[propertyName] === idempotencyKey
       ) {
         return event;
       }
     }
 
     return null;
+  }
+
+  private async findExistingEventByIdempotencyKey(
+    calendar: calendar_v3.Calendar,
+    userId: number,
+    companyId: number,
+    calendarId: string,
+    idempotencyKey: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<calendar_v3.Schema$Event | null> {
+    const recoveryWindowStart = new Date(startDate.getTime() - 24 * 60 * 60 * 1000);
+    const recoveryWindowEnd = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
+
+    const found = await this.findEventByIdempotencyPropertyName(
+      calendar, userId, companyId, calendarId, 'zintoIdempotencyKey', idempotencyKey, recoveryWindowStart, recoveryWindowEnd
+    );
+    if (found) return found;
+
+    // Fall back to the pre-rebrand property name so retries spanning the rename
+    // (e.g. a queued job started before this deploy) still find their event
+    // instead of creating a duplicate booking.
+    return this.findEventByIdempotencyPropertyName(
+      calendar, userId, companyId, calendarId, 'bothiveIdempotencyKey', idempotencyKey, recoveryWindowStart, recoveryWindowEnd
+    );
   }
 
   private async findExistingEventByIdempotencyKeyWithBackoff(
@@ -1152,7 +1175,7 @@ class GoogleCalendarService {
         },
         extendedProperties: {
           private: {
-            bothiveIdempotencyKey: idempotencyKey,
+            zintoIdempotencyKey: idempotencyKey,
             ...ownershipProps,
           }
         },

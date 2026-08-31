@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# BotHivePlus Quick Setup Script
+# Zinto Quick Setup Script
 # This script helps you quickly deploy your first instance
 
 set -e
@@ -62,9 +62,9 @@ generate_password() {
 cat << EOF
 ${GREEN}
 ╔═══════════════════════════════════════════════════════════════╗
-║                    BotHivePlus Quick Setup                  ║
+║                    Zinto Quick Setup                  ║
 ║                                                               ║
-║  This script will help you deploy your first BotHivePlus   ║
+║  This script will help you deploy your first Zinto   ║
 ║  instance with minimal configuration.                        ║
 ╚═══════════════════════════════════════════════════════════════╝
 ${NC}
@@ -96,7 +96,7 @@ print_success "Prerequisites check passed!"
 echo
 
 # Collect instance information
-print_status "Let's configure your BotHivePlus instance:"
+print_status "Let's configure your Zinto instance:"
 echo
 
 # Instance name
@@ -139,7 +139,7 @@ chmod +x "$SCRIPT_DIR/deploy-instance.sh"
 chmod +x "$SCRIPT_DIR/manage-instance.sh"
 
 # Deploy the instance
-print_status "Deploying BotHivePlus instance..."
+print_status "Deploying Zinto instance..."
 echo
 
 "$SCRIPT_DIR/deploy-instance.sh" "$INSTANCE_NAME" \
@@ -152,7 +152,7 @@ echo
 # Show final instructions
 cat << EOF
 
-${GREEN}🎉 BotHivePlus instance deployed successfully!${NC}
+${GREEN}🎉 Zinto instance deployed successfully!${NC}
 
 ${BLUE}Access Information:${NC}
   Application URL: ${YELLOW}http://localhost:$APP_PORT${NC}

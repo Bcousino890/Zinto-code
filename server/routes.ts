@@ -21234,8 +21234,8 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
   app.post('/api/google/calendar/webhook', async (req: any, res) => {
     res.status(204).send();
 
-    const userId = Number(req.headers['x-bothive-user-id'] || req.query.userId);
-    const companyId = Number(req.headers['x-bothive-company-id'] || req.query.companyId);
+    const userId = Number(req.headers['x-zinto-user-id'] || req.headers['x-bothive-user-id'] || req.query.userId);
+    const companyId = Number(req.headers['x-zinto-company-id'] || req.headers['x-bothive-company-id'] || req.query.companyId);
     if (Number.isFinite(userId) && Number.isFinite(companyId)) {
       void calendarReconciliationService.reconcileForUser(userId, companyId);
     }

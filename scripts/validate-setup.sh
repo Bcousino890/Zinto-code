@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# BotHivePlus Multi-Instance Setup Validation Script
+# Zinto Multi-Instance Setup Validation Script
 # Usage: ./scripts/validate-setup.sh
 
 set -e
@@ -159,7 +159,7 @@ check_docker_network() {
     print_header "Checking Docker Network"
     
     # Test Docker network creation
-    local test_network="bothive-test-network"
+    local test_network="zinto-test-network"
     
     if docker network create "$test_network" &> /dev/null; then
         print_success "Docker network creation works"
@@ -250,7 +250,7 @@ main() {
     echo -e "${GREEN}"
     cat << "EOF"
 ╔═══════════════════════════════════════════════════════════════╗
-║           BotHivePlus Multi-Instance Validation            ║
+║           Zinto Multi-Instance Validation            ║
 ║                                                               ║
 ║  This script validates your multi-instance deployment        ║
 ║  setup and checks for any issues.                            ║

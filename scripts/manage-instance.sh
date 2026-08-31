@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# BotHivePlus Multi-Instance Management Script
+# Zinto Multi-Instance Management Script
 # Usage: ./scripts/manage-instance.sh <instance_name> <command> [options]
 
 set -e
@@ -309,7 +309,7 @@ cmd_remove() {
 
 # Command: List instances
 cmd_list() {
-    print_status "BotHivePlus Instances:"
+    print_status "Zinto Instances:"
     echo
 
     if [ ! -d "$INSTANCES_DIR" ] || [ -z "$(ls -A "$INSTANCES_DIR" 2>/dev/null)" ]; then

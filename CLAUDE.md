@@ -166,47 +166,53 @@ deployment's env/DB names to preserve, so the infra layer was renamed too):
 - `server/auth.ts` — the `SESSION_SECRET` fallback (used only if the env var
   isn't set) was also a guessable hardcoded string; rotated to a random value.
 
-**Still found, deliberately NOT touched — ask before changing:**
-1. **`server/services/license-validator.ts:12`** and **`scripts/build-licensed.js`**
-   (same key duplicated in both) —
-   `ENCRYPTION_KEY = 'bothive-license-key-2024-secur'` is a real AES-256-CBC key
-   used to encrypt/decrypt license data (not just display text). Rotating it
-   would make any existing encrypted license data unreadable unless it's
-   re-encrypted with the new key at the same time. Also unclear whether, now that
-   the user owns the code outright, they even want to keep a license-gating
-   mechanism at all versus removing it — that's a product decision, not a rename.
-   **User said: revisit this in ~1 week (asked 2026-08-31); a reminder is scheduled.**
-2. **Persistent data markers already written to external state — renaming these
-   breaks recognition of anything created before the rename, not just branding:**
-   - `server/services/calendar-contact-privacy.ts` — `BOTHIVE_CONTACT_ID_PROP`
-     (`'bothiveContactId'`) / `BOTHIVE_CONTACT_PHONE_PROP` and the
-     `bothive_contact_id:`/`bothive_contact_phone:` description-text markers are
-     written onto real Google Calendar events (as both extended properties and
-     literal text in the event description) to gate which CRM contact can see a
-     booking. Renaming the key means the code stops recognizing the marker on
-     every calendar event created before the change.
-   - `server/services/google-calendar.ts` — `bothiveIdempotencyKey` extended
-     property, used to detect "did we already create this event" on retry. Same
-     risk: rename it and older events' idempotency markers become invisible to
-     the new code, risking duplicate-booking creation on retry.
-   - `server/routes.ts` (`/api/google/calendar/webhook`) — reads
-     `x-bothive-user-id` / `x-bothive-company-id` request headers (with a
-     `?userId`/`?companyId` query-param fallback). Unclear who/what actually
-     sends these headers today; treat as a possible external contract and don't
-     rename blind.
-   All three would need a migration (accept both old and new key names for some
-   period, or a data backfill) rather than a straight rename.
-3. **The multi-instance reseller tooling**: `install.sh`, `deploy-instance.sh`,
-   `manage-instance.sh`, `customize-instance.sh`, `customize-migration.sh`,
-   `quick-setup.sh`, `validate-setup.sh`, `monitor-resources.sh`,
-   `docker-restart-monitor.sh`, `start-with-monitor.sh`,
-   `test-docker-autoupdate.sh`, `backup-all.sh`, `manage-migrations.sh`,
-   `docker-compose.template.yml`. These implement the *original vendor's* model
-   of hosting many differently-branded instances on shared infrastructure
-   (per-instance container/volume/network names, a shared Docker network, etc.)
-   — almost certainly not what a single dedicated VPS deployment needs. Left
-   untouched pending confirmation of whether Zinto uses this multi-instance
-   workflow at all; if not, it's a candidate for deletion rather than rebranding.
+**Fixed in round 4** (user said: rename the persistent-data markers too, despite
+the migration risk; and keep + rebrand the multi-instance tooling — they'll run
+several VPS at once once they grow):
+- `server/services/calendar-contact-privacy.ts` — private-property keys and
+  description-text markers now write `zintoContactId`/`zintoContactPhone` /
+  `zinto_contact_id:`/`zinto_contact_phone:` going forward, but every read path
+  (ownership check, dedup check, customer-facing description sanitizer) still
+  also matches the legacy `bothive*` names/markers — so events created before
+  this change are still correctly recognized, only new events get the new keys.
+- `server/services/google-calendar.ts` — new events get an extended property
+  named `zintoIdempotencyKey`. The idempotency lookup
+  (`findExistingEventByIdempotencyKey`) now tries `zintoIdempotencyKey` first
+  and falls back to a second query by the legacy `bothiveIdempotencyKey` if
+  nothing matches, so a retry spanning the rename still finds its event instead
+  of creating a duplicate booking.
+- `server/routes.ts` (`/api/google/calendar/webhook`) — now reads
+  `x-zinto-user-id`/`x-zinto-company-id` first, falling back to the legacy
+  `x-bothive-user-id`/`x-bothive-company-id`, then the `?userId`/`?companyId`
+  query params. Nothing in this repo was found to actually send the legacy
+  headers, but kept the fallback since the real sender (if any) is external
+  and unconfirmed.
+- The multi-instance reseller tooling (`install.sh`, `deploy-instance.sh`,
+  `manage-instance.sh`, `customize-instance.sh`, `customize-migration.sh`,
+  `quick-setup.sh`, `validate-setup.sh`, `monitor-resources.sh`,
+  `docker-restart-monitor.sh`, `start-with-monitor.sh`,
+  `test-docker-autoupdate.sh`, `backup-all.sh`, `manage-migrations.sh`,
+  `docker-compose.template.yml`) — kept (user plans multiple simultaneous VPS
+  instances once they grow) and rebranded: container/volume/network name
+  prefixes, the Postgres user/DB name pattern, and banner/log text all now say
+  `zinto`/`Zinto` instead of `bothive`/`BotHive`. Important nuance in
+  `customize-instance.sh`/`customize-migration.sh`: these scripts' whole job is
+  to `sed`-replace a base placeholder brand with each deployed instance's own
+  `COMPANY_NAME` — they used to search for literal `BotHive`/
+  `admin@bothiveapp.net`; now they correctly search for `Zinto`/
+  `admin@zinto.app` instead (the brand now actually baked into the source), so
+  deploying a new white-labeled instance for a future sub-customer still works
+  the same way it always did, just rebased on Zinto instead of BotHive.
+
+**Still found, deliberately NOT touched:**
+**`server/services/license-validator.ts:12`** and **`scripts/build-licensed.js`**
+(same key duplicated in both) — `ENCRYPTION_KEY = 'bothive-license-key-2024-secur'`
+is a real AES-256-CBC key used to encrypt/decrypt license data (not just display
+text). Rotating it would make any existing encrypted license data unreadable
+unless it's re-encrypted with the new key at the same time. Also unclear whether,
+now that the user owns the code outright, they even want to keep a license-gating
+mechanism at all versus removing it — that's a product decision, not a rename.
+**User said: revisit this in ~1 week (asked 2026-08-31); a reminder is scheduled.**
 
 **Confirmed zero hits in this repo**: "PowerChat", "Ninnat", "Megacom" — not found
 anywhere in code/translations/config. If the user still sees these names, they're

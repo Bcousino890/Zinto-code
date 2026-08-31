@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# BotHivePlus Resource Monitoring Script
+# Zinto Resource Monitoring Script
 # Usage: ./scripts/monitor-resources.sh [instance_name] [--watch]
 
 set -e
@@ -162,7 +162,7 @@ monitor_instance() {
 
 # Function to monitor all instances
 monitor_all_instances() {
-    print_header "BotHivePlus Multi-Instance Resource Monitor"
+    print_header "Zinto Multi-Instance Resource Monitor"
     echo "Generated at: $(date)"
     echo
     

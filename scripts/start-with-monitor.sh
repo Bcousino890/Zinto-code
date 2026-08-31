@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Start BotHivePlus with Docker restart monitoring
+# Start Zinto with Docker restart monitoring
 # This script starts both the application and the restart monitor
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,20 +21,20 @@ log_success() {
 
 # Function to start the application
 start_application() {
-    log "Starting BotHivePlus with Docker Compose..."
+    log "Starting Zinto with Docker Compose..."
     cd "$PROJECT_DIR"
     
     # Start the application
     docker-compose up -d
     
     if [ $? -eq 0 ]; then
-        log_success "BotHivePlus started successfully"
+        log_success "Zinto started successfully"
         
         # Show running containers
         log "Running containers:"
         docker-compose ps
     else
-        echo "Failed to start BotHivePlus"
+        echo "Failed to start Zinto"
         exit 1
     fi
 }
@@ -63,7 +63,7 @@ setup_logs() {
 
 # Main execution
 main() {
-    log "BotHivePlus Docker Startup with Auto-Update Support"
+    log "Zinto Docker Startup with Auto-Update Support"
     log "=================================================="
     
     # Setup logs
@@ -75,7 +75,7 @@ main() {
     # Start monitor
     start_monitor
     
-    log_success "BotHivePlus is now running with auto-update support!"
+    log_success "Zinto is now running with auto-update support!"
     log ""
     log "Useful commands:"
     log "  View logs: docker-compose logs -f"

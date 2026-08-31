@@ -3,9 +3,12 @@ import { JWT } from 'google-auth-library';
 import { OAuth2Client } from 'google-auth-library';
 import { storage } from '../storage';
 
+// spreadsheets: read/append/update sheet values. drive.file: lets the Google Picker
+// grant Zinto access to only the spreadsheet the user explicitly selects, instead of
+// browsing the user's whole Drive (which drive.readonly would require).
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets',
-  'https://www.googleapis.com/auth/drive.readonly', 
+  'https://www.googleapis.com/auth/drive.file',
 ];
 
 export interface GoogleSheetsConfig {
@@ -176,9 +179,10 @@ class GoogleSheetsService {
   }
 
   /**
-   * Get authenticated Sheets client using OAuth tokens
+   * Get a valid (refreshed if needed) OAuth2 client for this user's Google Sheets connection.
+   * Shared by the Sheets API client and the Google Picker access-token endpoint.
    */
-  private async getSheetsClientWithOAuth(userId: number, companyId: number) {
+  private async getValidOAuth2Client(userId: number, companyId: number): Promise<OAuth2Client> {
     const oauth2Client = await this.getOAuth2Client();
 
     if (!oauth2Client) {
@@ -222,8 +226,43 @@ class GoogleSheetsService {
       }
     }
 
+    return oauth2Client;
+  }
+
+  /**
+   * Get authenticated Sheets client using OAuth tokens
+   */
+  private async getSheetsClientWithOAuth(userId: number, companyId: number) {
+    const oauth2Client = await this.getValidOAuth2Client(userId, companyId);
     const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
     return sheets;
+  }
+
+  /**
+   * Short-lived access token + Picker API key so the client can open the Google Picker
+   * and let the user select a spreadsheet directly, without Zinto browsing their Drive.
+   */
+  public async getPickerConfig(userId: number, companyId: number): Promise<{ success: boolean; accessToken?: string; apiKey?: string; error?: string }> {
+    try {
+      const oauth2Client = await this.getValidOAuth2Client(userId, companyId);
+      const accessToken = oauth2Client.credentials.access_token;
+      if (!accessToken) {
+        return { success: false, error: 'No valid Google access token available. Please reconnect Google Sheets.' };
+      }
+
+      const setting = await storage.getAppSetting('google_sheets_oauth');
+      const apiKey = (setting?.value as any)?.picker_api_key;
+      if (!apiKey) {
+        return { success: false, error: 'Google Picker API key is not configured. Ask your administrator to set it in Settings.' };
+      }
+
+      return { success: true, accessToken, apiKey };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      };
+    }
   }
 
   /**
@@ -419,39 +458,6 @@ class GoogleSheetsService {
       return {
         connected: false,
         message: 'Error checking authentication status'
-      };
-    }
-  }
-
-  /**
-   * List user's Google Sheets
-   */
-  async listUserSheets(userId: number, companyId: number): Promise<{ success: boolean; sheets?: Array<{id: string, name: string}>; error?: string }> {
-    try {
-      const sheets = await this.getSheetsClientWithOAuth(userId, companyId);
-      const drive = google.drive({ version: 'v3', auth: sheets.context._options.auth });
-
-      const response = await drive.files.list({
-        q: "mimeType='application/vnd.google-apps.spreadsheet'",
-        fields: 'files(id, name)',
-        pageSize: 100,
-        orderBy: 'modifiedTime desc'
-      });
-
-      const sheetsList = response.data.files?.map(file => ({
-        id: file.id!,
-        name: file.name!
-      })) || [];
-
-      return {
-        success: true,
-        sheets: sheetsList
-      };
-    } catch (error) {
-      console.error('Error listing Google Sheets:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
     }
   }

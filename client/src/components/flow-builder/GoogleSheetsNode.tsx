@@ -39,6 +39,7 @@ import { useFlowContext } from '../../pages/flow-builder';
 import { EnhancedVariablePicker } from './EnhancedVariablePicker';
 import { GoogleSheetsOAuthStatus } from './GoogleSheetsOAuthStatus';
 import { useGoogleSheetsAuth } from '@/hooks/useGoogleSheetsAuth';
+import { pickGoogleSpreadsheet } from '@/lib/googlePicker';
 import { useToast } from '@/hooks/use-toast';
 import { useCollapseOnAutoArrange } from '@/hooks/useCollapseOnAutoArrange';
 import { useTranslation } from '@/hooks/use-translation';
@@ -1100,11 +1101,11 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
     }
   };
 
-  const fetchGoogleSheets = async () => {
+  const openSpreadsheetPicker = async () => {
     if (!isGoogleSheetsConnected) {
       setTestResult({
         success: false,
-        message: 'Please connect your Google account first to fetch sheets'
+        message: 'Please connect your Google account first to select a spreadsheet'
       });
       setShowTestResult(true);
       return;
@@ -1112,7 +1113,7 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
 
     setIsFetchingSheets(true);
     try {
-      const response = await fetch('/api/google/sheets/list', {
+      const response = await fetch('/api/google/sheets/picker-config', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -1120,35 +1121,30 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
         credentials: 'include',
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch Google Sheets');
+      const config = await response.json();
+      if (!response.ok || !config.success) {
+        throw new Error(config.error || 'Failed to prepare Google Picker');
       }
 
-      const result = await response.json();
+      const picked = await pickGoogleSpreadsheet({
+        accessToken: config.accessToken,
+        apiKey: config.apiKey,
+      });
 
-      if (result.success) {
-        setFetchedSheets(result.sheets || []);
-
-
-        if (result.sheets && result.sheets.length > 0) {
-          setTestResult({
-            success: true,
-            message: `Found ${result.sheets.length} Google Sheets`
-          });
-          setShowTestResult(true);
-        }
-      } else {
-        setTestResult({
-          success: false,
-          message: result.error || 'Failed to fetch Google Sheets'
-        });
-        setShowTestResult(true);
+      if (picked) {
+        setFetchedSheets([picked]);
+        setSelectedSheetId(picked.id);
+        setSpreadsheetId(picked.id);
+        validateField('spreadsheetId', picked.id, true);
+        setSelectedSheetName('');
+        setSheetName('');
+        setFetchedSheetNames([]);
       }
     } catch (error) {
-      console.error('Error fetching Google Sheets:', error);
+      console.error('Error opening Google Picker:', error);
       setTestResult({
         success: false,
-        message: 'Network error: Unable to fetch Google Sheets'
+        message: error instanceof Error ? error.message : 'Unable to open the Google Picker'
       });
       setShowTestResult(true);
     } finally {
@@ -1624,7 +1620,7 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
                         variant="outline"
                         size="sm"
                         className="h-8 px-3 flex items-center gap-1.5"
-                        onClick={fetchGoogleSheets}
+                        onClick={openSpreadsheetPicker}
                         disabled={isFetchingSheets || !isGoogleSheetsConnected}
                       >
                         {isFetchingSheets ? (
@@ -1633,11 +1629,11 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
                           <>
                             <img
                               src="https://cdn-icons-png.flaticon.com/128/281/281761.png"
-                              alt={t('flow_builder.google_sheets.fetch_sheets', 'Fetch your Google Sheets')}
+                              alt={t('flow_builder.google_sheets.select_sheet', 'Select a spreadsheet from Google Drive')}
                               className="w-3 h-3"
                             />
                             <span className="text-[11px] font-medium">
-                              {t('flow_builder.google_sheets.fetch', 'Fetch')}
+                              {t('flow_builder.google_sheets.select', 'Select')}
                             </span>
                           </>
                         )}
@@ -1647,7 +1643,7 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
                       <p className="text-xs">
                         {!isGoogleSheetsConnected
                           ? t('flow_builder.google_sheets.connect_first', 'Connect your Google account first')
-                          : t('flow_builder.google_sheets.fetch_sheets', 'Fetch your Google Sheets')
+                          : t('flow_builder.google_sheets.select_sheet', 'Select a spreadsheet from Google Drive')
                         }
                       </p>
                     </TooltipContent>
@@ -1662,7 +1658,7 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
 
               {fetchedSheets.length > 0 && (
                 <div className="mt-2">
-                  <Label className="text-xs text-muted-foreground mb-1 block">{t('flow_builder.google_sheets.select_from_sheets', 'Select from your sheets:')}</Label>
+                  <Label className="text-xs text-muted-foreground mb-1 block">{t('flow_builder.google_sheets.selected_sheet_label', 'Selected spreadsheet:')}</Label>
                   <Select
                     value={selectedSheetId}
                     onValueChange={(value) => {

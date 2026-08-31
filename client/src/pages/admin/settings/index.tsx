@@ -338,7 +338,8 @@ export default function AdminSettingsPage() {
     enabled: false,
     client_id: '',
     client_secret: '',
-    redirect_uri: ''
+    redirect_uri: '',
+    picker_api_key: ''
   });
 
   const [googleMapsApiKey, setGoogleMapsApiKey] = useState('');
@@ -3181,6 +3182,20 @@ export default function AdminSettingsPage() {
                     />
                     <p className="text-xs text-muted-foreground">
                       {t('admin.settings.integrations.google_sheets.redirect_help', 'This redirect URI must be added to your Google Cloud Console OAuth configuration.')}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="google-sheets-picker-api-key">{t('admin.settings.integrations.google_sheets.picker_api_key', 'Google Picker API Key')}</Label>
+                    <Input
+                      id="google-sheets-picker-api-key"
+                      placeholder={t('admin.settings.integrations.google_sheets.placeholder_picker_api_key', 'Enter a Browser API key restricted to the Google Picker API')}
+                      value={googleSheetsOAuthForm.picker_api_key}
+                      onChange={(e) => setGoogleSheetsOAuthForm(prev => ({ ...prev, picker_api_key: e.target.value }))}
+                      disabled={!googleSheetsOAuthForm.enabled}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {t('admin.settings.integrations.google_sheets.picker_api_key_help', 'Users select a spreadsheet via the Google Picker (not by browsing their whole Drive). Enable the "Google Picker API" in Google Cloud Console and create a Browser API key restricted to this domain, then paste it here.')}
                     </p>
                   </div>
 

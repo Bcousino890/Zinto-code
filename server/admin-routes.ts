@@ -2990,7 +2990,8 @@ function registerAdminRoutes(app: Express) {
           enabled: false,
           client_id: '',
           client_secret: '',
-          redirect_uri: `${baseUrl}/api/google/sheets/callback`
+          redirect_uri: `${baseUrl}/api/google/sheets/callback`,
+          picker_api_key: ''
         };
         return res.json(defaultConfig);
       }
@@ -3100,7 +3101,7 @@ function registerAdminRoutes(app: Express) {
 
   app.post("/api/admin/settings/integrations/google-sheets", ensureSuperAdmin, async (req, res) => {
     try {
-      const { enabled, client_id, client_secret, redirect_uri } = req.body;
+      const { enabled, client_id, client_secret, redirect_uri, picker_api_key } = req.body;
 
       const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
       const host = req.get('host') || 'localhost:9000';
@@ -3125,7 +3126,8 @@ function registerAdminRoutes(app: Express) {
         enabled: !!enabled,
         client_id: client_id || '',
         client_secret: resolvedClientSecret,
-        redirect_uri: redirect_uri || `${baseUrl}/api/google/sheets/callback`
+        redirect_uri: redirect_uri || `${baseUrl}/api/google/sheets/callback`,
+        picker_api_key: picker_api_key !== undefined ? String(picker_api_key || '') : (existing.picker_api_key || '')
       };
 
       await storage.saveAppSetting('google_sheets_oauth', googleSheetsSettings);

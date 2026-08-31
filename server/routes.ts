@@ -21408,15 +21408,22 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
   });
 
 
-  app.get('/api/google/sheets/list', ensureAuthenticated, async (req: any, res) => {
+  // Short-lived access token + Picker API key for the Google Picker UI.
+  // Replaces the old drive.readonly-based "list all my sheets" endpoint: the user now
+  // picks a single spreadsheet through Google's own Picker, and Zinto only ever gets
+  // drive.file access to that one file.
+  app.get('/api/google/sheets/picker-config', ensureAuthenticated, async (req: any, res) => {
     try {
-      const sheets = await googleSheetsService.listUserSheets(req.user.id, req.user.companyId);
-      res.json(sheets);
+      const result = await googleSheetsService.getPickerConfig(req.user.id, req.user.companyId);
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      res.json(result);
     } catch (error) {
-      console.error('Error fetching Google Sheets:', error);
+      console.error('Error getting Google Picker config:', error);
       res.status(500).json({
         success: false,
-        error: 'Error fetching Google Sheets'
+        error: 'Error getting Google Picker configuration'
       });
     }
   });

@@ -29,7 +29,16 @@ export type ListGoogleCalendarEventsOptions = {
   calendarId?: string;
 };
 
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
+// Least-privilege set matching what Zinto actually does with Calendar:
+// check availability (freebusy), let the user pick which calendar (calendarlist),
+// and create/edit/delete appointments (events). Intentionally narrower than the
+// full 'calendar' scope, which also grants calendar management (create/delete
+// calendars, sharing, ACLs) that Zinto does not implement.
+const SCOPES = [
+  'https://www.googleapis.com/auth/calendar.events',
+  'https://www.googleapis.com/auth/calendar.calendarlist.readonly',
+  'https://www.googleapis.com/auth/calendar.freebusy',
+];
 
 
 const API_TIMEOUT_MS = 10000; // 10 seconds

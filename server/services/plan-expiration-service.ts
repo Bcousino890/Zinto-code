@@ -118,7 +118,10 @@ export class PlanExpirationService {
         }
       }
 
-      if (company.name === 'BotHive Admin' || company.slug === 'bothive-admin') {
+      // NOTE: if a company row still exists in the DB named 'BotHive Admin' /
+      // slug 'bothive-admin' relying on this bypass, it must be renamed to match
+      // below or it will silently lose the bypass.
+      if (company.name === 'Zinto Admin' || company.slug === 'zinto-admin') {
         return {
           allowed: true,
           expirationStatus: this.getDefaultExpirationStatus(),

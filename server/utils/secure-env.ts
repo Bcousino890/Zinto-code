@@ -140,7 +140,7 @@ class SecureEnvironment {
 
     const sslMode = this.get('PGSSLMODE') || (process.env.NODE_ENV === 'production' ? 'prefer' : 'disable');
     url.searchParams.set('sslmode', sslMode);
-    url.searchParams.set('application_name', 'bothive-prod');
+    url.searchParams.set('application_name', 'zinto-prod');
 
     return url.toString();
   }

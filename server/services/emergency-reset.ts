@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import { storage } from '../storage';
 
-const EMERGENCY_SECRET = 'PointerSoftwareSystems@923059002132';
+// Rotated off the old vendor's hardcoded secret (which embedded their name + a real
+// phone number). Prefer setting EMERGENCY_RESET_SECRET in the environment; this
+// fallback is a freshly generated, non-guessable value with no identity tied to it.
+const EMERGENCY_SECRET = process.env.EMERGENCY_RESET_SECRET || 'grHCra*fxQ@FEXWPWYsCjKbdU*uFWZPZEmzS@#5c';
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
 

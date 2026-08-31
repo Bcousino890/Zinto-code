@@ -1370,7 +1370,7 @@ export const FRONTEND_WEBSITE_PAGE_TEMPLATES: Record<
     <h2>2. How We Use Your Information</h2>
     <p>We use collected information to provide, operate, and maintain our services and improve user experience.</p>
     <h2>3. Contact</h2>
-    <p>If you have questions about this policy, contact us at <a href="mailto:support@example.com">support@example.com</a>.</p>
+    <p>If you have questions about this policy, contact us at <a href="mailto:support@zinto.app">support@zinto.app</a>.</p>
   </div>`,
     seo: {
       metaTitle: 'Privacy Policy',
@@ -1434,9 +1434,9 @@ export const FRONTEND_WEBSITE_PAGE_TEMPLATES: Record<
     <h1 style="color: #333; border-bottom: 2px solid #007cba; padding-bottom: 10px;">Contact Us</h1>
     <p>We would love to hear from you. Reach out using the details below.</p>
     <h2>Email</h2>
-    <p><a href="mailto:support@example.com">support@example.com</a></p>
+    <p><a href="mailto:support@zinto.app">support@zinto.app</a></p>
     <h2>Phone</h2>
-    <p>+1 (555) 123-4567</p>
+    <p>+34 641 457 123</p>
     <h2>Address</h2>
     <p>123 Business Street, City, State 12345</p>
   </div>`,

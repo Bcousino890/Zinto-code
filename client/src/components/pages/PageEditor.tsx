@@ -87,13 +87,13 @@ const TEMPLATE_CONTENT = {
     <p>We implement appropriate technical and organizational measures to protect your data against unauthorized access, alteration, disclosure, or destruction.</p>
 
     <h2>6. Your Rights</h2>
-    <p>You have the right to access, correct, or delete your personal data. To make a request, please contact us at <a href="mailto:support@example.com">support@example.com</a>.</p>
+    <p>You have the right to access, correct, or delete your personal data. To make a request, please contact us at <a href="mailto:support@zinto.app">support@zinto.app</a>.</p>
 
     <h2>7. Changes to This Policy</h2>
     <p>We may update this Privacy Policy from time to time. We encourage you to review this page periodically for any changes.</p>
 
     <h2>8. Contact</h2>
-    <p>If you have any questions or concerns about this policy, you can contact us at <a href="mailto:support@example.com">support@example.com</a>.</p>
+    <p>If you have any questions or concerns about this policy, you can contact us at <a href="mailto:support@zinto.app">support@zinto.app</a>.</p>
   </div>`,
     metaTitle: 'Privacy Policy - Your Company Name',
     metaDescription: 'Learn how we collect, use, and protect your personal information when you use our WhatsApp Business API services.',
@@ -182,12 +182,12 @@ const TEMPLATE_CONTENT = {
     <p>Our team consists of experienced developers, customer success managers, and WhatsApp specialists dedicated to helping your business succeed.</p>
 
     <h2>Get Started</h2>
-    <p>Ready to transform your customer communication? <a href="mailto:sales@example.com">Contact us today</a> to learn how we can help your business grow with WhatsApp.</p>
+    <p>Ready to transform your customer communication? <a href="mailto:contacto@zinto.app">Contact us today</a> to learn how we can help your business grow with WhatsApp.</p>
 
     <h2>Contact Information</h2>
     <p>
-      <strong>Email:</strong> <a href="mailto:info@example.com">info@example.com</a><br>
-      <strong>Phone:</strong> +1 (555) 123-4567<br>
+      <strong>Email:</strong> <a href="mailto:contacto@zinto.app">contacto@zinto.app</a><br>
+      <strong>Phone:</strong> +34 641 457 123<br>
       <strong>Address:</strong> 123 Business Street, City, State 12345
     </p>
   </div>`,

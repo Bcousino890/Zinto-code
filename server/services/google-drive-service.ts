@@ -208,7 +208,7 @@ export class GoogleDriveService {
 
   private async ensureBackupFolder(): Promise<string> {
     try {
-      const folderName = 'BotHive Backups';
+      const folderName = 'Zinto Backups';
 
       const response = await this.drive.files.list({
         q: `name='${folderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
@@ -285,7 +285,7 @@ export class GoogleDriveService {
           requestBody: {
             name: filename,
             parents: [folderId],
-            description: `BotHive database backup created on ${new Date().toISOString()}`
+            description: `Zinto database backup created on ${new Date().toISOString()}`
           },
           media: {
             mimeType: 'application/octet-stream',

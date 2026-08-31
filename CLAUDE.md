@@ -13,6 +13,18 @@ it in legal text). The platform was originally built by a vendor called **"Point
 Software"** (domain `pointer.pk`); a developer there, **"Abid Shafi"**, left personal
 example data (name, phone `+923059002132`, `@pointer.pk` emails) scattered through demo
 seeds, CSV examples, and test fixtures — being cleaned out (see "Rebrand" below).
+The user has said they bought the complete codebase outright — full rebrand and
+deeper changes are authorized, not just cosmetic text swaps, but still weigh
+operational risk (see the "needs a decision" list below) before touching anything
+that could break a live deployment.
+
+**Live URLs**: marketing site `https://zinto.app/`, CRM app `https://crm.zinto.app/`
+(login: `/auth`, signup: `/register`). Use `crm.zinto.app` for Google Cloud Console
+OAuth redirect URIs (e.g. `https://crm.zinto.app/api/google/sheets/callback`,
+`https://crm.zinto.app/api/google/calendar/callback`) and any other "our own app
+domain" reference. Real contact details for default/legal page templates:
+`support@zinto.app`, `pagos@zinto.app`, `contacto@zinto.app`, phone
+`+34 641 457 123`.
 
 Stack: Node/Express server (`server/`), React client (`client/src/`), Drizzle/Postgres
 (`shared/schema.ts`, `migrations/`), Vite build, `npm run check` for a full-repo `tsc`
@@ -83,41 +95,52 @@ original vendor's employee name/phone/email (`Abid Shafi`, `+923059002132`,
 `*@pointer.pk` → generic `Jane Doe` / `example.com`-style placeholders) across
 CSV examples, ERP demo seed, flow-builder doc examples, and translation strings.
 
-**Found but deliberately NOT touched — needs a decision, ask before changing:**
-1. **`server/services/emergency-reset.ts:4`** —
-   `EMERGENCY_SECRET = 'PointerSoftwareSystems@923059002132'`. A hardcoded
-   password (containing the old vendor's name + what looks like a real phone
-   number) that gates an "emergency admin access" HTTP route. This is a real
-   security exposure independent of branding — anyone who knows/guesses this
-   string can hit that endpoint. Should be rotated to a random secret sourced
-   from an environment variable, not hardcoded in source. Not changed because
-   swapping it silently could lock out whoever currently relies on it, and moving
-   it to an env var requires that var to be set in production before deploy.
-2. **`server/services/plan-expiration-service.ts:121`** —
-   `company.name === 'BotHive Admin' || company.slug === 'bothive-admin'` bypasses
-   plan-expiration checks entirely for a company with that exact name/slug. Unknown
-   whether such a row still exists in production and is still needed. Don't rename
-   the string without first checking the `companies` table and deciding what (if
-   anything) replaces this bypass.
-3. **`server/services/google-drive-service.ts`** — backup folder is named
-   `'BotHive Backups'` (`ensureBackupFolder()`), found/created by exact name.
-   Renaming the string starts a *new* Drive folder going forward; existing backups
-   stay in the old-named folder (not lost, just split across two folders unless
-   handled explicitly).
-4. **`server/services/auto-update-service.ts:41`** —
-   `releaseApiUrl = 'https://releases.bothiveapp.net/updates'`. The app's
-   auto-update mechanism points at a domain owned by the original platform vendor.
-   Need to know whether this is still a real, relied-upon update channel (leave
-   alone / point at Zinto's own release server) or dead code (safe to remove).
-5. **The "BotHive" infra footprint (~90 files)**: env var names, `.env*` files,
+**Fixed in round 2** (user confirmed they own the full codebase — authorized going
+beyond pure cosmetics):
+- `server/services/emergency-reset.ts` — rotated `EMERGENCY_SECRET` off the old
+  vendor's name+phone string to a freshly generated random value, with an
+  `EMERGENCY_RESET_SECRET` env var override available (not required).
+- `server/services/plan-expiration-service.ts` — bypass check now looks for
+  `company.name === 'Zinto Admin'` / `slug === 'zinto-admin'` (was
+  `'BotHive Admin'`/`'bothive-admin'`). **If a company row already exists in the
+  DB under the old name/slug relying on this bypass, it must be renamed to match
+  or it silently loses the bypass** — nobody has DB access from this environment
+  to check/fix that row directly.
+- `server/services/google-drive-service.ts` — backup folder renamed to
+  `'Zinto Backups'`. Existing backups stay in the old `'BotHive Backups'` folder
+  in each user's Drive (not lost, just split across two folders going forward).
+- `server/services/auto-update-service.ts` — `checkForUpdates()` now short-circuits
+  to `return null` (updates are delivered as files per the user, not fetched from
+  a hosted feed); removed the `releaseApiUrl` pointing at the old vendor's
+  `releases.bothiveapp.net`. The `/api/auto-update/*` routes and admin "Check for
+  updates" UI still exist but will just always report "no updates available."
+- `shared/frontend-website-settings.ts` / `client/src/components/pages/PageEditor.tsx`
+  — default Contact/About/Privacy page templates now use real Zinto contact info
+  (`support@zinto.app`, `contacto@zinto.app`, `+34 641 457 123`) instead of
+  `support@example.com` / `+1 (555) 123-4567` placeholders. (Left untouched:
+  input-field placeholder hints like `placeholder="support@company.com"` or
+  Twilio number format examples — those are format hints for admins typing their
+  *own* numbers/emails, not displayed Zinto contact info; and demo/webhook sample
+  data like `'Jane Doe' / '+15551234567'` — fake customer data, not a contact
+  channel.)
+
+**Still found, deliberately NOT touched — ask before changing:**
+1. **`server/services/license-validator.ts:12`** —
+   `ENCRYPTION_KEY = 'bothive-license-key-2024-secur'` is a real AES-256-CBC key
+   used to encrypt/decrypt license data (not just display text). Rotating it
+   would make any existing encrypted license data unreadable unless it's
+   re-encrypted with the new key at the same time. Also unclear whether, now that
+   the user owns the code outright, they even want to keep a license-gating
+   mechanism at all versus removing it — that's a product decision, not a rename.
+2. **The "BotHive" infra footprint (~90 files)**: env var *names*, `.env*` files,
    `docker-compose*.yml`, `Dockerfile*`, deploy/migration shell scripts under
-   `scripts/`, `server/utils/secure-env.ts`, `server/services/license-validator.ts`,
-   the npm package scope `@bothive/pointer-odontogram-module`. This is the
-   underlying platform's infrastructure naming, not just display text — renaming
-   risks breaking secret decryption, license validation, auto-update, or deployed
-   container/volume names. **Not touched.** Only pursue this with an explicit,
-   tested migration plan, not a find-and-replace.
-6. **Committed `.env` / `.env.development` / `server/.env`** are tracked in git
+   `scripts/`, the npm package scope `@bothive/pointer-odontogram-module`.
+   Renaming env var names in code without simultaneously updating the actual
+   values set on the live server would break the app on next restart — this
+   environment has no access to that live server config to do both sides at
+   once. Only pursue with an explicit migration plan (rename in code + deploy
+   config together), not a find-and-replace.
+3. **Committed `.env` / `.env.development` / `server/.env`** are tracked in git
    (not gitignored). They currently hold what look like local/dev values
    (`DATABASE_URL` points at `localhost`), not obviously live production secrets,
    but committing secret-shaped keys (`ENCRYPTION_KEY`, `SESSION_SECRET`) at all is

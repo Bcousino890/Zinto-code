@@ -38,8 +38,6 @@ export class AutoUpdateService extends EventEmitter {
   private readonly isDockerEnvironment: boolean;
   private readonly updateDir: string;
   private readonly backupDir: string;
-  private readonly releaseApiUrl = 'https://releases.bothiveapp.net/updates';
-
   constructor() {
     super();
 
@@ -108,30 +106,12 @@ export class AutoUpdateService extends EventEmitter {
    * Check for available updates
    */
   async checkForUpdates(): Promise<UpdatePackage | null> {
-    try {
-      const currentVersion = await this.getCurrentVersion();
-      const response = await fetch(`${this.releaseApiUrl}/v${currentVersion}`);
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          logger.info('auto-update', 'No updates available');
-          return null;
-        }
-        throw new Error(`Update check failed: ${response.statusText}`);
-      }
-
-      const updateInfo = await response.json() as UpdatePackage;
-      
-      if (!this.validateUpdatePackage(updateInfo)) {
-        throw new Error('Invalid update package structure');
-      }
-
-      logger.info('auto-update', `Update available: ${updateInfo.version}`);
-      return updateInfo;
-    } catch (error) {
-      logger.error('auto-update', 'Failed to check for updates', error);
-      throw error;
-    }
+    // Zinto ships updates as files delivered directly, not via a hosted release
+    // feed. This used to call the previous platform vendor's release server
+    // (releases.bothiveapp.net), which Zinto has no relationship with — disabled
+    // rather than repointed at a nonexistent Zinto domain.
+    logger.info('auto-update', 'Remote update checks are disabled; updates are delivered as files.');
+    return null;
   }
 
   /**

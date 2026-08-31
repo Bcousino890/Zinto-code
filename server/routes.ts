@@ -157,6 +157,7 @@ import {
   buildTeamMemberPermissionUpdates,
   normalizeAdminCustomPermissionsSnapshot,
 } from "./middleware";
+import { planLimitsService } from "./services/plan-limits-service";
 import {
   flowDefinitionWithMcpSecretsRedactedForViewer,
   normalizeFlowNodesAgentControl,
@@ -13770,6 +13771,11 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         });
       }
 
+      const contactLimit = await planLimitsService.checkPlanLimit(req.user.companyId, 'contacts');
+      if (!contactLimit.allowed) {
+        return res.status(403).json({ message: contactLimit.message || 'Contact limit reached for your plan' });
+      }
+
       const contact = await storage.getOrCreateContact(contactData);
 
 
@@ -23634,6 +23640,11 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       const { fullName, username, email, password, whatsappNumber } = validationResult.data;
       let role = validationResult.data.role as 'admin' | 'agent';
       let customRoleId: number | null = validationResult.data.customRoleId ?? null;
+
+      const userLimit = await planLimitsService.checkPlanLimit(req.user.companyId!, 'users');
+      if (!userLimit.allowed) {
+        return res.status(403).json({ message: userLimit.message || 'User limit reached for your plan' });
+      }
 
       if (customRoleId != null && role === 'admin') {
         return res.status(400).json({

@@ -6,7 +6,6 @@ public
 whatsapp-sessions
 *.tar.gz
 *.zip
-*.md
 backups
 media
 data/wa-version.json

@@ -87,7 +87,7 @@ interface ErpNodeProps {
     includePdfLink?: boolean;
     errorMessage?: string;
     orderStatus?: string;
-    /** Optional BotHive user ID (or template); overrides default actor for ERP accounting posts. */
+    /** Optional Zinto user ID (or template); overrides default actor for ERP accounting posts. */
     erpActorUserId?: string;
   };
   isConnectable: boolean;

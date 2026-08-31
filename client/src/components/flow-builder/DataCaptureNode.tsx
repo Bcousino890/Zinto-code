@@ -1231,7 +1231,7 @@ function DataCaptureHelpContent() {
               <h4 className="font-medium text-sm mb-2">{t('flow_builder.data_capture_example1', 'Example 1: Contact Information Collection')}</h4>
               <div className="space-y-2 text-xs">
                 <div className="bg-card rounded p-2">
-                  <strong>User Message:</strong> "Hi, my name is Abid Shafi and my email is abid@pointer.pk"
+                  <strong>User Message:</strong> "Hi, my name is Jane Doe and my email is jane@example.com"
                 </div>
                 <div className="bg-muted rounded p-2 font-mono">
                   <strong>Capture Rules:</strong><br/>
@@ -1240,8 +1240,8 @@ function DataCaptureHelpContent() {
                 </div>
                 <div className="bg-primary/10 rounded p-2">
                   <strong>Result:</strong><br/>
-                  &#123;&#123;user_name&#125;&#125; = "Abid Shafi"<br/>
-                  &#123;&#123;user_email&#125;&#125; = "abid@pointer.pk"
+                  &#123;&#123;user_name&#125;&#125; = "Jane Doe"<br/>
+                  &#123;&#123;user_email&#125;&#125; = "jane@example.com"
                 </div>
                 <div className="bg-primary/10 rounded p-2">
                   <strong>Usage in Next Node:</strong><br/>

@@ -283,7 +283,7 @@ export default function ERPSettingsPage() {
   );
 
   const sampleContactName = useMemo(
-    () => t('erp.settings.invoiceTemplates.previewSample.contactName', 'Abid Customer'),
+    () => t('erp.settings.invoiceTemplates.previewSample.contactName', 'Jane Doe'),
     [t]
   );
 

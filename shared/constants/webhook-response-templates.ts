@@ -201,9 +201,9 @@ export const WEBHOOK_SAMPLE_PAYLOADS: WebhookSamplePayload[] = [
       date_update_order: '2026-01-15T10:30:00Z',
       order_items: [{ id_product: 501, name: 'Sample Product', quantity: 1, price: 150000 }],
       customer: {
-        full_name: 'Abid Shafi',
-        email: 'admin@pointer.pk',
-        phone: '+923059002132',
+        full_name: 'Jane Doe',
+        email: 'jane@example.com',
+        phone: '+15550100',
       },
     },
   },

@@ -258,7 +258,7 @@ export default function AdminSettingsPage() {
   }, []);
 
   const [brandingForm, setBrandingForm] = useState({
-    appName: 'BotHive',
+    appName: 'Zinto',
     primaryColor: '#333235',
     secondaryColor: '#4F46E5',
     uiGradientPreset: 'glass-dark',
@@ -2035,7 +2035,7 @@ export default function AdminSettingsPage() {
     const height = embedSettings.height || '600px';
 
     const brandingSetting = settings?.find((s: any) => s.key === 'branding');
-    const appTitle = brandingForm.appName || brandingSetting?.value?.appName || 'BotHive Application';
+    const appTitle = brandingForm.appName || brandingSetting?.value?.appName || 'Zinto Application';
 
     const styles: React.CSSProperties = {
       border: 'none',
@@ -2073,7 +2073,7 @@ export default function AdminSettingsPage() {
     const height = embedSettings.height || '600px';
 
     const brandingSetting = settings?.find((s: any) => s.key === 'branding');
-    const appTitle = brandingForm.appName || brandingSetting?.value?.appName || 'BotHive Application';
+    const appTitle = brandingForm.appName || brandingSetting?.value?.appName || 'Zinto Application';
 
 
     const styles = [];
@@ -4392,11 +4392,11 @@ export default function AdminSettingsPage() {
                               <iframe
                                 title={t('admin.settings.welcome_email.preview_body_only', 'Body Render Preview Only')}
                                 srcDoc={welcomeEmailForm.body
-                                  .replace(/\{\{appName\}\}/g, brandingForm.appName || 'BotHive')
-                                  .replace(/\{\{companyName\}\}/g, 'Pointer Software')
+                                  .replace(/\{\{appName\}\}/g, brandingForm.appName || 'Zinto')
+                                  .replace(/\{\{companyName\}\}/g, 'Zinto')
                                   .replace(/\{\{adminFullName\}\}/g, 'Felix Zona')
                                   .replace(/\{\{adminUsername\}\}/g, 'felix')
-                                  .replace(/\{\{adminEmail\}\}/g, 'info@pointer.pk')
+                                  .replace(/\{\{adminEmail\}\}/g, 'contacto@zinto.app')
                                   .replace(/\{\{planLabel\}\}/g, 'Pro')
                                   .replace(/\{\{loginUrl\}\}/g, window.location.origin + '/auth')
                                   .replace(/\{\{currentYear\}\}/g, String(new Date().getFullYear()))
@@ -4455,11 +4455,11 @@ export default function AdminSettingsPage() {
                             <iframe
                               title={t('admin.settings.welcome_email.preview_desktop', 'Welcome Email Desktop Preview')}
                               srcDoc={welcomeEmailForm.body
-                                .replace(/\{\{appName\}\}/g, brandingForm.appName || 'BotHive')
-                                .replace(/\{\{companyName\}\}/g, 'Pointer Software')
+                                .replace(/\{\{appName\}\}/g, brandingForm.appName || 'Zinto')
+                                .replace(/\{\{companyName\}\}/g, 'Zinto')
                                 .replace(/\{\{adminFullName\}\}/g, 'Felix Zona')
                                 .replace(/\{\{adminUsername\}\}/g, 'felix')
-                                .replace(/\{\{adminEmail\}\}/g, 'info@pointer.pk')
+                                .replace(/\{\{adminEmail\}\}/g, 'contacto@zinto.app')
                                 .replace(/\{\{planLabel\}\}/g, 'Pro')
                                 .replace(/\{\{loginUrl\}\}/g, window.location.origin + '/auth')
                                 .replace(/\{\{currentYear\}\}/g, String(new Date().getFullYear()))
@@ -4481,11 +4481,11 @@ export default function AdminSettingsPage() {
                               <iframe
                                 title={t('admin.settings.welcome_email.preview_mobile', 'Welcome Email Mobile Preview')}
                                 srcDoc={welcomeEmailForm.body
-                                  .replace(/\{\{appName\}\}/g, brandingForm.appName || 'BotHive')
-                                  .replace(/\{\{companyName\}\}/g, 'Pointer Software')
+                                  .replace(/\{\{appName\}\}/g, brandingForm.appName || 'Zinto')
+                                  .replace(/\{\{companyName\}\}/g, 'Zinto')
                                   .replace(/\{\{adminFullName\}\}/g, 'Felix Zona')
                                   .replace(/\{\{adminUsername\}\}/g, 'felix')
-                                  .replace(/\{\{adminEmail\}\}/g, 'info@pointer.pk')
+                                  .replace(/\{\{adminEmail\}\}/g, 'contacto@zinto.app')
                                   .replace(/\{\{planLabel\}\}/g, 'Pro')
                                   .replace(/\{\{loginUrl\}\}/g, window.location.origin + '/auth')
                                   .replace(/\{\{currentYear\}\}/g, String(new Date().getFullYear()))
@@ -4882,7 +4882,7 @@ export default function AdminSettingsPage() {
                           {t(
                             'admin.settings.embed.copy_instruction',
                             'Copy this HTML code and paste it into your website where you want {{appName}} to appear.',
-                            { appName: brandingForm.appName || 'BotHive' }
+                            { appName: brandingForm.appName || 'Zinto' }
                           )}
                         </p>
                       </div>

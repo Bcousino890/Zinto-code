@@ -27825,7 +27825,7 @@
     },
     {
         "key": "landing.hero.subtitle",
-        "value": "Join thousands of businesses using BotHive to streamline their customer interactions and boost satisfaction rates."
+        "value": "Join thousands of businesses using Zinto to streamline their customer interactions and boost satisfaction rates."
     },
     {
         "key": "landing.hero.start_free_trial",
@@ -27917,7 +27917,7 @@
     },
     {
         "key": "landing.cta.subtitle",
-        "value": "Join thousands of businesses using BotHive to streamline their customer interactions and boost satisfaction rates."
+        "value": "Join thousands of businesses using Zinto to streamline their customer interactions and boost satisfaction rates."
     },
     {
         "key": "landing.cta.start_free_trial",
@@ -36077,7 +36077,7 @@
     },
     {
         "key": "settings.telegramConnectionForm.webhook.step2",
-        "value": "Ensure this BotHive server is reachable over HTTPS at the URL shown (or your configured public base URL)."
+        "value": "Ensure this Zinto server is reachable over HTTPS at the URL shown (or your configured public base URL)."
     },
     {
         "key": "settings.telegramConnectionForm.webhook.step3",
@@ -40889,7 +40889,7 @@
     },
     {
         "key": "erp.settings.invoiceTemplates.previewSample.contactName",
-        "value": "Abid"
+        "value": "Jane Doe"
     },
     {
         "key": "erp.settings.invoiceTemplates.previewSample.product1",

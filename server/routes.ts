@@ -1260,7 +1260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const appName =
         typeof brandingValue?.appName === 'string' && brandingValue.appName.trim()
           ? brandingValue.appName.trim()
-          : 'BotHive';
+          : 'Zinto';
       const logoUrl =
         typeof brandingLogoSetting?.value === 'string' ? brandingLogoSetting.value : undefined;
       const faviconUrl =
@@ -1358,7 +1358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const appName =
         typeof brandingValue?.appName === 'string' && brandingValue.appName.trim()
           ? brandingValue.appName.trim()
-          : 'BotHive';
+          : 'Zinto';
       const logoUrl =
         typeof brandingLogoSetting?.value === 'string' ? brandingLogoSetting.value : undefined;
       const faviconUrl =
@@ -12740,7 +12740,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
     try {
       const headers = ['name', 'phone', 'email', 'company', 'tags', 'notes'];
       const sampleData = [
-        'John Doe,+1234567890,john@example.com,Pointer Software,"vip,customer",Important client',
+        'John Doe,+1234567890,john@example.com,Example Corp,"vip,customer",Important client',
         'Felix Zona,+0987654321,jane@example.com,Tech Inc,"lead,prospect",New lead from website',
         'Bob Johnson,+1122334455,bob@example.com,StartupXYZ,"customer",Regular customer'
       ];

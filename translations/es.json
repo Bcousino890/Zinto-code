@@ -34813,7 +34813,7 @@
     },
     {
         "key": "settings.telegramConnectionForm.webhook.step2",
-        "value": "Asegúrese de que este servidor BotHive sea accesible por HTTPS en la URL indicada (o su URL base pública configurada)."
+        "value": "Asegúrese de que este servidor Zinto sea accesible por HTTPS en la URL indicada (o su URL base pública configurada)."
     },
     {
         "key": "settings.telegramConnectionForm.webhook.step3",
@@ -39365,7 +39365,7 @@
     },
     {
         "key": "erp.settings.invoiceTemplates.previewSample.contactName",
-        "value": "Cliente de ejemplo Abid"
+        "value": "Cliente de ejemplo Jane"
     },
     {
         "key": "erp.settings.invoiceTemplates.previewSample.product1",

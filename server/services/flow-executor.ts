@@ -348,9 +348,9 @@ function buildHttpNodeTestContextDefaults(
 ): Record<string, unknown> {
   const now = new Date();
   const defaults: Record<string, unknown> = {
-    'contact.name': 'Abid Shafi',
-    'contact.phone': '+923059002132',
-    'contact.email': 'admin@pointer.pk',
+    'contact.name': 'Jane Doe',
+    'contact.phone': '+15550100',
+    'contact.email': 'jane@example.com',
     'contact.id': '12345',
     'message.content': 'This is a test message',
     'date.today': now.toISOString().split('T')[0],
@@ -18354,7 +18354,7 @@ ${GAMMA_ASSISTANT_LOGO_ASK}
                 phone: context.getVariable('contact.phone')
               },
               timestamp: new Date().toISOString(),
-              source: 'BotHivePlus_Flow'
+              source: 'Zinto_Flow'
             };
           }
           break;
@@ -21915,7 +21915,7 @@ ${enabledDays.length > 0 ? `✅ Available days and hours:\n${enabledDays.map((s:
    - Optional: description, location, attendees, time_zone
    - IMPORTANT: Use conversation history to extract information that has already been provided:
      * If the user mentioned a service (e.g., "hair cut", "haircut"), use it as the title
-     * If the user mentioned a name (e.g., "abid", "John"), you can use it in the title or description (e.g., "Haircut for Abid")
+     * If the user mentioned a name (e.g., "Maria", "John"), you can use it in the title or description (e.g., "Haircut for Maria")
      * If the user mentioned an email, use it in the attendees parameter
      * If the user selected a time from available slots (e.g., "2pm", "02pm", "14:00"), use that time with the date from the availability check
      * If the user said "tomorrow" or a date, calculate the actual date (YYYY-MM-DD format)

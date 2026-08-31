@@ -141,7 +141,7 @@ export class SubscriptionDataValidator {
 
     try {
       const now = new Date();
-      const gracePeriodDays = 15; // BotHive's 15-day grace period
+      const gracePeriodDays = 15; // Zinto's 15-day grace period
 
 
       const companiesNeedingGracePeriod = await db

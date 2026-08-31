@@ -51,7 +51,7 @@ eventEmitterMonitor.register('email-service', eventEmitter);
 
 /**
  * Email Channel Service
- * Provides IMAP/SMTP email integration following BotHivePlus channel patterns
+ * Provides IMAP/SMTP email integration following Zinto channel patterns
  */
 
 /**

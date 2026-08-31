@@ -1562,7 +1562,7 @@ async function createPayPalPaymentSession(company: any, plan: any, enableAutoRen
       custom_id: transaction.id.toString()
     }] as any,
     application_context: {
-      brand_name: 'BotHivePlus',
+      brand_name: 'Zinto',
       landing_page: 'BILLING',
       user_action: 'PAY_NOW',
       return_url: `${(() => {

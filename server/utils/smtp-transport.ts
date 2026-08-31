@@ -85,7 +85,7 @@ export function resolveAdminSmtpConfig(raw: AdminSmtpConfig): ResolvedSmtpConfig
     security: normalizeSecurity(raw.security),
     username: raw.username,
     password: decryptSmtpPassword(raw.password),
-    fromName: raw.fromName || 'BotHivePlus',
+    fromName: raw.fromName || 'Zinto',
     fromEmail: raw.fromEmail || raw.username,
   };
 }
@@ -105,7 +105,7 @@ export function resolveLegacySmtpConfig(raw: Record<string, unknown>): ResolvedS
     security: secure ? 'ssl' : 'tls',
     username: auth.user,
     password: String(auth.pass),
-    fromName: String(raw.senderName || 'BotHivePlus'),
+    fromName: String(raw.senderName || 'Zinto'),
     fromEmail: String(raw.senderEmail || auth.user),
   };
 }

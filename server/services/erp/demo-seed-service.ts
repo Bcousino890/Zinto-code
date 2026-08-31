@@ -856,18 +856,18 @@ async function seedDentalDemoData(ctx: SeedContext) {
 
   const contactSearch = await storage.getContacts({
     companyId: ctx.companyId,
-    search: "Abid Patient",
+    search: "Demo Patient",
     limit: 5,
     page: 1,
   });
-  let patientContact = contactSearch.contacts.find((c) => c.name === "Abid Patient");
+  let patientContact = contactSearch.contacts.find((c) => c.name === "Demo Patient");
   if (!patientContact) {
     patientContact = await storage.createContact({
       companyId: ctx.companyId,
-      name: "Abid Shafi",
-      phone: "+923059002132",
+      name: "Demo Patient",
+      phone: "+15550100",
       email: "admin@app.com",
-      identifier: "dental-demo-abid",
+      identifier: "dental-demo-patient",
       identifierType: "custom",
       source: "erp-demo-seed",
     } as any);

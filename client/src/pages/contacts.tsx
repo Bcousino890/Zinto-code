@@ -1566,8 +1566,8 @@ export default function Contacts() {
   const downloadCsvTemplate = () => {
     const headers = ['name', 'email', 'phone', 'company', 'identifierType', 'identifier', 'notes', 'tags'];
     const exampleData = [
-      'Abid,admin@pointer.pk,+923059002132,Pointer Software,whatsapp,+923059020132,Sales lead,"lead,customer"',
-      'Niamat,niamat@pointer.pk,+923000052443,Pointer Software,messenger,niamat.shakran,Marketing contact,"prospect,vip"'
+      'John Doe,admin@example.com,+15550100,Example Corp,whatsapp,+15550101,Sales lead,"lead,customer"',
+      'Jane Smith,jane@example.com,+15550102,Example Corp,messenger,jane.smith,Marketing contact,"prospect,vip"'
     ];
 
     const csvContent = [headers.join(','), ...exampleData].join('\n');

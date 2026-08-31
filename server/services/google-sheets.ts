@@ -354,7 +354,7 @@ class GoogleSheetsService {
         <html>
           <body>
             <h1>Google Sheets Connected Successfully!</h1>
-            <p>You can now close this window and return to BotHivePlus.</p>
+            <p>You can now close this window and return to Zinto.</p>
             <script>window.close();</script>
           </body>
         </html>
@@ -1699,9 +1699,9 @@ class GoogleSheetsService {
         [
           'ORD-1001',
           '2026-03-15',
-          'Abid Shafi',
-          'abid@pointer.pk',
-          '+92 305 9002132',
+          'Jane Doe',
+          'jane@example.com',
+          '+1 555 0100',
           'Wireless Earbuds Pro',
           2,
           49.99,
@@ -1712,9 +1712,9 @@ class GoogleSheetsService {
         [
           'ORD-1002',
           '2026-03-18',
-          'Niamat Shakran',
-          'niamat@pointer.pk',
-          '+92 300 052443',
+          'Maria Lopez',
+          'maria@example.com',
+          '+1 555 0102',
           'Stainless Steel Water Bottle 1L',
           1,
           24.5,
@@ -1725,9 +1725,9 @@ class GoogleSheetsService {
         [
           'ORD-1003',
           '2026-03-20',
-          'Haider',
-          'haider@pointer.pk',
-          '+92 314 1899043',
+          'Alex Chen',
+          'alex@example.com',
+          '+1 555 0103',
           'USB-C Hub 7-Port',
           1,
           39,

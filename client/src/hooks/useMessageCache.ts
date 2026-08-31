@@ -97,7 +97,7 @@ export function useMessageCache(options: UseMessageCacheOptions = {}) {
 
             const mediaCount = cacheResult.messages.filter((m: any) => m.type && ['image','video','audio','document','sticker'].includes(m.type)).length;
             if (typeof console !== 'undefined' && console.debug) {
-              console.debug('[BotHive Cache] Messages from cache', { conversationId, page, count: cacheResult.messages.length, mediaCount });
+              console.debug('[Zinto Cache] Messages from cache', { conversationId, page, count: cacheResult.messages.length, mediaCount });
             }
 
             return {

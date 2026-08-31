@@ -673,7 +673,7 @@ export class KnowledgeBaseService {
         baseURL: 'https://openrouter.ai/api/v1',
         headers: {
           'HTTP-Referer': 'https://bothive.pro',
-          'X-Title': 'BotHive'
+          'X-Title': 'Zinto'
         }
       });
     }

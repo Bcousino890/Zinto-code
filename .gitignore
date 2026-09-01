@@ -13,5 +13,6 @@ data/wa-version.json
 .cursor/settings.json
 .env
 .env.*
+!.env.example
 server/.env
 cookies.txt

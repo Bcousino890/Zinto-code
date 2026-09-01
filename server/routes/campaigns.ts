@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 import crypto from 'crypto';
 import { CampaignService } from '../services/campaignService.js';
 import { requirePermission, requireAnyPermission } from '../middleware.js';
+import { planLimitsService } from '../services/plan-limits-service.js';
 import { db } from '../db.js';
 import { campaigns, campaignRecipients, campaignQueue, campaignMessages, contacts, channelConnections, whatsappAccounts } from '../../shared/schema.js';
 import { eq, sql, and, desc, inArray } from 'drizzle-orm';
@@ -103,6 +104,10 @@ router.post('/', requireAnyPermission(['create_campaigns']), async (req, res) =>
       return res.status(400).json({ success: false, error: 'Company ID and User ID required' });
     }
 
+    const campaignLimit = await planLimitsService.checkPlanLimit(companyId, 'campaigns');
+    if (!campaignLimit.allowed) {
+      return res.status(403).json({ success: false, error: campaignLimit.message || 'Campaign limit reached for your plan' });
+    }
 
     // Forward all body fields including email campaign: emailSubject, emailProvider, contentMode, channelId, channelType
     const campaignData = { ...req.body };

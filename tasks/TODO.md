@@ -25,10 +25,18 @@ Ver `PLAN.md` para contexto completo de cada punto. Última actualización:
 - [x] Host header injection en forgot-password (orden de prioridad
       invertido en `password-reset.ts`, cubre ambos endpoints)
 
-## Fase 2 — pendiente
-- [ ] `checkPlanLimit` en channels/flows/campaigns
+## Fase 2 — mayormente hecha
+- [x] `checkPlanLimit` en channels y campaigns (flows ya tenía su propio
+      enforcement funcional, no hacía falta)
+- [x] Auditoría IDOR completa de los ~50 endpoints de `server/routes.ts`
+      de la lista original — ver `tasks/done/2026-08-31-fase2-idor-audit.md`
+      para el detalle endpoint por endpoint. 10 puntos adicionales
+      encontrados con el campo de chequeo equivocado (`userId` en vez de
+      `companyId`), también corregidos.
+- [ ] Auditoría IDOR de endpoints **fuera** de `server/routes.ts`
+      (`server/routes/erp/*.ts`, `server/admin-routes.ts`,
+      `server/webhook-routes.ts`) — no cubierta todavía.
 - [ ] Corte real de storage/bandwidth en `data-usage-tracker.ts`
-- [ ] Auditoría IDOR de los ~50 endpoints con `:id` sin `companyId`
 - [ ] Tope de tokens IA en asistente conversacional + RAG
 
 ## Fase 3 — pendiente

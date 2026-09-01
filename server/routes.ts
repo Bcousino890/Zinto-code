@@ -11186,6 +11186,11 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(400).json({ message: 'Company ID is required for multi-tenant security' });
       }
 
+      const channelLimit = await planLimitsService.checkPlanLimit(req.user.companyId, 'channels');
+      if (!channelLimit.allowed) {
+        return res.status(403).json({ message: channelLimit.message || 'Channel limit reached for your plan' });
+      }
+
       const connectionData = validateBody(insertChannelConnectionSchema, {
         ...req.body,
         userId: req.user.id,
@@ -11437,6 +11442,14 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       const connectionId = parseInt(req.params.id);
       const forceQR = req.body?.forceQR === true;
 
+      const ownerCheckConnection = await storage.getChannelConnection(connectionId);
+      if (!ownerCheckConnection) {
+        return res.status(404).json({ message: 'Connection not found' });
+      }
+      if (!req.user.isSuperAdmin && ownerCheckConnection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
+      }
+
       const deps: ReconnectDeps = {
         storage: {
           async getChannelConnection(id: number) {
@@ -11638,7 +11651,9 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
+      }
 
       const diagnostics = whatsAppService.getConnectionDiagnostics(connectionId);
 
@@ -11679,6 +11694,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
 
       if (!connection) {
         return res.status(404).json({ message: 'Connection not found' });
+      }
+
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
       }
 
       if (!forceRefresh) {
@@ -11734,6 +11753,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
 
       if (!connection) {
         return res.status(404).json({ message: 'Connection not found' });
+      }
+
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
       }
 
       if (!forceRefresh) {
@@ -11798,7 +11821,9 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
+      }
 
       const isActive = whatsAppService.isConnectionActive(connectionId);
       if (!isActive) {
@@ -11829,6 +11854,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
 
       if (!connection) {
         return res.status(404).json({ message: 'Connection not found' });
+      }
+
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
       }
 
       if (!forceRefresh) {
@@ -11900,7 +11929,9 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
+      }
 
       const isActive = whatsAppService.isConnectionActive(connectionId);
       if (!isActive) {
@@ -12095,6 +12126,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
 
       if (!connection) {
         return res.status(404).json({ message: 'Connection not found' });
+      }
+
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
       }
 
 
@@ -12427,6 +12462,11 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       if (!conversation) {
         await fsExtra.unlink(req.file.path);
         return res.status(404).json({ error: 'Conversation not found' });
+      }
+
+      if (!req.user.isSuperAdmin && conversation.companyId !== req.user.companyId) {
+        await fsExtra.unlink(req.file.path);
+        return res.status(403).json({ error: 'Conversation does not belong to your company' });
       }
 
       if (!conversation.channelId) {
@@ -13361,7 +13401,11 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Contact not found' });
       }
 
-      const updateData = req.body;
+      if (!(req.user as any).isSuperAdmin && contact.companyId !== (req.user as any).companyId) {
+        return res.status(403).json({ message: 'Contact does not belong to your company' });
+      }
+
+      const { companyId: _ignoredCompanyId, ...updateData } = req.body || {};
 
 
       if (updateData.identifierType && !updateData.source) {
@@ -15932,6 +15976,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Contact not found' });
       }
 
+      if (!req.user.isSuperAdmin && contact.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Contact does not belong to your company' });
+      }
+
       const contactIdentifier = contact.identifier || contact.phone || null;
       const isWhatsApp = contact.identifierType === 'whatsapp' || contact.identifierType === 'whatsapp_unofficial';
       const isTelegram = contact.identifierType === 'telegram';
@@ -15943,6 +15991,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       const connection = await storage.getChannelConnection(connectionId);
       if (!connection) {
         return res.status(404).json({ message: 'Connection not found' });
+      }
+
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
       }
 
       const permissions = await getUserPermissions(req.user);
@@ -16044,6 +16096,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Conversation not found' });
       }
 
+      if (!req.user.isSuperAdmin && conversation.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Conversation does not belong to your company' });
+      }
+
       if (!conversation.isGroup || !conversation.groupJid) {
         return res.status(400).json({
           message: 'This conversation is not a group chat'
@@ -16055,7 +16111,9 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Connection does not belong to your company' });
+      }
 
       const isActive = whatsAppService.isConnectionActive(connectionId);
       if (!isActive) {
@@ -17125,7 +17183,15 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
   app.patch('/api/conversations/:id', ensureAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const updates = req.body;
+      const { companyId: _ignoredCompanyId, ...updates } = req.body || {};
+
+      const existingConversation = await storage.getConversation(id);
+      if (!existingConversation) {
+        return res.status(404).json({ message: 'Conversation not found' });
+      }
+      if (!(req.user as any).isSuperAdmin && existingConversation.companyId !== (req.user as any).companyId) {
+        return res.status(403).json({ message: 'Conversation does not belong to your company' });
+      }
 
       const conversation = await storage.updateConversation(id, updates);
 
@@ -18112,6 +18178,11 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ error: 'Conversation not found' });
       }
 
+      if (!(req.user as any).isSuperAdmin && conversation.companyId !== (req.user as any).companyId) {
+        await fsExtra.unlink(req.file.path);
+        return res.status(403).json({ error: 'Conversation does not belong to your company' });
+      }
+
       let determinedMediaType: 'image' | 'video' | 'audio' | 'document' = 'document';
       const mimeType = req.file.mimetype;
 
@@ -18982,6 +19053,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ error: 'Conversation not found' });
       }
 
+      if (!(req.user as any).isSuperAdmin && conversation.companyId !== (req.user as any).companyId) {
+        await fsExtra.unlink(req.file.path);
+        return res.status(403).json({ error: 'Conversation does not belong to your company' });
+      }
 
       let determinedMediaType: 'image' | 'video' | 'audio' | 'document' = 'document';
       const mimeType = req.file.mimetype;
@@ -19180,6 +19255,13 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
 
   app.get('/api/contacts/:id/notes', ensureAuthenticated, async (req, res) => {
     const contactId = parseInt(req.params.id);
+    const contactForNotes = await storage.getContact(contactId);
+    if (!contactForNotes) {
+      return res.status(404).json({ message: 'Contact not found' });
+    }
+    if (!(req.user as any).isSuperAdmin && contactForNotes.companyId !== (req.user as any).companyId) {
+      return res.status(403).json({ message: 'Contact does not belong to your company' });
+    }
     const notes = await storage.getNotesByContact(contactId);
     res.json(notes);
   });
@@ -19187,6 +19269,13 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
   app.post('/api/contacts/:id/notes', ensureAuthenticated, async (req: any, res) => {
     try {
       const contactId = parseInt(req.params.id);
+      const targetContact = await storage.getContact(contactId);
+      if (!targetContact) {
+        return res.status(404).json({ message: 'Contact not found' });
+      }
+      if (!req.user.isSuperAdmin && targetContact.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Contact does not belong to your company' });
+      }
       const noteData = validateBody(insertNoteSchema, {
         ...req.body,
         contactId,
@@ -25151,6 +25240,14 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         });
       }
 
+      const connection = await storage.getChannelConnection(connectionId);
+      if (!connection) {
+        return res.status(404).json({ success: false, error: 'CONNECTION_NOT_FOUND', message: 'Connection not found' });
+      }
+      if (!(req.user as any).isSuperAdmin && connection.companyId !== (req.user as any).companyId) {
+        return res.status(403).json({ success: false, error: 'FORBIDDEN', message: 'Connection does not belong to your company' });
+      }
+
       const emailService = await import('./services/channels/email');
       await emailService.syncNewEmails(connectionId, req.user.id);
 
@@ -25266,6 +25363,14 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         });
       }
 
+      const restartConnection = await storage.getChannelConnection(connectionId);
+      if (!restartConnection) {
+        return res.status(404).json({ success: false, error: 'CONNECTION_NOT_FOUND', message: 'Connection not found' });
+      }
+      if (!(req.user as any).isSuperAdmin && restartConnection.companyId !== (req.user as any).companyId) {
+        return res.status(403).json({ success: false, error: 'FORBIDDEN', message: 'Connection does not belong to your company' });
+      }
+
       const emailService = await import('./services/channels/email');
 
       await emailService.disconnectEmailChannel(connectionId);
@@ -25339,44 +25444,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
     }
   });
 
-  app.post('/api/email/sync/:connectionId', async (req, res) => {
-    try {
-      const { connectionId } = req.params;
-      const user = req.user;
-
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          error: 'UNAUTHORIZED',
-          message: 'User authentication required'
-        });
-      }
-
-      if (!connectionId) {
-        return res.status(400).json({
-          success: false,
-          error: 'MISSING_CONNECTION_ID',
-          message: 'Connection ID is required'
-        });
-      }
-
-      const emailService = await import('./services/channels/email');
-
-      await emailService.default.syncNewEmails(parseInt(connectionId), user.id);
-
-      res.json({
-        success: true,
-        message: 'Email sync triggered successfully'
-      });
-    } catch (error: any) {
-      console.error('Error triggering email sync:', error);
-      res.status(500).json({
-        success: false,
-        error: 'EMAIL_SYNC_ERROR',
-        message: error.message || 'Failed to trigger email sync'
-      });
-    }
-  });
+  // Removed: exact duplicate route of POST /api/email/sync/:connectionId
+  // above (line ~25144). Express only ever dispatched to the first
+  // registration, so this copy — which also lacked the companyId
+  // ownership check — was dead code.
 
   app.get('/api/email/:channelId/messages', ensureAuthenticated, async (req, res) => {
     try {
@@ -26656,6 +26727,14 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         });
       }
 
+      const mailboxConnection = await storage.getChannelConnection(parseInt(connectionId));
+      if (!mailboxConnection) {
+        return res.status(404).json({ success: false, error: 'CONNECTION_NOT_FOUND', message: 'Connection not found' });
+      }
+      if (!(req.user as any).isSuperAdmin && mailboxConnection.companyId !== (req.user as any).companyId) {
+        return res.status(403).json({ success: false, error: 'FORBIDDEN', message: 'Connection does not belong to your company' });
+      }
+
       const emailService = await import('./services/channels/email');
       const mailboxes = await emailService.default.listMailboxes(parseInt(connectionId));
 
@@ -27661,9 +27740,15 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       const { stage } = req.body;
 
       const existingDeal = await storage.getDeal(dealId);
-      const previousStageId = existingDeal?.stageId;
-      const previousPipelineId = existingDeal?.pipelineId;
-      const previousStageEnum = existingDeal?.stage;
+      if (!existingDeal) {
+        return res.status(404).json({ message: 'Deal not found' });
+      }
+      if (!(req.user as any).isSuperAdmin && existingDeal.companyId !== (req.user as any).companyId) {
+        return res.status(403).json({ message: 'Deal does not belong to your company' });
+      }
+      const previousStageId = existingDeal.stageId;
+      const previousPipelineId = existingDeal.pipelineId;
+      const previousStageEnum = existingDeal.stage;
 
       const updatedDeal = await storage.updateDealStage(dealId, stage);
 
@@ -27921,6 +28006,13 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
   app.get('/api/deals/:id/activities', ensureAuthenticated, async (req, res) => {
     try {
       const dealId = parseInt(req.params.id);
+      const deal = await storage.getDeal(dealId);
+      if (!deal) {
+        return res.status(404).json({ message: 'Deal not found' });
+      }
+      if (!(req.user as any).isSuperAdmin && deal.companyId !== (req.user as any).companyId) {
+        return res.status(403).json({ message: 'Deal does not belong to your company' });
+      }
       const activities = await storage.getDealActivities(dealId);
 
       return res.status(200).json(activities);
@@ -27933,6 +28025,13 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
   app.post('/api/deals/:id/activities', ensureAuthenticated, async (req, res) => {
     try {
       const dealId = parseInt(req.params.id);
+      const targetDeal = await storage.getDeal(dealId);
+      if (!targetDeal) {
+        return res.status(404).json({ message: 'Deal not found' });
+      }
+      if (!(req.user as any).isSuperAdmin && targetDeal.companyId !== (req.user as any).companyId) {
+        return res.status(403).json({ message: 'Deal does not belong to your company' });
+      }
       const activity = await storage.createDealActivity({
         ...req.body,
         dealId,
@@ -30011,7 +30110,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-      if (connection.userId !== req.user.id) {
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
         return res.status(403).json({ message: 'Unauthorized access to connection' });
       }
 
@@ -30060,7 +30159,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-      if (connection.userId !== req.user.id) {
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
         return res.status(403).json({ message: 'Unauthorized access to connection' });
       }
 
@@ -30151,7 +30250,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-      if (connection.userId !== req.user.id) {
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
         return res.status(403).json({ message: 'Unauthorized access to connection' });
       }
 
@@ -30298,7 +30397,9 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
+        return res.status(403).json({ message: 'Unauthorized access to connection' });
+      }
 
       let messageContent = message;
       try {
@@ -30337,7 +30438,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-      if (connection.userId !== req.user.id) {
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
         return res.status(403).json({ message: 'Unauthorized access to connection' });
       }
 
@@ -30368,7 +30469,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-      if (connection.userId !== req.user.id) {
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
         return res.status(403).json({ message: 'Unauthorized access to connection' });
       }
 
@@ -30394,7 +30495,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-      if (connection.userId !== req.user.id) {
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
         return res.status(403).json({ message: 'Unauthorized access to connection' });
       }
 
@@ -30420,7 +30521,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-      if (connection.userId !== req.user.id) {
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
         return res.status(403).json({ message: 'Unauthorized access to connection' });
       }
 
@@ -30450,7 +30551,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(404).json({ message: 'Connection not found' });
       }
 
-      if (connection.userId !== req.user.id) {
+      if (!req.user.isSuperAdmin && connection.companyId !== req.user.companyId) {
         return res.status(403).json({ message: 'Unauthorized access to connection' });
       }
 

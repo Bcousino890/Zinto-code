@@ -4109,31 +4109,14 @@ export class DatabaseStorage implements IStorage {
 
   async updateUserOnboardingProgress(userId: number, stepKey: string, completed: boolean): Promise<{ progress: Record<string, boolean>; completedAt: Date | null }> {
     try {
-      const [existing] = await db
-        .select({
-          onboardingProgress: users.onboardingProgress,
-          onboardingCompletedAt: users.onboardingCompletedAt,
-        })
-        .from(users)
-        .where(eq(users.id, userId));
-
-      if (!existing) {
-        throw new Error(`User with ID ${userId} not found`);
-      }
-
-      const currentProgress = (existing.onboardingProgress as Record<string, boolean> | null) || {};
-      const nextProgress: Record<string, boolean> = { ...currentProgress, [stepKey]: completed };
-
-      const allStepsComplete = ONBOARDING_CHECKLIST_STEP_KEYS.every((key) => nextProgress[key] === true);
-      const nextCompletedAt = allStepsComplete
-        ? (existing.onboardingCompletedAt ?? new Date())
-        : null;
-
-      const [updatedUser] = await db
+      // Merge the single step atomically via the jsonb `||` operator so
+      // concurrent updates for different stepKeys can't clobber each other
+      // (unlike a JS-side read-modify-write, which loses the loser's write).
+      const patch = JSON.stringify({ [stepKey]: completed });
+      const [merged] = await db
         .update(users)
         .set({
-          onboardingProgress: nextProgress,
-          onboardingCompletedAt: nextCompletedAt,
+          onboardingProgress: sql`COALESCE(${users.onboardingProgress}, '{}'::jsonb) || ${patch}::jsonb`,
           updatedAt: new Date(),
         })
         .where(eq(users.id, userId))
@@ -4142,10 +4125,23 @@ export class DatabaseStorage implements IStorage {
           onboardingCompletedAt: users.onboardingCompletedAt,
         });
 
-      return {
-        progress: (updatedUser?.onboardingProgress as Record<string, boolean> | null) || nextProgress,
-        completedAt: updatedUser?.onboardingCompletedAt ?? nextCompletedAt,
-      };
+      if (!merged) {
+        throw new Error(`User with ID ${userId} not found`);
+      }
+
+      const nextProgress = (merged.onboardingProgress as Record<string, boolean> | null) || {};
+      const allStepsComplete = ONBOARDING_CHECKLIST_STEP_KEYS.every((key) => nextProgress[key] === true);
+      let completedAt = merged.onboardingCompletedAt ?? null;
+
+      if (allStepsComplete && !completedAt) {
+        completedAt = new Date();
+        await db.update(users).set({ onboardingCompletedAt: completedAt }).where(eq(users.id, userId));
+      } else if (!allStepsComplete && completedAt) {
+        completedAt = null;
+        await db.update(users).set({ onboardingCompletedAt: null }).where(eq(users.id, userId));
+      }
+
+      return { progress: nextProgress, completedAt };
     } catch (error) {
       console.error("Error updating user onboarding progress:", error);
       throw error;

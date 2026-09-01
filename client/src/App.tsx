@@ -10,6 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, useEffect } from "react";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
+import OnboardingPage from "@/pages/onboarding";
 import Inbox from "@/pages/Inbox";
 import Flows from "@/pages/flows";
 import FlowBuilder from "@/pages/flow-builder";
@@ -461,6 +462,7 @@ function AppRoutesWithLayout() {
 
 
         <ProtectedRoute path="/profile" component={ProfilePage} />
+        <ProtectedRoute path="/onboarding" component={OnboardingPage} />
 
         <Route path="/access-denied" component={AccessDenied} />
 

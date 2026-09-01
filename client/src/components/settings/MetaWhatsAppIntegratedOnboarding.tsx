@@ -15,6 +15,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Loader2, ExternalLink, CheckCircle, AlertCircle } from 'lucide-react';
 import { initFacebookSDK, setupWhatsAppSignupListener, launchWhatsAppSignup } from '@/lib/facebook-sdk';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ErrorWithHelp } from '@/components/error-with-help';
 
 interface Props {
   isOpen: boolean;
@@ -32,9 +33,11 @@ export function MetaWhatsAppIntegratedOnboarding({ isOpen, onClose, onSuccess }:
   const [isCheckingConfig, setIsCheckingConfig] = useState(false);
   const [partnerConfig, setPartnerConfig] = useState<any>(null);
   const [signupMode, setSignupMode] = useState<'standard' | 'coexistence'>('standard');
+  const [signupError, setSignupError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
+      setSignupError(null);
       checkPartnerConfiguration();
     }
   }, [isOpen]);
@@ -92,6 +95,7 @@ export function MetaWhatsAppIntegratedOnboarding({ isOpen, onClose, onSuccess }:
 
       processSignupCallback(response).catch((error) => {
         console.error('Error processing signup callback:', error);
+        setSignupError(error instanceof Error ? error.message : 'failed_to_process_signup');
         toast({
           title: t('settings.whatsappOnboarding.toast_signup_error', 'Signup Error'),
           description: t('settings.whatsappOnboarding.toast_signup_error_process', 'Failed to process WhatsApp Business account signup'),
@@ -100,6 +104,7 @@ export function MetaWhatsAppIntegratedOnboarding({ isOpen, onClose, onSuccess }:
       });
     } else {
       console.error('Signup was not completed successfully:', response);
+      setSignupError('signup_incomplete');
       toast({
         title: t('settings.whatsappOnboarding.toast_signup_error', 'Signup Error'),
         description: t('settings.whatsappOnboarding.toast_signup_error_incomplete', 'WhatsApp signup was not completed successfully'),
@@ -141,6 +146,7 @@ export function MetaWhatsAppIntegratedOnboarding({ isOpen, onClose, onSuccess }:
 
     } catch (error) {
       console.error('Error processing signup callback:', error);
+      setSignupError(error instanceof Error ? error.message : 'failed_to_process_signup');
       toast({
         title: t('settings.whatsappOnboarding.toast_error', 'Error'),
         description: error instanceof Error ? error.message : t('settings.whatsappOnboarding.toast_error_process_signup', 'Failed to process signup'),
@@ -152,6 +158,7 @@ export function MetaWhatsAppIntegratedOnboarding({ isOpen, onClose, onSuccess }:
   };
 
   const handleStartOnboarding = async () => {
+    setSignupError(null);
     if (!connectionName.trim()) {
       toast({
         title: t('settings.whatsappOnboarding.toast_error', 'Error'),
@@ -194,6 +201,7 @@ export function MetaWhatsAppIntegratedOnboarding({ isOpen, onClose, onSuccess }:
     } catch (error) {
       console.error('Error launching WhatsApp signup:', error);
       const errorMessage = error instanceof Error ? error.message : t('settings.whatsappOnboarding.toast_error_launch', 'Failed to launch WhatsApp signup');
+      setSignupError(errorMessage);
       toast({
         title: t('settings.whatsappOnboarding.toast_error', 'Error'),
         description: errorMessage,
@@ -362,6 +370,8 @@ export function MetaWhatsAppIntegratedOnboarding({ isOpen, onClose, onSuccess }:
               </div>
             </div>
           )}
+
+          {signupError && <ErrorWithHelp error={signupError} />}
         </div>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-2">

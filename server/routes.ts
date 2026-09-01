@@ -301,7 +301,7 @@ import { calendlyCalendarService } from "./services/calendly-calendar";
 import googleSheetsService from "./services/google-sheets";
 import { normalizeTimezone, parseInZoneToUTC, validateTimezone } from "./utils/timezone";
 import { GOOGLE_MAPS_SCRAPE_MAX_RESULTS } from "./services/google-maps-scraper";
-import { storage, logContactAudit, getErpErrorResponse } from "./storage";
+import { storage, logContactAudit, getErpErrorResponse, ONBOARDING_CHECKLIST_STEP_KEYS } from "./storage";
 import { logger } from "./utils/logger";
 import { eventEmitterMonitor } from "./utils/event-emitter-monitor";
 import { inboxBackupService } from "./services/inbox-backup";
@@ -5201,6 +5201,9 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       const { stepKey, completed } = req.body || {};
       if (!stepKey || typeof stepKey !== 'string') {
         return res.status(400).json({ message: 'stepKey is required' });
+      }
+      if (!(ONBOARDING_CHECKLIST_STEP_KEYS as readonly string[]).includes(stepKey)) {
+        return res.status(400).json({ message: 'Unknown stepKey' });
       }
 
       const result = await storage.updateUserOnboardingProgress(userId, stepKey, completed !== false);

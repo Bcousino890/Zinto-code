@@ -165,7 +165,7 @@ export default function OnboardingChecklist() {
     }
   };
 
-  if (!user?.id || isLoading || dismissed || allComplete) {
+  if (!user?.id || isLoading || dismissed) {
     return null;
   }
 
@@ -178,6 +178,11 @@ export default function OnboardingChecklist() {
               {t('onboardingChecklist.title', 'Primeros pasos')} {completedCount}/{totalSteps}
             </h3>
             <div className="flex items-center gap-1 shrink-0">
+              <Button asChild variant="ghost" size="sm" className="h-7 text-xs hidden sm:inline-flex">
+                <Link href="/onboarding">
+                  {t('onboardingChecklist.viewGuide', 'Ver guía completa')}
+                </Link>
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"

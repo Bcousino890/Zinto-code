@@ -5176,6 +5176,41 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
   });
 
 
+  app.get('/api/users/onboarding-progress', ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const result = await storage.getUserOnboardingProgress(userId);
+      res.json(result);
+    } catch (error: any) {
+      console.error('Error fetching onboarding progress:', error);
+      res.status(500).json({ message: error.message || 'Error fetching onboarding progress' });
+    }
+  });
+
+  app.post('/api/users/onboarding-progress', ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const { stepKey, completed } = req.body || {};
+      if (!stepKey || typeof stepKey !== 'string') {
+        return res.status(400).json({ message: 'stepKey is required' });
+      }
+
+      const result = await storage.updateUserOnboardingProgress(userId, stepKey, completed !== false);
+      res.json(result);
+    } catch (error: any) {
+      console.error('Error updating onboarding progress:', error);
+      res.status(500).json({ message: error.message || 'Error updating onboarding progress' });
+    }
+  });
+
   app.put('/api/user/language', ensureAuthenticated, async (req, res) => {
     try {
       const userId = req.user?.id;

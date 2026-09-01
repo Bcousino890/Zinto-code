@@ -569,6 +569,7 @@ export default function Sidebar() {
         <div className="flex flex-col space-y-0.5">
           <Link
             href="/inbox"
+            data-tour="sidebar-inbox"
             className={`${navItemClass(location === '/inbox')} relative`}
             style={location === '/inbox' ? companyStyle.activeItem : {}}
             title={collapsedTitle(t('nav.inbox', 'Inbox'))}
@@ -597,6 +598,7 @@ export default function Sidebar() {
           <PermissionGate permissions={[PERMISSIONS.VIEW_CONTACTS, PERMISSIONS.MANAGE_CONTACTS]}>
             <Link
               href="/contacts"
+              data-tour="sidebar-contacts"
               className={navItemClass(location === '/contacts')}
               style={location === '/contacts' ? companyStyle.activeItem : {}}
               title={collapsedTitle(t('nav.contacts', 'Contacts'))}
@@ -609,6 +611,7 @@ export default function Sidebar() {
           <PermissionGate permissions={[PERMISSIONS.VIEW_PIPELINE, PERMISSIONS.MANAGE_PIPELINE]}>
             <Link
               href="/pipeline"
+              data-tour="sidebar-pipeline"
               className={navItemClass(location === '/pipeline')}
               style={location === '/pipeline' ? companyStyle.activeItem : {}}
               title={collapsedTitle(t('nav.pipeline', 'Pipeline'))}
@@ -621,6 +624,7 @@ export default function Sidebar() {
           <PermissionGate permissions={[PERMISSIONS.VIEW_TASKS, PERMISSIONS.MANAGE_TASKS]}>
             <Link
               href="/tasks"
+              data-tour="sidebar-tasks"
               className={navItemClass(location === '/tasks')}
               style={location === '/tasks' ? companyStyle.activeItem : {}}
               title={collapsedTitle(t('nav.tasks', 'Tasks'))}
@@ -800,7 +804,7 @@ export default function Sidebar() {
         </div>
 
         <PermissionGate permissions={[PERMISSIONS.VIEW_CHANNELS, PERMISSIONS.MANAGE_CHANNELS]}>
-          <div className={`mt-5 border-t ${isDark ? 'border-white/10' : 'border-slate-200'} pt-4`}>
+          <div data-tour="sidebar-channels" className={`mt-5 border-t ${isDark ? 'border-white/10' : 'border-slate-200'} pt-4`}>
             <h3 className={`mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] ${
               isDark ? 'text-white/35' : 'text-gray-500'
             } ${isCollapsed ? 'hidden' : 'block'}`}>

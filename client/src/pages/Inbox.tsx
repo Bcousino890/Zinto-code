@@ -13,6 +13,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { isEmbeddedContext } from '@/utils/embed-context';
 import { isEmbeddedInboxAccessAllowed, isEmbeddedInboxMode } from '@/utils/inbox-embed';
+import OnboardingChecklist from '@/components/onboarding-checklist';
+import { OnboardingTourOverlay } from '@/components/onboarding-tour-overlay';
 
 function InboxContent() {
   const queryClient = useQueryClient();
@@ -94,6 +96,13 @@ function InboxContent() {
       }
     >
       {!isEmbedded && <Header />}
+      {!isEmbedded && <OnboardingTourOverlay />}
+
+      {!isEmbedded && !isMobile && (
+        <div className="px-3 sm:px-4 pt-2 shrink-0">
+          <OnboardingChecklist />
+        </div>
+      )}
 
       <div className="flex flex-1 overflow-hidden relative min-h-0">
         <div className={`

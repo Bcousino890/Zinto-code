@@ -246,7 +246,7 @@ export default function Header() {
       </div>
 
       <div className="flex justify-center">
-        <div className="relative w-[400px] max-w-full hidden md:block" ref={searchContainerRef}>
+        <div data-tour="header-search" className="relative w-[400px] max-w-full hidden md:block" ref={searchContainerRef}>
           <form onSubmit={handleSearchSubmit}>
             <div className="relative">
               <input
@@ -322,6 +322,7 @@ export default function Header() {
 
         <PermissionGate permissions={[PERMISSIONS.VIEW_SETTINGS, PERMISSIONS.MANAGE_SETTINGS]}>
           <button
+            data-tour="header-settings"
             className={`flex items-center justify-center h-8 w-8 rounded-full border transition-colors ${isDark ? 'bg-background/20 border-white/10 hover:bg-background/30' : 'bg-white border-gray-200 shadow-sm hover:bg-gray-50'}`}
             onClick={() => navigate('/settings')}
           >
@@ -329,7 +330,7 @@ export default function Header() {
           </button>
         </PermissionGate>
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center cursor-pointer hover:opacity-80">
+          <DropdownMenuTrigger data-tour="header-profile" className="flex items-center cursor-pointer hover:opacity-80">
             <Avatar className="h-8 w-8">
               {user?.avatarUrl ? (
                 <AvatarImage src={user.avatarUrl} alt={user.fullName || 'User'} />

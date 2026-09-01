@@ -609,6 +609,20 @@ export type GetOrCreateContactResult = {
   created: boolean;
 };
 
+/**
+ * Canonical set of step keys for the interactive onboarding checklist.
+ * Keep this list in sync with the client's OnboardingChecklist component
+ * (client/src/components/onboarding-checklist.tsx) — it determines when
+ * onboarding_completed_at is stamped for a user.
+ */
+export const ONBOARDING_CHECKLIST_STEP_KEYS = [
+  "connect_channel",
+  "create_template",
+  "invite_team",
+  "configure_pipeline",
+  "auto_assignment",
+] as const;
+
 export interface IStorage {
   getAllCompanies(): Promise<Company[]>;
   getCompany(id: number): Promise<Company | undefined>;
@@ -629,6 +643,8 @@ export interface IStorage {
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User>;
   updateUserPassword(id: number, newPassword: string, isAlreadyHashed?: boolean): Promise<boolean>;
   deleteUser(id: number): Promise<boolean>;
+  getUserOnboardingProgress(userId: number): Promise<{ progress: Record<string, boolean>; completedAt: Date | null }>;
+  updateUserOnboardingProgress(userId: number, stepKey: string, completed: boolean): Promise<{ progress: Record<string, boolean>; completedAt: Date | null }>;
 
   getAllPlans(): Promise<Plan[]>;
   getPlan(id: number): Promise<Plan | undefined>;
@@ -4068,6 +4084,71 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error updating user password:", error);
       return false;
+    }
+  }
+
+  async getUserOnboardingProgress(userId: number): Promise<{ progress: Record<string, boolean>; completedAt: Date | null }> {
+    try {
+      const [user] = await db
+        .select({
+          onboardingProgress: users.onboardingProgress,
+          onboardingCompletedAt: users.onboardingCompletedAt,
+        })
+        .from(users)
+        .where(eq(users.id, userId));
+
+      return {
+        progress: (user?.onboardingProgress as Record<string, boolean> | null) || {},
+        completedAt: user?.onboardingCompletedAt ?? null,
+      };
+    } catch (error) {
+      console.error("Error getting user onboarding progress:", error);
+      return { progress: {}, completedAt: null };
+    }
+  }
+
+  async updateUserOnboardingProgress(userId: number, stepKey: string, completed: boolean): Promise<{ progress: Record<string, boolean>; completedAt: Date | null }> {
+    try {
+      const [existing] = await db
+        .select({
+          onboardingProgress: users.onboardingProgress,
+          onboardingCompletedAt: users.onboardingCompletedAt,
+        })
+        .from(users)
+        .where(eq(users.id, userId));
+
+      if (!existing) {
+        throw new Error(`User with ID ${userId} not found`);
+      }
+
+      const currentProgress = (existing.onboardingProgress as Record<string, boolean> | null) || {};
+      const nextProgress: Record<string, boolean> = { ...currentProgress, [stepKey]: completed };
+
+      const allStepsComplete = ONBOARDING_CHECKLIST_STEP_KEYS.every((key) => nextProgress[key] === true);
+      const nextCompletedAt = allStepsComplete
+        ? (existing.onboardingCompletedAt ?? new Date())
+        : null;
+
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          onboardingProgress: nextProgress,
+          onboardingCompletedAt: nextCompletedAt,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, userId))
+        .returning({
+          onboardingProgress: users.onboardingProgress,
+          onboardingCompletedAt: users.onboardingCompletedAt,
+        });
+
+      return {
+        progress: (updatedUser?.onboardingProgress as Record<string, boolean> | null) || nextProgress,
+        completedAt: updatedUser?.onboardingCompletedAt ?? nextCompletedAt,
+      };
+    } catch (error) {
+      console.error("Error updating user onboarding progress:", error);
+      throw error;
     }
   }
 

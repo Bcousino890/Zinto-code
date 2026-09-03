@@ -13770,7 +13770,27 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         });
       }
 
-      const contact = await storage.getOrCreateContact(contactData);
+      let contact = await storage.getOrCreateContact(contactData);
+
+      // Populate new WhatsApp contacts consistently with contacts created by an
+      // incoming message. Profile-photo lookup is best effort and must never make
+      // contact creation fail.
+      if (contact.phone && !contact.avatarUrl && contact.identifierType === 'whatsapp_unofficial') {
+        try {
+          const connections = await storage.getChannelConnectionsByCompany(req.user.companyId);
+          const connection = connections.find((candidate) =>
+            isBaileysChannel(candidate.channelType) && whatsAppService.isConnectionActive(candidate.id)
+          );
+          if (connection) {
+            const avatarUrl = await whatsAppService.fetchProfilePicture(connection.id, contact.identifier || contact.phone, true);
+            if (avatarUrl) {
+              contact = await storage.updateContact(contact.id, { avatarUrl });
+            }
+          }
+        } catch (profilePictureError) {
+          console.error('Error fetching profile picture for new contact:', profilePictureError);
+        }
+      }
 
 
       await logContactAudit({
@@ -13828,6 +13848,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
           return res.status(201).json({ ...contact, phone: null, identifier: null });
         }
       }
+      return res.status(201).json(contact);
       res.status(201).json(contact);
     } catch (err: any) {
       res.status(400).json({ message: err.message });
@@ -15936,16 +15957,39 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       }
 
       const contactIdentifier = contact.identifier || contact.phone || null;
-      const isWhatsApp = contact.identifierType === 'whatsapp' || contact.identifierType === 'whatsapp_unofficial';
-      const isTelegram = contact.identifierType === 'telegram';
-      const isInstagram = contact.identifierType === 'instagram';
-      if ((!isWhatsApp && !isTelegram && !isInstagram) || !contactIdentifier) {
-        return res.status(400).json({ message: 'Contact does not have a supported channel identifier' });
-      }
 
       const connection = await storage.getChannelConnection(connectionId);
       if (!connection) {
         return res.status(404).json({ message: 'Connection not found' });
+      }
+
+      if (contact.companyId !== req.user.companyId ||
+          (connection.companyId != null && connection.companyId !== req.user.companyId)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      // CSV imports made before identifierType was introduced only have a phone.
+      // Infer the channel from the selected connection and persist the backfill so
+      // subsequent refreshes do not fail with a 400 response.
+      let effectiveIdentifierType = contact.identifierType?.trim();
+      if (!effectiveIdentifierType) {
+        if (isBaileysChannel(connection.channelType)) effectiveIdentifierType = 'whatsapp_unofficial';
+        else if (connection.channelType === 'telegram') effectiveIdentifierType = 'telegram';
+        else if (connection.channelType === 'instagram') effectiveIdentifierType = 'instagram';
+
+        if (effectiveIdentifierType) {
+          await storage.updateContact(contactId, {
+            identifierType: effectiveIdentifierType,
+            identifier: contact.identifier || contact.phone || undefined
+          });
+        }
+      }
+
+      const isWhatsApp = effectiveIdentifierType === 'whatsapp' || effectiveIdentifierType === 'whatsapp_unofficial';
+      const isTelegram = effectiveIdentifierType === 'telegram';
+      const isInstagram = effectiveIdentifierType === 'instagram';
+      if ((!isWhatsApp && !isTelegram && !isInstagram) || !contactIdentifier) {
+        return res.status(400).json({ message: 'Contact does not have a supported channel identifier' });
       }
 
       const permissions = await getUserPermissions(req.user);
@@ -15955,7 +15999,10 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         const avatarAge = Date.now() - new Date(contact.updatedAt || contact.createdAt || Date.now()).getTime();
         const maxAge = 24 * 60 * 60 * 1000;
 
-        if (avatarAge < maxAge) {
+        const localAvatarExists = !contact.avatarUrl.startsWith('/media/') ||
+          await fsExtra.pathExists(path.join(process.cwd(), 'public', contact.avatarUrl));
+
+        if (avatarAge < maxAge && localAvatarExists) {
           const contactToReturn = canViewPhone ? contact : { ...contact, phone: null, identifier: null };
           return res.json({
             success: true,

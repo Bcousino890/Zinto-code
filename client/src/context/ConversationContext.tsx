@@ -282,7 +282,16 @@ function deduplicateConversationsByContact(conversations: any[]): any[] {
     } else {
       const existingConversation = contactMap.get(key);
 
-      if (new Date(conversation.lastMessageAt) > new Date(existingConversation.lastMessageAt)) {
+      // Prefer the conversation that actually contains a message. Empty duplicate
+      // records can have a newer creation/update timestamp and must not hide the
+      // real thread in the inbox.
+      const existingHasMessage = Boolean(existingConversation.lastMessage);
+      const candidateHasMessage = Boolean(conversation.lastMessage);
+      if (
+        (candidateHasMessage && !existingHasMessage) ||
+        (candidateHasMessage === existingHasMessage &&
+          new Date(conversation.lastMessageAt ?? 0) > new Date(existingConversation.lastMessageAt ?? 0))
+      ) {
         contactMap.set(key, conversation);
       }
     }
@@ -1071,7 +1080,19 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
 
       setMessages(prev => {
         const existingMessages = prev[conversationId] || [];
-        const newMessages = append ? [...result.messages, ...existingMessages] : result.messages;
+        let newMessages: any[];
+        if (append) {
+          newMessages = [...result.messages, ...existingMessages];
+        } else if (page === 1 && existingMessages.length > 0) {
+          // A page-one refresh should update the newest messages without throwing
+          // away older pages that the user has already loaded.
+          const refreshedById = new Map(result.messages.map((message: any) => [message.id, message]));
+          newMessages = existingMessages.map((message: any) => refreshedById.get(message.id) ?? message);
+          const existingIds = new Set(existingMessages.map((message: any) => message.id));
+          newMessages.push(...result.messages.filter((message: any) => !existingIds.has(message.id)));
+        } else {
+          newMessages = result.messages;
+        }
 
         if (newMessages.length > 0) {
           mediaCache.preloadMessagesMedia(newMessages).catch(console.error);

@@ -48174,5 +48174,37 @@
     {
         "key": "settings.team.members.empty_filtered",
         "value": "No members match your search or filters."
+    },
+    {
+        "key": "admin.translations.delete_key_failed",
+        "value": "Failed to delete translation key"
+    },
+    {
+        "key": "admin.translations.key_deleted",
+        "value": "Translation key deleted"
+    },
+    {
+        "key": "admin.translations.key_deleted_desc",
+        "value": "The translation key has been deleted successfully."
+    },
+    {
+        "key": "admin.translations.confirm_delete_key",
+        "value": "Are you sure you want to delete the \"{{name}}\" translation key? This will delete all translations for this key."
+    },
+    {
+        "key": "admin.translations.page_title",
+        "value": "Languages & Translations"
+    },
+    {
+        "key": "admin.languages_tab",
+        "value": "Languages"
+    },
+    {
+        "key": "admin.namespaces_tab",
+        "value": "Namespaces"
+    },
+    {
+        "key": "admin.translations_tab",
+        "value": "Translations"
     }
 ]

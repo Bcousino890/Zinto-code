@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Eye, EyeOff, Loader2, CheckCircle, XCircle, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/use-translation";
 import { useBranding } from "@/contexts/branding-context";
 import { useAuthBackgroundStyles } from "@/hooks/use-branding-styles";
 import { useTheme } from "next-themes";
@@ -35,6 +36,7 @@ export default function AdminResetPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { branding } = useBranding();
   const { theme } = useTheme();
   const authBackgroundStyles = useAuthBackgroundStyles('admin');

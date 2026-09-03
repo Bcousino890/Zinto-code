@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { usePlans } from "@/hooks/use-plans";
+import { useTranslation } from "@/hooks/use-translation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,23 +32,24 @@ import {
 } from "@/components/ui/select";
 import { useCurrency } from "@/contexts/currency-context";
 
-const companySchema = z.object({
-  name: z.string().min(1, "Company name is required"),
-  slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
-  logo: z.string().optional(),
-  primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
-  planId: z.number().int().min(1, "Plan is required"),
-  maxUsers: z.number().int().min(1, "Must have at least 1 user")
-});
-
-type CompanyFormValues = z.infer<typeof companySchema>;
-
 export default function NewCompanyPage() {
   const { user, isLoading: isLoadingAuth } = useAuth();
   const { plans, isLoading: isLoadingPlans } = usePlans();
   const [_, navigate] = useLocation();
   const { toast } = useToast();
   const { formatCurrency } = useCurrency();
+  const { t } = useTranslation();
+
+  const companySchema = z.object({
+    name: z.string().min(1, t('admin.companies.detail.validation.company_name_required', 'Company name is required')),
+    slug: z.string().min(1, t('admin.companies.detail.validation.slug_required', 'Slug is required')).regex(/^[a-z0-9-]+$/, t('admin.companies.detail.validation.slug_invalid', 'Slug can only contain lowercase letters, numbers, and hyphens')),
+    logo: z.string().optional(),
+    primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, t('admin.companies.detail.validation.color_invalid', 'Must be a valid hex color')),
+    planId: z.number().int().min(1, t('admin.companies.detail.validation.plan_required', 'Plan is required')),
+    maxUsers: z.number().int().min(1, t('admin.companies.detail.validation.max_users_required', 'Must have at least 1 user'))
+  });
+
+  type CompanyFormValues = z.infer<typeof companySchema>;
 
   useEffect(() => {
     if (!isLoadingAuth && user && !user.isSuperAdmin) {
@@ -82,24 +84,24 @@ export default function NewCompanyPage() {
       const res = await apiRequest("POST", "/api/admin/companies", data);
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to create company");
+        throw new Error(errorData.message || t('admin.companies.new.create_failed', 'Failed to create company'));
       }
       return res.json();
     },
     onSuccess: (data) => {
       const selectedPlan = plans.find(p => p.id === form.getValues().planId);
-      const planName = selectedPlan?.name || 'Unknown';
+      const planName = selectedPlan?.name || t('pipeline.unknown', 'Unknown');
 
       toast({
-        title: "Company created",
-        description: `The company has been created successfully with ${planName} plan. Subscription is now ${data.subscriptionStatus || 'active'}.`,
+        title: t('admin.companies.new.created_title', 'Company created'),
+        description: t('admin.companies.new.created_desc', 'The company has been created successfully with {{plan}} plan. Subscription is now {{status}}.', { plan: planName, status: data.subscriptionStatus || 'active' }),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/companies'] });
       navigate(`/admin/companies/${data.id}`);
     },
     onError: (error: Error) => {
       toast({
-        title: "Creation failed",
+        title: t('pipeline.creation_failed', 'Creation failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -128,16 +130,16 @@ export default function NewCompanyPage() {
         <div className="flex items-center mb-6">
           <Button variant="ghost" onClick={() => navigate("/admin/dashboard")} className="mr-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            {t('common.back', 'Back')}
           </Button>
-          <h1 className="text-2xl">Create New Company</h1>
+          <h1 className="text-2xl">{t('admin.companies.new.title', 'Create New Company')}</h1>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Company Information</CardTitle>
+            <CardTitle>{t('admin.companies.detail.card.title', 'Company Information')}</CardTitle>
             <CardDescription>
-              Enter the details for the new company
+              {t('admin.companies.new.description', 'Enter the details for the new company')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -149,7 +151,7 @@ export default function NewCompanyPage() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Company Name</FormLabel>
+                        <FormLabel>{t('admin.companies.detail.form.company_name', 'Company Name')}</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -163,12 +165,12 @@ export default function NewCompanyPage() {
                     name="slug"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Slug</FormLabel>
+                        <FormLabel>{t('admin.companies.detail.form.slug', 'Slug')}</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
                         <FormDescription>
-                          Used for URL and identification
+                          {t('admin.companies.detail.form.slug_description', 'Used for URL and identification')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -180,7 +182,7 @@ export default function NewCompanyPage() {
                     name="logo"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Logo URL</FormLabel>
+                        <FormLabel>{t('admin.companies.detail.form.logo_url', 'Logo URL')}</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -194,7 +196,7 @@ export default function NewCompanyPage() {
                     name="primaryColor"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Primary Color</FormLabel>
+                        <FormLabel>{t('admin.companies.detail.form.primary_color', 'Primary Color')}</FormLabel>
                         <div className="flex items-center space-x-2">
                           <div
                             className="w-8 h-8 rounded-full border cursor-pointer"
@@ -203,7 +205,7 @@ export default function NewCompanyPage() {
                               const colorInput = document.getElementById('primaryColorPicker') as HTMLInputElement;
                               if (colorInput) colorInput.click();
                             }}
-                            title="Pick a color"
+                            title={t('admin.companies.new.pick_color', 'Pick a color')}
                           />
                           <FormControl>
                             <Input
@@ -220,7 +222,7 @@ export default function NewCompanyPage() {
                             <Input
                               {...field}
                               type="text"
-                              placeholder="#333235"
+                              placeholder={t('admin.companies.detail.form.color_placeholder', '#333235')}
                               className="w-28"
                             />
                           </FormControl>
@@ -235,7 +237,7 @@ export default function NewCompanyPage() {
                     name="planId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Plan</FormLabel>
+                        <FormLabel>{t('admin.companies.detail.form.plan', 'Plan')}</FormLabel>
                         <Select
                           onValueChange={(value) => {
                             field.onChange(parseInt(value));
@@ -249,7 +251,7 @@ export default function NewCompanyPage() {
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a plan" />
+                              <SelectValue placeholder={t('admin.companies.detail.form.select_plan_placeholder', 'Select a plan')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -257,15 +259,15 @@ export default function NewCompanyPage() {
                               <SelectItem value="loading" disabled>
                                 <div className="flex items-center">
                                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                  Loading plans...
+                                  {t('admin.companies.detail.form.loading_plans', 'Loading plans...')}
                                 </div>
                               </SelectItem>
                             ) : plans.length === 0 ? (
-                              <SelectItem value="none" disabled>No plans available</SelectItem>
+                              <SelectItem value="none" disabled>{t('admin.companies.detail.form.no_plans_available', 'No plans available')}</SelectItem>
                             ) : (
                               plans.filter(plan => plan.isActive).map((plan) => (
                                 <SelectItem key={plan.id} value={plan.id.toString()}>
-                                  {plan.name} ({formatCurrency(plan.price)}/month)
+                                  {plan.name} ({formatCurrency(plan.price)}{t('admin.companies.new.per_month', '/month')})
                                 </SelectItem>
                               ))
                             )}
@@ -276,7 +278,7 @@ export default function NewCompanyPage() {
                             <>
                               {plans.find(p => p.id === field.value)?.description || ""}
                             </>
-                          ) : "Select a subscription plan for this company"}
+                          ) : t('admin.companies.detail.form.plan_description', 'Select a subscription plan for this company')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -288,7 +290,7 @@ export default function NewCompanyPage() {
                     name="maxUsers"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Max Users</FormLabel>
+                        <FormLabel>{t('admin.companies.detail.form.max_users', 'Max Users')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -310,12 +312,12 @@ export default function NewCompanyPage() {
                     {createMutation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating...
+                        {t('common.creating', 'Creating...')}
                       </>
                     ) : (
                       <>
                         <Save className="mr-2 h-4 w-4" />
-                        Create Company
+                        {t('admin.companies.new.submit_button', 'Create Company')}
                       </>
                     )}
                   </Button>

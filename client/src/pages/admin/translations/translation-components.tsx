@@ -147,26 +147,27 @@ export function DeleteTranslationKeyButton({
   onSuccess: () => void
 }) {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest('DELETE', `/api/admin/keys/${keyId}`);
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to delete translation key');
+        throw new Error(error.error || t('admin.translations.delete_key_failed', 'Failed to delete translation key'));
       }
       return res.json();
     },
     onSuccess: () => {
       toast({
-        title: 'Translation key deleted',
-        description: 'The translation key has been deleted successfully.',
+        title: t('admin.translations.key_deleted', 'Translation key deleted'),
+        description: t('admin.translations.key_deleted_desc', 'The translation key has been deleted successfully.'),
       });
       onSuccess();
     },
     onError: (error: Error) => {
       toast({
-        title: 'Error',
+        title: t('auth.error', 'Error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -174,7 +175,7 @@ export function DeleteTranslationKeyButton({
   });
 
   const handleDelete = () => {
-    if (confirm(`Are you sure you want to delete the "${keyName}" translation key? This will delete all translations for this key.`)) {
+    if (confirm(t('admin.translations.confirm_delete_key', 'Are you sure you want to delete the "{{name}}" translation key? This will delete all translations for this key.', { name: keyName }))) {
       deleteMutation.mutate();
     }
   };
@@ -191,7 +192,7 @@ export function DeleteTranslationKeyButton({
       ) : (
         <>
           <Trash className="h-4 w-4 mr-2" />
-          Delete
+          {t('common.delete', 'Delete')}
         </>
       )}
     </Button>

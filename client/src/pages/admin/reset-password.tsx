@@ -46,11 +46,11 @@ export default function AdminResetPasswordPage() {
   const { data: tokenValidation, isLoading: isValidatingToken, error: tokenError } = useQuery({
     queryKey: ["validate-admin-reset-token", token],
     queryFn: async () => {
-      if (!token) throw new Error("No token provided");
+      if (!token) throw new Error(t('admin.reset_password.no_token', 'No token provided'));
       const res = await apiRequest("GET", `/api/admin/auth/reset-password/${token}`);
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to validate token");
+        throw new Error(errorData.message || t('admin.reset_password.validate_failed', 'Failed to validate token'));
       }
       return await res.json() as AdminTokenValidationResponse;
     },
@@ -63,20 +63,20 @@ export default function AdminResetPasswordPage() {
       const res = await apiRequest("POST", "/api/admin/auth/reset-password", data);
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to reset password");
+        throw new Error(errorData.message || t('admin.users.error_reset_password', 'Failed to reset password'));
       }
       return await res.json() as AdminResetPasswordResponse;
     },
     onSuccess: (data) => {
       setIsSuccess(true);
       toast({
-        title: "Admin password reset successful",
+        title: t('admin.reset_password.success_toast_title', 'Admin password reset successful'),
         description: data.message,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t('auth.error', 'Error'),
         description: error.message,
         variant: "destructive",
       });
@@ -85,11 +85,11 @@ export default function AdminResetPasswordPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!token) {
       toast({
-        title: "Error",
-        description: "Invalid reset token",
+        title: t('auth.error', 'Error'),
+        description: t('auth.invalid_reset_token', 'Invalid reset token'),
         variant: "destructive",
       });
       return;
@@ -97,8 +97,8 @@ export default function AdminResetPasswordPage() {
 
     if (!newPassword.trim() || !confirmPassword.trim()) {
       toast({
-        title: "Error",
-        description: "Please fill in all fields",
+        title: t('auth.error', 'Error'),
+        description: t('auth.fill_all_fields', 'Please fill in all fields'),
         variant: "destructive",
       });
       return;
@@ -106,8 +106,8 @@ export default function AdminResetPasswordPage() {
 
     if (newPassword !== confirmPassword) {
       toast({
-        title: "Error",
-        description: "Passwords do not match",
+        title: t('auth.error', 'Error'),
+        description: t('auth.passwords_do_not_match', 'Passwords do not match'),
         variant: "destructive",
       });
       return;
@@ -115,8 +115,8 @@ export default function AdminResetPasswordPage() {
 
     if (newPassword.length < 6) {
       toast({
-        title: "Error",
-        description: "Password must be at least 6 characters long",
+        title: t('auth.error', 'Error'),
+        description: t('auth.password_min_length', 'Password must be at least 6 characters long'),
         variant: "destructive",
       });
       return;
@@ -235,7 +235,7 @@ export default function AdminResetPasswordPage() {
             <CardContent className="pt-6">
               <div className="text-center">
                 <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
-                <p className="mt-2 text-sm text-muted-foreground">Validating admin reset token...</p>
+                <p className="mt-2 text-sm text-muted-foreground">{t('admin.reset_password.validating', 'Validating admin reset token...')}</p>
               </div>
             </CardContent>
           </Card>
@@ -255,32 +255,32 @@ export default function AdminResetPasswordPage() {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30">
                 <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
               </div>
-              <CardTitle className="mt-4 text-red-600 dark:text-red-400">Invalid Admin Reset Link</CardTitle>
+              <CardTitle className="mt-4 text-red-600 dark:text-red-400">{t('admin.reset_password.invalid_link_title', 'Invalid Admin Reset Link')}</CardTitle>
               <CardDescription>
-                This admin password reset link is invalid or has expired.
+                {t('admin.reset_password.invalid_link_desc', 'This admin password reset link is invalid or has expired.')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert variant="destructive">
                 <XCircle className="h-4 w-4" />
                 <AlertDescription>
-                  {tokenError?.message || tokenValidation?.message || "The admin reset link is no longer valid."}
+                  {tokenError?.message || tokenValidation?.message || t('admin.reset_password.link_no_longer_valid', 'The admin reset link is no longer valid.')}
                 </AlertDescription>
               </Alert>
 
               <div className="text-center space-y-2">
                 <Link to="/admin/forgot-password">
                   <Button className="w-full btn-brand-primary" variant="brand">
-                    Request new admin reset link
+                    {t('admin.reset_password.request_new_link', 'Request new admin reset link')}
                   </Button>
                 </Link>
-                
+
                 <Link
                   to="/admin/login"
                   className="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
                 >
                   <ArrowLeft className="mr-1 h-4 w-4" />
-                  Back to admin login
+                  {t('admin.back_to_login', 'Back to admin login')}
                 </Link>
               </div>
             </CardContent>
@@ -301,23 +301,23 @@ export default function AdminResetPasswordPage() {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30">
                 <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
-              <CardTitle className="mt-4 text-green-600 dark:text-green-400">Admin Password Reset Successful</CardTitle>
+              <CardTitle className="mt-4 text-green-600 dark:text-green-400">{t('admin.reset_password.success_title', 'Admin Password Reset Successful')}</CardTitle>
               <CardDescription>
-                Your admin password has been successfully reset. You can now log in with your new password.
+                {t('admin.reset_password.success_desc', 'Your admin password has been successfully reset. You can now log in with your new password.')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert>
                 <Shield className="h-4 w-4" />
                 <AlertDescription>
-                  Your admin password has been updated successfully. For security reasons, you'll need to log in again.
+                  {t('admin.reset_password.success_message', "Your admin password has been updated successfully. For security reasons, you'll need to log in again.")}
                 </AlertDescription>
               </Alert>
 
               <div className="text-center">
                 <Link to="/admin/login">
                   <Button className="w-full btn-brand-primary" variant="brand">
-                    Continue to admin login
+                    {t('admin.reset_password.continue_to_login', 'Continue to admin login')}
                   </Button>
                 </Link>
               </div>
@@ -338,20 +338,20 @@ export default function AdminResetPasswordPage() {
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30">
               <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
-            <CardTitle className="mt-4">Reset Admin Password</CardTitle>
+            <CardTitle className="mt-4">{t('admin.reset_password.title', 'Reset Admin Password')}</CardTitle>
             <CardDescription>
-              Enter your new admin password below. Make sure it's at least 6 characters long.
+              {t('admin.reset_password.description', "Enter your new admin password below. Make sure it's at least 6 characters long.")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="newPassword">New admin password</Label>
+                <Label htmlFor="newPassword">{t('admin.reset_password.new_password_label', 'New admin password')}</Label>
                 <div className="relative">
                   <Input
                     id="newPassword"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your new admin password"
+                    placeholder={t('admin.reset_password.new_password_placeholder', 'Enter your new admin password')}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -376,12 +376,12 @@ export default function AdminResetPasswordPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm new admin password</Label>
+                <Label htmlFor="confirmPassword">{t('admin.reset_password.confirm_password_label', 'Confirm new admin password')}</Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your new admin password"
+                    placeholder={t('admin.reset_password.confirm_password_placeholder', 'Confirm your new admin password')}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -409,7 +409,7 @@ export default function AdminResetPasswordPage() {
                 <Alert variant="destructive">
                   <XCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Passwords do not match
+                    {t('auth.passwords_do_not_match', 'Passwords do not match')}
                   </AlertDescription>
                 </Alert>
               )}
@@ -417,7 +417,7 @@ export default function AdminResetPasswordPage() {
               <Alert>
                 <Shield className="h-4 w-4" />
                 <AlertDescription>
-                  This will reset your admin account password. Make sure to use a strong, secure password.
+                  {t('admin.reset_password.warning_message', 'This will reset your admin account password. Make sure to use a strong, secure password.')}
                 </AlertDescription>
               </Alert>
 
@@ -430,7 +430,7 @@ export default function AdminResetPasswordPage() {
                 {resetPasswordMutation.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Reset admin password
+                {t('admin.reset_password.submit_button', 'Reset admin password')}
               </Button>
             </form>
 
@@ -440,7 +440,7 @@ export default function AdminResetPasswordPage() {
                 className="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
               >
                 <ArrowLeft className="mr-1 h-4 w-4" />
-                Back to admin login
+                {t('admin.back_to_login', 'Back to admin login')}
               </Link>
             </div>
           </CardContent>

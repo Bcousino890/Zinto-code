@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { Save, Eye, ArrowLeft } from 'lucide-react';
 import { Link } from 'wouter';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -44,6 +45,7 @@ export default function WebsiteBuilderEditor() {
   const params = useParams();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   
   const websiteId = params.id ? parseInt(params.id) : null;
@@ -669,8 +671,8 @@ export default function WebsiteBuilderEditor() {
       } catch (error) {
         console.error('Failed to initialize GrapeJS:', error);
         toast({
-          title: 'Error',
-          description: 'Failed to initialize the website builder. Please try again.',
+          title: t('common.error', 'Error'),
+          description: t('admin.website_builder.init_failed', 'Failed to initialize the website builder. Please try again.'),
           variant: 'destructive'
         });
       }
@@ -727,28 +729,30 @@ export default function WebsiteBuilderEditor() {
       
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to save website');
+        throw new Error(error.error || t('admin.website_builder.save_failed', 'Failed to save website'));
       }
-      
+
       return response.json();
     },
     onSuccess: (savedWebsite) => {
       queryClient.invalidateQueries({ queryKey: ['admin-websites'] });
       queryClient.invalidateQueries({ queryKey: ['admin-website', websiteId] });
-      
+
       toast({
-        title: 'Success',
-        description: `Website ${isEditing ? 'updated' : 'created'} successfully`
+        title: t('common.success', 'Success'),
+        description: isEditing
+          ? t('admin.website_builder.update_success', 'Website updated successfully')
+          : t('admin.website_builder.create_success', 'Website created successfully')
       });
-      
+
       if (!isEditing) {
         setLocation(`/admin/website-builder/edit/${savedWebsite.id}`);
       }
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to save website',
+        title: t('common.error', 'Error'),
+        description: error.message || t('admin.website_builder.save_failed', 'Failed to save website'),
         variant: 'destructive'
       });
     }
@@ -764,8 +768,8 @@ export default function WebsiteBuilderEditor() {
 
     if (!websiteData.title || !websiteData.slug) {
       toast({
-        title: 'Validation Error',
-        description: 'Title and slug are required',
+        title: t('admin.website_builder.validation_error', 'Validation Error'),
+        description: t('admin.website_builder.title_slug_required', 'Title and slug are required'),
         variant: 'destructive'
       });
       return;
@@ -811,8 +815,8 @@ export default function WebsiteBuilderEditor() {
   const handleModalSave = () => {
     if (!tempSaveData.title || !tempSaveData.slug) {
       toast({
-        title: 'Validation Error',
-        description: 'Title and slug are required',
+        title: t('admin.website_builder.validation_error', 'Validation Error'),
+        description: t('admin.website_builder.title_slug_required', 'Title and slug are required'),
         variant: 'destructive'
       });
       return;
@@ -839,8 +843,8 @@ export default function WebsiteBuilderEditor() {
       window.open('/website', '_blank');
     } else {
       toast({
-        title: 'Preview Unavailable',
-        description: 'Please publish the website first to preview it',
+        title: t('admin.website_builder.preview_unavailable', 'Preview Unavailable'),
+        description: t('admin.website_builder.preview_unavailable_desc', 'Please publish the website first to preview it'),
         variant: 'destructive'
       });
     }
@@ -868,7 +872,7 @@ export default function WebsiteBuilderEditor() {
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p>Loading website builder...</p>
+            <p>{t('admin.website_builder.loading', 'Loading website builder...')}</p>
           </div>
         </div>
       </AdminLayout>
@@ -885,15 +889,15 @@ export default function WebsiteBuilderEditor() {
             <Link href="/admin/website-builder">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t('common.back', 'Back')}
               </Button>
             </Link>
             <div>
               <h1 className="text-lg font-semibold">
-                {isEditing ? `Edit: ${website?.title}` : 'New Website'}
+                {isEditing ? t('admin.website_builder.edit_title', 'Edit: {{title}}', { title: website?.title || '' }) : t('admin.website_builder.new_website_title', 'New Website')}
               </h1>
               <p className="text-sm text-gray-600">
-                {isEditing ? `/${website?.slug}` : 'Create a new website'}
+                {isEditing ? `/${website?.slug}` : t('admin.website_builder.create_new_subtitle', 'Create a new website')}
               </p>
             </div>
           </div>
@@ -906,7 +910,7 @@ export default function WebsiteBuilderEditor() {
               disabled={!website?.status || website.status !== 'published'}
             >
               <Eye className="w-4 h-4 mr-2" />
-              Preview
+              {t('pages.preview', 'Preview')}
             </Button>
             <Button
               size="sm"
@@ -914,7 +918,7 @@ export default function WebsiteBuilderEditor() {
               disabled={saveWebsiteMutation.isPending}
             >
               <Save className="w-4 h-4 mr-2" />
-              {saveWebsiteMutation.isPending ? 'Saving...' : 'Save'}
+              {saveWebsiteMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
             </Button>
           </div>
         </div>
@@ -929,26 +933,26 @@ export default function WebsiteBuilderEditor() {
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96 max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Save Website</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('admin.website_builder.save_modal_title', 'Save Website')}</h3>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="title">Website Title *</Label>
+                <Label htmlFor="title">{t('admin.website_builder.website_title_label', 'Website Title *')}</Label>
                 <Input
                   id="title"
                   value={tempSaveData.title}
                   onChange={(e) => setTempSaveData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Enter website title"
+                  placeholder={t('admin.website_builder.website_title_placeholder', 'Enter website title')}
                 />
               </div>
               <div>
-                <Label htmlFor="slug">URL Slug *</Label>
+                <Label htmlFor="slug">{t('admin.website_builder.url_slug_label', 'URL Slug *')}</Label>
                 <Input
                   id="slug"
                   value={tempSaveData.slug}
                   onChange={(e) => setTempSaveData(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') }))}
-                  placeholder="enter-url-slug"
+                  placeholder={t('admin.website_builder.url_slug_placeholder', 'enter-url-slug')}
                 />
-                <p className="text-sm text-gray-500 mt-1">This will be your website URL</p>
+                <p className="text-sm text-gray-500 mt-1">{t('admin.website_builder.url_slug_help', 'This will be your website URL')}</p>
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6">
@@ -956,13 +960,13 @@ export default function WebsiteBuilderEditor() {
                 variant="outline"
                 onClick={() => setShowSaveModal(false)}
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 onClick={handleModalSave}
                 disabled={!tempSaveData.title || !tempSaveData.slug}
               >
-                Save Website
+                {t('admin.website_builder.save_website_button', 'Save Website')}
               </Button>
             </div>
           </div>
@@ -973,14 +977,14 @@ export default function WebsiteBuilderEditor() {
       {showCustomHtmlModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[80vh] flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">Edit Custom HTML/CSS/JS</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('admin.website_builder.custom_html_modal_title', 'Edit Custom HTML/CSS/JS')}</h3>
             <div className="flex-1 min-h-0">
-              <Label htmlFor="custom-html-textarea" className="block mb-2">HTML/CSS/JavaScript Content</Label>
+              <Label htmlFor="custom-html-textarea" className="block mb-2">{t('admin.website_builder.custom_html_content_label', 'HTML/CSS/JavaScript Content')}</Label>
               <textarea
                 id="custom-html-textarea"
                 value={customHtmlContent}
                 onChange={(e) => setCustomHtmlContent(e.target.value)}
-                placeholder={`Paste your HTML code here - complete documents or snippets are supported!
+                placeholder={t('admin.website_builder.custom_html_placeholder', `Paste your HTML code here - complete documents or snippets are supported!
 
 Examples:
 
@@ -1000,29 +1004,29 @@ Examples:
   <h2>Interactive Widget</h2>
   <button onclick="alert('Hello!')">Click me</button>
 </div>
-<style>#widget { padding: 20px; }</style>`}
+<style>#widget { padding: 20px; }</style>`)}
                 className="w-full h-full min-h-[400px] p-3 border border-gray-300 rounded-md font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 style={{ fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace' }}
               />
             </div>
             <div className="flex justify-between items-center mt-4 pt-4 border-t">
               <div className="text-sm text-gray-500">
-                <p>• Complete HTML documents are supported (with &lt;html&gt;, &lt;head&gt;, &lt;body&gt;)</p>
-                <p>• CSS from &lt;style&gt; tags and head section will be applied</p>
-                <p>• JavaScript from &lt;script&gt; tags will be executed</p>
-                <p>• Meta tags (viewport, etc.) will be preserved</p>
+                <p>• {t('admin.website_builder.custom_html_hint_1', 'Complete HTML documents are supported (with <html>, <head>, <body>)')}</p>
+                <p>• {t('admin.website_builder.custom_html_hint_2', 'CSS from <style> tags and head section will be applied')}</p>
+                <p>• {t('admin.website_builder.custom_html_hint_3', 'JavaScript from <script> tags will be executed')}</p>
+                <p>• {t('admin.website_builder.custom_html_hint_4', 'Meta tags (viewport, etc.) will be preserved')}</p>
               </div>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   onClick={handleCustomHtmlCancel}
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   onClick={handleCustomHtmlSave}
                 >
-                  Apply HTML
+                  {t('admin.website_builder.apply_html_button', 'Apply HTML')}
                 </Button>
               </div>
             </div>

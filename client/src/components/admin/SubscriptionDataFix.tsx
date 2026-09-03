@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/use-translation";
 import { AlertTriangle, CheckCircle, RefreshCw, Database, Bug, Loader2 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -27,6 +28,7 @@ export default function SubscriptionDataFix() {
   const [isLoadingReport, setIsLoadingReport] = useState(false);
   const [isRunningFix, setIsRunningFix] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const loadReport = async () => {
     setIsLoadingReport(true);
@@ -39,8 +41,8 @@ export default function SubscriptionDataFix() {
       setReport(data.report);
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to load subscription data report",
+        title: t('common.error', 'Error'),
+        description: t('admin.subscription_fix.load_report_failed', 'Failed to load subscription data report'),
         variant: "destructive",
       });
     } finally {
@@ -60,24 +62,24 @@ export default function SubscriptionDataFix() {
       
       if (data.success) {
         toast({
-          title: "Success",
-          description: `Successfully fixed subscription data for ${data.fixedCompanies} companies`,
+          title: t('common.success', 'Success'),
+          description: t('admin.subscription_fix.fix_success', 'Successfully fixed subscription data for {{count}} companies', { count: data.fixedCompanies }),
         });
       } else {
         toast({
-          title: "Partial Success",
-          description: `Fixed ${data.fixedCompanies} companies but encountered ${data.errors.length} errors`,
+          title: t('admin.subscription_fix.partial_success_title', 'Partial Success'),
+          description: t('admin.subscription_fix.partial_success_desc', 'Fixed {{fixed}} companies but encountered {{errors}} errors', { fixed: data.fixedCompanies, errors: data.errors.length }),
           variant: "destructive",
         });
       }
-      
+
 
       await loadReport();
-      
+
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to run subscription data fix",
+        title: t('common.error', 'Error'),
+        description: t('admin.subscription_fix.run_fix_failed', 'Failed to run subscription data fix'),
         variant: "destructive",
       });
     } finally {
@@ -107,25 +109,23 @@ export default function SubscriptionDataFix() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Subscription Data Fix</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{t('admin.subscription_fix.title', 'Subscription Data Fix')}</h2>
           <p className="text-muted-foreground">
-            Fix critical subscription renewal dialog bugs in existing deployments
+            {t('admin.subscription_fix.subtitle', 'Fix critical subscription renewal dialog bugs in existing deployments')}
           </p>
         </div>
         <Button onClick={loadReport} disabled={isLoadingReport} variant="outline">
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingReport ? 'animate-spin' : ''}`} />
-          Refresh Report
+          {t('admin.subscription_fix.refresh_report_button', 'Refresh Report')}
         </Button>
       </div>
 
       {/* Critical Bug Alert */}
       <Alert className="border-red-200 bg-red-50">
         <Bug className="h-4 w-4" />
-        <AlertTitle>Critical Bug Fix Available</AlertTitle>
+        <AlertTitle>{t('admin.subscription_fix.critical_bug_title', 'Critical Bug Fix Available')}</AlertTitle>
         <AlertDescription>
-          This tool fixes the critical bug where existing application deployments show incorrect renewal dialogs 
-          for users with active subscriptions, while fresh installations work correctly. The issue is caused by 
-          NULL values in subscription fields that were added in later migrations.
+          {t('admin.subscription_fix.critical_bug_desc', 'This tool fixes the critical bug where existing application deployments show incorrect renewal dialogs for users with active subscriptions, while fresh installations work correctly. The issue is caused by NULL values in subscription fields that were added in later migrations.')}
         </AlertDescription>
       </Alert>
 
@@ -135,17 +135,17 @@ export default function SubscriptionDataFix() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Database className="h-5 w-5" />
-              Subscription Data Report
+              {t('admin.subscription_fix.report_title', 'Subscription Data Report')}
             </CardTitle>
             <CardDescription>
-              Current state of subscription data across all companies
+              {t('admin.subscription_fix.report_desc', 'Current state of subscription data across all companies')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold">{report.totalCompanies}</div>
-                <div className="text-sm text-muted-foreground">Total Companies</div>
+                <div className="text-sm text-muted-foreground">{t('admin.subscription_fix.total_companies_label', 'Total Companies')}</div>
               </div>
               {Object.entries(report.statusBreakdown).map(([status, count]) => (
                 <div key={status} className="text-center">
@@ -159,7 +159,7 @@ export default function SubscriptionDataFix() {
             {report.issuesFound.length > 0 && (
               <Alert className="border-yellow-200 bg-yellow-50">
                 <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Issues Found</AlertTitle>
+                <AlertTitle>{t('admin.subscription_fix.issues_found_title', 'Issues Found')}</AlertTitle>
                 <AlertDescription>
                   <ul className="list-disc list-inside space-y-1 mt-2">
                     {report.issuesFound.map((issue, index) => (
@@ -173,7 +173,7 @@ export default function SubscriptionDataFix() {
             {/* Recommendations */}
             {report.recommendations.length > 0 && (
               <div className="space-y-2">
-                <h4 className="font-semibold">Recommendations:</h4>
+                <h4 className="font-semibold">{t('admin.subscription_fix.recommendations_label', 'Recommendations:')}</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
                   {report.recommendations.map((rec, index) => (
                     <li key={index}>{rec}</li>

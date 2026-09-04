@@ -21295,7 +21295,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
 
       if (!authUrl) {
         return res.status(400).json({
-          error: 'Google Sheets integration not configured by platform administrator. Please contact support.'
+          error: 'Google Sheets integration not configured. An administrator must set the Google OAuth Client ID and Client Secret in Admin > Settings (Google Sheets or Google Calendar).'
         });
       }
 

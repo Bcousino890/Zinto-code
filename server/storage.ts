@@ -9375,7 +9375,7 @@ export class DatabaseStorage implements IStorage {
     const brandingValue = brandingSetting?.value as { appName?: string } | undefined;
     return typeof brandingValue?.appName === 'string' && brandingValue.appName.trim()
       ? brandingValue.appName.trim()
-      : 'BotHive';
+      : 'Zinto';
   }
 
   private async getDefaultLanguageCode(): Promise<string> {

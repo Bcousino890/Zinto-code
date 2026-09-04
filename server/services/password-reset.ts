@@ -319,12 +319,12 @@ export class PasswordResetService {
       }
 
       return {
-        appName: (brandingValue as any)?.appName || 'BotHive',
+        appName: (brandingValue as any)?.appName || 'Zinto',
         logoUrl: logoSetting?.value as string
       };
     } catch (error) {
       console.error('Error getting branding settings:', error);
-      return { appName: 'BotHive' };
+      return { appName: 'Zinto' };
     }
   }
 

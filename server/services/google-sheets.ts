@@ -315,7 +315,7 @@ class GoogleSheetsService {
         <html>
           <body>
             <h1>Google Sheets Connected Successfully!</h1>
-            <p>You can now close this window and return to BotHivePlus.</p>
+            <p>You can now close this window and return to Zinto.</p>
             <script>window.close();</script>
           </body>
         </html>

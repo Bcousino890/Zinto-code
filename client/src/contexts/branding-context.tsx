@@ -32,7 +32,7 @@ export type BrandingSettings = {
 };
 
 const DEFAULT_BRANDING: BrandingSettings = {
-  appName: "BotHive",
+  appName: "Zinto",
   primaryColor: "#17a132",
   secondaryColor: "#4F46E5",
   uiGradientPreset: "glass-dark",

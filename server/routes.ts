@@ -1260,7 +1260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const appName =
         typeof brandingValue?.appName === 'string' && brandingValue.appName.trim()
           ? brandingValue.appName.trim()
-          : 'BotHive';
+          : 'Zinto';
       const logoUrl =
         typeof brandingLogoSetting?.value === 'string' ? brandingLogoSetting.value : undefined;
       const faviconUrl =
@@ -1358,7 +1358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const appName =
         typeof brandingValue?.appName === 'string' && brandingValue.appName.trim()
           ? brandingValue.appName.trim()
-          : 'BotHive';
+          : 'Zinto';
       const logoUrl =
         typeof brandingLogoSetting?.value === 'string' ? brandingLogoSetting.value : undefined;
       const faviconUrl =

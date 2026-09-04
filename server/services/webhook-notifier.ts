@@ -160,7 +160,7 @@ class WebhookNotifier {
             'Content-Type': 'application/json',
             'X-Webhook-Signature': signature,
             'X-Request-ID': crypto.randomUUID(),
-            'User-Agent': 'BotHive-API-Webhook/1.0'
+            'User-Agent': 'Zinto-API-Webhook/1.0'
           },
           timeout: 10000 // 10 second timeout
         }

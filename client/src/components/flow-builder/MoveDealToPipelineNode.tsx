@@ -51,6 +51,7 @@ import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { standardHandleStyle } from './StyledHandle';
 import { apiRequest } from '@/lib/queryClient';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface VariableOption {
   value: string;
@@ -60,29 +61,31 @@ interface VariableOption {
   category: 'contact' | 'message' | 'system' | 'deal';
 }
 
-const AVAILABLE_VARIABLES: VariableOption[] = [
-  {
-    value: 'contact.phone',
-    label: 'Contact Phone',
-    description: 'Phone number of the contact',
-    icon: <Phone className="w-4 h-4" />,
-    category: 'contact'
-  },
-  {
-    value: 'contact.name',
-    label: 'Contact Name',
-    description: 'Full name of the contact',
-    icon: <Phone className="w-4 h-4" />,
-    category: 'contact'
-  },
-  {
-    value: 'pipeline.currentPipelineId',
-    label: 'Current Pipeline ID',
-    description: 'Current pipeline ID',
-    icon: <Layers className="w-4 h-4" />,
-    category: 'deal'
-  }
-];
+function useAvailableVariables(t: (key: string, fallback: string) => string): VariableOption[] {
+  return useMemo(() => [
+    {
+      value: 'contact.phone',
+      label: t('flow_builder.contact_phone', 'Contact Phone'),
+      description: t('flow_builder.move_deal_node.var_contact_phone_desc', 'Phone number of the contact'),
+      icon: <Phone className="w-4 h-4" />,
+      category: 'contact'
+    },
+    {
+      value: 'contact.name',
+      label: t('flow_builder.contact_name', 'Contact Name'),
+      description: t('flow_builder.move_deal_node.var_contact_name_desc', 'Full name of the contact'),
+      icon: <Phone className="w-4 h-4" />,
+      category: 'contact'
+    },
+    {
+      value: 'pipeline.currentPipelineId',
+      label: t('flow_builder.move_deal_node.var_current_pipeline_id_label', 'Current Pipeline ID'),
+      description: t('flow_builder.move_deal_node.var_current_pipeline_id_desc', 'Current pipeline ID'),
+      icon: <Layers className="w-4 h-4" />,
+      category: 'deal'
+    }
+  ], [t]);
+}
 
 interface VariablePickerProps {
   value: string;
@@ -92,10 +95,13 @@ interface VariablePickerProps {
 }
 
 function VariablePicker({ value, onChange, placeholder, className }: VariablePickerProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const AVAILABLE_VARIABLES = useAvailableVariables(t);
 
   const filteredVariables = AVAILABLE_VARIABLES.filter(variable =>
     variable.label.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -141,10 +147,10 @@ function VariablePicker({ value, onChange, placeholder, className }: VariablePic
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
-      case 'contact': return 'Contact';
-      case 'message': return 'Message';
-      case 'system': return 'System';
-      case 'deal': return 'Deal';
+      case 'contact': return t('flow_builder.condition_domains.contact', 'Contact');
+      case 'message': return t('flow_builder.condition_domains.message', 'Message');
+      case 'system': return t('flow_builder.move_deal_node.category_system', 'System');
+      case 'deal': return t('flow_builder.condition_domains.deal', 'Deal');
       default: return category;
     }
   };
@@ -174,12 +180,12 @@ function VariablePicker({ value, onChange, placeholder, className }: VariablePic
         <PopoverContent className="w-80 p-0" align="start">
           <Command>
             <CommandInput
-              placeholder="Search variables..."
+              placeholder={t('flow_builder.variable_browser_search_placeholder', 'Search variables...')}
               value={searchValue}
               onValueChange={setSearchValue}
             />
             <CommandList>
-              <CommandEmpty>No variables found.</CommandEmpty>
+              <CommandEmpty>{t('flow_builder.google_sheets.no_variables_found', 'No variables found.')}</CommandEmpty>
 
               {Object.entries(groupedVariables).map(([category, variables]) => (
                 <CommandGroup
@@ -235,6 +241,7 @@ function MoveDealToPipelineNode({
   selected,
   isConnectable
 }: NodeProps<MoveDealToPipelineData>) {
+  const { t } = useTranslation();
   const { onDeleteNode, onDuplicateNode } = useFlowContext();
   const { getNodes, setNodes } = useReactFlow();
   const [showToolbar, setShowToolbar] = useState(false);
@@ -373,10 +380,10 @@ function MoveDealToPipelineNode({
                 </div>
                 <div>
                   <CardTitle className="text-sm font-semibold">
-                    Move Deal to Pipeline
+                    {t('flow_builder.node_types.move_deal_to_pipeline', 'Move Deal to Pipeline')}
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    Move a deal to a different pipeline and stage
+                    {t('flow_builder.move_deal_node.description', 'Move a deal to a different pipeline and stage')}
                   </CardDescription>
                 </div>
               </div>
@@ -387,17 +394,17 @@ function MoveDealToPipelineNode({
                       <TooltipTrigger asChild>
                         <Badge variant="destructive" className="text-xs">
                           <AlertCircle className="w-3 h-3 mr-1" />
-                          Invalid Config
+                          {t('flow_builder.move_deal_node.invalid_config', 'Invalid Config')}
                         </Badge>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Selected stage does not belong to target pipeline</p>
+                        <p>{t('flow_builder.move_deal_node.stage_mismatch', 'Selected stage does not belong to target pipeline')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}
                 <Badge variant="secondary" className="text-xs">
-                  Pipeline
+                  {t('flow_builder.node_types.pipeline', 'Pipeline')}
                 </Badge>
               </div>
             </div>
@@ -407,7 +414,7 @@ function MoveDealToPipelineNode({
             <div className="space-y-2">
               <Label className="text-xs font-medium flex items-center gap-1">
                 <Phone className="w-3 h-3" />
-                Contact Phone Variable
+                {t('flow_builder.move_deal_node.contact_phone_variable_label', 'Contact Phone Variable')}
               </Label>
               <VariablePicker
                 value={data.dealIdVariable || ''}
@@ -416,20 +423,20 @@ function MoveDealToPipelineNode({
                 className="h-8"
               />
               <p className="text-xs text-muted-foreground">
-                Variable containing the contact phone number to identify the deal
+                {t('flow_builder.move_deal_node.contact_phone_variable_help', 'Variable containing the contact phone number to identify the deal')}
               </p>
             </div>
 
             <div className="space-y-2">
               <Label className="text-xs font-medium flex items-center gap-1">
                 <Layers className="w-3 h-3" />
-                Source Pipeline (Optional Filter)
+                {t('flow_builder.move_deal_node.source_pipeline_label', 'Source Pipeline (Optional Filter)')}
                 <Tooltip>
                   <TooltipTrigger>
                     <HelpCircle className="w-3 h-3 text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Optionally filter deals by source pipeline. Leave as "Any Pipeline" to move deals from any pipeline.</p>
+                    <p>{t('flow_builder.move_deal_node.source_pipeline_help', 'Optionally filter deals by source pipeline. Leave as "Any Pipeline" to move deals from any pipeline.')}</p>
                   </TooltipContent>
                 </Tooltip>
               </Label>
@@ -438,12 +445,12 @@ function MoveDealToPipelineNode({
                 onValueChange={handleSelectChange('sourcePipelineId')}
               >
                 <SelectTrigger className="h-8">
-                  <SelectValue placeholder="Any Pipeline" />
+                  <SelectValue placeholder={t('flow_builder.any_pipeline_option', 'Any Pipeline')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">Any Pipeline</SelectItem>
+                  <SelectItem value="any">{t('flow_builder.any_pipeline_option', 'Any Pipeline')}</SelectItem>
                   {pipelinesLoading ? (
-                    <SelectItem value="loading" disabled>Loading pipelines...</SelectItem>
+                    <SelectItem value="loading" disabled>{t('flow_builder.move_deal_node.loading_pipelines', 'Loading pipelines...')}</SelectItem>
                   ) : (
                     pipelines?.map(pipeline => (
                       <SelectItem key={pipeline.id} value={pipeline.id.toString()}>
@@ -464,13 +471,13 @@ function MoveDealToPipelineNode({
             <div className="space-y-2">
               <Label className="text-xs font-medium flex items-center gap-1">
                 <Target className="w-3 h-3" />
-                Target Pipeline
+                {t('flow_builder.target_pipeline_label', 'Target Pipeline')}
                 <Tooltip>
                   <TooltipTrigger>
                     <HelpCircle className="w-3 h-3 text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Select the target pipeline where the deal will be moved</p>
+                    <p>{t('flow_builder.move_deal_node.target_pipeline_help', 'Select the target pipeline where the deal will be moved')}</p>
                   </TooltipContent>
                 </Tooltip>
               </Label>
@@ -479,11 +486,11 @@ function MoveDealToPipelineNode({
                 onValueChange={handleSelectChange('targetPipelineId')}
               >
                 <SelectTrigger className="h-8">
-                  <SelectValue placeholder="Select target pipeline" />
+                  <SelectValue placeholder={t('flow_builder.move_deal_node.select_target_pipeline', 'Select target pipeline')} />
                 </SelectTrigger>
                 <SelectContent>
                   {pipelinesLoading ? (
-                    <SelectItem value="loading" disabled>Loading pipelines...</SelectItem>
+                    <SelectItem value="loading" disabled>{t('flow_builder.move_deal_node.loading_pipelines', 'Loading pipelines...')}</SelectItem>
                   ) : (
                     pipelines?.map(pipeline => (
                       <SelectItem key={pipeline.id} value={pipeline.id.toString()}>
@@ -499,13 +506,13 @@ function MoveDealToPipelineNode({
               <div className="space-y-2">
                 <Label className="text-xs font-medium flex items-center gap-1">
                   <Target className="w-3 h-3" />
-                  Target Stage
+                  {t('flow_builder.move_deal_node.target_stage_label', 'Target Stage')}
                   <Tooltip>
                     <TooltipTrigger>
                       <HelpCircle className="w-3 h-3 text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Select the target stage within the selected pipeline</p>
+                      <p>{t('flow_builder.move_deal_node.target_stage_help', 'Select the target stage within the selected pipeline')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </Label>
@@ -517,11 +524,11 @@ function MoveDealToPipelineNode({
                     "h-8",
                     !isValidStage && "border-red-500"
                   )}>
-                    <SelectValue placeholder="Select target stage" />
+                    <SelectValue placeholder={t('flow_builder.move_deal_node.select_target_stage', 'Select target stage')} />
                   </SelectTrigger>
                   <SelectContent>
                     {stagesLoading ? (
-                      <SelectItem value="loading" disabled>Loading stages...</SelectItem>
+                      <SelectItem value="loading" disabled>{t('flow_builder.move_deal_node.loading_stages', 'Loading stages...')}</SelectItem>
                     ) : targetPipelineStages.length > 0 ? (
                       targetPipelineStages.map((stage) => (
                         <SelectItem
@@ -538,19 +545,19 @@ function MoveDealToPipelineNode({
                         </SelectItem>
                       ))
                     ) : (
-                      <SelectItem value="no-stages" disabled>No stages available for this pipeline</SelectItem>
+                      <SelectItem value="no-stages" disabled>{t('flow_builder.move_deal_node.no_stages_available', 'No stages available for this pipeline')}</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
                 {!isValidStage && (
-                  <p className="text-xs text-red-500">Selected stage does not belong to target pipeline</p>
+                  <p className="text-xs text-red-500">{t('flow_builder.move_deal_node.stage_mismatch', 'Selected stage does not belong to target pipeline')}</p>
                 )}
               </div>
             )}
 
             <div className="space-y-3 pt-2 border-t">
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-medium">Create deal if not exists</Label>
+                <Label className="text-xs font-medium">{t('flow_builder.move_deal_node.create_if_not_exists', 'Create deal if not exists')}</Label>
                 <Switch
                   checked={data.createDealIfNotExists || false}
                   onCheckedChange={handleSwitchChange('createDealIfNotExists')}
@@ -558,7 +565,7 @@ function MoveDealToPipelineNode({
               </div>
 
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-medium">Preserve deal data</Label>
+                <Label className="text-xs font-medium">{t('flow_builder.move_deal_node.preserve_deal_data', 'Preserve deal data')}</Label>
                 <Switch
                   checked={data.preserveDealData !== false}
                   onCheckedChange={handleSwitchChange('preserveDealData')}
@@ -566,7 +573,7 @@ function MoveDealToPipelineNode({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-medium">Error Handling</Label>
+                <Label className="text-xs font-medium">{t('flow_builder.error_handling', 'Error Handling')}</Label>
                 <Select
                   value={data.errorHandling || 'continue'}
                   onValueChange={handleSelectChange('errorHandling')}
@@ -578,13 +585,13 @@ function MoveDealToPipelineNode({
                     <SelectItem value="continue">
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-3 h-3 text-green-500" />
-                        Continue on error
+                        {t('flow_builder.continue_on_error', 'Continue on error')}
                       </div>
                     </SelectItem>
                     <SelectItem value="stop">
                       <div className="flex items-center gap-2">
                         <AlertCircle className="w-3 h-3 text-red-500" />
-                        Stop on error
+                        {t('flow_builder.stop_on_error', 'Stop on error')}
                       </div>
                     </SelectItem>
                   </SelectContent>

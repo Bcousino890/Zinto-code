@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { formatMessageDate } from '@/utils/dateUtils';
 
 interface DateSeparatorProps {
@@ -5,10 +6,11 @@ interface DateSeparatorProps {
 }
 
 export default function DateSeparator({ date }: DateSeparatorProps) {
+  const { t } = useTranslation();
   return (
     <div className="date-separator">
       <span>
-        {formatMessageDate(date)}
+        {formatMessageDate(date, t)}
       </span>
     </div>
   );

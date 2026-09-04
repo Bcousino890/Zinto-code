@@ -552,7 +552,7 @@ function MessageNode({ data, isConnectable, id }: any) {
 
                 {enableKeywordTriggers && (
                   <div className="text-[10px] text-muted-foreground space-y-1">
-                    <div>Each keyword will create its own output connection.</div>
+                    <div>{t('flow_builder.keyword_trigger_each_output', 'Each keyword will create its own output connection.')}</div>
                     <div>A "no match" output will be available for unmatched responses.</div>
                   </div>
                 )}
@@ -1198,7 +1198,7 @@ function TriggerNode({ data, isConnectable, id }: any) {
                 updateNodeData({ triggerType: e.target.value });
               }}
             >
-              <option value="message_received">Message Received</option>
+              <option value="message_received">{t('flow_builder.trigger_type_message_received', 'Message Received')}</option>
               {/* <option value="webhook">Webhook</option>
               <option value="schedule">Schedule</option>
               <option value="manual">Manual</option>
@@ -1210,13 +1210,13 @@ function TriggerNode({ data, isConnectable, id }: any) {
 
           {triggerType === 'deal_enters_pipeline' && (
             <div>
-              <label className="block mb-1 font-medium">Target Pipeline</label>
+              <label className="block mb-1 font-medium">{t('flow_builder.target_pipeline_label', 'Target Pipeline')}</label>
               <select
                 className="w-full p-1 border rounded bg-background text-xs"
                 value={data.pipelineId?.toString() || ''}
                 onChange={(e) => updateNodeData({ pipelineId: e.target.value ? parseInt(e.target.value) : null })}
               >
-                <option value="">Select pipeline</option>
+                <option value="">{t('flow_builder.select_pipeline', 'Select pipeline')}</option>
                 {pipelines?.map((p: Pipeline) => (
                   <option key={p.id} value={p.id.toString()}>{p.name}</option>
                 ))}
@@ -1233,7 +1233,7 @@ function TriggerNode({ data, isConnectable, id }: any) {
                   value={data.fromPipelineId?.toString() || 'any'}
                   onChange={(e) => updateNodeData({ fromPipelineId: e.target.value === 'any' ? null : parseInt(e.target.value) })}
                 >
-                  <option value="any">Any Pipeline</option>
+                  <option value="any">{t('flow_builder.any_pipeline_option', 'Any Pipeline')}</option>
                   {pipelines?.map((p: Pipeline) => (
                     <option key={p.id} value={p.id.toString()}>{p.name}</option>
                   ))}
@@ -1246,7 +1246,7 @@ function TriggerNode({ data, isConnectable, id }: any) {
                   value={data.toPipelineId?.toString() || 'any'}
                   onChange={(e) => updateNodeData({ toPipelineId: e.target.value === 'any' ? null : parseInt(e.target.value) })}
                 >
-                  <option value="any">Any Pipeline</option>
+                  <option value="any">{t('flow_builder.any_pipeline_option', 'Any Pipeline')}</option>
                   {pipelines?.map((p: Pipeline) => (
                     <option key={p.id} value={p.id.toString()}>{p.name}</option>
                   ))}
@@ -2508,7 +2508,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
             </div>
 
             <div className="text-[10px] text-muted-foreground mt-2 space-y-1">
-              <div>Each option will have its own output connection.</div>
+              <div>{t('flow_builder.quick_reply_each_output', 'Each option will have its own output connection.')}</div>
               {/* 🔧 NEW: Keyboard shortcuts help */}
               <div className="text-[9px] text-muted-foreground/70">
                 <strong>Shortcuts:</strong> Ctrl+A (select all), Ctrl+D (duplicate), Del (delete), Esc (deselect), Ctrl+Enter (add option)
@@ -2563,7 +2563,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                   onChange={(e) => handleEnableGoBackChange(e.target.checked)}
                   className="w-4 h-4 rounded border-gray-300"
                 />
-                <span className="text-muted-foreground">Enable Go Back</span>
+                <span className="text-muted-foreground">{t('flow_builder.quick_reply_enable_go_back', 'Enable Go Back')}</span>
               </label>
             </div>
             
@@ -2724,7 +2724,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
               !
             </div>
             <div className="text-sm flex-1 pr-6">
-              <div className="text-orange-700 dark:text-orange-400 font-medium">Invalid Response</div>
+              <div className="text-orange-700 dark:text-orange-400 font-medium">{t('flow_builder.poll_invalid_response_title', 'Invalid Response')}</div>
               <div className="text-xs text-muted-foreground">
                 {invalidResponseMessage.length > 50
                   ? `${invalidResponseMessage.substring(0, 50)}...`
@@ -4070,15 +4070,19 @@ Note: Check available slots before responding when a user requests a specific ap
       }
 
       toast({
-        title: "Flow Template Applied",
-        description: `Successfully applied "${suggestion.title}" with ${newNodes.length} nodes.`,
+        title: t('flow_builder.main.template_applied', 'Flow Template Applied'),
+        description: t(
+          'flow_builder.main.template_applied_desc',
+          'Successfully applied "{{title}}" with {{count}} nodes.',
+          { title: suggestion.title, count: newNodes.length }
+        ),
       });
 
     } catch (error) {
       console.error('Error applying flow template:', error);
       toast({
-        title: "Error",
-        description: "Failed to apply flow template. Please try again.",
+        title: t('flow_builder.main.template_apply_error', 'Error'),
+        description: t('flow_builder.main.template_apply_error_desc', 'Failed to apply flow template. Please try again.'),
         variant: "destructive",
       });
     }

@@ -95,13 +95,13 @@ export default function Dashboard() {
 
           {hasErpAccess && erpKpisQuery.data && canViewErpSnapshot ? (
             <div className="mt-8 space-y-3">
-              <h2 className="text-lg font-semibold text-foreground">ERP snapshot</h2>
+              <h2 className="text-lg font-semibold text-foreground">{t('dashboard.erp_snapshot.title', 'ERP snapshot')}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {canViewErpRevenue ? (
                 <Link href="/erp/dashboard">
                   <Card className="transition-colors hover:bg-muted/40 cursor-pointer h-full">
                     <CardHeader>
-                      <CardTitle className="text-base">Revenue (30d)</CardTitle>
+                      <CardTitle className="text-base">{t('dashboard.erp_snapshot.revenue_30d', 'Revenue (30d)')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-2xl font-bold">
@@ -109,7 +109,7 @@ export default function Dashboard() {
                           erpKpisQuery.data.revenueLast30Days,
                         )}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">Open ERP dashboard</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('dashboard.erp_snapshot.open_erp_dashboard', 'Open ERP dashboard')}</p>
                     </CardContent>
                   </Card>
                 </Link>
@@ -118,11 +118,11 @@ export default function Dashboard() {
                 <Link href="/erp/sales-orders">
                   <Card className="transition-colors hover:bg-muted/40 cursor-pointer h-full">
                     <CardHeader>
-                      <CardTitle className="text-base">Pending orders</CardTitle>
+                      <CardTitle className="text-base">{t('dashboard.erp_snapshot.pending_orders', 'Pending orders')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-2xl font-bold">{erpKpisQuery.data.pendingOrders}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Sales pipeline</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('dashboard.erp_snapshot.sales_pipeline', 'Sales pipeline')}</p>
                     </CardContent>
                   </Card>
                 </Link>
@@ -131,11 +131,11 @@ export default function Dashboard() {
                 <Link href="/erp/invoices">
                   <Card className="transition-colors hover:bg-muted/40 cursor-pointer h-full">
                     <CardHeader>
-                      <CardTitle className="text-base">Overdue invoices</CardTitle>
+                      <CardTitle className="text-base">{t('dashboard.erp_snapshot.overdue_invoices', 'Overdue invoices')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-2xl font-bold">{erpKpisQuery.data.overdueInvoices}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Accounts receivable</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('dashboard.erp_snapshot.accounts_receivable', 'Accounts receivable')}</p>
                     </CardContent>
                   </Card>
                 </Link>

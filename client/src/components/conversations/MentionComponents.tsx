@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface MentionSuggestion {
   userId: number;
@@ -171,6 +172,7 @@ export function MentionNotificationPanel({
   getUserName,
   className = ''
 }: MentionNotificationPanelProps) {
+  const { t } = useTranslation();
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -185,7 +187,7 @@ export function MentionNotificationPanel({
       </PopoverTrigger>
       <PopoverContent className={cn('w-96 p-0', className)} align="end">
         <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold text-sm">Mentions</h3>
+          <h3 className="font-semibold text-sm">{t('conversations.mentions.panel_title', 'Mentions')}</h3>
           {mentions.length > 0 && (
             <Button
               variant="ghost"
@@ -193,16 +195,16 @@ export function MentionNotificationPanel({
               onClick={onClearAll}
               className="text-xs"
             >
-              Clear all
+              {t('conversations.mentions.clear_all', 'Clear all')}
             </Button>
           )}
         </div>
-        
+
         <ScrollArea className="h-96">
           {mentions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-gray-500">
               <Bell className="w-12 h-12 mb-2 opacity-50" />
-              <p className="text-sm">No mentions</p>
+              <p className="text-sm">{t('conversations.mentions.no_mentions', 'No mentions')}</p>
             </div>
           ) : (
             <div className="divide-y">
@@ -214,7 +216,7 @@ export function MentionNotificationPanel({
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <p className="text-sm font-medium text-gray-900">
-                      {getUserName(mention.mentionedByUserId)} mentioned you
+                      {t('conversations.mentions.mentioned_you', '{{userName}} mentioned you', { userName: getUserName(mention.mentionedByUserId) })}
                     </p>
                     <button
                       onClick={(e) => {
@@ -266,10 +268,11 @@ export function MentionInput({
   selectedIndex,
   showSuggestions,
   onSelectSuggestion,
-  placeholder = 'Type @ to mention someone...',
+  placeholder,
   className = '',
   inputRef
 }: MentionInputProps) {
+  const { t } = useTranslation();
   return (
     <div className="relative">
       <textarea
@@ -277,7 +280,7 @@ export function MentionInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('conversations.mentions.input_placeholder', 'Type @ to mention someone...')}
         className={cn(
           'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none',
           className

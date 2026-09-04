@@ -208,7 +208,7 @@ export default function MessageBubble({ message, contact, channelType, onReply, 
                      ? new Date(message.metadata.timestamp) 
                      : message.createdAt);
   
-  const formattedTime = formatMessageDateTime(new Date(timestamp));
+  const formattedTime = formatMessageDateTime(new Date(timestamp), t);
 
   useEffect(() => {
     const mediaTypes = ['image', 'video', 'audio', 'voice', 'sticker'];

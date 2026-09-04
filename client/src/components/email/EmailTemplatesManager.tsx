@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { Plus, Edit, Trash2, Copy, Eye, FileText } from 'lucide-react';
 import { VariableInsertion } from '@/components/campaigns/VariableInsertion';
 
@@ -39,16 +40,17 @@ interface EmailTemplateFormData {
   isActive: boolean;
 }
 
-const TEMPLATE_CATEGORIES = [
-  { value: 'general', label: 'General' },
-  { value: 'welcome', label: 'Welcome' },
-  { value: 'follow-up', label: 'Follow-up' },
-  { value: 'support', label: 'Support' },
-  { value: 'marketing', label: 'Marketing' },
-  { value: 'notification', label: 'Notification' }
-];
-
 export function EmailTemplatesManager() {
+  const { t } = useTranslation();
+  const TEMPLATE_CATEGORIES = [
+    { value: 'general', label: t('email.templates_manager.category_general', 'General') },
+    { value: 'welcome', label: t('email.templates_manager.category_welcome', 'Welcome') },
+    { value: 'follow-up', label: t('email.templates_manager.category_follow_up', 'Follow-up') },
+    { value: 'support', label: t('email.templates_manager.category_support', 'Support') },
+    { value: 'marketing', label: t('email.templates_manager.category_marketing', 'Marketing') },
+    { value: 'notification', label: t('email.templates_manager.category_notification', 'Notification') }
+  ];
+
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -78,21 +80,21 @@ export function EmailTemplatesManager() {
     try {
       const response = await fetch('/api/email-templates');
       const result = await response.json();
-      
+
       if (result.success) {
         setTemplates(result.data);
       } else {
         toast({
-          title: "Error",
-          description: "Failed to fetch email templates",
+          title: t('common.error', 'Error'),
+          description: t('email.templates_manager.fetch_error', 'Failed to fetch email templates'),
           variant: "destructive"
         });
       }
     } catch (error) {
       console.error('Error fetching templates:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch email templates",
+        title: t('common.error', 'Error'),
+        description: t('email.templates_manager.fetch_error', 'Failed to fetch email templates'),
         variant: "destructive"
       });
     } finally {
@@ -102,23 +104,23 @@ export function EmailTemplatesManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim() || !formData.subject.trim()) {
       toast({
-        title: "Error",
-        description: "Name and subject are required",
+        title: t('common.error', 'Error'),
+        description: t('email.templates_manager.name_subject_required', 'Name and subject are required'),
         variant: "destructive"
       });
       return;
     }
 
     try {
-      const url = editingTemplate 
+      const url = editingTemplate
         ? `/api/email-templates/${editingTemplate.id}`
         : '/api/email-templates';
-      
+
       const method = editingTemplate ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -128,27 +130,27 @@ export function EmailTemplatesManager() {
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         toast({
-          title: "Success",
-          description: editingTemplate ? 'Template updated successfully' : 'Template created successfully'
+          title: t('common.success', 'Success'),
+          description: editingTemplate ? t('email.templates_manager.update_success', 'Template updated successfully') : t('email.templates_manager.create_success', 'Template created successfully')
         });
         setIsDialogOpen(false);
         resetForm();
         fetchTemplates();
       } else {
         toast({
-          title: "Error",
-          description: result.error || 'Failed to save template',
+          title: t('common.error', 'Error'),
+          description: result.error || t('email.templates_manager.save_error', 'Failed to save template'),
           variant: "destructive"
         });
       }
     } catch (error) {
       console.error('Error saving template:', error);
       toast({
-        title: "Error",
-        description: 'Failed to save template',
+        title: t('common.error', 'Error'),
+        description: t('email.templates_manager.save_error', 'Failed to save template'),
         variant: "destructive"
       });
     }
@@ -170,7 +172,7 @@ export function EmailTemplatesManager() {
   };
 
   const handleDelete = async (templateId: number) => {
-    if (!confirm('Are you sure you want to delete this template?')) {
+    if (!confirm(t('email.templates_manager.delete_confirm', 'Are you sure you want to delete this template?'))) {
       return;
     }
 
@@ -180,25 +182,25 @@ export function EmailTemplatesManager() {
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         toast({
-          title: "Success",
-          description: 'Template deleted successfully'
+          title: t('common.success', 'Success'),
+          description: t('email.templates_manager.delete_success', 'Template deleted successfully')
         });
         fetchTemplates();
       } else {
         toast({
-          title: "Error",
-          description: result.error || 'Failed to delete template',
+          title: t('common.error', 'Error'),
+          description: result.error || t('email.templates_manager.delete_error', 'Failed to delete template'),
           variant: "destructive"
         });
       }
     } catch (error) {
       console.error('Error deleting template:', error);
       toast({
-        title: "Error",
-        description: 'Failed to delete template',
+        title: t('common.error', 'Error'),
+        description: t('email.templates_manager.delete_error', 'Failed to delete template'),
         variant: "destructive"
       });
     }
@@ -207,7 +209,7 @@ export function EmailTemplatesManager() {
   const handleDuplicate = (template: EmailTemplate) => {
     setEditingTemplate(null);
     setFormData({
-      name: `${template.name} (Copy)`,
+      name: t('email.templates_manager.copy_name', '{{name}} (Copy)', { name: template.name }),
       description: template.description || '',
       category: template.category,
       subject: template.subject,
@@ -236,47 +238,47 @@ export function EmailTemplatesManager() {
 
 
   if (loading) {
-    return <div className="flex justify-center p-8">Loading templates...</div>;
+    return <div className="flex justify-center p-8">{t('email.templates_manager.loading', 'Loading templates...')}</div>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Email Templates</h2>
-          <p className="text-muted-foreground">Manage your email templates for quick message composition</p>
+          <h2 className="text-2xl font-bold">{t('email.templates_manager.title', 'Email Templates')}</h2>
+          <p className="text-muted-foreground">{t('email.templates_manager.subtitle', 'Manage your email templates for quick message composition')}</p>
         </div>
-        
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={resetForm}>
               <Plus className="w-4 h-4 mr-2" />
-              New Template
+              {t('email.templates_manager.new_template', 'New Template')}
             </Button>
           </DialogTrigger>
-          
+
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {editingTemplate ? 'Edit Template' : 'Create New Template'}
+                {editingTemplate ? t('email.templates_manager.edit_title', 'Edit Template') : t('email.templates_manager.create_title', 'Create New Template')}
               </DialogTitle>
             </DialogHeader>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Template Name *</Label>
+                  <Label htmlFor="name">{t('email.templates_manager.name_label', 'Template Name *')}</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Enter template name"
+                    placeholder={t('email.templates_manager.name_placeholder', 'Enter template name')}
                     required
                   />
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
+                  <Label htmlFor="category">{t('email.templates_manager.category_label', 'Category')}</Label>
                   <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
                     <SelectTrigger>
                       <SelectValue />
@@ -291,26 +293,26 @@ export function EmailTemplatesManager() {
                   </Select>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('email.templates_manager.description_label', 'Description')}</Label>
                 <Input
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Brief description of the template"
+                  placeholder={t('email.templates_manager.description_placeholder', 'Brief description of the template')}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Subject Line *</Label>
+                  <Label htmlFor="subject">{t('email.templates_manager.subject_label', 'Subject Line *')}</Label>
                   <Input
                     ref={subjectRef}
                     id="subject"
                     value={formData.subject}
                     onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                    placeholder="Email subject line"
+                    placeholder={t('email.templates_manager.subject_placeholder', 'Email subject line')}
                     required
                   />
                   <div className="mt-1">
@@ -323,21 +325,21 @@ export function EmailTemplatesManager() {
                   </div>
                 </div>
               </div>
-              
+
               <Tabs defaultValue="html" className="w-full">
                 <TabsList>
-                  <TabsTrigger value="html">HTML Content</TabsTrigger>
-                  <TabsTrigger value="plain">Plain Text</TabsTrigger>
+                  <TabsTrigger value="html">{t('email.templates_manager.tab_html', 'HTML Content')}</TabsTrigger>
+                  <TabsTrigger value="plain">{t('email.templates_manager.tab_plain', 'Plain Text')}</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="html" className="space-y-2">
                   <div className="space-y-2">
-                    <Label>HTML Content</Label>
+                    <Label>{t('email.templates_manager.tab_html', 'HTML Content')}</Label>
                     <Textarea
                       ref={htmlContentRef}
                       value={formData.htmlContent}
                       onChange={(e) => setFormData(prev => ({ ...prev, htmlContent: e.target.value }))}
-                      placeholder="HTML email content with formatting"
+                      placeholder={t('email.templates_manager.html_placeholder', 'HTML email content with formatting')}
                       rows={10}
                       className="font-mono text-sm"
                     />
@@ -351,15 +353,15 @@ export function EmailTemplatesManager() {
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="plain" className="space-y-2">
                   <div className="space-y-2">
-                    <Label>Plain Text Content</Label>
+                    <Label>{t('email.templates_manager.plain_label', 'Plain Text Content')}</Label>
                     <Textarea
                       ref={plainTextContentRef}
                       value={formData.plainTextContent}
                       onChange={(e) => setFormData(prev => ({ ...prev, plainTextContent: e.target.value }))}
-                      placeholder="Plain text version of the email"
+                      placeholder={t('email.templates_manager.plain_placeholder', 'Plain text version of the email')}
                       rows={10}
                     />
                     <div className="mt-1">
@@ -373,22 +375,22 @@ export function EmailTemplatesManager() {
                   </div>
                 </TabsContent>
               </Tabs>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="isActive"
                   checked={formData.isActive}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked }))}
                 />
-                <Label htmlFor="isActive">Active Template</Label>
+                <Label htmlFor="isActive">{t('email.templates_manager.active_template_label', 'Active Template')}</Label>
               </div>
-              
+
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit">
-                  {editingTemplate ? 'Update Template' : 'Create Template'}
+                  {editingTemplate ? t('email.templates_manager.update_button', 'Update Template') : t('email.templates_manager.create_button', 'Create Template')}
                 </Button>
               </div>
             </form>
@@ -401,13 +403,13 @@ export function EmailTemplatesManager() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <FileText className="w-12 h-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Email Templates</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('email.templates_manager.empty_title', 'No Email Templates')}</h3>
               <p className="text-muted-foreground text-center mb-4">
-                Create your first email template to speed up your email composition
+                {t('email.templates_manager.empty_description', 'Create your first email template to speed up your email composition')}
               </p>
               <Button onClick={() => setIsDialogOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Create Template
+                {t('email.templates_manager.create_button', 'Create Template')}
               </Button>
             </CardContent>
           </Card>
@@ -420,17 +422,17 @@ export function EmailTemplatesManager() {
                     <CardTitle className="flex items-center gap-2">
                       {template.name}
                       <Badge variant={template.isActive ? "default" : "secondary"}>
-                        {template.isActive ? "Active" : "Inactive"}
+                        {template.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                       </Badge>
                       <Badge variant="outline">
                         {TEMPLATE_CATEGORIES.find(cat => cat.value === template.category)?.label || template.category}
                       </Badge>
                     </CardTitle>
                     <CardDescription>
-                      {template.description || 'No description'}
+                      {template.description || t('email.templates_manager.no_description', 'No description')}
                     </CardDescription>
                   </div>
-                  
+
                   <div className="flex space-x-2">
                     <Button
                       variant="outline"
@@ -456,16 +458,16 @@ export function EmailTemplatesManager() {
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 <div className="space-y-2">
                   <div>
-                    <strong>Subject:</strong> {template.subject}
+                    <strong>{t('email.templates_manager.subject_field_label', 'Subject:')}</strong> {template.subject}
                   </div>
-                  
+
                   {template.variables.length > 0 && (
                     <div>
-                      <strong>Variables:</strong>{' '}
+                      <strong>{t('email.templates_manager.variables_label', 'Variables:')}</strong>{' '}
                       {template.variables.map(variable => (
                         <Badge key={variable} variant="secondary" className="mr-1">
                           {`{{${variable}}}`}
@@ -473,9 +475,9 @@ export function EmailTemplatesManager() {
                       ))}
                     </div>
                   )}
-                  
+
                   <div className="text-sm text-muted-foreground">
-                    Used {template.usageCount} times • Last updated {new Date(template.updatedAt).toLocaleDateString()}
+                    {t('email.templates_manager.usage_summary', 'Used {{count}} times • Last updated {{date}}', { count: template.usageCount, date: new Date(template.updatedAt).toLocaleDateString() })}
                   </div>
                 </div>
               </CardContent>

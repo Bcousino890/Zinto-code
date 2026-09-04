@@ -714,13 +714,13 @@ export default function ConversationView() {
     const lastMessage = activeMessages[activeMessages.length - 1];
     if (lastMessage) {
       const lastMessageDate = new Date(lastMessage.sentAt || lastMessage.createdAt);
-      return formatMessageDateTime(lastMessageDate);
+      return formatMessageDateTime(lastMessageDate, t);
     }
     
 
     if (activeConversation.updatedAt) {
       const updatedDate = new Date(activeConversation.updatedAt);
-      return formatMessageDateTime(updatedDate);
+      return formatMessageDateTime(updatedDate, t);
     }
     
     return t('inbox.last_active_unknown', 'Last active unknown');

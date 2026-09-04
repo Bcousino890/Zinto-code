@@ -894,7 +894,7 @@ export default function WebsiteBuilderEditor() {
             </Link>
             <div>
               <h1 className="text-lg font-semibold">
-                {isEditing ? t('admin.website_builder.edit_title', 'Edit: {{title}}', { title: website?.title || '' }) : t('admin.website_builder.new_website_title', 'New Website')}
+                {isEditing ? t('admin.website_builder.edit_title', 'Edit: {{title}}', { title: website?.title || '' }) : t('admin.website_builder.new_website_button', 'New Website')}
               </h1>
               <p className="text-sm text-gray-600">
                 {isEditing ? `/${website?.slug}` : t('admin.website_builder.create_new_subtitle', 'Create a new website')}

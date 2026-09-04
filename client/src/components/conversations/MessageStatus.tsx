@@ -6,6 +6,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface MessageStatusProps {
   status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
@@ -27,6 +28,7 @@ export function MessageStatus({
   size = 'md',
   className = ''
 }: MessageStatusProps) {
+  const { t } = useTranslation();
   const sizeClasses = {
     sm: 'w-3 h-3',
     md: 'w-4 h-4',
@@ -53,15 +55,15 @@ export function MessageStatus({
   const getStatusLabel = () => {
     switch (status) {
       case 'sending':
-        return 'Sending...';
+        return t('conversations.message_status.sending', 'Sending...');
       case 'sent':
-        return 'Sent';
+        return t('conversations.message_status.sent', 'Sent');
       case 'delivered':
-        return 'Delivered';
+        return t('conversations.message_status.delivered', 'Delivered');
       case 'read':
-        return 'Read';
+        return t('conversations.message_status.read', 'Read');
       case 'failed':
-        return 'Failed';
+        return t('conversations.message_status.failed', 'Failed');
       default:
         return '';
     }
@@ -71,7 +73,7 @@ export function MessageStatus({
     const label = getStatusLabel();
     if (timestamp) {
       const time = new Date(timestamp).toLocaleString();
-      return `${label} at ${time}`;
+      return t('conversations.message_status.label_at_time', '{{label}} at {{time}}', { label, time });
     }
     return label;
   };
@@ -115,6 +117,7 @@ export function DetailedMessageStatus({
   readBy = [],
   className = ''
 }: DetailedMessageStatusProps) {
+  const { t } = useTranslation();
   const formatTime = (date: Date | string) => {
     return new Date(date).toLocaleString();
   };
@@ -125,7 +128,7 @@ export function DetailedMessageStatus({
       {sentAt && (
         <div className="flex items-center gap-2 text-gray-600">
           <Check className="w-4 h-4" />
-          <span>Sent: {formatTime(sentAt)}</span>
+          <span>{t('conversations.message_status.sent_at', 'Sent: {{time}}', { time: formatTime(sentAt) })}</span>
         </div>
       )}
 
@@ -133,7 +136,7 @@ export function DetailedMessageStatus({
       {deliveredAt && (
         <div className="flex items-center gap-2 text-gray-600">
           <CheckCheck className="w-4 h-4" />
-          <span>Delivered: {formatTime(deliveredAt)}</span>
+          <span>{t('conversations.message_status.delivered_at', 'Delivered: {{time}}', { time: formatTime(deliveredAt) })}</span>
         </div>
       )}
 
@@ -141,14 +144,14 @@ export function DetailedMessageStatus({
       {readAt && (
         <div className="flex items-center gap-2 text-blue-600">
           <Eye className="w-4 h-4" />
-          <span>Read: {formatTime(readAt)}</span>
+          <span>{t('conversations.message_status.read_at', 'Read: {{time}}', { time: formatTime(readAt) })}</span>
         </div>
       )}
 
       {/* Read by multiple users */}
       {readBy.length > 0 && (
         <div className="space-y-1 pl-6">
-          <p className="text-xs font-medium text-gray-500">Read by:</p>
+          <p className="text-xs font-medium text-gray-500">{t('conversations.message_status.read_by_label', 'Read by:')}</p>
           {readBy.map((receipt, index) => (
             <div key={index} className="flex items-center gap-2 text-xs text-gray-600">
               <span>{receipt.userName}</span>
@@ -164,7 +167,7 @@ export function DetailedMessageStatus({
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-red-600">
             <XCircle className="w-4 h-4" />
-            <span>Failed: {formatTime(failedAt)}</span>
+            <span>{t('conversations.message_status.failed_at', 'Failed: {{time}}', { time: formatTime(failedAt) })}</span>
           </div>
           {error && (
             <p className="text-xs text-red-500 pl-6">{error}</p>
@@ -191,19 +194,22 @@ export function ReadReceiptIndicator({
   readBy = [],
   className = ''
 }: ReadReceiptIndicatorProps) {
+  const { t } = useTranslation();
   if (readCount === 0) return null;
 
   const getTooltipText = () => {
     if (readBy.length > 0) {
       if (readBy.length === 1) {
-        return `Read by ${readBy[0]}`;
+        return t('conversations.message_status.read_by_one', 'Read by {{name}}', { name: readBy[0] });
       } else if (readBy.length === 2) {
-        return `Read by ${readBy[0]} and ${readBy[1]}`;
+        return t('conversations.message_status.read_by_two', 'Read by {{name1}} and {{name2}}', { name1: readBy[0], name2: readBy[1] });
       } else {
-        return `Read by ${readBy[0]}, ${readBy[1]} and ${readBy.length - 2} others`;
+        return t('conversations.message_status.read_by_many', 'Read by {{name1}}, {{name2}} and {{count}} others', { name1: readBy[0], name2: readBy[1], count: readBy.length - 2 });
       }
     }
-    return `Read by ${readCount} ${readCount === 1 ? 'person' : 'people'}`;
+    return readCount === 1
+      ? t('conversations.message_status.read_by_count_one', 'Read by {{count}} person', { count: readCount })
+      : t('conversations.message_status.read_by_count_other', 'Read by {{count}} people', { count: readCount });
   };
 
   return (
@@ -238,36 +244,37 @@ export function MessageStatusBadge({
   compact = false,
   className = ''
 }: MessageStatusBadgeProps) {
+  const { t } = useTranslation();
   const getStatusConfig = () => {
     switch (status) {
       case 'sending':
         return {
           icon: <Clock className="w-3 h-3" />,
-          label: 'Sending',
+          label: t('conversations.message_status.sending_short', 'Sending'),
           color: 'bg-gray-100 text-gray-600'
         };
       case 'sent':
         return {
           icon: <Check className="w-3 h-3" />,
-          label: 'Sent',
+          label: t('conversations.message_status.sent', 'Sent'),
           color: 'bg-gray-100 text-gray-600'
         };
       case 'delivered':
         return {
           icon: <CheckCheck className="w-3 h-3" />,
-          label: 'Delivered',
+          label: t('conversations.message_status.delivered', 'Delivered'),
           color: 'bg-blue-100 text-blue-600'
         };
       case 'read':
         return {
           icon: <Eye className="w-3 h-3" />,
-          label: 'Read',
+          label: t('conversations.message_status.read', 'Read'),
           color: 'bg-green-100 text-green-600'
         };
       case 'failed':
         return {
           icon: <XCircle className="w-3 h-3" />,
-          label: 'Failed',
+          label: t('conversations.message_status.failed', 'Failed'),
           color: 'bg-red-100 text-red-600'
         };
       default:

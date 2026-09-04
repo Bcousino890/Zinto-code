@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { AlertTriangle } from 'lucide-react';
 import TikTokConnectionDiagnostics from './TikTokConnectionDiagnostics';
 import {
@@ -28,6 +29,7 @@ export default function TikTokConnectionStatus({
   onReconnect,
   onDisconnect
 }: TikTokConnectionStatusProps) {
+  const { t } = useTranslation();
   const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const { toast } = useToast();
 
@@ -44,12 +46,12 @@ export default function TikTokConnectionStatus({
   });
 
   const statusBadge = () => {
-    if (isLoading || !health) return <Badge variant="secondary">Loading…</Badge>;
+    if (isLoading || !health) return <Badge variant="secondary">{t('common.loading', 'Loading…')}</Badge>;
     const s = health.status;
-    if (s === 'connected') return <Badge variant="default">Active</Badge>;
-    if (s === 'token_expiring') return <Badge variant="secondary">Token Expiring</Badge>;
-    if (s === 'disconnected') return <Badge variant="secondary">Disconnected</Badge>;
-    return <Badge variant="destructive">Error</Badge>;
+    if (s === 'connected') return <Badge variant="default">{t('common.active', 'Active')}</Badge>;
+    if (s === 'token_expiring') return <Badge variant="secondary">{t('tiktok.connection_status.token_expiring', 'Token Expiring')}</Badge>;
+    if (s === 'disconnected') return <Badge variant="secondary">{t('header.disconnected', 'Disconnected')}</Badge>;
+    return <Badge variant="destructive">{t('common.error', 'Error')}</Badge>;
   };
 
   const lastSync = health?.lastSuccessfulCall
@@ -58,29 +60,31 @@ export default function TikTokConnectionStatus({
         const diff = Date.now() - d.getTime();
         const m = Math.floor(diff / 60000);
         const h = Math.floor(m / 60);
-        if (h > 0) return `${h} hour${h !== 1 ? 's' : ''} ago`;
-        if (m > 0) return `${m} minute${m !== 1 ? 's' : ''} ago`;
-        return 'Just now';
+        if (h > 0) return h !== 1
+          ? t('tiktok.connection_status.hours_ago', '{{count}} hours ago', { count: h })
+          : t('tiktok.connection_status.hour_ago', '{{count}} hour ago', { count: h });
+        if (m > 0) return m !== 1
+          ? t('tiktok.connection_status.minutes_ago', '{{count}} minutes ago', { count: m })
+          : t('tiktok.connection_status.minute_ago', '{{count}} minute ago', { count: m });
+        return t('tiktok.connection_status.just_now', 'Just now');
       })()
     : '—';
 
   const warnings: string[] = [];
   if (health?.status === 'token_expiring') {
-    warnings.push('Token expiring within 7 days. Refresh token to avoid disconnection.');
+    warnings.push(t('tiktok.connection_status.warning_token_expiring', 'Token expiring within 7 days. Refresh token to avoid disconnection.'));
   }
   if (health?.missingScopes?.length) {
-    warnings.push('Missing required TikTok permissions: ' + health.missingScopes.join(', '));
+    warnings.push(t('tiktok.connection_status.warning_missing_scopes', 'Missing required TikTok permissions: {{scopes}}', { scopes: health.missingScopes.join(', ') }));
   }
   if (health?.regionRestrictions?.isRestricted) {
-    warnings.push('Region restrictions may limit some features.');
+    warnings.push(t('tiktok.connection_status.warning_region_restrictions', 'Region restrictions may limit some features.'));
   }
 
   const advisoryScopeNotes: string[] = [];
   if (health?.advisoryMissingScopes?.length) {
     advisoryScopeNotes.push(
-      'Your TikTok app requested additional permissions that were not granted: ' +
-        health.advisoryMissingScopes.join(', ') +
-        '. The connection can still work for supported features; re-authorize if you need those permissions.'
+      t('tiktok.connection_status.advisory_missing_scopes', 'Your TikTok app requested additional permissions that were not granted: {{scopes}}. The connection can still work for supported features; re-authorize if you need those permissions.', { scopes: health.advisoryMissingScopes.join(', ') })
     );
   }
 
@@ -99,24 +103,24 @@ export default function TikTokConnectionStatus({
               )}
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium truncate">{accountName || 'TikTok Account'}</span>
+                  <span className="font-medium truncate">{accountName || t('tiktok.connection_status.default_account_name', 'TikTok Account')}</span>
                   {statusBadge()}
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">Last sync: {lastSync}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{t('tiktok.connection_status.last_sync', 'Last sync: {{time}}', { time: lastSync })}</p>
               </div>
             </div>
             <div className="flex flex-col gap-1 flex-shrink-0">
               <Button variant="outline" size="sm" onClick={() => setDiagnosticsOpen(true)}>
-                View Diagnostics
+                {t('tiktok.connection_status.view_diagnostics', 'View Diagnostics')}
               </Button>
               {onReconnect && (
                 <Button variant="ghost" size="sm" onClick={onReconnect}>
-                  Reconnect
+                  {t('whatsapp.connection_control.reconnect', 'Reconnect')}
                 </Button>
               )}
               {onDisconnect && (
                 <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={onDisconnect}>
-                  Disconnect
+                  {t('whatsapp.connection_control.disconnect', 'Disconnect')}
                 </Button>
               )}
             </div>
@@ -150,7 +154,7 @@ export default function TikTokConnectionStatus({
       <Dialog open={diagnosticsOpen} onOpenChange={setDiagnosticsOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>TikTok Connection Diagnostics</DialogTitle>
+            <DialogTitle>{t('tiktok.connection_status.diagnostics_dialog_title', 'TikTok Connection Diagnostics')}</DialogTitle>
           </DialogHeader>
           <TikTokConnectionDiagnostics connectionId={connectionId} onReconnect={onReconnect} />
         </DialogContent>

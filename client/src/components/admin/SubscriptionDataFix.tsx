@@ -194,30 +194,30 @@ export default function SubscriptionDataFix() {
             ) : (
               <CheckCircle className="h-5 w-5 text-green-500" />
             )}
-            Data Validation & Fix
+            {t('admin.subscription_fix.validation_fix_title', 'Data Validation & Fix')}
           </CardTitle>
           <CardDescription>
-            {hasIssues 
-              ? "Issues detected - run the fix to resolve subscription data inconsistencies"
-              : "No issues detected - your subscription data is consistent"
+            {hasIssues
+              ? t('admin.subscription_fix.issues_detected_desc', 'Issues detected - run the fix to resolve subscription data inconsistencies')
+              : t('admin.subscription_fix.no_issues_desc', 'No issues detected - your subscription data is consistent')
             }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button 
-            onClick={runDataFix} 
+          <Button
+            onClick={runDataFix}
             disabled={isRunningFix}
             className={hasIssues ? "bg-yellow-600 hover:bg-yellow-700" : ""}
           >
             {isRunningFix ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Running Fix...
+                {t('admin.subscription_fix.running_fix', 'Running Fix...')}
               </>
             ) : (
               <>
                 <Database className="h-4 w-4 mr-2" />
-                {hasIssues ? "Fix Data Issues" : "Validate Data"}
+                {hasIssues ? t('admin.subscription_fix.fix_data_issues_button', 'Fix Data Issues') : t('admin.subscription_fix.validate_data_button', 'Validate Data')}
               </>
             )}
           </Button>
@@ -231,17 +231,17 @@ export default function SubscriptionDataFix() {
                 <AlertTriangle className="h-4 w-4" />
               )}
               <AlertTitle>
-                {validationResult.success ? "Fix Completed Successfully" : "Fix Completed with Errors"}
+                {validationResult.success ? t('admin.subscription_fix.fix_completed_success_title', 'Fix Completed Successfully') : t('admin.subscription_fix.fix_completed_errors_title', 'Fix Completed with Errors')}
               </AlertTitle>
               <AlertDescription>
                 <div className="space-y-2">
                   <p>{validationResult.message}</p>
                   {validationResult.fixedCompanies > 0 && (
-                    <p><strong>Companies Fixed:</strong> {validationResult.fixedCompanies}</p>
+                    <p><strong>{t('admin.subscription_fix.companies_fixed_label', 'Companies Fixed:')}</strong> {validationResult.fixedCompanies}</p>
                   )}
                   {validationResult.errors.length > 0 && (
                     <div>
-                      <strong>Errors:</strong>
+                      <strong>{t('admin.subscription_fix.errors_label', 'Errors:')}</strong>
                       <ul className="list-disc list-inside mt-1">
                         {validationResult.errors.map((error, index) => (
                           <li key={index} className="text-sm">{error}</li>
@@ -259,24 +259,23 @@ export default function SubscriptionDataFix() {
       {/* Instructions */}
       <Card>
         <CardHeader>
-          <CardTitle>How This Fix Works</CardTitle>
+          <CardTitle>{t('admin.subscription_fix.how_it_works_title', 'How This Fix Works')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            <strong>Problem:</strong> Existing application deployments may have NULL values in subscription fields 
-            that were added in later migrations, causing incorrect renewal dialog behavior.
+            <strong>{t('admin.subscription_fix.problem_label', 'Problem:')}</strong> {t('admin.subscription_fix.problem_text', 'Existing application deployments may have NULL values in subscription fields that were added in later migrations, causing incorrect renewal dialog behavior.')}
           </p>
           <p>
-            <strong>Solution:</strong> This tool identifies and fixes data inconsistencies by:
+            <strong>{t('admin.subscription_fix.solution_label', 'Solution:')}</strong> {t('admin.subscription_fix.solution_text', 'This tool identifies and fixes data inconsistencies by:')}
           </p>
           <ul className="list-disc list-inside space-y-1 ml-4">
-            <li>Normalizing NULL subscription_status values based on subscription dates</li>
-            <li>Adding missing grace periods for expired subscriptions</li>
-            <li>Fixing inconsistent trial statuses</li>
-            <li>Initializing missing fields with proper defaults</li>
+            <li>{t('admin.subscription_fix.fix_item_1', 'Normalizing NULL subscription_status values based on subscription dates')}</li>
+            <li>{t('admin.subscription_fix.fix_item_2', 'Adding missing grace periods for expired subscriptions')}</li>
+            <li>{t('admin.subscription_fix.fix_item_3', 'Fixing inconsistent trial statuses')}</li>
+            <li>{t('admin.subscription_fix.fix_item_4', 'Initializing missing fields with proper defaults')}</li>
           </ul>
           <p>
-            <strong>Safety:</strong> This fix is safe to run multiple times and only updates inconsistent data.
+            <strong>{t('admin.subscription_fix.safety_label', 'Safety:')}</strong> {t('admin.subscription_fix.safety_text', 'This fix is safe to run multiple times and only updates inconsistent data.')}
           </p>
         </CardContent>
       </Card>

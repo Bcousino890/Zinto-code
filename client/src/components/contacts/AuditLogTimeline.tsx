@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
+import { useTranslation } from '@/hooks/use-translation';
+import {
   Plus, 
   Edit, 
   Trash2, 
@@ -87,6 +88,7 @@ const formatActionType = (actionType: string) => {
 };
 
 export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({ logs, isLoading }) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -109,7 +111,7 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({ logs, isLoad
     return (
       <div className="text-center py-8 text-muted-foreground">
         <Clock className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
-        <p className="text-sm">No activity recorded yet</p>
+        <p className="text-sm">{t('contacts.audit_log.empty', 'No activity recorded yet')}</p>
       </div>
     );
   }
@@ -123,9 +125,9 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({ logs, isLoad
 
     let dateKey;
     if (date.toDateString() === today.toDateString()) {
-      dateKey = 'Today';
+      dateKey = t('common.today', 'Today');
     } else if (date.toDateString() === yesterday.toDateString()) {
-      dateKey = 'Yesterday';
+      dateKey = t('conversations.item.yesterday', 'Yesterday');
     } else {
       dateKey = date.toLocaleDateString();
     }
@@ -198,10 +200,10 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({ logs, isLoad
                         {log.metadata && Object.keys(log.metadata).length > 0 && (
                           <div className="mt-2 text-xs text-muted-foreground">
                             {log.metadata.documentId && (
-                              <span>Document ID: {log.metadata.documentId}</span>
+                              <span>{t('contacts.audit_log.document_id', 'Document ID: {{id}}', { id: log.metadata.documentId })}</span>
                             )}
                             {log.metadata.mimeType && (
-                              <span className="ml-2">Type: {log.metadata.mimeType}</span>
+                              <span className="ml-2">{t('contacts.audit_log.type', 'Type: {{type}}', { type: log.metadata.mimeType })}</span>
                             )}
                           </div>
                         )}

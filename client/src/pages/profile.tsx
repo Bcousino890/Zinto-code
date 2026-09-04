@@ -252,8 +252,8 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Profile Updated",
-        description: "Your profile information has been updated successfully.",
+        title: t('profile.updated_title', 'Profile Updated'),
+        description: t('profile.updated_desc', 'Your profile information has been updated successfully.'),
       });
 
       queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
@@ -261,8 +261,8 @@ export default function ProfilePage() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to update profile: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.update_failed_desc', 'Failed to update profile: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     }
@@ -287,8 +287,8 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Avatar Updated",
-        description: "Your profile picture has been updated successfully.",
+        title: t('profile.avatar_updated_title', 'Avatar Updated'),
+        description: t('profile.avatar_updated_desc', 'Your profile picture has been updated successfully.'),
       });
 
       queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
@@ -297,8 +297,8 @@ export default function ProfilePage() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to upload avatar: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.avatar_upload_failed_desc', 'Failed to upload avatar: {{error}}', { error: error.message }),
         variant: "destructive",
       });
       setIsUploadingAvatar(false);
@@ -319,15 +319,15 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Password Changed",
-        description: "Your password has been changed successfully.",
+        title: t('profile.password_changed_title', 'Password Changed'),
+        description: t('profile.password_changed_desc', 'Your password has been changed successfully.'),
       });
       passwordForm.reset();
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to change password: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.password_change_failed_desc', 'Failed to change password: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     }
@@ -344,14 +344,14 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Notifications Updated",
-        description: "Your notification preferences have been updated successfully.",
+        title: t('profile.notifications_updated_title', 'Notifications Updated'),
+        description: t('profile.notifications_updated_desc', 'Your notification preferences have been updated successfully.'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to update notifications: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.notifications_update_failed_desc', 'Failed to update notifications: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     }
@@ -368,15 +368,15 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Company Updated",
-        description: "Your company information has been updated successfully.",
+        title: t('profile.company_updated_title', 'Company Updated'),
+        description: t('profile.company_updated_desc', 'Your company information has been updated successfully.'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to update company: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.company_update_failed_desc', 'Failed to update company: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     }
@@ -434,8 +434,8 @@ export default function ProfilePage() {
 
       if (!allowedTypes.includes(file.type)) {
         toast({
-          title: "Invalid File Type",
-          description: "Please select a valid image file (JPEG, PNG, GIF, or WebP).",
+          title: t('profile.invalid_file_type_title', 'Invalid File Type'),
+          description: t('profile.invalid_file_type_desc', 'Please select a valid image file (JPEG, PNG, GIF, or WebP).'),
           variant: "destructive",
         });
 
@@ -445,8 +445,8 @@ export default function ProfilePage() {
 
       if (file.size > maxSize) {
         toast({
-          title: "File Too Large",
-          description: "Please select an image smaller than 5MB.",
+          title: t('profile.file_too_large_title', 'File Too Large'),
+          description: t('profile.file_too_large_desc', 'Please select an image smaller than 5MB.'),
           variant: "destructive",
         });
 

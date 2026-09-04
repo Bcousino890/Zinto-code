@@ -11,6 +11,7 @@ import { usePaymentMethods } from '@/hooks/use-payment-methods';
 import { useAvailablePlans } from '@/hooks/use-available-plans';
 import { useGeneralSettings } from '@/hooks/use-general-settings';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { getPlanBillingPeriod, formatPlanDurationForDisplay } from '@/utils/plan-duration';
@@ -48,6 +49,7 @@ export default function SubscriptionRenewalDialog({
   const { plans, isLoading: loadingPlans } = useAvailablePlans();
   const { settings: generalSettings, isLoading: isLoadingSettings } = useGeneralSettings();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { formatCurrency } = useCurrency();
 
 
@@ -91,7 +93,7 @@ export default function SubscriptionRenewalDialog({
     },
     onError: (error: Error) => {
       toast({
-        title: "Renewal Failed",
+        title: t('plan_expiration.subscription_renewal_dialog.renewal_failed_title', 'Renewal Failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -102,8 +104,8 @@ export default function SubscriptionRenewalDialog({
 
     if (!generalSettings.planRenewalEnabled) {
       toast({
-        title: "Plan Renewal Disabled",
-        description: "Plan renewal has been disabled by the administrator. Please contact support for assistance.",
+        title: t('plan_expiration.subscription_renewal_dialog.renewal_disabled_title', 'Plan Renewal Disabled'),
+        description: t('plan_expiration.subscription_renewal_dialog.renewal_disabled_description', 'Plan renewal has been disabled by the administrator. Please contact support for assistance.'),
         variant: "destructive",
       });
       return;
@@ -111,8 +113,8 @@ export default function SubscriptionRenewalDialog({
 
     if (!selectedMethod) {
       toast({
-        title: "Payment Method Required",
-        description: "Please select a payment method to continue.",
+        title: t('plan_expiration.subscription_renewal_dialog.payment_method_required_title', 'Payment Method Required'),
+        description: t('plan_expiration.subscription_renewal_dialog.payment_method_required_description', 'Please select a payment method to continue.'),
         variant: "destructive",
       });
       return;

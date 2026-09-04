@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, UserX } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface Agent {
   id: number;
@@ -27,7 +28,8 @@ export default function AgentDisplay({
   assignedAt,
   variant = 'full'
 }: AgentDisplayProps) {
-  
+  const { t } = useTranslation();
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -46,7 +48,7 @@ export default function AgentDisplay({
         year: 'numeric'
       });
     } catch {
-      return 'Unknown';
+      return t('pipeline.unknown', 'Unknown');
     }
   };
 
@@ -67,7 +69,7 @@ export default function AgentDisplay({
     return (
       <div className="flex items-center space-x-3 p-4 bg-muted rounded-lg">
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">Loading agent information...</span>
+        <span className="text-sm text-muted-foreground">{t('contacts.agent_display.loading', 'Loading agent information...')}</span>
       </div>
     );
   }
@@ -79,8 +81,8 @@ export default function AgentDisplay({
           <UserX className="h-5 w-5 text-muted-foreground" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-medium text-foreground">No agent assigned</p>
-          <p className="text-xs text-muted-foreground">This contact has not been assigned to any agent yet</p>
+          <p className="text-sm font-medium text-foreground">{t('contacts.agent_display.no_agent', 'No agent assigned')}</p>
+          <p className="text-xs text-muted-foreground">{t('contacts.agent_display.no_agent_description', 'This contact has not been assigned to any agent yet')}</p>
         </div>
       </div>
     );
@@ -112,7 +114,7 @@ export default function AgentDisplay({
             {getInitials(assignedAgent.fullName)}
           </AvatarFallback>
         </Avatar>
-        
+
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-1">
             <h4 className="text-sm font-semibold text-foreground truncate">
@@ -122,14 +124,14 @@ export default function AgentDisplay({
               {assignedAgent.role}
             </Badge>
           </div>
-          
+
           <p className="text-sm text-muted-foreground mb-2">{assignedAgent.email}</p>
-          
+
           {assignedAt && (
             <div className="text-xs text-muted-foreground">
-              <span>Assigned on {formatDate(assignedAt)}</span>
+              <span>{t('contacts.agent_display.assigned_on', 'Assigned on {{date}}', { date: formatDate(assignedAt) })}</span>
               {conversationId && (
-                <span className="ml-2">• Conversation #{conversationId}</span>
+                <span className="ml-2">{t('contacts.agent_display.conversation_hash', '• Conversation #{{id}}', { id: conversationId })}</span>
               )}
             </div>
           )}

@@ -48206,5 +48206,2021 @@
     {
         "key": "admin.translations_tab",
         "value": "Translations"
+    },
+    {
+        "key": "common.error_boundary.title",
+        "value": "Something went wrong"
+    },
+    {
+        "key": "common.error_boundary.description",
+        "value": "An error occurred while loading the pipeline. Please try again or go back to the dashboard."
+    },
+    {
+        "key": "common.error_boundary.error_details",
+        "value": "Error details"
+    },
+    {
+        "key": "common.error_boundary.try_again",
+        "value": "Try Again"
+    },
+    {
+        "key": "common.error_boundary.go_back",
+        "value": "Go Back"
+    },
+    {
+        "key": "admin.subscription_fix.validation_fix_title",
+        "value": "Data Validation & Fix"
+    },
+    {
+        "key": "admin.subscription_fix.issues_detected_desc",
+        "value": "Issues detected - run the fix to resolve subscription data inconsistencies"
+    },
+    {
+        "key": "admin.subscription_fix.no_issues_desc",
+        "value": "No issues detected - your subscription data is consistent"
+    },
+    {
+        "key": "admin.subscription_fix.running_fix",
+        "value": "Running Fix..."
+    },
+    {
+        "key": "admin.subscription_fix.fix_data_issues_button",
+        "value": "Fix Data Issues"
+    },
+    {
+        "key": "admin.subscription_fix.validate_data_button",
+        "value": "Validate Data"
+    },
+    {
+        "key": "admin.subscription_fix.fix_completed_success_title",
+        "value": "Fix Completed Successfully"
+    },
+    {
+        "key": "admin.subscription_fix.fix_completed_errors_title",
+        "value": "Fix Completed with Errors"
+    },
+    {
+        "key": "admin.subscription_fix.companies_fixed_label",
+        "value": "Companies Fixed:"
+    },
+    {
+        "key": "admin.subscription_fix.errors_label",
+        "value": "Errors:"
+    },
+    {
+        "key": "admin.subscription_fix.how_it_works_title",
+        "value": "How This Fix Works"
+    },
+    {
+        "key": "admin.subscription_fix.problem_label",
+        "value": "Problem:"
+    },
+    {
+        "key": "admin.subscription_fix.problem_text",
+        "value": "Existing application deployments may have NULL values in subscription fields that were added in later migrations, causing incorrect renewal dialog behavior."
+    },
+    {
+        "key": "admin.subscription_fix.solution_label",
+        "value": "Solution:"
+    },
+    {
+        "key": "admin.subscription_fix.solution_text",
+        "value": "This tool identifies and fixes data inconsistencies by:"
+    },
+    {
+        "key": "admin.subscription_fix.fix_item_1",
+        "value": "Normalizing NULL subscription_status values based on subscription dates"
+    },
+    {
+        "key": "admin.subscription_fix.fix_item_2",
+        "value": "Adding missing grace periods for expired subscriptions"
+    },
+    {
+        "key": "admin.subscription_fix.fix_item_3",
+        "value": "Fixing inconsistent trial statuses"
+    },
+    {
+        "key": "admin.subscription_fix.fix_item_4",
+        "value": "Initializing missing fields with proper defaults"
+    },
+    {
+        "key": "admin.subscription_fix.safety_label",
+        "value": "Safety:"
+    },
+    {
+        "key": "admin.subscription_fix.safety_text",
+        "value": "This fix is safe to run multiple times and only updates inconsistent data."
+    },
+    {
+        "key": "contacts.agent_display.loading",
+        "value": "Loading agent information..."
+    },
+    {
+        "key": "contacts.agent_display.no_agent",
+        "value": "No agent assigned"
+    },
+    {
+        "key": "contacts.agent_display.no_agent_description",
+        "value": "This contact has not been assigned to any agent yet"
+    },
+    {
+        "key": "contacts.agent_display.assigned_on",
+        "value": "Assigned on {{date}}"
+    },
+    {
+        "key": "contacts.agent_display.conversation_hash",
+        "value": "• Conversation #{{id}}"
+    },
+    {
+        "key": "contacts.audit_log.empty",
+        "value": "No activity recorded yet"
+    },
+    {
+        "key": "contacts.audit_log.document_id",
+        "value": "Document ID: {{id}}"
+    },
+    {
+        "key": "contacts.audit_log.type",
+        "value": "Type: {{type}}"
+    },
+    {
+        "key": "conversations.call_screen_modal.audio_device_disconnected_title",
+        "value": "Audio device disconnected"
+    },
+    {
+        "key": "conversations.call_screen_modal.audio_device_disconnected_description",
+        "value": "Switching to default device."
+    },
+    {
+        "key": "conversations.call_screen_modal.poor_call_quality_title",
+        "value": "Poor call quality"
+    },
+    {
+        "key": "conversations.call_screen_modal.poor_call_quality_description",
+        "value": "Quality score low ({{score}}). Connection may be unstable."
+    },
+    {
+        "key": "conversations.call_screen_modal.high_latency_title",
+        "value": "High latency"
+    },
+    {
+        "key": "conversations.call_screen_modal.high_latency_description",
+        "value": "Latency is high ({{ms}}ms). You may notice delay."
+    },
+    {
+        "key": "conversations.call_screen_modal.call_reconnected_title",
+        "value": "Call reconnected"
+    },
+    {
+        "key": "conversations.call_screen_modal.call_reconnected_description",
+        "value": "Call reconnected successfully."
+    },
+    {
+        "key": "conversations.call_screen_modal.call_quality_optimized_title",
+        "value": "Call quality optimized"
+    },
+    {
+        "key": "conversations.call_screen_modal.call_quality_optimized_description",
+        "value": "Call quality optimized for poor network."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.error_generic",
+        "value": "Failed to access microphone. Please check your browser settings and try again."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.error_permission_denied",
+        "value": "Microphone permission denied. Please allow access in your browser settings and try again."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.error_not_found",
+        "value": "No microphone found. Please connect a microphone and try again."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.error_not_readable",
+        "value": "Microphone is being used by another application. Please close other apps and try again."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.title",
+        "value": "Choose Voice Call Type"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.description",
+        "value": "Select how you want to place this outbound call"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.provider_managed_note",
+        "value": "{{provider}} places direct calls as provider-managed PSTN calls. Browser microphone access is not required for this stack."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.requesting_permission",
+        "value": "Requesting Permission..."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.talk_directly",
+        "value": "Talk Directly"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.place_direct_call",
+        "value": "Place Direct Call"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.use_microphone",
+        "value": "Use your microphone to speak with the customer"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.provider_will_place_call",
+        "value": "{{provider}} will place the outbound direct call"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.microphone_ready",
+        "value": "Microphone ready"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.microphone_access_required",
+        "value": "Microphone access required"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.use_ai_agent",
+        "value": "Use AI Agent"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.provider_will_handle_conversation",
+        "value": "{{provider}} will handle the conversation"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.microphone_access_required_title",
+        "value": "Microphone Access Required"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.try_again",
+        "value": "Try Again"
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancelled_title",
+        "value": "Follow-up cancelled"
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancelled_manual_description",
+        "value": "The scheduled follow-up has been cancelled."
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancel_failed_title",
+        "value": "Failed to cancel follow-up"
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancel_failed_generic",
+        "value": "Something went wrong. Please try again."
+    },
+    {
+        "key": "conversations.follow_up_indicator.sent_title",
+        "value": "Follow-up sent"
+    },
+    {
+        "key": "conversations.follow_up_indicator.sent_description",
+        "value": "A scheduled follow-up message was sent."
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancelled_description",
+        "value": "A scheduled follow-up was cancelled."
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancelled_external_description",
+        "value": "The scheduled follow-up was cancelled."
+    },
+    {
+        "key": "conversations.follow_up_indicator.loading_aria",
+        "value": "Loading follow-up information"
+    },
+    {
+        "key": "conversations.follow_up_indicator.loading_tooltip",
+        "value": "Loading scheduled follow-ups…"
+    },
+    {
+        "key": "conversations.follow_up_indicator.error_aria",
+        "value": "Error loading follow-ups"
+    },
+    {
+        "key": "conversations.follow_up_indicator.error_message",
+        "value": "Could not load scheduled follow-ups."
+    },
+    {
+        "key": "conversations.follow_up_indicator.active_aria",
+        "value": "Active follow-up messages scheduled"
+    },
+    {
+        "key": "conversations.follow_up_indicator.panel_title",
+        "value": "Scheduled Follow-ups"
+    },
+    {
+        "key": "conversations.follow_up_indicator.no_message_preview",
+        "value": "(No message preview)"
+    },
+    {
+        "key": "conversations.follow_up_indicator.will_cancel",
+        "value": "Will cancel if user replies"
+    },
+    {
+        "key": "conversations.follow_up_indicator.no_auto_cancel",
+        "value": "No auto-cancel"
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancel_aria",
+        "value": "Cancel follow-up scheduled for {{time}}"
+    },
+    {
+        "key": "conversations.follow_up_indicator.confirm_cancel_title",
+        "value": "Cancel this follow-up?"
+    },
+    {
+        "key": "conversations.follow_up_indicator.confirm_cancel_description",
+        "value": "This will cancel the scheduled follow-up message. This action cannot be undone."
+    },
+    {
+        "key": "conversations.follow_up_indicator.keep_it",
+        "value": "Keep it"
+    },
+    {
+        "key": "conversations.follow_up_indicator.confirm_cancel_action",
+        "value": "Cancel follow-up"
+    },
+    {
+        "key": "conversations.mentions.panel_title",
+        "value": "Mentions"
+    },
+    {
+        "key": "conversations.mentions.clear_all",
+        "value": "Clear all"
+    },
+    {
+        "key": "conversations.mentions.no_mentions",
+        "value": "No mentions"
+    },
+    {
+        "key": "conversations.mentions.mentioned_you",
+        "value": "{{userName}} mentioned you"
+    },
+    {
+        "key": "conversations.mentions.input_placeholder",
+        "value": "Type @ to mention someone..."
+    },
+    {
+        "key": "conversations.message_status.sending",
+        "value": "Sending..."
+    },
+    {
+        "key": "conversations.message_status.sent",
+        "value": "Sent"
+    },
+    {
+        "key": "conversations.message_status.delivered",
+        "value": "Delivered"
+    },
+    {
+        "key": "conversations.message_status.read",
+        "value": "Read"
+    },
+    {
+        "key": "conversations.message_status.failed",
+        "value": "Failed"
+    },
+    {
+        "key": "conversations.message_status.label_at_time",
+        "value": "{{label}} at {{time}}"
+    },
+    {
+        "key": "conversations.message_status.sent_at",
+        "value": "Sent: {{time}}"
+    },
+    {
+        "key": "conversations.message_status.delivered_at",
+        "value": "Delivered: {{time}}"
+    },
+    {
+        "key": "conversations.message_status.read_at",
+        "value": "Read: {{time}}"
+    },
+    {
+        "key": "conversations.message_status.read_by_label",
+        "value": "Read by:"
+    },
+    {
+        "key": "conversations.message_status.failed_at",
+        "value": "Failed: {{time}}"
+    },
+    {
+        "key": "conversations.message_status.read_by_one",
+        "value": "Read by {{name}}"
+    },
+    {
+        "key": "conversations.message_status.read_by_two",
+        "value": "Read by {{name1}} and {{name2}}"
+    },
+    {
+        "key": "conversations.message_status.read_by_many",
+        "value": "Read by {{name1}}, {{name2}} and {{count}} others"
+    },
+    {
+        "key": "conversations.message_status.read_by_count_one",
+        "value": "Read by {{count}} person"
+    },
+    {
+        "key": "conversations.message_status.read_by_count_other",
+        "value": "Read by {{count}} people"
+    },
+    {
+        "key": "conversations.message_status.sending_short",
+        "value": "Sending"
+    },
+    {
+        "key": "conversations.reaction_picker.react_with",
+        "value": "React with {{emoji}}"
+    },
+    {
+        "key": "conversations.reaction_picker.reaction_count_one",
+        "value": "{{count}} reaction"
+    },
+    {
+        "key": "conversations.reaction_picker.reaction_count_other",
+        "value": "{{count}} reactions"
+    },
+    {
+        "key": "conversations.reaction_picker.add_reaction",
+        "value": "Add reaction"
+    },
+    {
+        "key": "conversations.reaction_picker.show_all_reactions",
+        "value": "Show all reactions"
+    },
+    {
+        "key": "conversations.typing_indicator.user_is_typing",
+        "value": "{{userName}} is typing..."
+    },
+    {
+        "key": "conversations.typing_indicator.typing",
+        "value": "Typing..."
+    },
+    {
+        "key": "conversations.typing_indicator.two_users_are_typing",
+        "value": "{{userName1}} and {{userName2}} are typing..."
+    },
+    {
+        "key": "conversations.typing_indicator.multiple_users_are_typing",
+        "value": "{{userName}} and {{count}} others are typing..."
+    },
+    {
+        "key": "conversations.typing_indicator.online",
+        "value": "Online"
+    },
+    {
+        "key": "conversations.typing_indicator.away",
+        "value": "Away"
+    },
+    {
+        "key": "conversations.typing_indicator.offline",
+        "value": "Offline"
+    },
+    {
+        "key": "email.signatures_manager.fetch_error",
+        "value": "Failed to fetch email signatures"
+    },
+    {
+        "key": "email.signatures_manager.name_required",
+        "value": "Signature name is required"
+    },
+    {
+        "key": "email.signatures_manager.content_required",
+        "value": "Either HTML content or plain text content is required"
+    },
+    {
+        "key": "email.signatures_manager.update_success",
+        "value": "Signature updated successfully"
+    },
+    {
+        "key": "email.signatures_manager.create_success",
+        "value": "Signature created successfully"
+    },
+    {
+        "key": "email.signatures_manager.save_error",
+        "value": "Failed to save signature"
+    },
+    {
+        "key": "email.signatures_manager.delete_confirm",
+        "value": "Are you sure you want to delete this signature?"
+    },
+    {
+        "key": "email.signatures_manager.delete_success",
+        "value": "Signature deleted successfully"
+    },
+    {
+        "key": "email.signatures_manager.delete_error",
+        "value": "Failed to delete signature"
+    },
+    {
+        "key": "email.signatures_manager.set_default_success",
+        "value": "Default signature updated"
+    },
+    {
+        "key": "email.signatures_manager.set_default_error",
+        "value": "Failed to set default signature"
+    },
+    {
+        "key": "email.signatures_manager.loading",
+        "value": "Loading signatures..."
+    },
+    {
+        "key": "email.signatures_manager.title",
+        "value": "Email Signatures"
+    },
+    {
+        "key": "email.signatures_manager.subtitle",
+        "value": "Manage your email signatures for professional communication"
+    },
+    {
+        "key": "email.signatures_manager.new_signature",
+        "value": "New Signature"
+    },
+    {
+        "key": "email.signatures_manager.edit_title",
+        "value": "Edit Signature"
+    },
+    {
+        "key": "email.signatures_manager.create_title",
+        "value": "Create New Signature"
+    },
+    {
+        "key": "email.signatures_manager.name_label",
+        "value": "Signature Name *"
+    },
+    {
+        "key": "email.signatures_manager.name_placeholder",
+        "value": "Enter signature name (e.g., Professional, Casual)"
+    },
+    {
+        "key": "email.signatures_manager.tab_html",
+        "value": "HTML Signature"
+    },
+    {
+        "key": "email.signatures_manager.tab_plain",
+        "value": "Plain Text"
+    },
+    {
+        "key": "email.signatures_manager.html_placeholder",
+        "value": "HTML signature with formatting (e.g., <br>Best regards,<br><strong>Your Name</strong>)"
+    },
+    {
+        "key": "email.signatures_manager.html_hint",
+        "value": "Use HTML tags for formatting. Example: &lt;br&gt; for line breaks, &lt;strong&gt; for bold text"
+    },
+    {
+        "key": "email.signatures_manager.plain_label",
+        "value": "Plain Text Signature"
+    },
+    {
+        "key": "email.signatures_manager.plain_placeholder",
+        "value": "Plain text version of your signature"
+    },
+    {
+        "key": "email.signatures_manager.plain_hint",
+        "value": "Plain text version for email clients that don't support HTML"
+    },
+    {
+        "key": "email.signatures_manager.set_default_label",
+        "value": "Set as Default Signature"
+    },
+    {
+        "key": "email.signatures_manager.update_button",
+        "value": "Update Signature"
+    },
+    {
+        "key": "email.signatures_manager.create_button",
+        "value": "Create Signature"
+    },
+    {
+        "key": "email.signatures_manager.empty_title",
+        "value": "No Email Signatures"
+    },
+    {
+        "key": "email.signatures_manager.empty_description",
+        "value": "Create your first email signature for professional communication"
+    },
+    {
+        "key": "email.signatures_manager.created_on",
+        "value": "Created {{date}}"
+    },
+    {
+        "key": "email.signatures_manager.html_preview_label",
+        "value": "HTML Preview:"
+    },
+    {
+        "key": "email.signatures_manager.plain_text_label",
+        "value": "Plain Text:"
+    },
+    {
+        "key": "email.templates_manager.category_general",
+        "value": "General"
+    },
+    {
+        "key": "email.templates_manager.category_welcome",
+        "value": "Welcome"
+    },
+    {
+        "key": "email.templates_manager.category_follow_up",
+        "value": "Follow-up"
+    },
+    {
+        "key": "email.templates_manager.category_support",
+        "value": "Support"
+    },
+    {
+        "key": "email.templates_manager.category_marketing",
+        "value": "Marketing"
+    },
+    {
+        "key": "email.templates_manager.category_notification",
+        "value": "Notification"
+    },
+    {
+        "key": "email.templates_manager.fetch_error",
+        "value": "Failed to fetch email templates"
+    },
+    {
+        "key": "email.templates_manager.name_subject_required",
+        "value": "Name and subject are required"
+    },
+    {
+        "key": "email.templates_manager.update_success",
+        "value": "Template updated successfully"
+    },
+    {
+        "key": "email.templates_manager.create_success",
+        "value": "Template created successfully"
+    },
+    {
+        "key": "email.templates_manager.save_error",
+        "value": "Failed to save template"
+    },
+    {
+        "key": "email.templates_manager.delete_confirm",
+        "value": "Are you sure you want to delete this template?"
+    },
+    {
+        "key": "email.templates_manager.delete_success",
+        "value": "Template deleted successfully"
+    },
+    {
+        "key": "email.templates_manager.delete_error",
+        "value": "Failed to delete template"
+    },
+    {
+        "key": "email.templates_manager.copy_name",
+        "value": "{{name}} (Copy)"
+    },
+    {
+        "key": "email.templates_manager.loading",
+        "value": "Loading templates..."
+    },
+    {
+        "key": "email.templates_manager.title",
+        "value": "Email Templates"
+    },
+    {
+        "key": "email.templates_manager.subtitle",
+        "value": "Manage your email templates for quick message composition"
+    },
+    {
+        "key": "email.templates_manager.new_template",
+        "value": "New Template"
+    },
+    {
+        "key": "email.templates_manager.edit_title",
+        "value": "Edit Template"
+    },
+    {
+        "key": "email.templates_manager.create_title",
+        "value": "Create New Template"
+    },
+    {
+        "key": "email.templates_manager.name_label",
+        "value": "Template Name *"
+    },
+    {
+        "key": "email.templates_manager.name_placeholder",
+        "value": "Enter template name"
+    },
+    {
+        "key": "email.templates_manager.category_label",
+        "value": "Category"
+    },
+    {
+        "key": "email.templates_manager.description_label",
+        "value": "Description"
+    },
+    {
+        "key": "email.templates_manager.description_placeholder",
+        "value": "Brief description of the template"
+    },
+    {
+        "key": "email.templates_manager.subject_label",
+        "value": "Subject Line *"
+    },
+    {
+        "key": "email.templates_manager.subject_placeholder",
+        "value": "Email subject line"
+    },
+    {
+        "key": "email.templates_manager.tab_html",
+        "value": "HTML Content"
+    },
+    {
+        "key": "email.templates_manager.tab_plain",
+        "value": "Plain Text"
+    },
+    {
+        "key": "email.templates_manager.html_placeholder",
+        "value": "HTML email content with formatting"
+    },
+    {
+        "key": "email.templates_manager.plain_label",
+        "value": "Plain Text Content"
+    },
+    {
+        "key": "email.templates_manager.plain_placeholder",
+        "value": "Plain text version of the email"
+    },
+    {
+        "key": "email.templates_manager.active_template_label",
+        "value": "Active Template"
+    },
+    {
+        "key": "email.templates_manager.update_button",
+        "value": "Update Template"
+    },
+    {
+        "key": "email.templates_manager.create_button",
+        "value": "Create Template"
+    },
+    {
+        "key": "email.templates_manager.empty_title",
+        "value": "No Email Templates"
+    },
+    {
+        "key": "email.templates_manager.empty_description",
+        "value": "Create your first email template to speed up your email composition"
+    },
+    {
+        "key": "email.templates_manager.no_description",
+        "value": "No description"
+    },
+    {
+        "key": "email.templates_manager.subject_field_label",
+        "value": "Subject:"
+    },
+    {
+        "key": "email.templates_manager.variables_label",
+        "value": "Variables:"
+    },
+    {
+        "key": "email.templates_manager.usage_summary",
+        "value": "Used {{count}} times • Last updated {{date}}"
+    },
+    {
+        "key": "erp.product_picker.search_placeholder",
+        "value": "Search products or variant SKU..."
+    },
+    {
+        "key": "erp.product_picker.clear_selection",
+        "value": "Clear selection"
+    },
+    {
+        "key": "erp.product_picker.loading",
+        "value": "Loading products..."
+    },
+    {
+        "key": "erp.product_picker.no_products_found",
+        "value": "No products found."
+    },
+    {
+        "key": "erp.product_picker.prep_time",
+        "value": "~{{minutes}} min"
+    },
+    {
+        "key": "erp.product_picker.load_more",
+        "value": "Load more"
+    },
+    {
+        "key": "flow_builder.custom_variables.default_badge",
+        "value": "Default"
+    },
+    {
+        "key": "flow_builder.custom_variables.error_label_required",
+        "value": "Label is required."
+    },
+    {
+        "key": "flow_builder.custom_variables.error_name_pattern",
+        "value": "Name must match snake_case: start with a letter, then letters, digits, or underscores."
+    },
+    {
+        "key": "flow_builder.custom_variables.error_name_duplicate",
+        "value": "This name is already used by another variable."
+    },
+    {
+        "key": "flow_builder.custom_variables.title",
+        "value": "Custom Variables"
+    },
+    {
+        "key": "flow_builder.custom_variables.new_variable",
+        "value": "New Variable"
+    },
+    {
+        "key": "flow_builder.custom_variables.loading_current_values",
+        "value": "Loading current values…"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_label",
+        "value": "Label"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_description",
+        "value": "Description"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_current_value",
+        "value": "Current value"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_type",
+        "value": "Type"
+    },
+    {
+        "key": "flow_builder.custom_variables.data_type_text",
+        "value": "text"
+    },
+    {
+        "key": "flow_builder.custom_variables.edit_variable_aria",
+        "value": "Edit variable"
+    },
+    {
+        "key": "flow_builder.custom_variables.delete_variable_aria",
+        "value": "Delete variable"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_current_value_full",
+        "value": "Current Value"
+    },
+    {
+        "key": "flow_builder.custom_variables.label_placeholder",
+        "value": "Human-readable label"
+    },
+    {
+        "key": "flow_builder.custom_variables.name_placeholder",
+        "value": "snake_case"
+    },
+    {
+        "key": "flow_builder.custom_variables.description_placeholder",
+        "value": "Optional description"
+    },
+    {
+        "key": "flow_builder.custom_variables.default_value_placeholder",
+        "value": "Optional default when no session value exists"
+    },
+    {
+        "key": "flow_builder.custom_variables.delete_confirm_title",
+        "value": "Delete variable?"
+    },
+    {
+        "key": "flow_builder.custom_variables.this_variable",
+        "value": "this variable"
+    },
+    {
+        "key": "flow_builder.custom_variables.confirm_delete",
+        "value": "Confirm Delete"
+    },
+    {
+        "key": "flow_builder.variable_picker.insert_variable_title",
+        "value": "Insert variable"
+    },
+    {
+        "key": "flow_builder.variable_picker.refresh_tooltip",
+        "value": "Refresh captured variables"
+    },
+    {
+        "key": "flow_builder.execution_overlay.done",
+        "value": "Done"
+    },
+    {
+        "key": "flow_builder.execution_overlay.status_title",
+        "value": "Flow Execution Status"
+    },
+    {
+        "key": "flow_builder.execution_overlay.execution_id",
+        "value": "Execution {{id}}"
+    },
+    {
+        "key": "flow_builder.execution_overlay.nodes_executed",
+        "value": "{{count}} nodes executed"
+    },
+    {
+        "key": "flow_builder.execution_overlay.stat_line",
+        "value": "{{label}}: {{count}}"
+    },
+    {
+        "key": "flow_builder.execution_overlay.stats_total_label",
+        "value": "Total"
+    },
+    {
+        "key": "flow_builder.move_deal_node.var_contact_phone_desc",
+        "value": "Phone number of the contact"
+    },
+    {
+        "key": "flow_builder.move_deal_node.var_contact_name_desc",
+        "value": "Full name of the contact"
+    },
+    {
+        "key": "flow_builder.move_deal_node.var_current_pipeline_id_label",
+        "value": "Current Pipeline ID"
+    },
+    {
+        "key": "flow_builder.move_deal_node.var_current_pipeline_id_desc",
+        "value": "Current pipeline ID"
+    },
+    {
+        "key": "flow_builder.move_deal_node.category_system",
+        "value": "System"
+    },
+    {
+        "key": "flow_builder.move_deal_node.description",
+        "value": "Move a deal to a different pipeline and stage"
+    },
+    {
+        "key": "flow_builder.move_deal_node.invalid_config",
+        "value": "Invalid Config"
+    },
+    {
+        "key": "flow_builder.move_deal_node.stage_mismatch",
+        "value": "Selected stage does not belong to target pipeline"
+    },
+    {
+        "key": "flow_builder.move_deal_node.contact_phone_variable_label",
+        "value": "Contact Phone Variable"
+    },
+    {
+        "key": "flow_builder.move_deal_node.contact_phone_variable_help",
+        "value": "Variable containing the contact phone number to identify the deal"
+    },
+    {
+        "key": "flow_builder.move_deal_node.source_pipeline_label",
+        "value": "Source Pipeline (Optional Filter)"
+    },
+    {
+        "key": "flow_builder.move_deal_node.source_pipeline_help",
+        "value": "Optionally filter deals by source pipeline. Leave as \"Any Pipeline\" to move deals from any pipeline."
+    },
+    {
+        "key": "flow_builder.any_pipeline_option",
+        "value": "Any Pipeline"
+    },
+    {
+        "key": "flow_builder.move_deal_node.loading_pipelines",
+        "value": "Loading pipelines..."
+    },
+    {
+        "key": "flow_builder.target_pipeline_label",
+        "value": "Target Pipeline"
+    },
+    {
+        "key": "flow_builder.move_deal_node.target_pipeline_help",
+        "value": "Select the target pipeline where the deal will be moved"
+    },
+    {
+        "key": "flow_builder.move_deal_node.select_target_pipeline",
+        "value": "Select target pipeline"
+    },
+    {
+        "key": "flow_builder.move_deal_node.target_stage_label",
+        "value": "Target Stage"
+    },
+    {
+        "key": "flow_builder.move_deal_node.target_stage_help",
+        "value": "Select the target stage within the selected pipeline"
+    },
+    {
+        "key": "flow_builder.move_deal_node.select_target_stage",
+        "value": "Select target stage"
+    },
+    {
+        "key": "flow_builder.move_deal_node.loading_stages",
+        "value": "Loading stages..."
+    },
+    {
+        "key": "flow_builder.move_deal_node.no_stages_available",
+        "value": "No stages available for this pipeline"
+    },
+    {
+        "key": "flow_builder.move_deal_node.create_if_not_exists",
+        "value": "Create deal if not exists"
+    },
+    {
+        "key": "flow_builder.move_deal_node.preserve_deal_data",
+        "value": "Preserve deal data"
+    },
+    {
+        "key": "follow_ups.panel.scheduled_title",
+        "value": "Follow-up Scheduled"
+    },
+    {
+        "key": "follow_ups.panel.scheduled_description",
+        "value": "Your follow-up message has been scheduled successfully."
+    },
+    {
+        "key": "follow_ups.panel.schedule_error",
+        "value": "Failed to schedule follow-up"
+    },
+    {
+        "key": "follow_ups.panel.cancelled_title",
+        "value": "Follow-up Cancelled"
+    },
+    {
+        "key": "follow_ups.panel.cancelled_description",
+        "value": "The follow-up message has been cancelled."
+    },
+    {
+        "key": "follow_ups.panel.cancel_error",
+        "value": "Failed to cancel follow-up"
+    },
+    {
+        "key": "follow_ups.panel.title",
+        "value": "Follow-up Messages"
+    },
+    {
+        "key": "follow_ups.panel.schedule_button",
+        "value": "Schedule Follow-up"
+    },
+    {
+        "key": "follow_ups.panel.dialog_title",
+        "value": "Schedule Follow-up Message"
+    },
+    {
+        "key": "follow_ups.panel.tab_message",
+        "value": "Message"
+    },
+    {
+        "key": "follow_ups.panel.tab_timing",
+        "value": "Timing"
+    },
+    {
+        "key": "follow_ups.panel.message_type_label",
+        "value": "Message Type"
+    },
+    {
+        "key": "follow_ups.panel.message_content_label",
+        "value": "Message Content"
+    },
+    {
+        "key": "follow_ups.panel.message_content_placeholder",
+        "value": "Enter your follow-up message..."
+    },
+    {
+        "key": "follow_ups.panel.media_url_label",
+        "value": "Media URL"
+    },
+    {
+        "key": "follow_ups.panel.media_url_placeholder",
+        "value": "Enter media URL..."
+    },
+    {
+        "key": "follow_ups.panel.caption_label",
+        "value": "Caption (Optional)"
+    },
+    {
+        "key": "follow_ups.panel.caption_placeholder",
+        "value": "Enter caption for media..."
+    },
+    {
+        "key": "follow_ups.panel.scheduling_method_label",
+        "value": "Scheduling Method"
+    },
+    {
+        "key": "follow_ups.panel.relative_delay",
+        "value": "Relative Delay"
+    },
+    {
+        "key": "follow_ups.panel.specific_datetime",
+        "value": "Specific Date/Time"
+    },
+    {
+        "key": "follow_ups.panel.date_time_label",
+        "value": "Date and Time"
+    },
+    {
+        "key": "follow_ups.panel.delay_amount_label",
+        "value": "Delay Amount"
+    },
+    {
+        "key": "follow_ups.panel.delay_unit_label",
+        "value": "Delay Unit"
+    },
+    {
+        "key": "follow_ups.panel.weeks",
+        "value": "Weeks"
+    },
+    {
+        "key": "follow_ups.panel.scheduling",
+        "value": "Scheduling..."
+    },
+    {
+        "key": "follow_ups.panel.empty_title",
+        "value": "No follow-up messages scheduled"
+    },
+    {
+        "key": "follow_ups.panel.empty_description",
+        "value": "Schedule a follow-up to automatically send messages later"
+    },
+    {
+        "key": "follow_ups.panel.caption_prefix",
+        "value": "Caption: {{caption}}"
+    },
+    {
+        "key": "follow_ups.panel.sent_prefix",
+        "value": "Sent: {{date}}"
+    },
+    {
+        "key": "follow_ups.panel.scheduled_prefix",
+        "value": "Scheduled: {{date}}"
+    },
+    {
+        "key": "follow_ups.panel.retries",
+        "value": "Retries: {{count}}/{{max}}"
+    },
+    {
+        "key": "follow_ups.panel.error_prefix",
+        "value": "Error:"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.no_plan_found",
+        "value": "No plan found to activate"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.activated_successfully",
+        "value": "Subscription activated successfully!"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.activation_failed",
+        "value": "Failed to activate subscription"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.action_required",
+        "value": "Action Required"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.current_subscription",
+        "value": "Current Subscription"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.title_grace_period",
+        "value": "Subscription Expired - Grace Period"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.title",
+        "value": "Subscription Expired"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.expired_on",
+        "value": "Your subscription for {{companyName}} expired on {{date}}."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.recently",
+        "value": "recently"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.grace_period_active_label",
+        "value": "Grace Period Active:"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.grace_period_active_body",
+        "value": "You have limited access until {{date}}. Renew now to restore full functionality."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.soon",
+        "value": "soon"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.expired_body",
+        "value": "Your subscription for {{companyName}} has expired. You need to renew to continue using the service."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.access_restricted_label",
+        "value": "Access Restricted:"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.access_restricted_body",
+        "value": "Most features are currently disabled. Please renew your subscription to restore access."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.redirecting_to_payment",
+        "value": "Redirecting to Payment..."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.pay_and_renew",
+        "value": "Pay & Renew Subscription"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.setup_auto_renewal",
+        "value": "Setup Auto-Renewal"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.enable_auto_renewal_label",
+        "value": "Enable automatic renewal to prevent future interruptions"
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.renewal_failed_title",
+        "value": "Renewal Failed"
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.renewal_disabled_title",
+        "value": "Plan Renewal Disabled"
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.renewal_disabled_description",
+        "value": "Plan renewal has been disabled by the administrator. Please contact support for assistance."
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.payment_method_required_title",
+        "value": "Payment Method Required"
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.payment_method_required_description",
+        "value": "Please select a payment method to continue."
+    },
+    {
+        "key": "whatsapp_business.template_send_failed_fallback",
+        "value": "Failed to send template message"
+    },
+    {
+        "key": "whatsapp_business.phone_not_allowed_error",
+        "value": "Phone number not in allowed list. Please add this number to your Meta for Developers dashboard under \"Phone numbers\" section, or use a number that's already approved."
+    },
+    {
+        "key": "whatsapp_business.template_not_approved_error",
+        "value": "Template message error. Make sure the \"hello_world\" template is approved in your WhatsApp Business Manager."
+    },
+    {
+        "key": "whatsapp_business.dialog_title",
+        "value": "Connect WhatsApp Business API"
+    },
+    {
+        "key": "whatsapp_business.dialog_description",
+        "value": "Connect your existing WhatsApp Business API account. You'll need your Meta for Developers credentials."
+    },
+    {
+        "key": "whatsapp_business.verify_token_input_placeholder",
+        "value": "e.g. abc123xyz..."
+    },
+    {
+        "key": "whatsapp_business.verify_token_auto_generated_help",
+        "value": "This unique token is auto-generated. Copy it and paste it in the 'Verify token' field in your Meta Developer Console. Each connection gets its own secure token."
+    },
+    {
+        "key": "whatsapp_business.connection_specific_token_bold",
+        "value": "✅ Connection-Specific Token:"
+    },
+    {
+        "key": "whatsapp_business.connection_specific_token_desc",
+        "value": "This verify token will be stored with your WhatsApp Business API connection:"
+    },
+    {
+        "key": "whatsapp_business.development_mode_note_desc",
+        "value": "If your WhatsApp Business API is in development mode, you can only send messages to phone numbers that are added to the \"allowed list\" in your Meta for Developers dashboard."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.token_refreshed_title",
+        "value": "Token refreshed"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.token_refreshed_description",
+        "value": "Connection token has been refreshed."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.refresh_failed_title",
+        "value": "Refresh failed"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.refreshed_title",
+        "value": "Diagnostics refreshed"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.refreshed_description",
+        "value": "Connection diagnostics have been updated."
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.refresh_failed_description",
+        "value": "Failed to refresh diagnostics."
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.never",
+        "value": "Never"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.days_ago",
+        "value": "{{count}}d ago"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.hours_ago",
+        "value": "{{count}}h ago"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.minutes_ago",
+        "value": "{{count}}m ago"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.just_now",
+        "value": "Just now"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expired",
+        "value": "Expired"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expires_in_days",
+        "value": "In {{count}} days"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expires_in_day",
+        "value": "In {{count}} day"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expires_in_hours",
+        "value": "In {{count}} hours"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expires_in_hour",
+        "value": "In {{count}} hour"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.title",
+        "value": "TikTok Connection Diagnostics"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.unable_to_load",
+        "value": "Unable to load diagnostics"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.health_score",
+        "value": "Health Score"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.status",
+        "value": "Status"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.status_connected",
+        "value": "✓ Connected"
+    },
+    {
+        "key": "tiktok.connection_status.token_expiring",
+        "value": "Token Expiring"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.token_expires",
+        "value": "Token Expires"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.last_successful_call",
+        "value": "Last successful call: {{time}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.error_count_label",
+        "value": "Error count: "
+    },
+    {
+        "key": "tiktok.connection_diagnostics.granted_scopes",
+        "value": "Granted Scopes"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.required_permissions_missing",
+        "value": "Required permissions missing: {{scopes}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.portal_requested_permissions",
+        "value": "Portal-requested permissions not granted (informational): {{scopes}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.region",
+        "value": "Region"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.restricted",
+        "value": "Restricted"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.unavailable_features",
+        "value": "Unavailable: {{features}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.media_region_limits",
+        "value": "Media-related limits from TikTok may apply in this region. Check unavailable features on the connection."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.media_messaging_api",
+        "value": "Media and messaging API"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.rich_media",
+        "value": "Rich media"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.supported",
+        "value": "Supported"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.not_indicated",
+        "value": "Not indicated"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.enabled",
+        "value": "Enabled"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.not_listed",
+        "value": "Not listed"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.reported_types",
+        "value": "Reported types: {{types}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.messaging_features_note",
+        "value": "Typing indicators, read receipts, and reactions are not driven by TikTok for this channel in application."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.capabilities_unavailable",
+        "value": "Capabilities unavailable. Try refresh."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.refresh_token",
+        "value": "Refresh Token"
+    },
+    {
+        "key": "whatsapp.connection_control.reconnect",
+        "value": "Reconnect"
+    },
+    {
+        "key": "tiktok.connection_status.hours_ago",
+        "value": "{{count}} hours ago"
+    },
+    {
+        "key": "tiktok.connection_status.hour_ago",
+        "value": "{{count}} hour ago"
+    },
+    {
+        "key": "tiktok.connection_status.minutes_ago",
+        "value": "{{count}} minutes ago"
+    },
+    {
+        "key": "tiktok.connection_status.minute_ago",
+        "value": "{{count}} minute ago"
+    },
+    {
+        "key": "tiktok.connection_status.just_now",
+        "value": "Just now"
+    },
+    {
+        "key": "tiktok.connection_status.warning_token_expiring",
+        "value": "Token expiring within 7 days. Refresh token to avoid disconnection."
+    },
+    {
+        "key": "tiktok.connection_status.warning_missing_scopes",
+        "value": "Missing required TikTok permissions: {{scopes}}"
+    },
+    {
+        "key": "tiktok.connection_status.warning_region_restrictions",
+        "value": "Region restrictions may limit some features."
+    },
+    {
+        "key": "tiktok.connection_status.advisory_missing_scopes",
+        "value": "Your TikTok app requested additional permissions that were not granted: {{scopes}}. The connection can still work for supported features; re-authorize if you need those permissions."
+    },
+    {
+        "key": "tiktok.connection_status.default_account_name",
+        "value": "TikTok Account"
+    },
+    {
+        "key": "tiktok.connection_status.last_sync",
+        "value": "Last sync: {{time}}"
+    },
+    {
+        "key": "tiktok.connection_status.view_diagnostics",
+        "value": "View Diagnostics"
+    },
+    {
+        "key": "whatsapp.connection_control.disconnect",
+        "value": "Disconnect"
+    },
+    {
+        "key": "tiktok.connection_status.diagnostics_dialog_title",
+        "value": "TikTok Connection Diagnostics"
+    },
+    {
+        "key": "whatsapp.connection_control.qr_required_title",
+        "value": "QR Code Required"
+    },
+    {
+        "key": "whatsapp.connection_control.qr_required_description",
+        "value": "Your session has expired. Please click 'Rescan QR' to reconnect."
+    },
+    {
+        "key": "whatsapp.connection_control.reconnect_initiated_title",
+        "value": "Reconnection initiated"
+    },
+    {
+        "key": "whatsapp.connection_control.reconnect_initiated_description",
+        "value": "Attempting to reconnect your WhatsApp connection... (Attempt {{attempt}})"
+    },
+    {
+        "key": "whatsapp.connection_control.reconnect_failed_title",
+        "value": "Reconnection failed"
+    },
+    {
+        "key": "whatsapp.connection_control.disconnect_success_title",
+        "value": "Disconnection successful"
+    },
+    {
+        "key": "whatsapp.connection_control.disconnect_success_description",
+        "value": "Your WhatsApp connection has been disconnected."
+    },
+    {
+        "key": "whatsapp.connection_control.disconnect_failed_title",
+        "value": "Disconnection failed"
+    },
+    {
+        "key": "whatsapp.connection_control.disconnecting",
+        "value": "Disconnecting..."
+    },
+    {
+        "key": "whatsapp.connection_control.reconnecting",
+        "value": "Reconnecting..."
+    },
+    {
+        "key": "whatsapp.connection_control.rescan_qr",
+        "value": "Rescan QR"
+    },
+    {
+        "key": "whatsapp.connection_control.health_title",
+        "value": "Connection Health"
+    },
+    {
+        "key": "whatsapp.connection_control.health_score",
+        "value": "Score: {{score}}/100"
+    },
+    {
+        "key": "whatsapp.connection_control.health_errors",
+        "value": "Errors: {{count}}"
+    },
+    {
+        "key": "whatsapp.connection_control.health_last_error",
+        "value": "Last Error: {{error}}"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.refresh_failed_title",
+        "value": "Refresh failed"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.title",
+        "value": "Connection Diagnostics"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.health_score_hint",
+        "value": "Connection stability and performance indicator"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.socket",
+        "value": "Socket"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.authentication",
+        "value": "Authentication"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.user_id",
+        "value": "User ID:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.valid",
+        "value": "Valid"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.missing",
+        "value": "Missing"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.auth_state",
+        "value": "Auth State:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.keys",
+        "value": "Keys:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.session",
+        "value": "Session:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.exists",
+        "value": "Exists"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.rate_limiting",
+        "value": "Rate Limiting"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.messages_sent",
+        "value": "Messages Sent:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.limited",
+        "value": "Limited"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.normal",
+        "value": "Normal"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.window_reset",
+        "value": "Window Reset:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.connection_history",
+        "value": "Connection History"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.last_connected",
+        "value": "Last Connected:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.reconnect_attempts",
+        "value": "Reconnect Attempts:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.error_count",
+        "value": "Error Count:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.last_error",
+        "value": "Last Error:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.manual_reconnection",
+        "value": "Manual Reconnection"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.manual_reconnection_hint",
+        "value": "Force a reconnection attempt if experiencing issues"
+    },
+    {
+        "key": "admin.website_builder.edit_title",
+        "value": "Edit: {{title}}"
+    },
+    {
+        "key": "admin.website_builder.new_website_button",
+        "value": "New Website"
+    },
+    {
+        "key": "dashboard.erp_snapshot.title",
+        "value": "ERP snapshot"
+    },
+    {
+        "key": "dashboard.erp_snapshot.revenue_30d",
+        "value": "Revenue (30d)"
+    },
+    {
+        "key": "dashboard.erp_snapshot.open_erp_dashboard",
+        "value": "Open ERP dashboard"
+    },
+    {
+        "key": "dashboard.erp_snapshot.pending_orders",
+        "value": "Pending orders"
+    },
+    {
+        "key": "dashboard.erp_snapshot.sales_pipeline",
+        "value": "Sales pipeline"
+    },
+    {
+        "key": "dashboard.erp_snapshot.overdue_invoices",
+        "value": "Overdue invoices"
+    },
+    {
+        "key": "dashboard.erp_snapshot.accounts_receivable",
+        "value": "Accounts receivable"
+    },
+    {
+        "key": "flow_builder.keyword_trigger_each_output",
+        "value": "Each keyword will create its own output connection."
+    },
+    {
+        "key": "flow_builder.trigger_type_message_received",
+        "value": "Message Received"
+    },
+    {
+        "key": "flow_builder.quick_reply_each_output",
+        "value": "Each option will have its own output connection."
+    },
+    {
+        "key": "flow_builder.quick_reply_enable_go_back",
+        "value": "Enable Go Back"
+    },
+    {
+        "key": "flow_builder.main.template_applied",
+        "value": "Flow Template Applied"
+    },
+    {
+        "key": "flow_builder.main.template_apply_error",
+        "value": "Error"
+    },
+    {
+        "key": "flow_builder.main.template_apply_error_desc",
+        "value": "Failed to apply flow template. Please try again."
+    },
+    {
+        "key": "payment.cancel.title",
+        "value": "Payment Cancelled"
+    },
+    {
+        "key": "payment.cancel.description",
+        "value": "Your payment process was cancelled. No charges were made."
+    },
+    {
+        "key": "payment.go_to_dashboard",
+        "value": "Go to Dashboard"
+    },
+    {
+        "key": "payment.pending.title",
+        "value": "Payment Pending"
+    },
+    {
+        "key": "payment.pending.description",
+        "value": "Your payment is being processed. This may take some time to complete."
+    },
+    {
+        "key": "payment.pending.notify_message",
+        "value": "We'll notify you once your payment is confirmed. You can check your subscription status in the settings page."
+    },
+    {
+        "key": "profile.updated_title",
+        "value": "Profile Updated"
+    },
+    {
+        "key": "profile.updated_desc",
+        "value": "Your profile information has been updated successfully."
+    },
+    {
+        "key": "profile.update_failed_desc",
+        "value": "Failed to update profile: {{error}}"
+    },
+    {
+        "key": "profile.avatar_updated_title",
+        "value": "Avatar Updated"
+    },
+    {
+        "key": "profile.avatar_updated_desc",
+        "value": "Your profile picture has been updated successfully."
+    },
+    {
+        "key": "profile.avatar_upload_failed_desc",
+        "value": "Failed to upload avatar: {{error}}"
+    },
+    {
+        "key": "profile.password_changed_title",
+        "value": "Password Changed"
+    },
+    {
+        "key": "profile.password_changed_desc",
+        "value": "Your password has been changed successfully."
+    },
+    {
+        "key": "profile.password_change_failed_desc",
+        "value": "Failed to change password: {{error}}"
+    },
+    {
+        "key": "profile.notifications_updated_title",
+        "value": "Notifications Updated"
+    },
+    {
+        "key": "profile.notifications_updated_desc",
+        "value": "Your notification preferences have been updated successfully."
+    },
+    {
+        "key": "profile.notifications_update_failed_desc",
+        "value": "Failed to update notifications: {{error}}"
+    },
+    {
+        "key": "profile.company_updated_title",
+        "value": "Company Updated"
+    },
+    {
+        "key": "profile.company_updated_desc",
+        "value": "Your company information has been updated successfully."
+    },
+    {
+        "key": "profile.company_update_failed_desc",
+        "value": "Failed to update company: {{error}}"
+    },
+    {
+        "key": "profile.invalid_file_type_title",
+        "value": "Invalid File Type"
+    },
+    {
+        "key": "profile.invalid_file_type_desc",
+        "value": "Please select a valid image file (JPEG, PNG, GIF, or WebP)."
+    },
+    {
+        "key": "profile.file_too_large_title",
+        "value": "File Too Large"
+    },
+    {
+        "key": "profile.file_too_large_desc",
+        "value": "Please select an image smaller than 5MB."
+    },
+    {
+        "key": "settings.channel.connection_initiated_title",
+        "value": "Channel Connection Initiated"
+    },
+    {
+        "key": "settings.channel.connection_initiated_desc",
+        "value": "Starting connection flow for {{channelType}}"
+    },
+    {
+        "key": "settings.channel.connect_failed_desc",
+        "value": "Failed to connect to channel"
+    },
+    {
+        "key": "settings.channel.disconnected_title",
+        "value": "Channel Disconnected"
+    },
+    {
+        "key": "settings.channel.disconnected_desc",
+        "value": "The channel has been disconnected successfully"
+    },
+    {
+        "key": "settings.error",
+        "value": "Error"
+    },
+    {
+        "key": "settings.channel.disconnect_failed_desc",
+        "value": "Failed to disconnect channel"
+    },
+    {
+        "key": "settings.channel.whatsapp_disconnected_title",
+        "value": "WhatsApp Number Disconnected"
+    },
+    {
+        "key": "settings.channel.whatsapp_disconnected_desc",
+        "value": "WhatsApp number disconnected successfully"
+    },
+    {
+        "key": "settings.channel.whatsapp_disconnect_failed_desc",
+        "value": "Failed to disconnect WhatsApp number"
+    },
+    {
+        "key": "settings.channel.delete_confirm",
+        "value": "Are you sure you want to delete this connection? This action cannot be undone."
+    },
+    {
+        "key": "settings.channel.deleted_title",
+        "value": "Channel Deleted"
+    },
+    {
+        "key": "settings.channel.deleted_desc",
+        "value": "The channel connection has been permanently deleted"
+    },
+    {
+        "key": "settings.channel.delete_failed_desc",
+        "value": "Failed to delete channel connection"
+    },
+    {
+        "key": "settings.channel.generic_error_desc",
+        "value": "An error occurred"
+    },
+    {
+        "key": "settings.channel.email_connected_desc",
+        "value": "Email channel connected successfully!"
+    },
+    {
+        "key": "settings.channel.connection_failed_title",
+        "value": "Connection Failed"
+    },
+    {
+        "key": "settings.channel.email_connect_failed_desc",
+        "value": "Failed to connect email channel"
+    },
+    {
+        "key": "settings.channel.sync_started_title",
+        "value": "Sync Started"
+    },
+    {
+        "key": "settings.channel.sync_started_desc",
+        "value": "Email sync initiated successfully!"
+    },
+    {
+        "key": "settings.channel.sync_failed_title",
+        "value": "Sync Failed"
+    },
+    {
+        "key": "settings.channel.sync_failed_desc",
+        "value": "Failed to sync"
+    },
+    {
+        "key": "settings.channel.sync_error_title",
+        "value": "Sync Error"
+    },
+    {
+        "key": "settings.channel.embed_copied_title",
+        "value": "Copied!"
+    },
+    {
+        "key": "settings.channel.embed_copied_desc",
+        "value": "Embed code copied to clipboard"
+    },
+    {
+        "key": "settings.channel.token_not_found_title",
+        "value": "Token not found"
+    },
+    {
+        "key": "settings.channel.token_not_found_desc",
+        "value": "This WebChat connection does not have a widget token yet"
+    },
+    {
+        "key": "settings.channel.name_required_desc",
+        "value": "Channel name cannot be empty"
+    },
+    {
+        "key": "settings.channel.renamed_title",
+        "value": "Channel Renamed"
+    },
+    {
+        "key": "settings.channel.renamed_desc",
+        "value": "The channel has been renamed successfully"
+    },
+    {
+        "key": "settings.channel.rename_failed_desc",
+        "value": "Failed to rename channel"
+    },
+    {
+        "key": "settings.channel.connection_cancelled_title",
+        "value": "Connection Cancelled"
+    },
+    {
+        "key": "settings.channel.connection_cancelled_desc",
+        "value": "WhatsApp connection has been cancelled and removed."
+    },
+    {
+        "key": "settings.channel.email_updated_title",
+        "value": "Email Channel Updated"
+    },
+    {
+        "key": "settings.channel.email_updated_desc",
+        "value": "Your email channel has been updated successfully"
+    },
+    {
+        "key": "settings.channel.whatsapp_api_updated_title",
+        "value": "WhatsApp Business API Updated"
+    },
+    {
+        "key": "settings.channel.whatsapp_api_updated_desc",
+        "value": "Your WhatsApp Business API connection has been updated successfully"
+    },
+    {
+        "key": "conversations.date_utils.today_at",
+        "value": "Today, {{time}}"
+    },
+    {
+        "key": "conversations.date_utils.yesterday_at",
+        "value": "Yesterday, {{time}}"
+    },
+    {
+        "key": "conversations.date_utils.overdue",
+        "value": "Overdue"
+    },
+    {
+        "key": "conversations.date_utils.hours_ago",
+        "value": "{{hours}} hour(s) ago"
+    },
+    {
+        "key": "conversations.date_utils.in_one_minute",
+        "value": "in 1 minute"
+    },
+    {
+        "key": "conversations.date_utils.in_minutes",
+        "value": "in {{minutes}} minutes"
+    },
+    {
+        "key": "conversations.date_utils.in_one_hour",
+        "value": "in 1 hour"
+    },
+    {
+        "key": "conversations.date_utils.in_hours",
+        "value": "in {{hours}} hours"
+    },
+    {
+        "key": "conversations.date_utils.tomorrow_at",
+        "value": "Tomorrow at {{time}}"
     }
 ]

@@ -139,8 +139,8 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
   const testWebhookConnection = async () => {
     if (!formData.webhookUrl || !formData.verifyToken) {
       toast({
-        title: "Test Error",
-        description: "Webhook URL and verify token are required for testing.",
+        title: t('whatsapp_business.test_error', 'Test Error'),
+        description: t('whatsapp_business.webhook_required', 'Webhook URL and verify token are required for testing.'),
         variant: "destructive"
       });
       return;
@@ -163,21 +163,21 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
 
       if (response.ok && result.success) {
         toast({
-          title: "Webhook Test Successful!",
-          description: "Your webhook configuration is working correctly. You can now configure it in Meta Developer Console.",
+          title: t('whatsapp_business.webhook_test_successful', 'Webhook Test Successful!'),
+          description: t('whatsapp_business.webhook_test_success_desc', 'Your webhook configuration is working correctly. You can now configure it in Meta Developer Console.'),
         });
       } else {
         toast({
-          title: "Webhook Test Failed",
-          description: result.message || "Please check your webhook configuration and try again.",
+          title: t('whatsapp_business.webhook_test_failed', 'Webhook Test Failed'),
+          description: result.message || t('whatsapp_business.webhook_test_failed_desc', 'Please check your webhook configuration and try again.'),
           variant: "destructive"
         });
       }
     } catch (error) {
       console.error('Webhook test error:', error);
       toast({
-        title: "Test Failed",
-        description: "Network error. Please check your connection and try again.",
+        title: t('whatsapp_business.test_failed', 'Test Failed'),
+        description: t('whatsapp_business.network_error', 'Network error. Please check your connection and try again.'),
         variant: "destructive"
       });
     } finally {
@@ -188,8 +188,8 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
   const testTemplate = async () => {
     if (!testPhone) {
       toast({
-        title: "Test Error",
-        description: "Please enter a phone number to test the template message.",
+        title: t('whatsapp_business.test_error', 'Test Error'),
+        description: t('whatsapp_business.phone_required', 'Please enter a phone number to test the template message.'),
         variant: "destructive"
       });
       return;
@@ -197,8 +197,8 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
 
     if (!formData.accessToken || !formData.phoneNumberId) {
       toast({
-        title: "Test Error",
-        description: "Please save the connection first before testing.",
+        title: t('whatsapp_business.test_error', 'Test Error'),
+        description: t('whatsapp_business.save_first', 'Please save the connection first before testing.'),
         variant: "destructive"
       });
       return;
@@ -231,7 +231,7 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
       });
 
       if (!tempConnectionResponse.ok) {
-        throw new Error('Failed to create temporary connection for testing');
+        throw new Error(t('whatsapp_business.temp_connection_failed', 'Failed to create temporary connection for testing'));
       }
 
       const tempConnection = await tempConnectionResponse.json();
@@ -253,18 +253,18 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
         if (testResponse.ok) {
           const result = await testResponse.json();
           toast({
-            title: "Template Test Successful",
-            description: `Template message sent successfully to ${testPhone}. Message ID: ${result.messageId}`,
+            title: t('whatsapp_business.template_test_successful', 'Template Test Successful'),
+            description: t('whatsapp_business.template_test_success_desc', 'Template message sent successfully to {{phone}}. Message ID: {{messageId}}', { phone: testPhone, messageId: result.messageId }),
           });
         } else {
           const errorData = await testResponse.json();
-          let errorMessage = errorData.error || 'Failed to send template message';
+          let errorMessage = errorData.error || t('whatsapp_business.template_send_failed_fallback', 'Failed to send template message');
 
 
           if (errorMessage.includes('131030') || errorMessage.includes('not in allowed list')) {
-            errorMessage = 'Phone number not in allowed list. Please add this number to your Meta for Developers dashboard under "Phone numbers" section, or use a number that\'s already approved.';
+            errorMessage = t('whatsapp_business.phone_not_allowed_error', 'Phone number not in allowed list. Please add this number to your Meta for Developers dashboard under "Phone numbers" section, or use a number that\'s already approved.');
           } else if (errorMessage.includes('131026') || errorMessage.includes('template')) {
-            errorMessage = 'Template message error. Make sure the "hello_world" template is approved in your WhatsApp Business Manager.';
+            errorMessage = t('whatsapp_business.template_not_approved_error', 'Template message error. Make sure the "hello_world" template is approved in your WhatsApp Business Manager.');
           }
 
           throw new Error(errorMessage);
@@ -277,8 +277,8 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
       }
     } catch (error: any) {
       toast({
-        title: "Template Test Failed",
-        description: error.message || "Failed to send template message.",
+        title: t('whatsapp_business.template_test_failed', 'Template Test Failed'),
+        description: error.message || t('whatsapp_business.template_test_failed_desc', 'Failed to send template message.'),
         variant: "destructive"
       });
     } finally {
@@ -323,25 +323,25 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create WhatsApp Business API connection');
+        throw new Error(errorData.message || t('whatsapp_business.connection_failed', 'Failed to create WhatsApp Business API connection'));
       }
-      
+
       onClose();
-      
+
       toast({
-        title: "WhatsApp Business API Connected",
-        description: "Your WhatsApp Business API account has been connected successfully!",
+        title: t('whatsapp_business.connection_created', 'WhatsApp Business API Connected'),
+        description: t('whatsapp_business.connection_created_desc', 'Your WhatsApp Business API account has been connected successfully!'),
       });
-      
+
       resetForm();
-      
+
       onSuccess();
-      
+
     } catch (error: any) {
       console.error('Error connecting to WhatsApp Business API:', error);
       toast({
-        title: "Connection Error",
-        description: error.message || "Failed to connect to WhatsApp Business API",
+        title: t('whatsapp_business.connection_error', 'Connection Error'),
+        description: error.message || t('whatsapp_business.connection_error_desc', 'Failed to connect to WhatsApp Business API'),
         variant: "destructive"
       });
     } finally {
@@ -353,10 +353,9 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Connect WhatsApp Business API</DialogTitle>
+          <DialogTitle>{t('whatsapp_business.dialog_title', 'Connect WhatsApp Business API')}</DialogTitle>
           <DialogDescription>
-            Connect your existing WhatsApp Business API account.
-            You'll need your Meta for Developers credentials.
+            {t('whatsapp_business.dialog_description', "Connect your existing WhatsApp Business API account. You'll need your Meta for Developers credentials.")}
           </DialogDescription>
         </DialogHeader>
         
@@ -393,7 +392,7 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="businessAccountId">Business Account ID</Label>
+              <Label htmlFor="businessAccountId">{t('whatsapp_business.business_account_id', 'Business Account ID')}</Label>
               <Input
                 id="businessAccountId"
                 name="businessAccountId"
@@ -405,14 +404,14 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="accessToken">Access Token</Label>
+              <Label htmlFor="accessToken">{t('whatsapp_business.access_token', 'Access Token')}</Label>
               <div className="flex gap-2">
                 <Input
                   id="accessToken"
                   name="accessToken"
                   value={formData.accessToken}
                   onChange={handleInputChange}
-                  placeholder="EAAxxxxx..."
+                  placeholder={t('whatsapp_business.access_token_placeholder', 'EAAxxxxx...')}
                   required
                   className="flex-1"
                 />
@@ -427,12 +426,12 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
                 </Button>
               </div>
               <p className="text-sm text-gray-500">
-                Long-lived or permanent access token from Meta for Developers
+                {t('whatsapp_business.access_token_help', 'Long-lived or permanent access token from Meta for Developers')}
               </p>
             </div>
-            
+
             <div className="grid gap-2">
-              <Label htmlFor="appId">App ID</Label>
+              <Label htmlFor="appId">{t('whatsapp_business.app_id', 'App ID')}</Label>
               <Input
                 id="appId"
                 name="appId"
@@ -444,7 +443,7 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="appSecret">App Secret</Label>
+              <Label htmlFor="appSecret">{t('whatsapp_business.app_secret', 'App Secret')}</Label>
               <Input
                 id="appSecret"
                 name="appSecret"
@@ -457,7 +456,7 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="webhookUrl">Webhook URL</Label>
+              <Label htmlFor="webhookUrl">{t('whatsapp_business.webhook_url', 'Webhook URL')}</Label>
               <div className="flex gap-2">
                 <Input
                   id="webhookUrl"
@@ -478,19 +477,19 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
                 </Button>
               </div>
               <p className="text-sm text-gray-500">
-                Enter your webhook URL or use the auto-generated one. Copy this URL and paste it in your Meta for Developers dashboard under Webhooks configuration.
+                {t('whatsapp_business.webhook_url_help', 'Enter your webhook URL or use the auto-generated one. Copy this URL and paste it in your Meta for Developers dashboard under Webhooks configuration.')}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="verifyToken">Webhook Verify Token</Label>
+              <Label htmlFor="verifyToken">{t('whatsapp_business.webhook_verify_token', 'Webhook Verify Token')}</Label>
               <div className="flex gap-2">
                 <Input
                   id="verifyToken"
                   name="verifyToken"
                   value={formData.verifyToken}
                   onChange={handleInputChange}
-                  placeholder="e.g. abc123xyz..."
+                  placeholder={t('whatsapp_business.verify_token_input_placeholder', 'e.g. abc123xyz...')}
                   required
                   className="flex-1"
                 />
@@ -500,25 +499,25 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
                   onClick={() => navigator.clipboard.writeText(formData.verifyToken)}
                   className="whitespace-nowrap"
                 >
-                  Copy
+                  {t('whatsapp_business.copy', 'Copy')}
                 </Button>
               </div>
               <p className="text-sm text-gray-500">
-                This unique token is auto-generated. Copy it and paste it in the &apos;Verify token&apos; field in your Meta Developer Console. Each connection gets its own secure token.
+                {t('whatsapp_business.verify_token_auto_generated_help', "This unique token is auto-generated. Copy it and paste it in the 'Verify token' field in your Meta Developer Console. Each connection gets its own secure token.")}
               </p>
               <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
                 <p className="text-sm text-green-800">
-                  <strong>✅ Connection-Specific Token:</strong> This verify token will be stored with your WhatsApp Business API connection:
+                  <strong>{t('whatsapp_business.connection_specific_token_bold', '✅ Connection-Specific Token:')}</strong> {t('whatsapp_business.connection_specific_token_desc', 'This verify token will be stored with your WhatsApp Business API connection:')}
                   <code className="bg-green-100 px-1 rounded font-mono">{formData.verifyToken}</code>
                 </p>
                 <p className="text-sm text-green-800 mt-1">
-                  Enter this exact token in your Meta Developer Console webhook configuration. Each WhatsApp Business API connection can have its own unique verify token.
+                  {t('whatsapp_business.token_instructions', 'Enter this exact token in your Meta Developer Console webhook configuration. Each WhatsApp Business API connection can have its own unique verify token.')}
                 </p>
               </div>
             </div>
 
             <div className="grid gap-2">
-              <Label>Test Webhook Configuration</Label>
+              <Label>{t('whatsapp_business.test_webhook_config', 'Test Webhook Configuration')}</Label>
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -527,25 +526,25 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
                   disabled={isValidating || !formData.webhookUrl || !formData.verifyToken}
                   className="whitespace-nowrap"
                 >
-                  {isValidating ? 'Testing...' : 'Test Webhook'}
+                  {isValidating ? t('whatsapp_business.testing', 'Testing...') : t('whatsapp_business.test_webhook', 'Test Webhook')}
                 </Button>
                 <div className="flex-1 text-sm text-gray-600 flex items-center">
-                  Test your webhook configuration before submitting to Meta
+                  {t('whatsapp_business.test_webhook_desc', 'Test your webhook configuration before submitting to Meta')}
                 </div>
               </div>
               <p className="text-sm text-gray-500">
-                This will verify that your webhook URL is accessible and responds correctly to Meta's verification requests.
+                {t('whatsapp_business.test_webhook_help', "This will verify that your webhook URL is accessible and responds correctly to Meta's verification requests.")}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="testPhone">Test Template Message (Optional)</Label>
+              <Label htmlFor="testPhone">{t('whatsapp_business.test_template_message', 'Test Template Message (Optional)')}</Label>
               <div className="flex gap-2">
                 <Input
                   id="testPhone"
                   value={testPhone}
                   onChange={(e) => setTestPhone(e.target.value)}
-                  placeholder="+1234567890"
+                  placeholder={t('whatsapp_business.test_template_placeholder', '+1234567890')}
                   className="flex-1"
                 />
                 <Button
@@ -555,23 +554,22 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
                   disabled={isTestingTemplate || !formData.accessToken || !formData.phoneNumberId}
                   className="whitespace-nowrap"
                 >
-                  {isTestingTemplate ? 'Testing...' : 'Test'}
+                  {isTestingTemplate ? t('whatsapp_business.testing', 'Testing...') : t('whatsapp_business.test', 'Test')}
                 </Button>
               </div>
               <p className="text-sm text-gray-500">
-                Send a test "hello_world" template message to verify your connection is working.
-                Enter a phone number with country code (e.g., +1234567890).
+                {t('whatsapp_business.test_template_help', 'Send a test "hello_world" template message to verify your connection is working. Enter a phone number with country code (e.g., +1234567890).')}
               </p>
               <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
                 <p className="text-sm text-amber-800">
-                  <strong>Note:</strong> If your WhatsApp Business API is in development mode, you can only send messages to phone numbers that are added to the "allowed list" in your Meta for Developers dashboard.
+                  <strong>{t('settings.whatsappEmbeddedSignup.note', 'Note:')}</strong> {t('whatsapp_business.development_mode_note_desc', 'If your WhatsApp Business API is in development mode, you can only send messages to phone numbers that are added to the "allowed list" in your Meta for Developers dashboard.')}
                   <a
                     href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started#add-recipient-phone-numbers"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline hover:text-amber-900"
                   >
-                    Learn how to add phone numbers →
+                    {t('whatsapp_business.learn_more', 'Learn how to add phone numbers →')}
                   </a>
                 </p>
               </div>
@@ -587,7 +585,7 @@ export function WhatsAppBusinessApiForm({ isOpen, onClose, onSuccess }: Props) {
                 onClose();
               }}
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               type="submit"

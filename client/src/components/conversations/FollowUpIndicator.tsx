@@ -8,6 +8,7 @@ import { Clock, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import useSocket from '@/hooks/useSocket';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { formatFollowUpTime, getFollowUpStatusColor } from '@/utils/dateUtils';
 import { apiRequest } from '@/lib/queryClient';
 import {
@@ -38,6 +39,7 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
   const [confirmCancelScheduleId, setConfirmCancelScheduleId] = useState<string | null>(null);
   const [removingScheduleIds, setRemovingScheduleIds] = useState<string[]>([]);
   const { toast } = useToast();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const socket = useSocket('/ws');
 
@@ -80,8 +82,8 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
       setConfirmCancelScheduleId(null);
       setRemovingScheduleIds((ids) => ids.filter((id) => id !== scheduleId));
       toast({
-        title: 'Follow-up cancelled',
-        description: 'The scheduled follow-up has been cancelled.',
+        title: t('conversations.follow_up_indicator.cancelled_title', 'Follow-up cancelled'),
+        description: t('conversations.follow_up_indicator.cancelled_manual_description', 'The scheduled follow-up has been cancelled.'),
         variant: 'default',
       });
       queryClient.invalidateQueries({ queryKey: ['follow-ups', 'active', conversationId] });
@@ -94,12 +96,12 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
         queryClient.setQueryData(['follow-ups', 'active', conversationId], context.prev);
       }
       toast({
-        title: 'Failed to cancel follow-up',
-        description: err instanceof Error ? err.message : 'Something went wrong. Please try again.',
+        title: t('conversations.follow_up_indicator.cancel_failed_title', 'Failed to cancel follow-up'),
+        description: err instanceof Error ? err.message : t('conversations.follow_up_indicator.cancel_failed_generic', 'Something went wrong. Please try again.'),
         variant: 'destructive',
         action: (
-          <ToastAction altText="Retry" onClick={() => handleCancelFollowUp(scheduleId)}>
-            Retry
+          <ToastAction altText={t('common.retry', 'Retry')} onClick={() => handleCancelFollowUp(scheduleId)}>
+            {t('common.retry', 'Retry')}
           </ToastAction>
         ),
       });
@@ -138,8 +140,8 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
       if (data?.data?.conversationId === conversationId) {
         queryClient.invalidateQueries({ queryKey: ['follow-ups', 'active', conversationId] });
         toast({
-          title: 'Follow-up sent',
-          description: 'A scheduled follow-up message was sent.',
+          title: t('conversations.follow_up_indicator.sent_title', 'Follow-up sent'),
+          description: t('conversations.follow_up_indicator.sent_description', 'A scheduled follow-up message was sent.'),
           variant: 'default',
         });
       }
@@ -148,8 +150,8 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
       if (data?.data?.conversationId === conversationId) {
         queryClient.invalidateQueries({ queryKey: ['follow-ups', 'active', conversationId] });
         toast({
-          title: 'Follow-up cancelled',
-          description: 'A scheduled follow-up was cancelled.',
+          title: t('conversations.follow_up_indicator.cancelled_title', 'Follow-up cancelled'),
+          description: t('conversations.follow_up_indicator.cancelled_description', 'A scheduled follow-up was cancelled.'),
           variant: 'default',
         });
       }
@@ -165,8 +167,8 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
         if (data?.data?.conversationId === conversationId) {
           queryClient.invalidateQueries({ queryKey: ['follow-ups', 'active', conversationId] });
           toast({
-            title: 'Follow-up cancelled',
-            description: 'The scheduled follow-up was cancelled.',
+            title: t('conversations.follow_up_indicator.cancelled_title', 'Follow-up cancelled'),
+            description: t('conversations.follow_up_indicator.cancelled_external_description', 'The scheduled follow-up was cancelled.'),
             variant: 'default',
           });
         }
@@ -222,12 +224,12 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
             <div
               className={className}
               role="status"
-              aria-label="Loading follow-up information"
+              aria-label={t('conversations.follow_up_indicator.loading_aria', 'Loading follow-up information')}
             >
               <Skeleton className="h-5 w-8 rounded-full" />
             </div>
           </TooltipTrigger>
-          <TooltipContent>Loading scheduled follow-ups…</TooltipContent>
+          <TooltipContent>{t('conversations.follow_up_indicator.loading_tooltip', 'Loading scheduled follow-ups…')}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     );
@@ -241,21 +243,21 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
             <Badge
               variant="outline"
               className={`inline-flex items-center gap-1 cursor-help ${className}`}
-              aria-label="Error loading follow-ups"
+              aria-label={t('conversations.follow_up_indicator.error_aria', 'Error loading follow-ups')}
             >
               <AlertCircle className="h-3 w-3" />
               <span>?</span>
             </Badge>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Could not load scheduled follow-ups.</p>
+            <p>{t('conversations.follow_up_indicator.error_message', 'Could not load scheduled follow-ups.')}</p>
             <Button
               variant="outline"
               size="sm"
               className="mt-2"
               onClick={() => refetch()}
             >
-              Retry
+              {t('common.retry', 'Retry')}
             </Button>
           </TooltipContent>
         </Tooltip>
@@ -277,7 +279,7 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
             <button
               type="button"
               className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition-colors bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${className ?? ''}`}
-              aria-label="Active follow-up messages scheduled"
+              aria-label={t('conversations.follow_up_indicator.active_aria', 'Active follow-up messages scheduled')}
               onPointerEnter={handleTriggerPointerEnter}
               onPointerLeave={handleTriggerPointerLeave}
             >
@@ -293,7 +295,7 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
             onPointerLeave={handleContentPointerLeave}
           >
             <div className="p-3 border-b shrink-0">
-              <h3 className="font-semibold text-sm">Scheduled Follow-ups</h3>
+              <h3 className="font-semibold text-sm">{t('conversations.follow_up_indicator.panel_title', 'Scheduled Follow-ups')}</h3>
             </div>
             <div className="overflow-y-auto flex-1 min-h-0 p-2" role="list">
               {activeFollowUps.map((fu) => (
@@ -309,22 +311,22 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
                       ? fu.messageContent.length > TRUNCATE_LEN
                         ? `${fu.messageContent.slice(0, TRUNCATE_LEN)}…`
                         : fu.messageContent
-                      : '(No message preview)'}
+                      : t('conversations.follow_up_indicator.no_message_preview', '(No message preview)')}
                   </p>
                   <p className={`text-xs font-medium ${getFollowUpStatusColor(fu.scheduledFor)}`}>
-                    {formatFollowUpTime(fu.scheduledFor)}
+                    {formatFollowUpTime(fu.scheduledFor, t)}
                   </p>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
                       {fu.willCancelOnResponse ? (
                         <>
                           <AlertCircle className="h-3 w-3 shrink-0" aria-hidden />
-                          <span>Will cancel if user replies</span>
+                          <span>{t('conversations.follow_up_indicator.will_cancel', 'Will cancel if user replies')}</span>
                         </>
                       ) : (
                         <>
                           <CheckCircle className="h-3 w-3 shrink-0" aria-hidden />
-                          <span>No auto-cancel</span>
+                          <span>{t('conversations.follow_up_indicator.no_auto_cancel', 'No auto-cancel')}</span>
                         </>
                       )}
                     </div>
@@ -334,7 +336,7 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
                       className="h-7 w-7 p-0 shrink-0 text-muted-foreground hover:text-destructive"
                       onClick={() => handleCancelFollowUp(fu.scheduleId)}
                       disabled={cancelMutation.isPending && cancelScheduleId === fu.scheduleId}
-                      aria-label={`Cancel follow-up scheduled for ${formatFollowUpTime(fu.scheduledFor)}`}
+                      aria-label={t('conversations.follow_up_indicator.cancel_aria', 'Cancel follow-up scheduled for {{time}}', { time: formatFollowUpTime(fu.scheduledFor, t) })}
                     >
                       {cancelMutation.isPending && cancelScheduleId === fu.scheduleId ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
@@ -353,15 +355,15 @@ export function FollowUpIndicator({ conversationId, className }: FollowUpIndicat
       <AlertDialog open={!!confirmCancelScheduleId} onOpenChange={(open) => !open && setConfirmCancelScheduleId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel this follow-up?</AlertDialogTitle>
+            <AlertDialogTitle>{t('conversations.follow_up_indicator.confirm_cancel_title', 'Cancel this follow-up?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will cancel the scheduled follow-up message. This action cannot be undone.
+              {t('conversations.follow_up_indicator.confirm_cancel_description', 'This will cancel the scheduled follow-up message. This action cannot be undone.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <AlertDialogCancel>{t('conversations.follow_up_indicator.keep_it', 'Keep it')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmCancel} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Cancel follow-up
+              {t('conversations.follow_up_indicator.confirm_cancel_action', 'Cancel follow-up')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

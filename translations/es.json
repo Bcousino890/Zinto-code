@@ -51970,5 +51970,2021 @@
     {
         "key": "admin.translations_tab",
         "value": "Traducciones"
+    },
+    {
+        "key": "common.error_boundary.title",
+        "value": "Algo salió mal"
+    },
+    {
+        "key": "common.error_boundary.description",
+        "value": "Ocurrió un error al cargar el pipeline. Inténtelo de nuevo o vuelva al panel de control."
+    },
+    {
+        "key": "common.error_boundary.error_details",
+        "value": "Detalles del error"
+    },
+    {
+        "key": "common.error_boundary.try_again",
+        "value": "Intentar de nuevo"
+    },
+    {
+        "key": "common.error_boundary.go_back",
+        "value": "Volver"
+    },
+    {
+        "key": "admin.subscription_fix.validation_fix_title",
+        "value": "Validación y corrección de datos"
+    },
+    {
+        "key": "admin.subscription_fix.issues_detected_desc",
+        "value": "Se detectaron problemas: ejecute la corrección para resolver las inconsistencias en los datos de suscripción"
+    },
+    {
+        "key": "admin.subscription_fix.no_issues_desc",
+        "value": "No se detectaron problemas: los datos de su suscripción son consistentes"
+    },
+    {
+        "key": "admin.subscription_fix.running_fix",
+        "value": "Ejecutando corrección..."
+    },
+    {
+        "key": "admin.subscription_fix.fix_data_issues_button",
+        "value": "Corregir problemas de datos"
+    },
+    {
+        "key": "admin.subscription_fix.validate_data_button",
+        "value": "Validar datos"
+    },
+    {
+        "key": "admin.subscription_fix.fix_completed_success_title",
+        "value": "Corrección completada con éxito"
+    },
+    {
+        "key": "admin.subscription_fix.fix_completed_errors_title",
+        "value": "Corrección completada con errores"
+    },
+    {
+        "key": "admin.subscription_fix.companies_fixed_label",
+        "value": "Empresas corregidas:"
+    },
+    {
+        "key": "admin.subscription_fix.errors_label",
+        "value": "Errores:"
+    },
+    {
+        "key": "admin.subscription_fix.how_it_works_title",
+        "value": "Cómo funciona esta corrección"
+    },
+    {
+        "key": "admin.subscription_fix.problem_label",
+        "value": "Problema:"
+    },
+    {
+        "key": "admin.subscription_fix.problem_text",
+        "value": "Las implementaciones existentes de la aplicación pueden tener valores NULL en los campos de suscripción que se agregaron en migraciones posteriores, lo que causa un comportamiento incorrecto en el diálogo de renovación."
+    },
+    {
+        "key": "admin.subscription_fix.solution_label",
+        "value": "Solución:"
+    },
+    {
+        "key": "admin.subscription_fix.solution_text",
+        "value": "Esta herramienta identifica y corrige las inconsistencias de datos mediante:"
+    },
+    {
+        "key": "admin.subscription_fix.fix_item_1",
+        "value": "Normalización de valores NULL en subscription_status según las fechas de suscripción"
+    },
+    {
+        "key": "admin.subscription_fix.fix_item_2",
+        "value": "Adición de períodos de gracia faltantes para suscripciones vencidas"
+    },
+    {
+        "key": "admin.subscription_fix.fix_item_3",
+        "value": "Corrección de estados de prueba inconsistentes"
+    },
+    {
+        "key": "admin.subscription_fix.fix_item_4",
+        "value": "Inicialización de campos faltantes con valores predeterminados adecuados"
+    },
+    {
+        "key": "admin.subscription_fix.safety_label",
+        "value": "Seguridad:"
+    },
+    {
+        "key": "admin.subscription_fix.safety_text",
+        "value": "Esta corrección es segura de ejecutar varias veces y solo actualiza datos inconsistentes."
+    },
+    {
+        "key": "contacts.agent_display.loading",
+        "value": "Cargando información del agente..."
+    },
+    {
+        "key": "contacts.agent_display.no_agent",
+        "value": "Ningún agente asignado"
+    },
+    {
+        "key": "contacts.agent_display.no_agent_description",
+        "value": "Este contacto aún no ha sido asignado a ningún agente"
+    },
+    {
+        "key": "contacts.agent_display.assigned_on",
+        "value": "Asignado el {{date}}"
+    },
+    {
+        "key": "contacts.agent_display.conversation_hash",
+        "value": "• Conversación #{{id}}"
+    },
+    {
+        "key": "contacts.audit_log.empty",
+        "value": "Aún no hay actividad registrada"
+    },
+    {
+        "key": "contacts.audit_log.document_id",
+        "value": "ID de documento: {{id}}"
+    },
+    {
+        "key": "contacts.audit_log.type",
+        "value": "Tipo: {{type}}"
+    },
+    {
+        "key": "conversations.call_screen_modal.audio_device_disconnected_title",
+        "value": "Dispositivo de audio desconectado"
+    },
+    {
+        "key": "conversations.call_screen_modal.audio_device_disconnected_description",
+        "value": "Cambiando al dispositivo predeterminado."
+    },
+    {
+        "key": "conversations.call_screen_modal.poor_call_quality_title",
+        "value": "Calidad de llamada deficiente"
+    },
+    {
+        "key": "conversations.call_screen_modal.poor_call_quality_description",
+        "value": "Puntuación de calidad baja ({{score}}). La conexión puede ser inestable."
+    },
+    {
+        "key": "conversations.call_screen_modal.high_latency_title",
+        "value": "Latencia alta"
+    },
+    {
+        "key": "conversations.call_screen_modal.high_latency_description",
+        "value": "La latencia es alta ({{ms}}ms). Es posible que note retrasos."
+    },
+    {
+        "key": "conversations.call_screen_modal.call_reconnected_title",
+        "value": "Llamada reconectada"
+    },
+    {
+        "key": "conversations.call_screen_modal.call_reconnected_description",
+        "value": "La llamada se reconectó correctamente."
+    },
+    {
+        "key": "conversations.call_screen_modal.call_quality_optimized_title",
+        "value": "Calidad de llamada optimizada"
+    },
+    {
+        "key": "conversations.call_screen_modal.call_quality_optimized_description",
+        "value": "Calidad de llamada optimizada para red deficiente."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.error_generic",
+        "value": "Error al acceder al micrófono. Verifique la configuración de su navegador e inténtelo de nuevo."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.error_permission_denied",
+        "value": "Permiso de micrófono denegado. Permita el acceso en la configuración de su navegador e inténtelo de nuevo."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.error_not_found",
+        "value": "No se encontró ningún micrófono. Conecte un micrófono e inténtelo de nuevo."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.error_not_readable",
+        "value": "El micrófono está siendo utilizado por otra aplicación. Cierre otras aplicaciones e inténtelo de nuevo."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.title",
+        "value": "Elegir tipo de llamada de voz"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.description",
+        "value": "Seleccione cómo desea realizar esta llamada saliente"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.provider_managed_note",
+        "value": "{{provider}} realiza llamadas directas como llamadas PSTN gestionadas por el proveedor. No se requiere acceso al micrófono del navegador para este stack."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.requesting_permission",
+        "value": "Solicitando permiso..."
+    },
+    {
+        "key": "conversations.call_type_selection_modal.talk_directly",
+        "value": "Hablar directamente"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.place_direct_call",
+        "value": "Realizar llamada directa"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.use_microphone",
+        "value": "Use su micrófono para hablar con el cliente"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.provider_will_place_call",
+        "value": "{{provider}} realizará la llamada directa saliente"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.microphone_ready",
+        "value": "Micrófono listo"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.microphone_access_required",
+        "value": "Se requiere acceso al micrófono"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.use_ai_agent",
+        "value": "Usar agente de IA"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.provider_will_handle_conversation",
+        "value": "{{provider}} se encargará de la conversación"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.microphone_access_required_title",
+        "value": "Se requiere acceso al micrófono"
+    },
+    {
+        "key": "conversations.call_type_selection_modal.try_again",
+        "value": "Intentar de nuevo"
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancelled_title",
+        "value": "Seguimiento cancelado"
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancelled_manual_description",
+        "value": "El seguimiento programado ha sido cancelado."
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancel_failed_title",
+        "value": "Error al cancelar el seguimiento"
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancel_failed_generic",
+        "value": "Algo salió mal. Inténtelo de nuevo."
+    },
+    {
+        "key": "conversations.follow_up_indicator.sent_title",
+        "value": "Seguimiento enviado"
+    },
+    {
+        "key": "conversations.follow_up_indicator.sent_description",
+        "value": "Se envió un mensaje de seguimiento programado."
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancelled_description",
+        "value": "Se canceló un seguimiento programado."
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancelled_external_description",
+        "value": "El seguimiento programado fue cancelado."
+    },
+    {
+        "key": "conversations.follow_up_indicator.loading_aria",
+        "value": "Cargando información de seguimiento"
+    },
+    {
+        "key": "conversations.follow_up_indicator.loading_tooltip",
+        "value": "Cargando seguimientos programados…"
+    },
+    {
+        "key": "conversations.follow_up_indicator.error_aria",
+        "value": "Error al cargar los seguimientos"
+    },
+    {
+        "key": "conversations.follow_up_indicator.error_message",
+        "value": "No se pudieron cargar los seguimientos programados."
+    },
+    {
+        "key": "conversations.follow_up_indicator.active_aria",
+        "value": "Mensajes de seguimiento activos programados"
+    },
+    {
+        "key": "conversations.follow_up_indicator.panel_title",
+        "value": "Seguimientos programados"
+    },
+    {
+        "key": "conversations.follow_up_indicator.no_message_preview",
+        "value": "(Sin vista previa del mensaje)"
+    },
+    {
+        "key": "conversations.follow_up_indicator.will_cancel",
+        "value": "Se cancelará si el usuario responde"
+    },
+    {
+        "key": "conversations.follow_up_indicator.no_auto_cancel",
+        "value": "Sin cancelación automática"
+    },
+    {
+        "key": "conversations.follow_up_indicator.cancel_aria",
+        "value": "Cancelar seguimiento programado para {{time}}"
+    },
+    {
+        "key": "conversations.follow_up_indicator.confirm_cancel_title",
+        "value": "¿Cancelar este seguimiento?"
+    },
+    {
+        "key": "conversations.follow_up_indicator.confirm_cancel_description",
+        "value": "Esto cancelará el mensaje de seguimiento programado. Esta acción no se puede deshacer."
+    },
+    {
+        "key": "conversations.follow_up_indicator.keep_it",
+        "value": "Mantenerlo"
+    },
+    {
+        "key": "conversations.follow_up_indicator.confirm_cancel_action",
+        "value": "Cancelar seguimiento"
+    },
+    {
+        "key": "conversations.mentions.panel_title",
+        "value": "Menciones"
+    },
+    {
+        "key": "conversations.mentions.clear_all",
+        "value": "Borrar todo"
+    },
+    {
+        "key": "conversations.mentions.no_mentions",
+        "value": "Sin menciones"
+    },
+    {
+        "key": "conversations.mentions.mentioned_you",
+        "value": "{{userName}} le mencionó"
+    },
+    {
+        "key": "conversations.mentions.input_placeholder",
+        "value": "Escriba @ para mencionar a alguien..."
+    },
+    {
+        "key": "conversations.message_status.sending",
+        "value": "Enviando..."
+    },
+    {
+        "key": "conversations.message_status.sent",
+        "value": "Enviado"
+    },
+    {
+        "key": "conversations.message_status.delivered",
+        "value": "Entregado"
+    },
+    {
+        "key": "conversations.message_status.read",
+        "value": "Leído"
+    },
+    {
+        "key": "conversations.message_status.failed",
+        "value": "Fallido"
+    },
+    {
+        "key": "conversations.message_status.label_at_time",
+        "value": "{{label}} a las {{time}}"
+    },
+    {
+        "key": "conversations.message_status.sent_at",
+        "value": "Enviado: {{time}}"
+    },
+    {
+        "key": "conversations.message_status.delivered_at",
+        "value": "Entregado: {{time}}"
+    },
+    {
+        "key": "conversations.message_status.read_at",
+        "value": "Leído: {{time}}"
+    },
+    {
+        "key": "conversations.message_status.read_by_label",
+        "value": "Leído por:"
+    },
+    {
+        "key": "conversations.message_status.failed_at",
+        "value": "Fallido: {{time}}"
+    },
+    {
+        "key": "conversations.message_status.read_by_one",
+        "value": "Leído por {{name}}"
+    },
+    {
+        "key": "conversations.message_status.read_by_two",
+        "value": "Leído por {{name1}} y {{name2}}"
+    },
+    {
+        "key": "conversations.message_status.read_by_many",
+        "value": "Leído por {{name1}}, {{name2}} y {{count}} más"
+    },
+    {
+        "key": "conversations.message_status.read_by_count_one",
+        "value": "Leído por {{count}} persona"
+    },
+    {
+        "key": "conversations.message_status.read_by_count_other",
+        "value": "Leído por {{count}} personas"
+    },
+    {
+        "key": "conversations.message_status.sending_short",
+        "value": "Enviando"
+    },
+    {
+        "key": "conversations.reaction_picker.react_with",
+        "value": "Reaccionar con {{emoji}}"
+    },
+    {
+        "key": "conversations.reaction_picker.reaction_count_one",
+        "value": "{{count}} reacción"
+    },
+    {
+        "key": "conversations.reaction_picker.reaction_count_other",
+        "value": "{{count}} reacciones"
+    },
+    {
+        "key": "conversations.reaction_picker.add_reaction",
+        "value": "Agregar reacción"
+    },
+    {
+        "key": "conversations.reaction_picker.show_all_reactions",
+        "value": "Mostrar todas las reacciones"
+    },
+    {
+        "key": "conversations.typing_indicator.user_is_typing",
+        "value": "{{userName}} está escribiendo..."
+    },
+    {
+        "key": "conversations.typing_indicator.typing",
+        "value": "Escribiendo..."
+    },
+    {
+        "key": "conversations.typing_indicator.two_users_are_typing",
+        "value": "{{userName1}} y {{userName2}} están escribiendo..."
+    },
+    {
+        "key": "conversations.typing_indicator.multiple_users_are_typing",
+        "value": "{{userName}} y {{count}} más están escribiendo..."
+    },
+    {
+        "key": "conversations.typing_indicator.online",
+        "value": "En línea"
+    },
+    {
+        "key": "conversations.typing_indicator.away",
+        "value": "Ausente"
+    },
+    {
+        "key": "conversations.typing_indicator.offline",
+        "value": "Sin conexión"
+    },
+    {
+        "key": "email.signatures_manager.fetch_error",
+        "value": "Error al obtener las firmas de correo"
+    },
+    {
+        "key": "email.signatures_manager.name_required",
+        "value": "El nombre de la firma es obligatorio"
+    },
+    {
+        "key": "email.signatures_manager.content_required",
+        "value": "Se requiere contenido HTML o contenido de texto plano"
+    },
+    {
+        "key": "email.signatures_manager.update_success",
+        "value": "Firma actualizada correctamente"
+    },
+    {
+        "key": "email.signatures_manager.create_success",
+        "value": "Firma creada correctamente"
+    },
+    {
+        "key": "email.signatures_manager.save_error",
+        "value": "Error al guardar la firma"
+    },
+    {
+        "key": "email.signatures_manager.delete_confirm",
+        "value": "¿Está seguro de que desea eliminar esta firma?"
+    },
+    {
+        "key": "email.signatures_manager.delete_success",
+        "value": "Firma eliminada correctamente"
+    },
+    {
+        "key": "email.signatures_manager.delete_error",
+        "value": "Error al eliminar la firma"
+    },
+    {
+        "key": "email.signatures_manager.set_default_success",
+        "value": "Firma predeterminada actualizada"
+    },
+    {
+        "key": "email.signatures_manager.set_default_error",
+        "value": "Error al establecer la firma predeterminada"
+    },
+    {
+        "key": "email.signatures_manager.loading",
+        "value": "Cargando firmas..."
+    },
+    {
+        "key": "email.signatures_manager.title",
+        "value": "Firmas de correo"
+    },
+    {
+        "key": "email.signatures_manager.subtitle",
+        "value": "Administre sus firmas de correo para una comunicación profesional"
+    },
+    {
+        "key": "email.signatures_manager.new_signature",
+        "value": "Nueva firma"
+    },
+    {
+        "key": "email.signatures_manager.edit_title",
+        "value": "Editar firma"
+    },
+    {
+        "key": "email.signatures_manager.create_title",
+        "value": "Crear nueva firma"
+    },
+    {
+        "key": "email.signatures_manager.name_label",
+        "value": "Nombre de la firma *"
+    },
+    {
+        "key": "email.signatures_manager.name_placeholder",
+        "value": "Introduzca el nombre de la firma (ej., Profesional, Casual)"
+    },
+    {
+        "key": "email.signatures_manager.tab_html",
+        "value": "Firma HTML"
+    },
+    {
+        "key": "email.signatures_manager.tab_plain",
+        "value": "Texto plano"
+    },
+    {
+        "key": "email.signatures_manager.html_placeholder",
+        "value": "Firma HTML con formato (ej., <br>Saludos,<br><strong>Su nombre</strong>)"
+    },
+    {
+        "key": "email.signatures_manager.html_hint",
+        "value": "Use etiquetas HTML para dar formato. Ejemplo: &lt;br&gt; para saltos de línea, &lt;strong&gt; para texto en negrita"
+    },
+    {
+        "key": "email.signatures_manager.plain_label",
+        "value": "Firma en texto plano"
+    },
+    {
+        "key": "email.signatures_manager.plain_placeholder",
+        "value": "Versión en texto plano de su firma"
+    },
+    {
+        "key": "email.signatures_manager.plain_hint",
+        "value": "Versión en texto plano para clientes de correo que no admiten HTML"
+    },
+    {
+        "key": "email.signatures_manager.set_default_label",
+        "value": "Establecer como firma predeterminada"
+    },
+    {
+        "key": "email.signatures_manager.update_button",
+        "value": "Actualizar firma"
+    },
+    {
+        "key": "email.signatures_manager.create_button",
+        "value": "Crear firma"
+    },
+    {
+        "key": "email.signatures_manager.empty_title",
+        "value": "Sin firmas de correo"
+    },
+    {
+        "key": "email.signatures_manager.empty_description",
+        "value": "Cree su primera firma de correo para una comunicación profesional"
+    },
+    {
+        "key": "email.signatures_manager.created_on",
+        "value": "Creada el {{date}}"
+    },
+    {
+        "key": "email.signatures_manager.html_preview_label",
+        "value": "Vista previa HTML:"
+    },
+    {
+        "key": "email.signatures_manager.plain_text_label",
+        "value": "Texto plano:"
+    },
+    {
+        "key": "email.templates_manager.category_general",
+        "value": "General"
+    },
+    {
+        "key": "email.templates_manager.category_welcome",
+        "value": "Bienvenida"
+    },
+    {
+        "key": "email.templates_manager.category_follow_up",
+        "value": "Seguimiento"
+    },
+    {
+        "key": "email.templates_manager.category_support",
+        "value": "Soporte"
+    },
+    {
+        "key": "email.templates_manager.category_marketing",
+        "value": "Marketing"
+    },
+    {
+        "key": "email.templates_manager.category_notification",
+        "value": "Notificación"
+    },
+    {
+        "key": "email.templates_manager.fetch_error",
+        "value": "Error al obtener las plantillas de correo"
+    },
+    {
+        "key": "email.templates_manager.name_subject_required",
+        "value": "El nombre y el asunto son obligatorios"
+    },
+    {
+        "key": "email.templates_manager.update_success",
+        "value": "Plantilla actualizada correctamente"
+    },
+    {
+        "key": "email.templates_manager.create_success",
+        "value": "Plantilla creada correctamente"
+    },
+    {
+        "key": "email.templates_manager.save_error",
+        "value": "Error al guardar la plantilla"
+    },
+    {
+        "key": "email.templates_manager.delete_confirm",
+        "value": "¿Está seguro de que desea eliminar esta plantilla?"
+    },
+    {
+        "key": "email.templates_manager.delete_success",
+        "value": "Plantilla eliminada correctamente"
+    },
+    {
+        "key": "email.templates_manager.delete_error",
+        "value": "Error al eliminar la plantilla"
+    },
+    {
+        "key": "email.templates_manager.copy_name",
+        "value": "{{name}} (Copia)"
+    },
+    {
+        "key": "email.templates_manager.loading",
+        "value": "Cargando plantillas..."
+    },
+    {
+        "key": "email.templates_manager.title",
+        "value": "Plantillas de correo"
+    },
+    {
+        "key": "email.templates_manager.subtitle",
+        "value": "Administre sus plantillas de correo para una redacción de mensajes más rápida"
+    },
+    {
+        "key": "email.templates_manager.new_template",
+        "value": "Nueva plantilla"
+    },
+    {
+        "key": "email.templates_manager.edit_title",
+        "value": "Editar plantilla"
+    },
+    {
+        "key": "email.templates_manager.create_title",
+        "value": "Crear nueva plantilla"
+    },
+    {
+        "key": "email.templates_manager.name_label",
+        "value": "Nombre de la plantilla *"
+    },
+    {
+        "key": "email.templates_manager.name_placeholder",
+        "value": "Introduzca el nombre de la plantilla"
+    },
+    {
+        "key": "email.templates_manager.category_label",
+        "value": "Categoría"
+    },
+    {
+        "key": "email.templates_manager.description_label",
+        "value": "Descripción"
+    },
+    {
+        "key": "email.templates_manager.description_placeholder",
+        "value": "Breve descripción de la plantilla"
+    },
+    {
+        "key": "email.templates_manager.subject_label",
+        "value": "Línea de asunto *"
+    },
+    {
+        "key": "email.templates_manager.subject_placeholder",
+        "value": "Asunto del correo"
+    },
+    {
+        "key": "email.templates_manager.tab_html",
+        "value": "Contenido HTML"
+    },
+    {
+        "key": "email.templates_manager.tab_plain",
+        "value": "Texto plano"
+    },
+    {
+        "key": "email.templates_manager.html_placeholder",
+        "value": "Contenido de correo HTML con formato"
+    },
+    {
+        "key": "email.templates_manager.plain_label",
+        "value": "Contenido en texto plano"
+    },
+    {
+        "key": "email.templates_manager.plain_placeholder",
+        "value": "Versión en texto plano del correo"
+    },
+    {
+        "key": "email.templates_manager.active_template_label",
+        "value": "Plantilla activa"
+    },
+    {
+        "key": "email.templates_manager.update_button",
+        "value": "Actualizar plantilla"
+    },
+    {
+        "key": "email.templates_manager.create_button",
+        "value": "Crear plantilla"
+    },
+    {
+        "key": "email.templates_manager.empty_title",
+        "value": "Sin plantillas de correo"
+    },
+    {
+        "key": "email.templates_manager.empty_description",
+        "value": "Cree su primera plantilla de correo para agilizar la redacción de sus correos"
+    },
+    {
+        "key": "email.templates_manager.no_description",
+        "value": "Sin descripción"
+    },
+    {
+        "key": "email.templates_manager.subject_field_label",
+        "value": "Asunto:"
+    },
+    {
+        "key": "email.templates_manager.variables_label",
+        "value": "Variables:"
+    },
+    {
+        "key": "email.templates_manager.usage_summary",
+        "value": "Usada {{count}} veces • Última actualización {{date}}"
+    },
+    {
+        "key": "erp.product_picker.search_placeholder",
+        "value": "Buscar productos o SKU de variante..."
+    },
+    {
+        "key": "erp.product_picker.clear_selection",
+        "value": "Borrar selección"
+    },
+    {
+        "key": "erp.product_picker.loading",
+        "value": "Cargando productos..."
+    },
+    {
+        "key": "erp.product_picker.no_products_found",
+        "value": "No se encontraron productos."
+    },
+    {
+        "key": "erp.product_picker.prep_time",
+        "value": "~{{minutes}} min"
+    },
+    {
+        "key": "erp.product_picker.load_more",
+        "value": "Cargar más"
+    },
+    {
+        "key": "flow_builder.custom_variables.default_badge",
+        "value": "Predeterminado"
+    },
+    {
+        "key": "flow_builder.custom_variables.error_label_required",
+        "value": "La etiqueta es obligatoria."
+    },
+    {
+        "key": "flow_builder.custom_variables.error_name_pattern",
+        "value": "El nombre debe seguir el formato snake_case: comenzar con una letra, seguida de letras, dígitos o guiones bajos."
+    },
+    {
+        "key": "flow_builder.custom_variables.error_name_duplicate",
+        "value": "Este nombre ya está siendo usado por otra variable."
+    },
+    {
+        "key": "flow_builder.custom_variables.title",
+        "value": "Variables personalizadas"
+    },
+    {
+        "key": "flow_builder.custom_variables.new_variable",
+        "value": "Nueva variable"
+    },
+    {
+        "key": "flow_builder.custom_variables.loading_current_values",
+        "value": "Cargando valores actuales…"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_label",
+        "value": "Etiqueta"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_description",
+        "value": "Descripción"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_current_value",
+        "value": "Valor actual"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_type",
+        "value": "Tipo"
+    },
+    {
+        "key": "flow_builder.custom_variables.data_type_text",
+        "value": "texto"
+    },
+    {
+        "key": "flow_builder.custom_variables.edit_variable_aria",
+        "value": "Editar variable"
+    },
+    {
+        "key": "flow_builder.custom_variables.delete_variable_aria",
+        "value": "Eliminar variable"
+    },
+    {
+        "key": "flow_builder.custom_variables.column_current_value_full",
+        "value": "Valor actual"
+    },
+    {
+        "key": "flow_builder.custom_variables.label_placeholder",
+        "value": "Etiqueta legible"
+    },
+    {
+        "key": "flow_builder.custom_variables.name_placeholder",
+        "value": "snake_case"
+    },
+    {
+        "key": "flow_builder.custom_variables.description_placeholder",
+        "value": "Descripción opcional"
+    },
+    {
+        "key": "flow_builder.custom_variables.default_value_placeholder",
+        "value": "Valor predeterminado opcional cuando no existe un valor de sesión"
+    },
+    {
+        "key": "flow_builder.custom_variables.delete_confirm_title",
+        "value": "¿Eliminar variable?"
+    },
+    {
+        "key": "flow_builder.custom_variables.this_variable",
+        "value": "esta variable"
+    },
+    {
+        "key": "flow_builder.custom_variables.confirm_delete",
+        "value": "Confirmar eliminación"
+    },
+    {
+        "key": "flow_builder.variable_picker.insert_variable_title",
+        "value": "Insertar variable"
+    },
+    {
+        "key": "flow_builder.variable_picker.refresh_tooltip",
+        "value": "Actualizar variables capturadas"
+    },
+    {
+        "key": "flow_builder.execution_overlay.done",
+        "value": "Listo"
+    },
+    {
+        "key": "flow_builder.execution_overlay.status_title",
+        "value": "Estado de ejecución del flujo"
+    },
+    {
+        "key": "flow_builder.execution_overlay.execution_id",
+        "value": "Ejecución {{id}}"
+    },
+    {
+        "key": "flow_builder.execution_overlay.nodes_executed",
+        "value": "{{count}} nodos ejecutados"
+    },
+    {
+        "key": "flow_builder.execution_overlay.stat_line",
+        "value": "{{label}}: {{count}}"
+    },
+    {
+        "key": "flow_builder.execution_overlay.stats_total_label",
+        "value": "Total"
+    },
+    {
+        "key": "flow_builder.move_deal_node.var_contact_phone_desc",
+        "value": "Número de teléfono del contacto"
+    },
+    {
+        "key": "flow_builder.move_deal_node.var_contact_name_desc",
+        "value": "Nombre completo del contacto"
+    },
+    {
+        "key": "flow_builder.move_deal_node.var_current_pipeline_id_label",
+        "value": "ID del pipeline actual"
+    },
+    {
+        "key": "flow_builder.move_deal_node.var_current_pipeline_id_desc",
+        "value": "ID del pipeline actual"
+    },
+    {
+        "key": "flow_builder.move_deal_node.category_system",
+        "value": "Sistema"
+    },
+    {
+        "key": "flow_builder.move_deal_node.description",
+        "value": "Mover un negocio a un pipeline y etapa diferentes"
+    },
+    {
+        "key": "flow_builder.move_deal_node.invalid_config",
+        "value": "Configuración no válida"
+    },
+    {
+        "key": "flow_builder.move_deal_node.stage_mismatch",
+        "value": "La etapa seleccionada no pertenece al pipeline de destino"
+    },
+    {
+        "key": "flow_builder.move_deal_node.contact_phone_variable_label",
+        "value": "Variable de teléfono del contacto"
+    },
+    {
+        "key": "flow_builder.move_deal_node.contact_phone_variable_help",
+        "value": "Variable que contiene el número de teléfono del contacto para identificar el negocio"
+    },
+    {
+        "key": "flow_builder.move_deal_node.source_pipeline_label",
+        "value": "Pipeline de origen (filtro opcional)"
+    },
+    {
+        "key": "flow_builder.move_deal_node.source_pipeline_help",
+        "value": "Opcionalmente, filtre los negocios por pipeline de origen. Deje \"Cualquier pipeline\" para mover negocios de cualquier pipeline."
+    },
+    {
+        "key": "flow_builder.any_pipeline_option",
+        "value": "Cualquier pipeline"
+    },
+    {
+        "key": "flow_builder.move_deal_node.loading_pipelines",
+        "value": "Cargando pipelines..."
+    },
+    {
+        "key": "flow_builder.target_pipeline_label",
+        "value": "Pipeline de destino"
+    },
+    {
+        "key": "flow_builder.move_deal_node.target_pipeline_help",
+        "value": "Seleccione el pipeline de destino al que se moverá el negocio"
+    },
+    {
+        "key": "flow_builder.move_deal_node.select_target_pipeline",
+        "value": "Seleccionar pipeline de destino"
+    },
+    {
+        "key": "flow_builder.move_deal_node.target_stage_label",
+        "value": "Etapa de destino"
+    },
+    {
+        "key": "flow_builder.move_deal_node.target_stage_help",
+        "value": "Seleccione la etapa de destino dentro del pipeline seleccionado"
+    },
+    {
+        "key": "flow_builder.move_deal_node.select_target_stage",
+        "value": "Seleccionar etapa de destino"
+    },
+    {
+        "key": "flow_builder.move_deal_node.loading_stages",
+        "value": "Cargando etapas..."
+    },
+    {
+        "key": "flow_builder.move_deal_node.no_stages_available",
+        "value": "No hay etapas disponibles para este pipeline"
+    },
+    {
+        "key": "flow_builder.move_deal_node.create_if_not_exists",
+        "value": "Crear negocio si no existe"
+    },
+    {
+        "key": "flow_builder.move_deal_node.preserve_deal_data",
+        "value": "Conservar los datos del negocio"
+    },
+    {
+        "key": "follow_ups.panel.scheduled_title",
+        "value": "Seguimiento programado"
+    },
+    {
+        "key": "follow_ups.panel.scheduled_description",
+        "value": "Su mensaje de seguimiento se ha programado correctamente."
+    },
+    {
+        "key": "follow_ups.panel.schedule_error",
+        "value": "Error al programar el seguimiento"
+    },
+    {
+        "key": "follow_ups.panel.cancelled_title",
+        "value": "Seguimiento cancelado"
+    },
+    {
+        "key": "follow_ups.panel.cancelled_description",
+        "value": "El mensaje de seguimiento ha sido cancelado."
+    },
+    {
+        "key": "follow_ups.panel.cancel_error",
+        "value": "Error al cancelar el seguimiento"
+    },
+    {
+        "key": "follow_ups.panel.title",
+        "value": "Mensajes de seguimiento"
+    },
+    {
+        "key": "follow_ups.panel.schedule_button",
+        "value": "Programar seguimiento"
+    },
+    {
+        "key": "follow_ups.panel.dialog_title",
+        "value": "Programar mensaje de seguimiento"
+    },
+    {
+        "key": "follow_ups.panel.tab_message",
+        "value": "Mensaje"
+    },
+    {
+        "key": "follow_ups.panel.tab_timing",
+        "value": "Momento"
+    },
+    {
+        "key": "follow_ups.panel.message_type_label",
+        "value": "Tipo de mensaje"
+    },
+    {
+        "key": "follow_ups.panel.message_content_label",
+        "value": "Contenido del mensaje"
+    },
+    {
+        "key": "follow_ups.panel.message_content_placeholder",
+        "value": "Escriba su mensaje de seguimiento..."
+    },
+    {
+        "key": "follow_ups.panel.media_url_label",
+        "value": "URL del archivo multimedia"
+    },
+    {
+        "key": "follow_ups.panel.media_url_placeholder",
+        "value": "Introduzca la URL del archivo multimedia..."
+    },
+    {
+        "key": "follow_ups.panel.caption_label",
+        "value": "Descripción (opcional)"
+    },
+    {
+        "key": "follow_ups.panel.caption_placeholder",
+        "value": "Introduzca la descripción del archivo multimedia..."
+    },
+    {
+        "key": "follow_ups.panel.scheduling_method_label",
+        "value": "Método de programación"
+    },
+    {
+        "key": "follow_ups.panel.relative_delay",
+        "value": "Retraso relativo"
+    },
+    {
+        "key": "follow_ups.panel.specific_datetime",
+        "value": "Fecha y hora específicas"
+    },
+    {
+        "key": "follow_ups.panel.date_time_label",
+        "value": "Fecha y hora"
+    },
+    {
+        "key": "follow_ups.panel.delay_amount_label",
+        "value": "Cantidad de retraso"
+    },
+    {
+        "key": "follow_ups.panel.delay_unit_label",
+        "value": "Unidad de retraso"
+    },
+    {
+        "key": "follow_ups.panel.weeks",
+        "value": "Semanas"
+    },
+    {
+        "key": "follow_ups.panel.scheduling",
+        "value": "Programando..."
+    },
+    {
+        "key": "follow_ups.panel.empty_title",
+        "value": "No hay mensajes de seguimiento programados"
+    },
+    {
+        "key": "follow_ups.panel.empty_description",
+        "value": "Programe un seguimiento para enviar mensajes automáticamente más tarde"
+    },
+    {
+        "key": "follow_ups.panel.caption_prefix",
+        "value": "Descripción: {{caption}}"
+    },
+    {
+        "key": "follow_ups.panel.sent_prefix",
+        "value": "Enviado: {{date}}"
+    },
+    {
+        "key": "follow_ups.panel.scheduled_prefix",
+        "value": "Programado: {{date}}"
+    },
+    {
+        "key": "follow_ups.panel.retries",
+        "value": "Reintentos: {{count}}/{{max}}"
+    },
+    {
+        "key": "follow_ups.panel.error_prefix",
+        "value": "Error:"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.no_plan_found",
+        "value": "No se encontró ningún plan para activar"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.activated_successfully",
+        "value": "¡Suscripción activada correctamente!"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.activation_failed",
+        "value": "Error al activar la suscripción"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.action_required",
+        "value": "Acción requerida"
+    },
+    {
+        "key": "plan_expiration.plan_expiration_checker.current_subscription",
+        "value": "Suscripción actual"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.title_grace_period",
+        "value": "Suscripción vencida - Período de gracia"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.title",
+        "value": "Suscripción vencida"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.expired_on",
+        "value": "Su suscripción de {{companyName}} venció el {{date}}."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.recently",
+        "value": "recientemente"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.grace_period_active_label",
+        "value": "Período de gracia activo:"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.grace_period_active_body",
+        "value": "Tiene acceso limitado hasta el {{date}}. Renueve ahora para restaurar la funcionalidad completa."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.soon",
+        "value": "pronto"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.expired_body",
+        "value": "Su suscripción de {{companyName}} ha vencido. Debe renovarla para continuar usando el servicio."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.access_restricted_label",
+        "value": "Acceso restringido:"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.access_restricted_body",
+        "value": "La mayoría de las funciones están actualmente deshabilitadas. Renueve su suscripción para restaurar el acceso."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.redirecting_to_payment",
+        "value": "Redirigiendo al pago..."
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.pay_and_renew",
+        "value": "Pagar y renovar suscripción"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.setup_auto_renewal",
+        "value": "Configurar renovación automática"
+    },
+    {
+        "key": "plan_expiration.subscription_expired_modal.enable_auto_renewal_label",
+        "value": "Habilite la renovación automática para evitar futuras interrupciones"
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.renewal_failed_title",
+        "value": "Error en la renovación"
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.renewal_disabled_title",
+        "value": "Renovación de plan deshabilitada"
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.renewal_disabled_description",
+        "value": "El administrador ha deshabilitado la renovación de planes. Contacte con soporte para obtener ayuda."
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.payment_method_required_title",
+        "value": "Se requiere método de pago"
+    },
+    {
+        "key": "plan_expiration.subscription_renewal_dialog.payment_method_required_description",
+        "value": "Seleccione un método de pago para continuar."
+    },
+    {
+        "key": "whatsapp_business.template_send_failed_fallback",
+        "value": "Error al enviar el mensaje de plantilla"
+    },
+    {
+        "key": "whatsapp_business.phone_not_allowed_error",
+        "value": "El número de teléfono no está en la lista permitida. Agregue este número en su panel de Meta for Developers en la sección \"Phone numbers\", o use un número que ya esté aprobado."
+    },
+    {
+        "key": "whatsapp_business.template_not_approved_error",
+        "value": "Error en el mensaje de plantilla. Asegúrese de que la plantilla \"hello_world\" esté aprobada en su WhatsApp Business Manager."
+    },
+    {
+        "key": "whatsapp_business.dialog_title",
+        "value": "Conectar API de WhatsApp Business"
+    },
+    {
+        "key": "whatsapp_business.dialog_description",
+        "value": "Conecte su cuenta existente de la API de WhatsApp Business. Necesitará sus credenciales de Meta for Developers."
+    },
+    {
+        "key": "whatsapp_business.verify_token_input_placeholder",
+        "value": "ej. abc123xyz..."
+    },
+    {
+        "key": "whatsapp_business.verify_token_auto_generated_help",
+        "value": "Este token único se genera automáticamente. Cópielo y péguelo en el campo \"Verify token\" de Meta Developer Console. Cada conexión obtiene su propio token seguro."
+    },
+    {
+        "key": "whatsapp_business.connection_specific_token_bold",
+        "value": "✅ Token específico de la conexión:"
+    },
+    {
+        "key": "whatsapp_business.connection_specific_token_desc",
+        "value": "Este token de verificación se almacenará con su conexión de la API de WhatsApp Business:"
+    },
+    {
+        "key": "whatsapp_business.development_mode_note_desc",
+        "value": "Si su API de WhatsApp Business está en modo de desarrollo, solo podrá enviar mensajes a números de teléfono que estén añadidos a la \"lista permitida\" en su panel de Meta for Developers."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.token_refreshed_title",
+        "value": "Token actualizado"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.token_refreshed_description",
+        "value": "El token de conexión ha sido actualizado."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.refresh_failed_title",
+        "value": "Error al actualizar"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.refreshed_title",
+        "value": "Diagnóstico actualizado"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.refreshed_description",
+        "value": "Se han actualizado los diagnósticos de conexión."
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.refresh_failed_description",
+        "value": "Error al actualizar los diagnósticos."
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.never",
+        "value": "Nunca"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.days_ago",
+        "value": "hace {{count}}d"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.hours_ago",
+        "value": "hace {{count}}h"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.minutes_ago",
+        "value": "hace {{count}}m"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.just_now",
+        "value": "Justo ahora"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expired",
+        "value": "Expirado"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expires_in_days",
+        "value": "En {{count}} días"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expires_in_day",
+        "value": "En {{count}} día"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expires_in_hours",
+        "value": "En {{count}} horas"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.expires_in_hour",
+        "value": "En {{count}} hora"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.title",
+        "value": "Diagnóstico de conexión de TikTok"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.unable_to_load",
+        "value": "No se pudieron cargar los diagnósticos"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.health_score",
+        "value": "Puntuación de estado"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.status",
+        "value": "Estado"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.status_connected",
+        "value": "✓ Conectado"
+    },
+    {
+        "key": "tiktok.connection_status.token_expiring",
+        "value": "Token por expirar"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.token_expires",
+        "value": "El token expira"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.last_successful_call",
+        "value": "Última llamada exitosa: {{time}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.error_count_label",
+        "value": "Cantidad de errores: "
+    },
+    {
+        "key": "tiktok.connection_diagnostics.granted_scopes",
+        "value": "Permisos otorgados"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.required_permissions_missing",
+        "value": "Faltan permisos requeridos: {{scopes}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.portal_requested_permissions",
+        "value": "Permisos solicitados por el portal no otorgados (informativo): {{scopes}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.region",
+        "value": "Región"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.restricted",
+        "value": "Restringido"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.unavailable_features",
+        "value": "No disponible: {{features}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.media_region_limits",
+        "value": "Es posible que se apliquen límites de TikTok relacionados con contenido multimedia en esta región. Verifique las funciones no disponibles en la conexión."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.media_messaging_api",
+        "value": "API de mensajería y multimedia"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.rich_media",
+        "value": "Contenido multimedia enriquecido"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.supported",
+        "value": "Compatible"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.not_indicated",
+        "value": "No indicado"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.enabled",
+        "value": "Habilitado"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.not_listed",
+        "value": "No listado"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.reported_types",
+        "value": "Tipos reportados: {{types}}"
+    },
+    {
+        "key": "tiktok.connection_diagnostics.messaging_features_note",
+        "value": "Los indicadores de escritura, las confirmaciones de lectura y las reacciones no son gestionados por TikTok para este canal en la aplicación."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.capabilities_unavailable",
+        "value": "Capacidades no disponibles. Intente actualizar."
+    },
+    {
+        "key": "tiktok.connection_diagnostics.refresh_token",
+        "value": "Actualizar token"
+    },
+    {
+        "key": "whatsapp.connection_control.reconnect",
+        "value": "Reconectar"
+    },
+    {
+        "key": "tiktok.connection_status.hours_ago",
+        "value": "hace {{count}} horas"
+    },
+    {
+        "key": "tiktok.connection_status.hour_ago",
+        "value": "hace {{count}} hora"
+    },
+    {
+        "key": "tiktok.connection_status.minutes_ago",
+        "value": "hace {{count}} minutos"
+    },
+    {
+        "key": "tiktok.connection_status.minute_ago",
+        "value": "hace {{count}} minuto"
+    },
+    {
+        "key": "tiktok.connection_status.just_now",
+        "value": "Justo ahora"
+    },
+    {
+        "key": "tiktok.connection_status.warning_token_expiring",
+        "value": "El token expira en 7 días. Actualícelo para evitar la desconexión."
+    },
+    {
+        "key": "tiktok.connection_status.warning_missing_scopes",
+        "value": "Faltan permisos requeridos de TikTok: {{scopes}}"
+    },
+    {
+        "key": "tiktok.connection_status.warning_region_restrictions",
+        "value": "Las restricciones regionales pueden limitar algunas funciones."
+    },
+    {
+        "key": "tiktok.connection_status.advisory_missing_scopes",
+        "value": "Su aplicación de TikTok solicitó permisos adicionales que no fueron otorgados: {{scopes}}. La conexión aún puede funcionar para las funciones compatibles; vuelva a autorizar si necesita esos permisos."
+    },
+    {
+        "key": "tiktok.connection_status.default_account_name",
+        "value": "Cuenta de TikTok"
+    },
+    {
+        "key": "tiktok.connection_status.last_sync",
+        "value": "Última sincronización: {{time}}"
+    },
+    {
+        "key": "tiktok.connection_status.view_diagnostics",
+        "value": "Ver diagnóstico"
+    },
+    {
+        "key": "whatsapp.connection_control.disconnect",
+        "value": "Desconectar"
+    },
+    {
+        "key": "tiktok.connection_status.diagnostics_dialog_title",
+        "value": "Diagnóstico de conexión de TikTok"
+    },
+    {
+        "key": "whatsapp.connection_control.qr_required_title",
+        "value": "Se requiere código QR"
+    },
+    {
+        "key": "whatsapp.connection_control.qr_required_description",
+        "value": "Su sesión ha expirado. Haga clic en \"Volver a escanear QR\" para reconectar."
+    },
+    {
+        "key": "whatsapp.connection_control.reconnect_initiated_title",
+        "value": "Reconexión iniciada"
+    },
+    {
+        "key": "whatsapp.connection_control.reconnect_initiated_description",
+        "value": "Intentando reconectar su conexión de WhatsApp... (Intento {{attempt}})"
+    },
+    {
+        "key": "whatsapp.connection_control.reconnect_failed_title",
+        "value": "Error de reconexión"
+    },
+    {
+        "key": "whatsapp.connection_control.disconnect_success_title",
+        "value": "Desconexión exitosa"
+    },
+    {
+        "key": "whatsapp.connection_control.disconnect_success_description",
+        "value": "Su conexión de WhatsApp ha sido desconectada."
+    },
+    {
+        "key": "whatsapp.connection_control.disconnect_failed_title",
+        "value": "Error de desconexión"
+    },
+    {
+        "key": "whatsapp.connection_control.disconnecting",
+        "value": "Desconectando..."
+    },
+    {
+        "key": "whatsapp.connection_control.reconnecting",
+        "value": "Reconectando..."
+    },
+    {
+        "key": "whatsapp.connection_control.rescan_qr",
+        "value": "Volver a escanear QR"
+    },
+    {
+        "key": "whatsapp.connection_control.health_title",
+        "value": "Estado de la conexión"
+    },
+    {
+        "key": "whatsapp.connection_control.health_score",
+        "value": "Puntuación: {{score}}/100"
+    },
+    {
+        "key": "whatsapp.connection_control.health_errors",
+        "value": "Errores: {{count}}"
+    },
+    {
+        "key": "whatsapp.connection_control.health_last_error",
+        "value": "Último error: {{error}}"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.refresh_failed_title",
+        "value": "Error al actualizar"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.title",
+        "value": "Diagnóstico de conexión"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.health_score_hint",
+        "value": "Indicador de estabilidad y rendimiento de la conexión"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.socket",
+        "value": "Socket"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.authentication",
+        "value": "Autenticación"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.user_id",
+        "value": "ID de usuario:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.valid",
+        "value": "Válido"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.missing",
+        "value": "Faltante"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.auth_state",
+        "value": "Estado de autenticación:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.keys",
+        "value": "Claves:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.session",
+        "value": "Sesión:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.exists",
+        "value": "Existe"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.rate_limiting",
+        "value": "Límite de tasa"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.messages_sent",
+        "value": "Mensajes enviados:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.limited",
+        "value": "Limitado"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.normal",
+        "value": "Normal"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.window_reset",
+        "value": "Reinicio de ventana:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.connection_history",
+        "value": "Historial de conexión"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.last_connected",
+        "value": "Última conexión:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.reconnect_attempts",
+        "value": "Intentos de reconexión:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.error_count",
+        "value": "Cantidad de errores:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.last_error",
+        "value": "Último error:"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.manual_reconnection",
+        "value": "Reconexión manual"
+    },
+    {
+        "key": "whatsapp.connection_diagnostics.manual_reconnection_hint",
+        "value": "Forzar un intento de reconexión si experimenta problemas"
+    },
+    {
+        "key": "admin.website_builder.edit_title",
+        "value": "Editar: {{title}}"
+    },
+    {
+        "key": "admin.website_builder.new_website_button",
+        "value": "Nuevo sitio web"
+    },
+    {
+        "key": "dashboard.erp_snapshot.title",
+        "value": "Resumen de ERP"
+    },
+    {
+        "key": "dashboard.erp_snapshot.revenue_30d",
+        "value": "Ingresos (30d)"
+    },
+    {
+        "key": "dashboard.erp_snapshot.open_erp_dashboard",
+        "value": "Abrir panel de ERP"
+    },
+    {
+        "key": "dashboard.erp_snapshot.pending_orders",
+        "value": "Pedidos pendientes"
+    },
+    {
+        "key": "dashboard.erp_snapshot.sales_pipeline",
+        "value": "Pipeline de ventas"
+    },
+    {
+        "key": "dashboard.erp_snapshot.overdue_invoices",
+        "value": "Facturas vencidas"
+    },
+    {
+        "key": "dashboard.erp_snapshot.accounts_receivable",
+        "value": "Cuentas por cobrar"
+    },
+    {
+        "key": "flow_builder.keyword_trigger_each_output",
+        "value": "Cada palabra clave creará su propia conexión de salida."
+    },
+    {
+        "key": "flow_builder.trigger_type_message_received",
+        "value": "Mensaje recibido"
+    },
+    {
+        "key": "flow_builder.quick_reply_each_output",
+        "value": "Cada opción tendrá su propia conexión de salida."
+    },
+    {
+        "key": "flow_builder.quick_reply_enable_go_back",
+        "value": "Habilitar volver atrás"
+    },
+    {
+        "key": "flow_builder.main.template_applied",
+        "value": "Plantilla de flujo aplicada"
+    },
+    {
+        "key": "flow_builder.main.template_apply_error",
+        "value": "Error"
+    },
+    {
+        "key": "flow_builder.main.template_apply_error_desc",
+        "value": "Error al aplicar la plantilla de flujo. Inténtelo de nuevo."
+    },
+    {
+        "key": "payment.cancel.title",
+        "value": "Pago cancelado"
+    },
+    {
+        "key": "payment.cancel.description",
+        "value": "Su proceso de pago fue cancelado. No se realizó ningún cargo."
+    },
+    {
+        "key": "payment.go_to_dashboard",
+        "value": "Ir al panel de control"
+    },
+    {
+        "key": "payment.pending.title",
+        "value": "Pago pendiente"
+    },
+    {
+        "key": "payment.pending.description",
+        "value": "Su pago se está procesando. Esto puede tardar un poco en completarse."
+    },
+    {
+        "key": "payment.pending.notify_message",
+        "value": "Le notificaremos una vez que se confirme su pago. Puede consultar el estado de su suscripción en la página de configuración."
+    },
+    {
+        "key": "profile.updated_title",
+        "value": "Perfil actualizado"
+    },
+    {
+        "key": "profile.updated_desc",
+        "value": "La información de su perfil se ha actualizado correctamente."
+    },
+    {
+        "key": "profile.update_failed_desc",
+        "value": "Error al actualizar el perfil: {{error}}"
+    },
+    {
+        "key": "profile.avatar_updated_title",
+        "value": "Avatar actualizado"
+    },
+    {
+        "key": "profile.avatar_updated_desc",
+        "value": "Su foto de perfil se ha actualizado correctamente."
+    },
+    {
+        "key": "profile.avatar_upload_failed_desc",
+        "value": "Error al subir el avatar: {{error}}"
+    },
+    {
+        "key": "profile.password_changed_title",
+        "value": "Contraseña cambiada"
+    },
+    {
+        "key": "profile.password_changed_desc",
+        "value": "Su contraseña se ha cambiado correctamente."
+    },
+    {
+        "key": "profile.password_change_failed_desc",
+        "value": "Error al cambiar la contraseña: {{error}}"
+    },
+    {
+        "key": "profile.notifications_updated_title",
+        "value": "Notificaciones actualizadas"
+    },
+    {
+        "key": "profile.notifications_updated_desc",
+        "value": "Sus preferencias de notificaciones se han actualizado correctamente."
+    },
+    {
+        "key": "profile.notifications_update_failed_desc",
+        "value": "Error al actualizar las notificaciones: {{error}}"
+    },
+    {
+        "key": "profile.company_updated_title",
+        "value": "Empresa actualizada"
+    },
+    {
+        "key": "profile.company_updated_desc",
+        "value": "La información de su empresa se ha actualizado correctamente."
+    },
+    {
+        "key": "profile.company_update_failed_desc",
+        "value": "Error al actualizar la empresa: {{error}}"
+    },
+    {
+        "key": "profile.invalid_file_type_title",
+        "value": "Tipo de archivo no válido"
+    },
+    {
+        "key": "profile.invalid_file_type_desc",
+        "value": "Seleccione un archivo de imagen válido (JPEG, PNG, GIF o WebP)."
+    },
+    {
+        "key": "profile.file_too_large_title",
+        "value": "Archivo demasiado grande"
+    },
+    {
+        "key": "profile.file_too_large_desc",
+        "value": "Seleccione una imagen menor a 5 MB."
+    },
+    {
+        "key": "settings.channel.connection_initiated_title",
+        "value": "Conexión de canal iniciada"
+    },
+    {
+        "key": "settings.channel.connection_initiated_desc",
+        "value": "Iniciando el flujo de conexión para {{channelType}}"
+    },
+    {
+        "key": "settings.channel.connect_failed_desc",
+        "value": "Error al conectar con el canal"
+    },
+    {
+        "key": "settings.channel.disconnected_title",
+        "value": "Canal desconectado"
+    },
+    {
+        "key": "settings.channel.disconnected_desc",
+        "value": "El canal se ha desconectado correctamente"
+    },
+    {
+        "key": "settings.error",
+        "value": "Error"
+    },
+    {
+        "key": "settings.channel.disconnect_failed_desc",
+        "value": "Error al desconectar el canal"
+    },
+    {
+        "key": "settings.channel.whatsapp_disconnected_title",
+        "value": "Número de WhatsApp desconectado"
+    },
+    {
+        "key": "settings.channel.whatsapp_disconnected_desc",
+        "value": "Número de WhatsApp desconectado correctamente"
+    },
+    {
+        "key": "settings.channel.whatsapp_disconnect_failed_desc",
+        "value": "Error al desconectar el número de WhatsApp"
+    },
+    {
+        "key": "settings.channel.delete_confirm",
+        "value": "¿Está seguro de que desea eliminar esta conexión? Esta acción no se puede deshacer."
+    },
+    {
+        "key": "settings.channel.deleted_title",
+        "value": "Canal eliminado"
+    },
+    {
+        "key": "settings.channel.deleted_desc",
+        "value": "La conexión del canal se ha eliminado permanentemente"
+    },
+    {
+        "key": "settings.channel.delete_failed_desc",
+        "value": "Error al eliminar la conexión del canal"
+    },
+    {
+        "key": "settings.channel.generic_error_desc",
+        "value": "Ocurrió un error"
+    },
+    {
+        "key": "settings.channel.email_connected_desc",
+        "value": "¡Canal de correo conectado correctamente!"
+    },
+    {
+        "key": "settings.channel.connection_failed_title",
+        "value": "Conexión fallida"
+    },
+    {
+        "key": "settings.channel.email_connect_failed_desc",
+        "value": "Error al conectar el canal de correo"
+    },
+    {
+        "key": "settings.channel.sync_started_title",
+        "value": "Sincronización iniciada"
+    },
+    {
+        "key": "settings.channel.sync_started_desc",
+        "value": "¡Sincronización de correo iniciada correctamente!"
+    },
+    {
+        "key": "settings.channel.sync_failed_title",
+        "value": "Error de sincronización"
+    },
+    {
+        "key": "settings.channel.sync_failed_desc",
+        "value": "Error al sincronizar"
+    },
+    {
+        "key": "settings.channel.sync_error_title",
+        "value": "Error de sincronización"
+    },
+    {
+        "key": "settings.channel.embed_copied_title",
+        "value": "¡Copiado!"
+    },
+    {
+        "key": "settings.channel.embed_copied_desc",
+        "value": "Código de inserción copiado al portapapeles"
+    },
+    {
+        "key": "settings.channel.token_not_found_title",
+        "value": "Token no encontrado"
+    },
+    {
+        "key": "settings.channel.token_not_found_desc",
+        "value": "Esta conexión de WebChat aún no tiene un token de widget"
+    },
+    {
+        "key": "settings.channel.name_required_desc",
+        "value": "El nombre del canal no puede estar vacío"
+    },
+    {
+        "key": "settings.channel.renamed_title",
+        "value": "Canal renombrado"
+    },
+    {
+        "key": "settings.channel.renamed_desc",
+        "value": "El canal se ha renombrado correctamente"
+    },
+    {
+        "key": "settings.channel.rename_failed_desc",
+        "value": "Error al renombrar el canal"
+    },
+    {
+        "key": "settings.channel.connection_cancelled_title",
+        "value": "Conexión cancelada"
+    },
+    {
+        "key": "settings.channel.connection_cancelled_desc",
+        "value": "La conexión de WhatsApp ha sido cancelada y eliminada."
+    },
+    {
+        "key": "settings.channel.email_updated_title",
+        "value": "Canal de correo actualizado"
+    },
+    {
+        "key": "settings.channel.email_updated_desc",
+        "value": "Su canal de correo se ha actualizado correctamente"
+    },
+    {
+        "key": "settings.channel.whatsapp_api_updated_title",
+        "value": "API de WhatsApp Business actualizada"
+    },
+    {
+        "key": "settings.channel.whatsapp_api_updated_desc",
+        "value": "Su conexión de la API de WhatsApp Business se ha actualizado correctamente"
+    },
+    {
+        "key": "conversations.date_utils.today_at",
+        "value": "Hoy, {{time}}"
+    },
+    {
+        "key": "conversations.date_utils.yesterday_at",
+        "value": "Ayer, {{time}}"
+    },
+    {
+        "key": "conversations.date_utils.overdue",
+        "value": "Vencido"
+    },
+    {
+        "key": "conversations.date_utils.hours_ago",
+        "value": "hace {{hours}} hora(s)"
+    },
+    {
+        "key": "conversations.date_utils.in_one_minute",
+        "value": "en 1 minuto"
+    },
+    {
+        "key": "conversations.date_utils.in_minutes",
+        "value": "en {{minutes}} minutos"
+    },
+    {
+        "key": "conversations.date_utils.in_one_hour",
+        "value": "en 1 hora"
+    },
+    {
+        "key": "conversations.date_utils.in_hours",
+        "value": "en {{hours}} horas"
+    },
+    {
+        "key": "conversations.date_utils.tomorrow_at",
+        "value": "Mañana a las {{time}}"
     }
 ]

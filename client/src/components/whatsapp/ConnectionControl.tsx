@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, RefreshCw, Wifi, Power, PowerOff } from "lucide-react";
 import useSocket from '@/hooks/useSocket';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface ConnectionControlProps {
   connectionId: number;
@@ -28,6 +29,7 @@ const ConnectionControl: React.FC<ConnectionControlProps> = ({
   channelType,
   onQrCodeNeeded
 }) => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
@@ -59,8 +61,8 @@ const ConnectionControl: React.FC<ConnectionControlProps> = ({
     const unsubscribe = onMessage('whatsappQrCodeRequired', (event: any) => {
       if (event.connectionId === connectionId) {
         toast({
-          title: "QR Code Required",
-          description: event.message || "Your session has expired. Please click 'Rescan QR' to reconnect.",
+          title: t('whatsapp.connection_control.qr_required_title', 'QR Code Required'),
+          description: event.message || t('whatsapp.connection_control.qr_required_description', "Your session has expired. Please click 'Rescan QR' to reconnect."),
           variant: "default",
           duration: 10000, // Show for 10 seconds
         });
@@ -103,8 +105,8 @@ const ConnectionControl: React.FC<ConnectionControlProps> = ({
       }
 
       toast({
-        title: "Reconnection initiated",
-        description: `Attempting to reconnect your WhatsApp connection... (Attempt ${reconnectAttempts + 1})`,
+        title: t('whatsapp.connection_control.reconnect_initiated_title', 'Reconnection initiated'),
+        description: t('whatsapp.connection_control.reconnect_initiated_description', 'Attempting to reconnect your WhatsApp connection... (Attempt {{attempt}})', { attempt: reconnectAttempts + 1 }),
       });
 
       setLocalStatus('reconnecting');
@@ -119,8 +121,8 @@ const ConnectionControl: React.FC<ConnectionControlProps> = ({
     } catch (error) {
       console.error('Error reconnecting WhatsApp:', error);
       toast({
-        title: "Reconnection failed",
-        description: error instanceof Error ? error.message : 'Unknown error occurred',
+        title: t('whatsapp.connection_control.reconnect_failed_title', 'Reconnection failed'),
+        description: error instanceof Error ? error.message : t('common.unknown_error', 'Unknown error occurred'),
         variant: "destructive"
       });
       setIsReconnecting(false);
@@ -149,8 +151,8 @@ const ConnectionControl: React.FC<ConnectionControlProps> = ({
       }
 
       toast({
-        title: "Disconnection successful",
-        description: "Your WhatsApp connection has been disconnected.",
+        title: t('whatsapp.connection_control.disconnect_success_title', 'Disconnection successful'),
+        description: t('whatsapp.connection_control.disconnect_success_description', 'Your WhatsApp connection has been disconnected.'),
       });
 
       setLocalStatus('disconnected');
@@ -165,8 +167,8 @@ const ConnectionControl: React.FC<ConnectionControlProps> = ({
     } catch (error) {
       console.error('Error disconnecting WhatsApp:', error);
       toast({
-        title: "Disconnection failed",
-        description: error instanceof Error ? error.message : 'Unknown error occurred',
+        title: t('whatsapp.connection_control.disconnect_failed_title', 'Disconnection failed'),
+        description: error instanceof Error ? error.message : t('common.unknown_error', 'Unknown error occurred'),
         variant: "destructive"
       });
       setIsDisconnecting(false);
@@ -225,12 +227,12 @@ const ConnectionControl: React.FC<ConnectionControlProps> = ({
             {isDisconnecting ? (
               <>
                 <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                <span className="text-xs">Disconnecting...</span>
+                <span className="text-xs">{t('whatsapp.connection_control.disconnecting', 'Disconnecting...')}</span>
               </>
             ) : (
               <>
                 <PowerOff className="h-3 w-3 mr-1" />
-                <span className="text-xs">Disconnect</span>
+                <span className="text-xs">{t('whatsapp.connection_control.disconnect', 'Disconnect')}</span>
               </>
             )}
           </Button>
@@ -247,17 +249,17 @@ const ConnectionControl: React.FC<ConnectionControlProps> = ({
             {isReconnecting ? (
               <>
                 <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                <span className="text-xs">Reconnecting...</span>
+                <span className="text-xs">{t('whatsapp.connection_control.reconnecting', 'Reconnecting...')}</span>
               </>
             ) : isUnofficialWhatsApp ? (
               <>
                 <RefreshCw className="h-3 w-3 mr-1" />
-                <span className="text-xs">Rescan QR</span>
+                <span className="text-xs">{t('whatsapp.connection_control.rescan_qr', 'Rescan QR')}</span>
               </>
             ) : (
               <>
                 <Power className="h-3 w-3 mr-1" />
-                <span className="text-xs">Reconnect</span>
+                <span className="text-xs">{t('whatsapp.connection_control.reconnect', 'Reconnect')}</span>
               </>
             )}
           </Button>
@@ -275,16 +277,16 @@ const ConnectionControl: React.FC<ConnectionControlProps> = ({
             </TooltipTrigger>
             <TooltipContent>
               <div className="text-sm">
-                <p className="font-medium">Connection Health</p>
+                <p className="font-medium">{t('whatsapp.connection_control.health_title', 'Connection Health')}</p>
                 <p className="text-xs text-muted-foreground">
-                  Score: {diagnostics.healthScore}/100
+                  {t('whatsapp.connection_control.health_score', 'Score: {{score}}/100', { score: diagnostics.healthScore })}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Errors: {diagnostics.errorCount}
+                  {t('whatsapp.connection_control.health_errors', 'Errors: {{count}}', { count: diagnostics.errorCount })}
                 </p>
                 {diagnostics.lastError && (
                   <p className="text-xs text-red-500 mt-1">
-                    Last Error: {diagnostics.lastError}
+                    {t('whatsapp.connection_control.health_last_error', 'Last Error: {{error}}', { error: diagnostics.lastError })}
                   </p>
                 )}
               </div>

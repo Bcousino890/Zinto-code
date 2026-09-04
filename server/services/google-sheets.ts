@@ -114,24 +114,42 @@ class GoogleSheetsService {
     redirectUri: string;
   } | null> {
     try {
-      const credentials = await storage.getAppSetting('google_sheets_oauth');
+      const setting = await storage.getAppSetting('google_sheets_oauth');
+      const config = (setting?.value || {}) as any;
 
-      if (!credentials || !credentials.value) {
-        console.error('Google Sheets OAuth not configured in admin settings');
+      const defaultRedirectUri = `${process.env.BASE_URL || 'http://localhost:9000'}/api/google/sheets/callback`;
+      const redirectUri = config.redirect_uri || defaultRedirectUri;
+
+      // The integration is only disabled when the admin explicitly turned it off.
+      if (config.enabled === false) {
+        console.error('Google Sheets OAuth is disabled in admin settings');
         return null;
       }
 
-      const config = credentials.value as any;
-      if (!config.enabled || !config.client_id || !config.client_secret) {
-        console.error('Google Sheets OAuth not properly configured or disabled');
-        return null;
+      if (config.client_id && config.client_secret) {
+        return {
+          clientId: config.client_id,
+          clientSecret: config.client_secret,
+          redirectUri
+        };
       }
 
-      return {
-        clientId: config.client_id,
-        clientSecret: config.client_secret,
-        redirectUri: config.redirect_uri || `${process.env.BASE_URL || 'http://localhost:9000'}/api/google/sheets/callback`
-      };
+      // Sheets and Calendar can share the same Google Cloud project, so fall back
+      // to the Google Calendar OAuth credentials when Sheets has none of its own.
+      const calendarSetting = await storage.getAppSetting('google_calendar_oauth');
+      const calendarConfig = (calendarSetting?.value || {}) as any;
+
+      if (calendarConfig.client_id && calendarConfig.client_secret) {
+        console.warn('Google Sheets OAuth credentials missing, falling back to Google Calendar OAuth credentials');
+        return {
+          clientId: calendarConfig.client_id,
+          clientSecret: calendarConfig.client_secret,
+          redirectUri
+        };
+      }
+
+      console.error('Google Sheets OAuth not configured: no client_id/client_secret in google_sheets_oauth or google_calendar_oauth');
+      return null;
     } catch (error) {
       console.error('Error getting application Google Sheets credentials:', error);
       return null;

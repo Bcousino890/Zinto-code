@@ -53986,5 +53986,173 @@
     {
         "key": "conversations.date_utils.tomorrow_at",
         "value": "Mañana a las {{time}}"
+    },
+    {
+        "key": "common.carousel.previous_slide",
+        "value": "Diapositiva anterior"
+    },
+    {
+        "key": "common.carousel.next_slide",
+        "value": "Siguiente diapositiva"
+    },
+    {
+        "key": "common.file_upload.too_large_title",
+        "value": "Archivo demasiado grande"
+    },
+    {
+        "key": "common.file_upload.too_large_desc",
+        "value": "El tamaño máximo de archivo es {{maxSize}}MB"
+    },
+    {
+        "key": "common.file_upload.upload_file",
+        "value": "Subir archivo"
+    },
+    {
+        "key": "common.file_upload.uploading",
+        "value": "Subiendo archivo..."
+    },
+    {
+        "key": "common.file_upload.percent_uploaded",
+        "value": "{{progress}}% subido"
+    },
+    {
+        "key": "common.file_upload.change_file",
+        "value": "Cambiar archivo"
+    },
+    {
+        "key": "common.image_editor.title",
+        "value": "Propiedades de la imagen"
+    },
+    {
+        "key": "common.image_editor.tab_size",
+        "value": "Tamaño"
+    },
+    {
+        "key": "common.image_editor.tab_style",
+        "value": "Estilo"
+    },
+    {
+        "key": "common.image_editor.tab_position",
+        "value": "Posición"
+    },
+    {
+        "key": "common.image_editor.width_px",
+        "value": "Ancho (px)"
+    },
+    {
+        "key": "common.image_editor.height_px",
+        "value": "Alto (px)"
+    },
+    {
+        "key": "common.image_editor.alt_text",
+        "value": "Texto alternativo"
+    },
+    {
+        "key": "common.image_editor.alt_placeholder",
+        "value": "Describa la imagen..."
+    },
+    {
+        "key": "common.image_editor.opacity_label",
+        "value": "Opacidad: {{value}}%"
+    },
+    {
+        "key": "common.image_editor.border_width_px",
+        "value": "Grosor del borde (px)"
+    },
+    {
+        "key": "common.image_editor.border_color",
+        "value": "Color del borde"
+    },
+    {
+        "key": "common.image_editor.alignment",
+        "value": "Alineación"
+    },
+    {
+        "key": "common.image_editor.align_left",
+        "value": "Izquierda"
+    },
+    {
+        "key": "common.image_editor.align_center",
+        "value": "Centro"
+    },
+    {
+        "key": "common.image_editor.align_right",
+        "value": "Derecha"
+    },
+    {
+        "key": "common.image_editor.align_float_left",
+        "value": "Flotar a la izquierda"
+    },
+    {
+        "key": "common.image_editor.align_float_right",
+        "value": "Flotar a la derecha"
+    },
+    {
+        "key": "common.image_editor.margin_px",
+        "value": "Margen (px)"
+    },
+    {
+        "key": "common.image_editor.apply_changes",
+        "value": "Aplicar cambios"
+    },
+    {
+        "key": "common.pagination.previous_aria",
+        "value": "Ir a la página anterior"
+    },
+    {
+        "key": "common.pagination.previous",
+        "value": "Anterior"
+    },
+    {
+        "key": "common.pagination.next_aria",
+        "value": "Ir a la página siguiente"
+    },
+    {
+        "key": "common.pagination.next",
+        "value": "Siguiente"
+    },
+    {
+        "key": "common.pagination.more_pages",
+        "value": "Más páginas"
+    },
+    {
+        "key": "common.sidebar.toggle",
+        "value": "Mostrar/ocultar barra lateral"
+    },
+    {
+        "key": "common.theme_toggle.switch_to_light",
+        "value": "Cambiar a modo claro"
+    },
+    {
+        "key": "common.theme_toggle.switch_to_dark",
+        "value": "Cambiar a modo oscuro"
+    },
+    {
+        "key": "common.theme_toggle.light_mode",
+        "value": "Modo claro"
+    },
+    {
+        "key": "common.theme_toggle.dark_mode",
+        "value": "Modo oscuro"
+    },
+    {
+        "key": "common.wysiwyg.normal",
+        "value": "Normal"
+    },
+    {
+        "key": "common.wysiwyg.align_center",
+        "value": "Centro"
+    },
+    {
+        "key": "common.wysiwyg.align_right",
+        "value": "Derecha"
+    },
+    {
+        "key": "common.wysiwyg.align_justify",
+        "value": "Justificar"
+    },
+    {
+        "key": "common.wysiwyg.html_placeholder",
+        "value": "Introduzca el código HTML aquí..."
     }
 ]

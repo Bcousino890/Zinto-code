@@ -50222,5 +50222,173 @@
     {
         "key": "conversations.date_utils.tomorrow_at",
         "value": "Tomorrow at {{time}}"
+    },
+    {
+        "key": "common.carousel.previous_slide",
+        "value": "Previous slide"
+    },
+    {
+        "key": "common.carousel.next_slide",
+        "value": "Next slide"
+    },
+    {
+        "key": "common.file_upload.too_large_title",
+        "value": "File too large"
+    },
+    {
+        "key": "common.file_upload.too_large_desc",
+        "value": "Maximum file size is {{maxSize}}MB"
+    },
+    {
+        "key": "common.file_upload.upload_file",
+        "value": "Upload File"
+    },
+    {
+        "key": "common.file_upload.uploading",
+        "value": "Uploading file..."
+    },
+    {
+        "key": "common.file_upload.percent_uploaded",
+        "value": "{{progress}}% uploaded"
+    },
+    {
+        "key": "common.file_upload.change_file",
+        "value": "Change file"
+    },
+    {
+        "key": "common.image_editor.title",
+        "value": "Image Properties"
+    },
+    {
+        "key": "common.image_editor.tab_size",
+        "value": "Size"
+    },
+    {
+        "key": "common.image_editor.tab_style",
+        "value": "Style"
+    },
+    {
+        "key": "common.image_editor.tab_position",
+        "value": "Position"
+    },
+    {
+        "key": "common.image_editor.width_px",
+        "value": "Width (px)"
+    },
+    {
+        "key": "common.image_editor.height_px",
+        "value": "Height (px)"
+    },
+    {
+        "key": "common.image_editor.alt_text",
+        "value": "Alt Text"
+    },
+    {
+        "key": "common.image_editor.alt_placeholder",
+        "value": "Describe the image..."
+    },
+    {
+        "key": "common.image_editor.opacity_label",
+        "value": "Opacity: {{value}}%"
+    },
+    {
+        "key": "common.image_editor.border_width_px",
+        "value": "Border Width (px)"
+    },
+    {
+        "key": "common.image_editor.border_color",
+        "value": "Border Color"
+    },
+    {
+        "key": "common.image_editor.alignment",
+        "value": "Alignment"
+    },
+    {
+        "key": "common.image_editor.align_left",
+        "value": "Left"
+    },
+    {
+        "key": "common.image_editor.align_center",
+        "value": "Center"
+    },
+    {
+        "key": "common.image_editor.align_right",
+        "value": "Right"
+    },
+    {
+        "key": "common.image_editor.align_float_left",
+        "value": "Float Left"
+    },
+    {
+        "key": "common.image_editor.align_float_right",
+        "value": "Float Right"
+    },
+    {
+        "key": "common.image_editor.margin_px",
+        "value": "Margin (px)"
+    },
+    {
+        "key": "common.image_editor.apply_changes",
+        "value": "Apply Changes"
+    },
+    {
+        "key": "common.pagination.previous_aria",
+        "value": "Go to previous page"
+    },
+    {
+        "key": "common.pagination.previous",
+        "value": "Previous"
+    },
+    {
+        "key": "common.pagination.next_aria",
+        "value": "Go to next page"
+    },
+    {
+        "key": "common.pagination.next",
+        "value": "Next"
+    },
+    {
+        "key": "common.pagination.more_pages",
+        "value": "More pages"
+    },
+    {
+        "key": "common.sidebar.toggle",
+        "value": "Toggle Sidebar"
+    },
+    {
+        "key": "common.theme_toggle.switch_to_light",
+        "value": "Switch to light mode"
+    },
+    {
+        "key": "common.theme_toggle.switch_to_dark",
+        "value": "Switch to dark mode"
+    },
+    {
+        "key": "common.theme_toggle.light_mode",
+        "value": "Light Mode"
+    },
+    {
+        "key": "common.theme_toggle.dark_mode",
+        "value": "Dark Mode"
+    },
+    {
+        "key": "common.wysiwyg.normal",
+        "value": "Normal"
+    },
+    {
+        "key": "common.wysiwyg.align_center",
+        "value": "Center"
+    },
+    {
+        "key": "common.wysiwyg.align_right",
+        "value": "Right"
+    },
+    {
+        "key": "common.wysiwyg.align_justify",
+        "value": "Justify"
+    },
+    {
+        "key": "common.wysiwyg.html_placeholder",
+        "value": "Enter HTML code here..."
     }
 ]

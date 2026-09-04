@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { ImageUploadDialog } from './image-upload-dialog';
 import { ImageEditorPanel } from './image-editor-panel';
 import { ImageResizeHandles } from './image-resize-handles';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface WysiwygEditorProps {
   value: string;
@@ -23,6 +24,7 @@ export function WysiwygEditor({
   imageUploadUrl,
   allowImageUrlInput = true,
 }: WysiwygEditorProps) {
+  const { t } = useTranslation();
   const editorRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isUpdatingRef = useRef(false);
@@ -383,7 +385,7 @@ export function WysiwygEditor({
           defaultValue=""
           disabled={isCodeView}
         >
-          <option value="">Normal</option>
+          <option value="">{t('common.wysiwyg.normal', 'Normal')}</option>
           <option value="h1">Heading 1</option>
           <option value="h2">Heading 2</option>
           <option value="h3">Heading 3</option>
@@ -490,9 +492,9 @@ export function WysiwygEditor({
         >
           <option value="">Align</option>
           <option value="justifyLeft">Left</option>
-          <option value="justifyCenter">Center</option>
-          <option value="justifyRight">Right</option>
-          <option value="justifyFull">Justify</option>
+          <option value="justifyCenter">{t('common.wysiwyg.align_center', 'Center')}</option>
+          <option value="justifyRight">{t('common.wysiwyg.align_right', 'Right')}</option>
+          <option value="justifyFull">{t('common.wysiwyg.align_justify', 'Justify')}</option>
         </select>
 
         <Separator orientation="vertical" className="h-6 mx-1" />
@@ -517,7 +519,7 @@ export function WysiwygEditor({
           onChange={handleTextareaChange}
           className="min-h-96 p-4 focus:outline-none font-mono text-sm border-0 resize-none w-full bg-background text-foreground placeholder:text-muted-foreground"
           style={{ minHeight: '400px' }}
-          placeholder="Enter HTML code here..."
+          placeholder={t('common.wysiwyg.html_placeholder', 'Enter HTML code here...')}
         />
       ) : (
         <div className="relative">

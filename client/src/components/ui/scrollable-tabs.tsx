@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface ScrollableTabsProps {
   children: React.ReactNode;
@@ -9,6 +10,7 @@ interface ScrollableTabsProps {
 }
 
 export function ScrollableTabs({ children, className }: ScrollableTabsProps) {
+  const { t } = useTranslation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
@@ -119,7 +121,7 @@ export function ScrollableTabs({ children, className }: ScrollableTabsProps) {
           size="sm"
           className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 p-0 bg-background shadow-lg border-border hover:bg-accent rounded-full"
           onClick={scrollLeft}
-          aria-label="Scroll tabs left"
+          aria-label={t('common.scrollable_tabs.scroll_left', 'Scroll tabs left')}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -132,7 +134,7 @@ export function ScrollableTabs({ children, className }: ScrollableTabsProps) {
           size="sm"
           className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 p-0 bg-background shadow-lg border-border hover:bg-accent rounded-full"
           onClick={scrollRight}
-          aria-label="Scroll tabs right"
+          aria-label={t('common.scrollable_tabs.scroll_right', 'Scroll tabs right')}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

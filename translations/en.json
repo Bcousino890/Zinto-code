@@ -51242,5 +51242,1425 @@
     {
         "key": "erp.salesOrders.updated",
         "value": "Updated"
+    },
+    {
+        "key": "flow_builder.keyword_match_value_label",
+        "value": "Match Value:"
+    },
+    {
+        "key": "flow_builder.keyword_match_value_placeholder",
+        "value": "Text to match"
+    },
+    {
+        "key": "flow_builder.keyword_trigger_no_match_output",
+        "value": "A \"no match\" output will be available for unmatched responses."
+    },
+    {
+        "key": "flow_builder.keyword_case_sensitive_suffix",
+        "value": "(case sensitive)"
+    },
+    {
+        "key": "flow_builder.call_agent",
+        "value": "Call Agent"
+    },
+    {
+        "key": "flow_builder.call_agent.to_phone_placeholder",
+        "value": "+1234567890 or {{contact.phone}}"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_config",
+        "value": "⚙️ Config"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_config_tooltip",
+        "value": "Operation configuration completed"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_config_tooltip_sub",
+        "value": "{{count}} configuration option(s) set"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_vars",
+        "value": "🔗 {{count}} Vars"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_vars_tooltip",
+        "value": "Variable mappings configured"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_vars_tooltip_sub",
+        "value": "{{count}} output variable(s) will be created"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_column_mapping",
+        "value": "Column mapping:"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_use_variables",
+        "value": "Use variables from conversation context"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_filter_by_phone",
+        "value": "Filter by phone:"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_limit_results",
+        "value": "Limit results with maxRows for better performance"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_match_by_id",
+        "value": "Match by ID:"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_update_columns",
+        "value": "Update specific columns:"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_no_config_needed",
+        "value": "No configuration needed - returns sheet metadata"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_get_headers",
+        "value": "Use to get column headers and sheet information"
+    },
+    {
+        "key": "flow_builder.make_node_title",
+        "value": "Make.com Integration"
+    },
+    {
+        "key": "flow_builder.make_region_us1",
+        "value": "US1 (United States) - Recommended"
+    },
+    {
+        "key": "flow_builder.make_region_us2",
+        "value": "US2 (United States)"
+    },
+    {
+        "key": "flow_builder.make_region_eu1",
+        "value": "EU1 (Europe)"
+    },
+    {
+        "key": "flow_builder.make_region_eu2",
+        "value": "EU2 (Europe)"
+    },
+    {
+        "key": "flow_builder.make_parameter_name_placeholder",
+        "value": "Parameter name"
+    },
+    {
+        "key": "flow_builder.make_parameter_value_placeholder",
+        "value": "Value (use {{variable}} for dynamic)"
+    },
+    {
+        "key": "flow_builder.shopify_api_connected",
+        "value": "API Connected"
+    },
+    {
+        "key": "flow_builder.shopify_quick_templates",
+        "value": "Quick Templates"
+    },
+    {
+        "key": "flow_builder.shopify_choose_operation",
+        "value": "Choose a Shopify operation..."
+    },
+    {
+        "key": "flow_builder.shopify_shop_configuration",
+        "value": "Shop Configuration"
+    },
+    {
+        "key": "flow_builder.shopify_shop_domain",
+        "value": "Shop Domain"
+    },
+    {
+        "key": "flow_builder.shopify_shop_domain_placeholder",
+        "value": "mystore.myshopify.com"
+    },
+    {
+        "key": "flow_builder.shopify_api_key",
+        "value": "API Key"
+    },
+    {
+        "key": "flow_builder.shopify_api_key_placeholder",
+        "value": "Your Shopify API key"
+    },
+    {
+        "key": "flow_builder.shopify_api_password",
+        "value": "API Password"
+    },
+    {
+        "key": "flow_builder.shopify_api_password_placeholder",
+        "value": "Your Shopify API password"
+    },
+    {
+        "key": "flow_builder.shopify_test_connection_tooltip",
+        "value": "Test connection to your Shopify store"
+    },
+    {
+        "key": "flow_builder.shopify_test_connection",
+        "value": "Test Connection"
+    },
+    {
+        "key": "flow_builder.shopify_resource",
+        "value": "Shopify Resource"
+    },
+    {
+        "key": "flow_builder.shopify_select_resource",
+        "value": "Select resource"
+    },
+    {
+        "key": "flow_builder.shopify_action_type",
+        "value": "Action Type"
+    },
+    {
+        "key": "flow_builder.shopify_select_action",
+        "value": "Select action"
+    },
+    {
+        "key": "flow_builder.shopify_filters_parameters",
+        "value": "Filters & Parameters"
+    },
+    {
+        "key": "flow_builder.shopify_select_filter_placeholder",
+        "value": "Select {{label}}"
+    },
+    {
+        "key": "flow_builder.shopify_enter_filter_placeholder",
+        "value": "Enter {{label}}"
+    },
+    {
+        "key": "flow_builder.shopify_response_field_placeholder",
+        "value": "orders.0.id"
+    },
+    {
+        "key": "flow_builder.shopify_variable_name_placeholder",
+        "value": "shopify.order_id"
+    },
+    {
+        "key": "flow_builder.shopify_mapping_help",
+        "value": "Map Shopify response fields to flow variables for use in subsequent nodes"
+    },
+    {
+        "key": "flow_builder.shopify_rate_limit_delay",
+        "value": "Rate Limit Delay (ms)"
+    },
+    {
+        "key": "flow_builder.shopify_rate_limit_help",
+        "value": "Delay between requests to respect Shopify's rate limits"
+    },
+    {
+        "key": "flow_builder.shopify_var_resource_data",
+        "value": "{{resource}} data"
+    },
+    {
+        "key": "flow_builder.shopify_var_response_count",
+        "value": "Number of results returned"
+    },
+    {
+        "key": "flow_builder.shopify_var_rate_limit_remaining",
+        "value": "API calls remaining"
+    },
+    {
+        "key": "flow_builder.shopify_var_success",
+        "value": "Request success status"
+    },
+    {
+        "key": "flow_builder.shopify_var_order_id",
+        "value": "Order ID"
+    },
+    {
+        "key": "flow_builder.shopify_var_order_total",
+        "value": "Order total"
+    },
+    {
+        "key": "flow_builder.shopify_var_customer_email",
+        "value": "Customer email"
+    },
+    {
+        "key": "flow_builder.shopify_var_product_id",
+        "value": "Product ID"
+    },
+    {
+        "key": "flow_builder.shopify_var_product_title",
+        "value": "Product title"
+    },
+    {
+        "key": "flow_builder.shopify_var_product_vendor",
+        "value": "Product vendor"
+    },
+    {
+        "key": "flow_builder.shopify_var_customer_id",
+        "value": "Customer ID"
+    },
+    {
+        "key": "flow_builder.shopify_var_customer_first_name",
+        "value": "First name"
+    },
+    {
+        "key": "flow_builder.shopify_node_footer",
+        "value": "The Shopify Integration node connects to your Shopify store's Admin API. Response data will be available as variables in subsequent nodes."
+    },
+    {
+        "key": "flow_builder.shopify_connection_successful",
+        "value": "Connection Successful"
+    },
+    {
+        "key": "flow_builder.shopify_connection_failed_title",
+        "value": "Connection Failed"
+    },
+    {
+        "key": "flow_builder.shopify_one_result",
+        "value": "1 result"
+    },
+    {
+        "key": "flow_builder.shopify_n_results",
+        "value": "{{count}} results"
+    },
+    {
+        "key": "flow_builder.shopify_api_calls_remaining",
+        "value": "{{count}} API calls remaining"
+    },
+    {
+        "key": "flow_builder.shopify_connection_success_detail",
+        "value": "Successfully connected to Shopify store and retrieved {{resource}} data."
+    },
+    {
+        "key": "flow_builder.shopify_sample_response_data",
+        "value": "Sample Response Data:"
+    },
+    {
+        "key": "flow_builder.webhook_error_url_required",
+        "value": "Please enter a webhook URL"
+    },
+    {
+        "key": "flow_builder.webhook_node_footer",
+        "value": "The webhook node makes an HTTP request when reached in the flow and continues immediately to the next node. Response data is stored in variables (webhook.lastResponse, webhook.status, etc.) for use in subsequent nodes. The webhook executes only once per flow execution."
+    },
+    {
+        "key": "flow_builder.webhook_test_successful",
+        "value": "Test Successful"
+    },
+    {
+        "key": "flow_builder.webhook_test_failed",
+        "value": "Test Failed"
+    },
+    {
+        "key": "flow_builder.webhook_response_body_label",
+        "value": "Response Body:"
+    },
+    {
+        "key": "flow_builder.webhook_help_label",
+        "value": "Help"
+    },
+    {
+        "key": "flow_builder.webhook_help.dialog_title",
+        "value": "Webhook Trigger - Help & Documentation"
+    },
+    {
+        "key": "flow_builder.webhook_help.dialog_description",
+        "value": "Configure webhooks to receive events from external systems (Shopify, Stripe, CRM, etc.)"
+    },
+    {
+        "key": "flow_builder.webhook_filter_field_placeholder",
+        "value": "event_type or order.status"
+    },
+    {
+        "key": "flow_builder.webhook_filter_case",
+        "value": "Case"
+    },
+    {
+        "key": "flow_builder.webhook_help.overview_title",
+        "value": "Webhook Trigger Overview"
+    },
+    {
+        "key": "flow_builder.webhook_help.overview_prefix",
+        "value": "The"
+    },
+    {
+        "key": "flow_builder.webhook_help.overview_text",
+        "value": "node receives HTTP POST requests from external systems and starts your flow. Use it to integrate with Shopify, Stripe, CRMs, or any service that can send webhooks."
+    },
+    {
+        "key": "flow_builder.webhook_help.key_features_label",
+        "value": "Key features:"
+    },
+    {
+        "key": "flow_builder.webhook_help.key_features_text",
+        "value": "Unique URL per flow, optional payload filters, contact association (extract or create), configurable response (async/sync), and test tooling."
+    },
+    {
+        "key": "flow_builder.webhook_help.url_title",
+        "value": "URL Configuration & Security"
+    },
+    {
+        "key": "flow_builder.webhook_help.url_text_before",
+        "value": "After saving the flow, a unique webhook URL is generated. You can use the default (flow ID + token) or enable"
+    },
+    {
+        "key": "flow_builder.webhook_help.url_text_example",
+        "value": "for a memorable path (e.g."
+    },
+    {
+        "key": "flow_builder.webhook_help.url_text_after",
+        "value": "). Custom paths must be unique across all webhook triggers and use only letters, numbers, hyphens, and underscores."
+    },
+    {
+        "key": "flow_builder.webhook_help.url_regenerate_before",
+        "value": "Use"
+    },
+    {
+        "key": "flow_builder.webhook_help.url_regenerate_after",
+        "value": "if the URL is compromised. Update the new URL in your external system."
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_title",
+        "value": "Contact Mapping Strategies"
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_extract_before",
+        "value": "Use a field path (e.g."
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_extract_after",
+        "value": ") to identify an existing contact. Best when the payload includes customer identifiers."
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_create_desc",
+        "value": "Map payload fields to name, email, and phone to create a new contact for each webhook. Ideal for lead gen or new signups."
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_system_desc",
+        "value": "Run the flow without associating a contact. Use for background jobs, notifications, or system events."
+    },
+    {
+        "key": "flow_builder.webhook_help.filtering_title",
+        "value": "Payload Filtering"
+    },
+    {
+        "key": "flow_builder.webhook_help.filtering_before",
+        "value": "Add conditions so the flow runs only when the payload matches (e.g."
+    },
+    {
+        "key": "flow_builder.webhook_help.filtering_equals",
+        "value": "equals"
+    },
+    {
+        "key": "flow_builder.webhook_help.filtering_after",
+        "value": "). All conditions are ANDed. Use dot notation for nested fields."
+    },
+    {
+        "key": "flow_builder.webhook_help.response_async_desc",
+        "value": "(recommended): Returns 202 Accepted immediately; flow runs in the background."
+    },
+    {
+        "key": "flow_builder.webhook_help.response_sync_desc",
+        "value": ": Waits for the flow to finish (with timeout) before responding—use when the caller needs the result (e.g. payment gateways)."
+    },
+    {
+        "key": "flow_builder.webhook_help.response_body_before",
+        "value": "You can set status code, response body template (with variables like"
+    },
+    {
+        "key": "flow_builder.webhook_help.response_body_after",
+        "value": "), and custom headers."
+    },
+    {
+        "key": "flow_builder.webhook_help.examples_title",
+        "value": "Integration Examples"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_shopify_before",
+        "value": "Order created, customer data: use Extract with"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_shopify_middle",
+        "value": "; filter by"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_stripe_before",
+        "value": "Payment events: filter by"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_stripe_middle",
+        "value": "(e.g."
+    },
+    {
+        "key": "flow_builder.webhook_help.example_stripe_after",
+        "value": "); use Sync mode if you need to return a response."
+    },
+    {
+        "key": "flow_builder.webhook_help.example_crm_title",
+        "value": "CRM / Forms"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_crm_desc",
+        "value": "New lead: use Create New Contact and map form fields to name, email, phone."
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_title",
+        "value": "Troubleshooting"
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_save_flow",
+        "value": "Save the flow first to get a valid webhook URL."
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_test",
+        "value": "Use the Test Webhook section to send a sample payload and verify filters and contact resolution."
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_logs",
+        "value": "Check the Logs button for incoming requests and errors."
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_content_type_before",
+        "value": "Ensure the external system sends"
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_content_type_after",
+        "value": "for JSON payloads."
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.official_api",
+        "value": "Official API"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.no_flow_id",
+        "value": "No Flow ID"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.managed_in_business_manager",
+        "value": "Flow content managed in Facebook Business Manager"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.flow_id",
+        "value": "Flow ID"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.create_flow",
+        "value": "Create Flow"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.flow_id_placeholder",
+        "value": "Paste Flow URL or enter Flow ID (e.g., 1501195611215264)"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.flow_id_help",
+        "value": "Paste the full Facebook Flow URL or just the Flow ID. The ID will be extracted automatically."
+    },
+    {
+        "key": "settings.email_channel.error_not_found",
+        "value": "Email configuration not found. Please check if the email channel is properly configured."
+    },
+    {
+        "key": "settings.email_channel.error_access_denied",
+        "value": "Access denied. You do not have permission to edit this email channel."
+    },
+    {
+        "key": "settings.email_channel.error_authentication_required",
+        "value": "Authentication required. Please log in again."
+    },
+    {
+        "key": "settings.email_channel.error_server",
+        "value": "Server error: {{status}}. Please try again later."
+    },
+    {
+        "key": "settings.email_channel.load_failed_desc",
+        "value": "Failed to load email configuration"
+    },
+    {
+        "key": "settings.email_channel.test_success_desc",
+        "value": "Both IMAP and SMTP connections are working correctly"
+    },
+    {
+        "key": "settings.email_channel.updated_title",
+        "value": "Email Channel Updated"
+    },
+    {
+        "key": "settings.email_channel.updated_desc",
+        "value": "Your email channel has been updated successfully"
+    },
+    {
+        "key": "settings.email_channel.update_failed_desc",
+        "value": "Failed to update email channel"
+    },
+    {
+        "key": "settings.email_channel.loading_configuration",
+        "value": "Loading email configuration..."
+    },
+    {
+        "key": "settings.email_channel.edit_title",
+        "value": "Edit Email Channel"
+    },
+    {
+        "key": "settings.email_channel.display_name_placeholder",
+        "value": "Support Team"
+    },
+    {
+        "key": "settings.email_channel.display_name_help",
+        "value": "The name that appears when sending emails"
+    },
+    {
+        "key": "settings.email_channel.imap_username_label",
+        "value": "IMAP Username"
+    },
+    {
+        "key": "settings.email_channel.username_help",
+        "value": "Usually your email address. Leave empty to use the email address above."
+    },
+    {
+        "key": "settings.email_channel.password_placeholder",
+        "value": "Leave empty to keep current password"
+    },
+    {
+        "key": "settings.email_channel.password_help",
+        "value": "Leave empty to keep the current password unchanged"
+    },
+    {
+        "key": "settings.email_channel.smtp_username_label",
+        "value": "SMTP Username"
+    },
+    {
+        "key": "settings.email_channel.signature_label",
+        "value": "Email Signature (Optional)"
+    },
+    {
+        "key": "settings.email_channel.signature_placeholder",
+        "value": "Best regards, Support Team"
+    },
+    {
+        "key": "settings.email_channel.signature_help",
+        "value": "Signature to append to outgoing emails"
+    },
+    {
+        "key": "settings.email_channel.select_folder_placeholder",
+        "value": "Select folder"
+    },
+    {
+        "key": "settings.email_channel.folder_all_mail",
+        "value": "All Mail"
+    },
+    {
+        "key": "settings.email_channel.folder_sent",
+        "value": "Sent"
+    },
+    {
+        "key": "settings.email_channel.update_button",
+        "value": "Update Channel"
+    },
+    {
+        "key": "settings.messenger_connection.update_failed",
+        "value": "Failed to update Messenger connection"
+    },
+    {
+        "key": "settings.messenger_connection.updated_title",
+        "value": "Messenger Updated"
+    },
+    {
+        "key": "settings.messenger_connection.updated_desc",
+        "value": "Your Facebook page connection has been updated successfully."
+    },
+    {
+        "key": "settings.messenger_connection.update_failed_desc",
+        "value": "Failed to update Facebook page connection. Please check your credentials and try again."
+    },
+    {
+        "key": "settings.messenger_connection.edit_title",
+        "value": "Edit Facebook Messenger Connection"
+    },
+    {
+        "key": "settings.messenger_connection.edit_description",
+        "value": "Update your Facebook page connection settings. You'll need your Meta for Developers credentials."
+    },
+    {
+        "key": "settings.messenger_connection.account_name_placeholder",
+        "value": "e.g. My Facebook Page"
+    },
+    {
+        "key": "settings.messenger_connection.page_id_label",
+        "value": "Facebook Page ID *"
+    },
+    {
+        "key": "settings.messenger_connection.page_id_help",
+        "value": "Your Facebook Page ID from Meta for Developers"
+    },
+    {
+        "key": "settings.messenger_connection.page_access_token_label",
+        "value": "Page Access Token"
+    },
+    {
+        "key": "settings.messenger_connection.page_access_token_help",
+        "value": "Long-lived page access token from Meta for Developers. Leave empty to keep current token."
+    },
+    {
+        "key": "settings.messenger_connection.app_secret_update_help",
+        "value": "Your Meta app secret (optional, for webhook verification). Leave empty to keep current secret."
+    },
+    {
+        "key": "settings.messenger_connection.setup_step_subscribe_fields",
+        "value": "Subscribe to 'messages' and 'messaging_postbacks' webhook fields"
+    },
+    {
+        "key": "settings.messenger_connection.setup_step_permissions",
+        "value": "Ensure your page has the necessary permissions"
+    },
+    {
+        "key": "settings.twilio_sms.load_failed_desc",
+        "value": "Failed to load Twilio SMS configuration"
+    },
+    {
+        "key": "settings.twilio_sms.invalid_channel_type",
+        "value": "Invalid channel type"
+    },
+    {
+        "key": "settings.twilio_sms.update_failed",
+        "value": "Failed to update Twilio SMS connection"
+    },
+    {
+        "key": "settings.twilio_sms.updated_title",
+        "value": "Twilio SMS Updated"
+    },
+    {
+        "key": "settings.twilio_sms.updated_desc",
+        "value": "Your Twilio SMS channel has been updated successfully."
+    },
+    {
+        "key": "settings.twilio_sms.update_failed_desc",
+        "value": "Failed to update Twilio SMS connection."
+    },
+    {
+        "key": "settings.twilio_sms.edit_dialog_title",
+        "value": "Edit Twilio SMS Connection"
+    },
+    {
+        "key": "settings.twilio_sms.edit_dialog_description",
+        "value": "Update your Twilio Programmable Messaging configuration."
+    },
+    {
+        "key": "settings.whatsapp_business_api.error_not_found",
+        "value": "WhatsApp connection not found."
+    },
+    {
+        "key": "settings.whatsapp_business_api.error_access_denied",
+        "value": "Access denied. You do not have permission to edit this connection."
+    },
+    {
+        "key": "settings.whatsapp_business_api.load_failed_desc",
+        "value": "Failed to load WhatsApp configuration"
+    },
+    {
+        "key": "settings.whatsapp_business_api.connection_id_required",
+        "value": "Connection ID is required for testing."
+    },
+    {
+        "key": "settings.whatsapp_business_api.webhook_test_success_desc",
+        "value": "Your webhook configuration is working correctly."
+    },
+    {
+        "key": "settings.whatsapp_business_api.update_failed",
+        "value": "Failed to update WhatsApp Business API connection"
+    },
+    {
+        "key": "settings.whatsapp_business_api.updated_title",
+        "value": "WhatsApp Business API Updated"
+    },
+    {
+        "key": "settings.whatsapp_business_api.updated_desc",
+        "value": "Your WhatsApp Business API connection has been updated successfully!"
+    },
+    {
+        "key": "settings.whatsapp_business_api.update_error_title",
+        "value": "Update Error"
+    },
+    {
+        "key": "settings.whatsapp_business_api.loading_configuration",
+        "value": "Loading WhatsApp configuration..."
+    },
+    {
+        "key": "settings.whatsapp_business_api.edit_title",
+        "value": "Edit WhatsApp Business API"
+    },
+    {
+        "key": "settings.whatsapp_business_api.access_token_placeholder",
+        "value": "Leave empty to keep current token"
+    },
+    {
+        "key": "settings.whatsapp_business_api.access_token_help",
+        "value": "Leave empty to keep the current access token unchanged"
+    },
+    {
+        "key": "settings.whatsapp_business_api.app_secret_placeholder",
+        "value": "Leave empty to keep current secret"
+    },
+    {
+        "key": "settings.whatsapp_business_api.app_secret_help",
+        "value": "Leave empty to keep the current app secret unchanged"
+    },
+    {
+        "key": "settings.whatsapp_business_api.verify_token_help",
+        "value": "This token is stored with your WhatsApp Business API connection. Copy this token and paste it in the \"Verify token\" field in your Meta for Developers webhook configuration."
+    },
+    {
+        "key": "settings.whatsapp_business_api.connection_token_label",
+        "value": "✅ Connection Token:"
+    },
+    {
+        "key": "settings.whatsapp_business_api.connection_token_desc",
+        "value": "This verify token is stored with your connection:"
+    },
+    {
+        "key": "settings.whatsapp_business_api.token_instructions",
+        "value": "Make sure this exact token is entered in your Meta Developer Console webhook configuration."
+    },
+    {
+        "key": "settings.whatsapp_business_api.test_webhook_short_desc",
+        "value": "Test your webhook configuration"
+    },
+    {
+        "key": "settings.whatsapp_business_api.note_label",
+        "value": "Note:"
+    },
+    {
+        "key": "settings.instagram.step_intro_title",
+        "value": "Introduction"
+    },
+    {
+        "key": "settings.instagram.step_intro_desc",
+        "value": "Overview of Instagram setup process"
+    },
+    {
+        "key": "settings.instagram.step_meta_app_title",
+        "value": "Meta App Setup"
+    },
+    {
+        "key": "settings.instagram.step_meta_app_desc",
+        "value": "Create and configure Meta Developer app"
+    },
+    {
+        "key": "settings.instagram.step_credentials_title",
+        "value": "Account Details"
+    },
+    {
+        "key": "settings.instagram.step_credentials_desc",
+        "value": "Enter Instagram account information"
+    },
+    {
+        "key": "settings.instagram.step_webhook_desc",
+        "value": "Configure webhook settings"
+    },
+    {
+        "key": "settings.instagram.step_test_desc",
+        "value": "Verify everything is working"
+    },
+    {
+        "key": "settings.instagram.step_complete_desc",
+        "value": "Finalize Instagram connection"
+    },
+    {
+        "key": "settings.instagram.copied_to_clipboard",
+        "value": "{{label}} copied to clipboard"
+    },
+    {
+        "key": "settings.instagram.copy_failed_desc",
+        "value": "Please copy the text manually"
+    },
+    {
+        "key": "settings.instagram.webhook_test_successful",
+        "value": "Webhook test successful!"
+    },
+    {
+        "key": "settings.instagram.webhook_test_failed",
+        "value": "Webhook test failed"
+    },
+    {
+        "key": "settings.instagram.webhook_test_failed_desc",
+        "value": "Please check your webhook configuration."
+    },
+    {
+        "key": "settings.instagram.network_error_during_test",
+        "value": "Network error during webhook test"
+    },
+    {
+        "key": "settings.instagram.network_error",
+        "value": "Network error. Please try again."
+    },
+    {
+        "key": "settings.instagram.connected_successfully",
+        "value": "Instagram connected successfully!"
+    },
+    {
+        "key": "settings.instagram.connected_successfully_desc",
+        "value": "Your Instagram account is now connected and ready to use."
+    },
+    {
+        "key": "settings.instagram.establish_connection_failed",
+        "value": "Failed to establish Instagram connection"
+    },
+    {
+        "key": "settings.instagram.connection_failed",
+        "value": "Connection failed"
+    },
+    {
+        "key": "settings.instagram.connection_failed_desc",
+        "value": "Please check your configuration and try again."
+    },
+    {
+        "key": "settings.instagram.intro_title",
+        "value": "Connect Your Instagram Account"
+    },
+    {
+        "key": "settings.instagram.intro_description",
+        "value": "This guided setup will help you connect your Instagram Business account to enable messaging capabilities."
+    },
+    {
+        "key": "settings.instagram.feature_secure_title",
+        "value": "Secure"
+    },
+    {
+        "key": "settings.instagram.feature_secure_desc",
+        "value": "Your credentials are encrypted and stored securely"
+    },
+    {
+        "key": "settings.instagram.feature_fast_title",
+        "value": "Fast Setup"
+    },
+    {
+        "key": "settings.instagram.feature_fast_desc",
+        "value": "Complete setup in just a few minutes"
+    },
+    {
+        "key": "settings.instagram.feature_messaging_title",
+        "value": "Rich Messaging"
+    },
+    {
+        "key": "settings.instagram.feature_messaging_desc",
+        "value": "Support for text, images, and quick replies"
+    },
+    {
+        "key": "settings.instagram.prerequisites_label",
+        "value": "Prerequisites:"
+    },
+    {
+        "key": "settings.instagram.prerequisites_desc",
+        "value": "You'll need a Meta Developer account and an Instagram Business account. Don't worry - we'll guide you through each step!"
+    },
+    {
+        "key": "settings.instagram.meta_app_title",
+        "value": "Meta Developer App Setup"
+    },
+    {
+        "key": "settings.instagram.meta_app_description",
+        "value": "First, you need to create a Meta Developer app to get your App ID and App Secret."
+    },
+    {
+        "key": "settings.instagram.meta_setup_guide_toggle",
+        "value": "Step-by-step Meta Developer setup guide"
+    },
+    {
+        "key": "settings.instagram.meta_step_go_to",
+        "value": "Go to"
+    },
+    {
+        "key": "settings.instagram.meta_for_developers",
+        "value": "Meta for Developers"
+    },
+    {
+        "key": "settings.instagram.meta_step_create_app",
+        "value": "Click \"My Apps\" and then \"Create App\""
+    },
+    {
+        "key": "settings.instagram.meta_step_select_business",
+        "value": "Select \"Business\" as the app type"
+    },
+    {
+        "key": "settings.instagram.meta_step_fill_details",
+        "value": "Fill in your app details and create the app"
+    },
+    {
+        "key": "settings.instagram.meta_step_add_product",
+        "value": "In the app dashboard, add the \"Instagram Basic Display\" product"
+    },
+    {
+        "key": "settings.instagram.meta_step_find_credentials",
+        "value": "Go to App Settings → Basic to find your App ID and App Secret"
+    },
+    {
+        "key": "settings.instagram.meta_step_copy_credentials",
+        "value": "Copy the App ID and App Secret to the form below"
+    },
+    {
+        "key": "settings.instagram.app_id_placeholder",
+        "value": "Your Meta App ID"
+    },
+    {
+        "key": "settings.instagram.app_secret_placeholder",
+        "value": "Your Meta App Secret"
+    },
+    {
+        "key": "settings.instagram.app_secret_notice",
+        "value": "Your App Secret will be encrypted and stored securely. Never share it publicly."
+    },
+    {
+        "key": "settings.instagram.account_details_title",
+        "value": "Instagram Account Details"
+    },
+    {
+        "key": "settings.instagram.account_details_description",
+        "value": "Enter your Instagram Business account information and access token."
+    },
+    {
+        "key": "settings.instagram.account_display_name_label",
+        "value": "Account Display Name *"
+    },
+    {
+        "key": "settings.instagram.account_display_name_placeholder",
+        "value": "e.g., My Business Instagram"
+    },
+    {
+        "key": "settings.instagram.account_display_name_help",
+        "value": "This is how the connection will appear in your dashboard"
+    },
+    {
+        "key": "settings.instagram.instagram_account_id_placeholder",
+        "value": "Your Instagram Business Account ID"
+    },
+    {
+        "key": "settings.instagram.access_token_placeholder",
+        "value": "Your long-lived page access token"
+    },
+    {
+        "key": "settings.instagram.token_help_toggle",
+        "value": "How to get your Instagram Account ID and Access Token"
+    },
+    {
+        "key": "settings.instagram.getting_account_id_title",
+        "value": "Getting your Instagram Account ID:"
+    },
+    {
+        "key": "settings.instagram.help_step_go_dashboard",
+        "value": "Go to your Meta Developer app dashboard"
+    },
+    {
+        "key": "settings.instagram.help_step_navigate_basic_display",
+        "value": "Navigate to Instagram Basic Display → Basic Display"
+    },
+    {
+        "key": "settings.instagram.help_step_account_id_listed",
+        "value": "Your Instagram Account ID will be listed there"
+    },
+    {
+        "key": "settings.instagram.getting_access_token_title",
+        "value": "Getting your Access Token:"
+    },
+    {
+        "key": "settings.instagram.help_step_go_basic_display",
+        "value": "In your Meta app, go to Instagram Basic Display"
+    },
+    {
+        "key": "settings.instagram.help_step_generate_token",
+        "value": "Generate a long-lived access token"
+    },
+    {
+        "key": "settings.instagram.help_step_token_permissions",
+        "value": "Make sure it has the necessary permissions for messaging"
+    },
+    {
+        "key": "settings.instagram.webhook_description",
+        "value": "Configure webhook settings to receive Instagram messages in real-time."
+    },
+    {
+        "key": "settings.instagram.webhook_url_help",
+        "value": "This URL is automatically configured for your domain"
+    },
+    {
+        "key": "settings.instagram.verify_token_label",
+        "value": "Verify Token"
+    },
+    {
+        "key": "settings.instagram.verify_token_placeholder",
+        "value": "Enter a verify token"
+    },
+    {
+        "key": "settings.instagram.verify_token_help",
+        "value": "A random token has been generated for you"
+    },
+    {
+        "key": "settings.instagram.important_label",
+        "value": "Important:"
+    },
+    {
+        "key": "settings.instagram.webhook_important_desc",
+        "value": "You'll need to configure these webhook settings in your Meta Developer app. Copy the URL and verify token to use in your Meta app webhook configuration."
+    },
+    {
+        "key": "settings.instagram.webhook_help_toggle",
+        "value": "How to configure webhooks in Meta Developer Console"
+    },
+    {
+        "key": "settings.instagram.webhook_step_navigate_configuration",
+        "value": "Navigate to Instagram → Configuration"
+    },
+    {
+        "key": "settings.instagram.webhook_step_add_callback",
+        "value": "In the Webhooks section, click \"Add Callback URL\""
+    },
+    {
+        "key": "settings.instagram.webhook_step_paste_url",
+        "value": "Paste the Webhook URL from above"
+    },
+    {
+        "key": "settings.instagram.webhook_step_enter_token",
+        "value": "Enter the Verify Token from above"
+    },
+    {
+        "key": "settings.instagram.webhook_step_subscribe_messages",
+        "value": "Subscribe to \"messages\" events"
+    },
+    {
+        "key": "settings.instagram.webhook_step_save",
+        "value": "Save the configuration"
+    },
+    {
+        "key": "settings.instagram.test_title",
+        "value": "Test Your Configuration"
+    },
+    {
+        "key": "settings.instagram.test_description",
+        "value": "Let's test your webhook configuration to make sure everything is working correctly."
+    },
+    {
+        "key": "settings.instagram.webhook_connection_test",
+        "value": "Webhook Connection Test"
+    },
+    {
+        "key": "settings.instagram.webhook_connection_test_desc",
+        "value": "Verify that your webhook URL is accessible and configured correctly"
+    },
+    {
+        "key": "settings.instagram.test_passed",
+        "value": "Test Passed"
+    },
+    {
+        "key": "settings.instagram.test_success_alert",
+        "value": "Webhook test successful! Your configuration is working correctly."
+    },
+    {
+        "key": "settings.instagram.test_failure_hint",
+        "value": "If the test fails, please check that you've correctly configured the webhook URL and verify token in your Meta Developer app."
+    },
+    {
+        "key": "settings.instagram.complete_title",
+        "value": "Instagram Connected Successfully!"
+    },
+    {
+        "key": "settings.instagram.complete_description",
+        "value": "Your Instagram Business account is now connected and ready to receive messages."
+    },
+    {
+        "key": "settings.instagram.feature_message_management_title",
+        "value": "Message Management"
+    },
+    {
+        "key": "settings.instagram.feature_message_management_desc",
+        "value": "Receive and respond to Instagram messages"
+    },
+    {
+        "key": "settings.instagram.feature_rich_media_title",
+        "value": "Rich Media"
+    },
+    {
+        "key": "settings.instagram.feature_rich_media_desc",
+        "value": "Send images, videos, and quick replies"
+    },
+    {
+        "key": "settings.instagram.next_steps_label",
+        "value": "Next steps:"
+    },
+    {
+        "key": "settings.instagram.next_steps_desc",
+        "value": "You can now start receiving Instagram messages. Visit the conversations page to see incoming messages and respond to your customers."
+    },
+    {
+        "key": "settings.instagram.step_content_fallback",
+        "value": "Step content for {{step}}"
+    },
+    {
+        "key": "settings.instagram.setup_dialog_title",
+        "value": "Instagram Connection Setup"
+    },
+    {
+        "key": "settings.instagram.setup_dialog_description",
+        "value": "Connect your Instagram Business account to enable messaging"
+    },
+    {
+        "key": "settings.instagram.step_progress",
+        "value": "Step {{current}} of {{total}}"
+    },
+    {
+        "key": "settings.instagram.percent_complete",
+        "value": "{{percent}}% Complete"
+    },
+    {
+        "key": "settings.instagram.complete_setup_button",
+        "value": "Complete Setup"
+    },
+    {
+        "key": "settings.inbox.test_notification_failed_desc",
+        "value": "Could not show test notification. Check browser console for details."
+    },
+    {
+        "key": "settings.inbox.test_notification_error_desc",
+        "value": "Error showing test notification: {{message}}"
+    },
+    {
+        "key": "settings.inbox.audio_transcription_update_failed",
+        "value": "Failed to update transcription setting"
+    },
+    {
+        "key": "settings.inbox.audio_transcription_settings_update_failed",
+        "value": "Failed to update transcription settings"
+    },
+    {
+        "key": "settings.inbox.start_history_sync_failed",
+        "value": "Failed to start history sync"
+    },
+    {
+        "key": "settings.inbox.history_sync_started",
+        "value": "History Sync Started"
+    },
+    {
+        "key": "settings.inbox.history_sync_started_desc",
+        "value": "WhatsApp will reconnect to sync message history from the last 7 days. You may need to scan the QR code again."
+    },
+    {
+        "key": "settings.messenger_connection.connect_failed_desc",
+        "value": "Failed to connect Facebook page. Please check your credentials and try again."
+    },
+    {
+        "key": "settings.messenger_connection.connect_title",
+        "value": "Connect Facebook Messenger"
+    },
+    {
+        "key": "settings.messenger_connection.connect_description",
+        "value": "Connect your Facebook page to receive and send messages via Messenger. You'll need your Meta for Developers credentials."
+    },
+    {
+        "key": "settings.messenger_connection.app_secret_placeholder",
+        "value": "Your app secret (optional)"
+    },
+    {
+        "key": "settings.messenger_connection.app_secret_help",
+        "value": "Your Meta app secret (optional, for webhook verification)"
+    },
+    {
+        "key": "settings.messenger_connection.connect_button",
+        "value": "Connect Messenger"
+    },
+    {
+        "key": "settings.ses.saved_title",
+        "value": "Amazon SES Configuration Saved"
+    },
+    {
+        "key": "settings.ses.saved_desc",
+        "value": "Your SES settings have been updated successfully"
+    },
+    {
+        "key": "settings.ses.update_failed_desc",
+        "value": "Failed to update SES configuration: {{message}}"
+    },
+    {
+        "key": "settings.ses.test_email_sent_title",
+        "value": "Test Email Sent"
+    },
+    {
+        "key": "settings.ses.test_email_sent_desc",
+        "value": "A test email has been sent successfully"
+    },
+    {
+        "key": "settings.ses.test_email_failed_desc",
+        "value": "Failed to send test email: {{message}}"
+    },
+    {
+        "key": "settings.ses.validation_region_required",
+        "value": "AWS Region is required"
+    },
+    {
+        "key": "settings.ses.validation_access_key_required",
+        "value": "Access Key ID is required"
+    },
+    {
+        "key": "settings.ses.validation_secret_key_required",
+        "value": "Secret Access Key is required"
+    },
+    {
+        "key": "settings.ses.validation_from_email_required",
+        "value": "From Email address is required"
+    },
+    {
+        "key": "settings.ses.validation_test_email_required",
+        "value": "Please enter an email address to send the test email to"
+    },
+    {
+        "key": "settings.ses.validation_complete_config",
+        "value": "Please complete all required SES configuration fields first"
+    },
+    {
+        "key": "settings.ses.section_title",
+        "value": "Amazon SES Configuration"
+    },
+    {
+        "key": "settings.ses.section_description",
+        "value": "Configure Amazon Simple Email Service (SES) to send emails for notifications, invitations, and campaigns."
+    },
+    {
+        "key": "settings.ses.sandbox_notice",
+        "value": "Ensure your SES account is out of sandbox mode and your sender email address is verified in AWS SES."
+    },
+    {
+        "key": "settings.ses.region_label",
+        "value": "AWS Region"
+    },
+    {
+        "key": "settings.ses.region_help",
+        "value": "AWS region where your SES service is configured (e.g., us-east-1, eu-west-1)"
+    },
+    {
+        "key": "settings.ses.port_label",
+        "value": "Port"
+    },
+    {
+        "key": "settings.ses.port_help",
+        "value": "Optional. SES SMTP port (e.g. 587, 465). Leave blank to use the default HTTPS endpoint."
+    },
+    {
+        "key": "settings.ses.access_key_id_label",
+        "value": "Access Key ID"
+    },
+    {
+        "key": "settings.ses.secret_access_key_label",
+        "value": "Secret Access Key"
+    },
+    {
+        "key": "settings.ses.secret_access_key_stored_placeholder",
+        "value": "Leave empty to keep current key"
+    },
+    {
+        "key": "settings.ses.secret_access_key_placeholder",
+        "value": "Enter secret access key"
+    },
+    {
+        "key": "settings.ses.secret_access_key_stored_help",
+        "value": "Secret key is set. Leave empty to keep it unchanged, or enter new key."
+    },
+    {
+        "key": "settings.ses.secret_access_key_help",
+        "value": "Your AWS secret access key"
+    },
+    {
+        "key": "settings.ses.from_email_label",
+        "value": "From Email"
+    },
+    {
+        "key": "settings.ses.from_email_help",
+        "value": "Verified sender email address in AWS SES"
+    },
+    {
+        "key": "settings.ses.from_name_label",
+        "value": "From Name"
+    },
+    {
+        "key": "settings.ses.enable_label",
+        "value": "Enable Amazon SES"
+    },
+    {
+        "key": "settings.ses.enable_help",
+        "value": "Enable or disable Amazon SES for sending emails"
+    },
+    {
+        "key": "settings.ses.test_section_title",
+        "value": "Test Email Configuration"
+    },
+    {
+        "key": "settings.ses.test_email_placeholder",
+        "value": "Enter an email address to receive a test message"
+    },
+    {
+        "key": "settings.ses.send_test_email",
+        "value": "Send Test Email"
+    },
+    {
+        "key": "settings.smtp.saved_title",
+        "value": "SMTP Configuration Saved"
+    },
+    {
+        "key": "settings.smtp.saved_desc",
+        "value": "Your email settings have been updated successfully"
+    },
+    {
+        "key": "settings.smtp.update_failed_desc",
+        "value": "Failed to update SMTP configuration: {{message}}"
+    },
+    {
+        "key": "settings.smtp.validation_host_required",
+        "value": "SMTP host is required"
+    },
+    {
+        "key": "settings.smtp.validation_credentials_required",
+        "value": "SMTP username and password are required"
+    },
+    {
+        "key": "settings.smtp.validation_sender_email_required",
+        "value": "Sender email address is required"
+    },
+    {
+        "key": "settings.smtp.validation_complete_config",
+        "value": "Please complete all required SMTP configuration fields first"
+    },
+    {
+        "key": "settings.smtp.section_title",
+        "value": "SMTP Server Configuration"
+    },
+    {
+        "key": "settings.smtp.section_description",
+        "value": "Configure your email server settings to enable sending verification emails, notifications, and other communications."
+    },
+    {
+        "key": "settings.smtp.important_notice",
+        "value": "Email functionality is required for team member invitations and password reset features."
+    },
+    {
+        "key": "settings.smtp.secure_label",
+        "value": "Use Secure Connection (SSL/TLS)"
+    },
+    {
+        "key": "settings.smtp.secure_help",
+        "value": "Enable for SSL/TLS connections. Usually port 465 for SSL and port 465 for TLS."
+    },
+    {
+        "key": "settings.smtp.username_label",
+        "value": "SMTP Username"
+    },
+    {
+        "key": "settings.smtp.password_stored_placeholder",
+        "value": "Leave empty to keep current password"
+    },
+    {
+        "key": "settings.smtp.password_placeholder",
+        "value": "Enter password"
+    },
+    {
+        "key": "settings.smtp.password_stored_help",
+        "value": "Password is set. Leave empty to keep it unchanged, or enter new password."
+    },
+    {
+        "key": "settings.smtp.password_help",
+        "value": "For Gmail, use an App Password instead of your regular password"
+    },
+    {
+        "key": "settings.smtp.sender_email_label",
+        "value": "Sender Email Address"
+    },
+    {
+        "key": "settings.smtp.sender_name_label",
+        "value": "Sender Name"
     }
 ]

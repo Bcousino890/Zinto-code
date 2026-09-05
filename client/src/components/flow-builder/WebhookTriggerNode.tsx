@@ -519,7 +519,7 @@ export function WebhookTriggerNode({ id, data, isConnectable }: WebhookTriggerNo
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7 text-primary hover:text-primary/80 hover:bg-primary/10"
-                      aria-label="Help"
+                      aria-label={t('flow_builder.webhook_help_label', 'Help')}
                     >
                       <HelpCircle className="h-3.5 w-3.5" />
                     </Button>
@@ -529,10 +529,10 @@ export function WebhookTriggerNode({ id, data, isConnectable }: WebhookTriggerNo
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                       <img src={WEBHOOK_ICON_URL} alt="" className="h-5 w-5" aria-hidden />
-                      Webhook Trigger - Help & Documentation
+                      {t('flow_builder.webhook_help.dialog_title', 'Webhook Trigger - Help & Documentation')}
                     </DialogTitle>
                     <DialogDescription>
-                      Configure webhooks to receive events from external systems (Shopify, Stripe, CRM, etc.)
+                      {t('flow_builder.webhook_help.dialog_description', 'Configure webhooks to receive events from external systems (Shopify, Stripe, CRM, etc.)')}
                     </DialogDescription>
                   </DialogHeader>
                   <WebhookHelpContent />
@@ -557,7 +557,7 @@ export function WebhookTriggerNode({ id, data, isConnectable }: WebhookTriggerNo
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p className="text-xs">Duplicate node</p>
+                  <p className="text-xs">{t('flow_builder.duplicate_node', 'Duplicate node')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -988,7 +988,7 @@ export function WebhookTriggerNode({ id, data, isConnectable }: WebhookTriggerNo
                       <TooltipTrigger asChild>
                         <span className="flex-1 min-w-[80px] inline-block">
                           <Input
-                            placeholder="event_type or order.status"
+                            placeholder={t('flow_builder.webhook_filter_field_placeholder', 'event_type or order.status')}
                             value={fc.fieldPath}
                             onChange={(e) => updateFilter(index, { fieldPath: e.target.value })}
                             className="font-mono w-full text-xs"
@@ -1028,7 +1028,7 @@ export function WebhookTriggerNode({ id, data, isConnectable }: WebhookTriggerNo
                   </TooltipProvider>
                   {!VALUE_LESS_OPERATORS.includes(fc.operator) && (
                     <Input
-                      placeholder="Value"
+                      placeholder={t('flow_builder.value', 'Value')}
                       value={fc.value !== undefined ? String(fc.value) : ''}
                       onChange={(e) => updateFilter(index, { value: e.target.value })}
                       className="w-20 text-xs"
@@ -1045,7 +1045,7 @@ export function WebhookTriggerNode({ id, data, isConnectable }: WebhookTriggerNo
                               onChange={(e) => updateFilter(index, { caseSensitive: e.target.checked })}
                               className="w-3 h-3"
                             />
-                            <span className="text-[10px]">Case</span>
+                            <span className="text-[10px]">{t('flow_builder.webhook_filter_case', 'Case')}</span>
                           </label>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-[220px]">
@@ -1275,7 +1275,7 @@ export function WebhookTriggerNode({ id, data, isConnectable }: WebhookTriggerNo
                 {responseHeaders.map((h, idx) => (
                   <div key={idx} className="flex gap-1 mb-1">
                     <Input
-                      placeholder="Header name"
+                      placeholder={t('flow_builder.http_header_name', 'Header name')}
                       value={h.key}
                       onChange={(e) =>
                         setResponseHeaders((prev) => {
@@ -1287,7 +1287,7 @@ export function WebhookTriggerNode({ id, data, isConnectable }: WebhookTriggerNo
                       className="font-mono text-xs h-7 flex-1"
                     />
                     <Input
-                      placeholder="Value"
+                      placeholder={t('flow_builder.value', 'Value')}
                       value={h.value}
                       onChange={(e) =>
                         setResponseHeaders((prev) => {
@@ -1619,22 +1619,21 @@ curl_close($ch);
 }
 
 function WebhookHelpContent() {
+  const { t } = useTranslation();
   return (
     <ScrollArea className="h-[70vh] pr-4">
       <div className="space-y-6">
         <section>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <Globe className="h-4 w-4 text-primary" />
-            Webhook Trigger Overview
+            {t('flow_builder.webhook_help.overview_title', 'Webhook Trigger Overview')}
           </h3>
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
             <p className="text-sm text-foreground mb-2">
-              The <strong>Webhook Trigger</strong> node receives HTTP POST requests from external systems and starts your flow.
-              Use it to integrate with Shopify, Stripe, CRMs, or any service that can send webhooks.
+              {t('flow_builder.webhook_help.overview_prefix', 'The')} <strong>{t('flow_builder.webhook_trigger_title', 'Webhook Trigger')}</strong> {t('flow_builder.webhook_help.overview_text', 'node receives HTTP POST requests from external systems and starts your flow. Use it to integrate with Shopify, Stripe, CRMs, or any service that can send webhooks.')}
             </p>
             <p className="text-sm text-foreground">
-              <strong>Key features:</strong> Unique URL per flow, optional payload filters, contact association (extract or create),
-              configurable response (async/sync), and test tooling.
+              <strong>{t('flow_builder.webhook_help.key_features_label', 'Key features:')}</strong> {t('flow_builder.webhook_help.key_features_text', 'Unique URL per flow, optional payload filters, contact association (extract or create), configurable response (async/sync), and test tooling.')}
             </p>
           </div>
         </section>
@@ -1642,16 +1641,16 @@ function WebhookHelpContent() {
         <section>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <Globe className="h-4 w-4 text-primary" />
-            URL Configuration & Security
+            {t('flow_builder.webhook_help.url_title', 'URL Configuration & Security')}
           </h3>
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              After saving the flow, a unique webhook URL is generated. You can use the default (flow ID + token) or enable
-              <strong> Custom Path</strong> for a memorable path (e.g. <code className="bg-muted px-1 rounded">shopify-orders</code>).
-              Custom paths must be unique across all webhook triggers and use only letters, numbers, hyphens, and underscores.
+              {t('flow_builder.webhook_help.url_text_before', 'After saving the flow, a unique webhook URL is generated. You can use the default (flow ID + token) or enable')}
+              <strong> {t('flow_builder.webhook_custom_path', 'Custom Path')}</strong> {t('flow_builder.webhook_help.url_text_example', 'for a memorable path (e.g.')} <code className="bg-muted px-1 rounded">shopify-orders</code>
+              {t('flow_builder.webhook_help.url_text_after', '). Custom paths must be unique across all webhook triggers and use only letters, numbers, hyphens, and underscores.')}
             </p>
             <p className="text-sm text-muted-foreground">
-              Use <strong>Regenerate Token</strong> if the URL is compromised. Update the new URL in your external system.
+              {t('flow_builder.webhook_help.url_regenerate_before', 'Use')} <strong>{t('flow_builder.webhook_regenerate_token', 'Regenerate Token')}</strong> {t('flow_builder.webhook_help.url_regenerate_after', 'if the URL is compromised. Update the new URL in your external system.')}
             </p>
           </div>
         </section>
@@ -1659,25 +1658,25 @@ function WebhookHelpContent() {
         <section>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <User className="h-4 w-4 text-primary" />
-            Contact Mapping Strategies
+            {t('flow_builder.webhook_help.contact_title', 'Contact Mapping Strategies')}
           </h3>
           <div className="space-y-3">
             <div className="border rounded-lg p-3">
-              <h4 className="font-medium text-sm mb-1">Extract from Payload</h4>
+              <h4 className="font-medium text-sm mb-1">{t('flow_builder.webhook_extract_from_payload', 'Extract from Payload')}</h4>
               <p className="text-xs text-muted-foreground">
-                Use a field path (e.g. <code className="bg-muted px-1 rounded">customer.email</code>) to identify an existing contact. Best when the payload includes customer identifiers.
+                {t('flow_builder.webhook_help.contact_extract_before', 'Use a field path (e.g.')} <code className="bg-muted px-1 rounded">customer.email</code>{t('flow_builder.webhook_help.contact_extract_after', ') to identify an existing contact. Best when the payload includes customer identifiers.')}
               </p>
             </div>
             <div className="border rounded-lg p-3">
-              <h4 className="font-medium text-sm mb-1">Create New Contact</h4>
+              <h4 className="font-medium text-sm mb-1">{t('flow_builder.webhook_create_new_contact', 'Create New Contact')}</h4>
               <p className="text-xs text-muted-foreground">
-                Map payload fields to name, email, and phone to create a new contact for each webhook. Ideal for lead gen or new signups.
+                {t('flow_builder.webhook_help.contact_create_desc', 'Map payload fields to name, email, and phone to create a new contact for each webhook. Ideal for lead gen or new signups.')}
               </p>
             </div>
             <div className="border rounded-lg p-3">
-              <h4 className="font-medium text-sm mb-1">System-Level (No Contact)</h4>
+              <h4 className="font-medium text-sm mb-1">{t('flow_builder.webhook_system_level', 'System-Level (No Contact)')}</h4>
               <p className="text-xs text-muted-foreground">
-                Run the flow without associating a contact. Use for background jobs, notifications, or system events.
+                {t('flow_builder.webhook_help.contact_system_desc', 'Run the flow without associating a contact. Use for background jobs, notifications, or system events.')}
               </p>
             </div>
           </div>
@@ -1686,11 +1685,10 @@ function WebhookHelpContent() {
         <section>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <Filter className="h-4 w-4 text-primary" />
-            Payload Filtering
+            {t('flow_builder.webhook_help.filtering_title', 'Payload Filtering')}
           </h3>
           <p className="text-sm text-muted-foreground mb-2">
-            Add conditions so the flow runs only when the payload matches (e.g. <code className="bg-muted px-1 rounded">event_type</code> equals <code className="bg-muted px-1 rounded">order.created</code>).
-            All conditions are ANDed. Use dot notation for nested fields.
+            {t('flow_builder.webhook_help.filtering_before', 'Add conditions so the flow runs only when the payload matches (e.g.')} <code className="bg-muted px-1 rounded">event_type</code> {t('flow_builder.webhook_help.filtering_equals', 'equals')} <code className="bg-muted px-1 rounded">order.created</code>{t('flow_builder.webhook_help.filtering_after', '). All conditions are ANDed. Use dot notation for nested fields.')}
           </p>
           <div className="bg-muted rounded p-2 text-xs font-mono">
             event_type equals order.created<br />
@@ -1701,14 +1699,14 @@ function WebhookHelpContent() {
         <section>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <Settings className="h-4 w-4 text-primary" />
-            Response Configuration
+            {t('flow_builder.webhook_response_config', 'Response Configuration')}
           </h3>
           <p className="text-sm text-muted-foreground mb-2">
-            <strong>Asynchronous</strong> (recommended): Returns 202 Accepted immediately; flow runs in the background.
-            <strong> Synchronous</strong>: Waits for the flow to finish (with timeout) before responding—use when the caller needs the result (e.g. payment gateways).
+            <strong>{t('flow_builder.webhook_async_mode', 'Asynchronous')}</strong> {t('flow_builder.webhook_help.response_async_desc', '(recommended): Returns 202 Accepted immediately; flow runs in the background.')}
+            <strong> {t('flow_builder.webhook_sync_mode', 'Synchronous')}</strong>{t('flow_builder.webhook_help.response_sync_desc', ': Waits for the flow to finish (with timeout) before responding—use when the caller needs the result (e.g. payment gateways).')}
           </p>
           <p className="text-sm text-muted-foreground">
-            You can set status code, response body template (with variables like <code className="bg-muted px-1 rounded">&#123;&#123;flow.id&#125;&#125;</code>, <code className="bg-muted px-1 rounded">&#123;&#123;webhook.requestId&#125;&#125;</code>), and custom headers.
+            {t('flow_builder.webhook_help.response_body_before', 'You can set status code, response body template (with variables like')} <code className="bg-muted px-1 rounded">&#123;&#123;flow.id&#125;&#125;</code>, <code className="bg-muted px-1 rounded">&#123;&#123;webhook.requestId&#125;&#125;</code>{t('flow_builder.webhook_help.response_body_after', '), and custom headers.')}
           </p>
         </section>
 
@@ -1717,20 +1715,20 @@ function WebhookHelpContent() {
         <section>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-primary" />
-            Integration Examples
+            {t('flow_builder.webhook_help.examples_title', 'Integration Examples')}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="border rounded-lg p-3">
               <h4 className="font-medium text-sm mb-1">Shopify</h4>
-              <p className="text-xs text-muted-foreground">Order created, customer data: use Extract with <code className="bg-muted px-0.5">customer.email</code>; filter by <code className="bg-muted px-0.5">topic</code>.</p>
+              <p className="text-xs text-muted-foreground">{t('flow_builder.webhook_help.example_shopify_before', 'Order created, customer data: use Extract with')} <code className="bg-muted px-0.5">customer.email</code>{t('flow_builder.webhook_help.example_shopify_middle', '; filter by')} <code className="bg-muted px-0.5">topic</code>.</p>
             </div>
             <div className="border rounded-lg p-3">
               <h4 className="font-medium text-sm mb-1">Stripe</h4>
-              <p className="text-xs text-muted-foreground">Payment events: filter by <code className="bg-muted px-0.5">type</code> (e.g. <code className="bg-muted px-0.5">invoice.paid</code>); use Sync mode if you need to return a response.</p>
+              <p className="text-xs text-muted-foreground">{t('flow_builder.webhook_help.example_stripe_before', 'Payment events: filter by')} <code className="bg-muted px-0.5">type</code> {t('flow_builder.webhook_help.example_stripe_middle', '(e.g.')} <code className="bg-muted px-0.5">invoice.paid</code>{t('flow_builder.webhook_help.example_stripe_after', '); use Sync mode if you need to return a response.')}</p>
             </div>
             <div className="border rounded-lg p-3">
-              <h4 className="font-medium text-sm mb-1">CRM / Forms</h4>
-              <p className="text-xs text-muted-foreground">New lead: use Create New Contact and map form fields to name, email, phone.</p>
+              <h4 className="font-medium text-sm mb-1">{t('flow_builder.webhook_help.example_crm_title', 'CRM / Forms')}</h4>
+              <p className="text-xs text-muted-foreground">{t('flow_builder.webhook_help.example_crm_desc', 'New lead: use Create New Contact and map form fields to name, email, phone.')}</p>
             </div>
           </div>
         </section>
@@ -1738,13 +1736,13 @@ function WebhookHelpContent() {
         <section>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <AlertCircle className="h-4 w-4 text-primary" />
-            Troubleshooting
+            {t('flow_builder.webhook_help.troubleshooting_title', 'Troubleshooting')}
           </h3>
           <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-            <li>Save the flow first to get a valid webhook URL.</li>
-            <li>Use the Test Webhook section to send a sample payload and verify filters and contact resolution.</li>
-            <li>Check the Logs button for incoming requests and errors.</li>
-            <li>Ensure the external system sends <code className="bg-muted px-0.5">Content-Type: application/json</code> for JSON payloads.</li>
+            <li>{t('flow_builder.webhook_help.troubleshooting_save_flow', 'Save the flow first to get a valid webhook URL.')}</li>
+            <li>{t('flow_builder.webhook_help.troubleshooting_test', 'Use the Test Webhook section to send a sample payload and verify filters and contact resolution.')}</li>
+            <li>{t('flow_builder.webhook_help.troubleshooting_logs', 'Check the Logs button for incoming requests and errors.')}</li>
+            <li>{t('flow_builder.webhook_help.troubleshooting_content_type_before', 'Ensure the external system sends')} <code className="bg-muted px-0.5">Content-Type: application/json</code> {t('flow_builder.webhook_help.troubleshooting_content_type_after', 'for JSON payloads.')}</li>
           </ul>
         </section>
       </div>

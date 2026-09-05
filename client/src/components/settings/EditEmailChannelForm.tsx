@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { Loader2, Mail, TestTube, Eye, EyeOff, Edit } from 'lucide-react';
 
 interface EditEmailChannelFormProps {
@@ -40,6 +41,7 @@ interface EmailFormData {
 
 export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId }: EditEmailChannelFormProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,13 +89,13 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         if (response.status === 404) {
-          throw new Error(errorData.message || 'Email configuration not found. Please check if the email channel is properly configured.');
+          throw new Error(errorData.message || t('settings.email_channel.error_not_found', 'Email configuration not found. Please check if the email channel is properly configured.'));
         } else if (response.status === 403) {
-          throw new Error(errorData.message || 'Access denied. You do not have permission to edit this email channel.');
+          throw new Error(errorData.message || t('settings.email_channel.error_access_denied', 'Access denied. You do not have permission to edit this email channel.'));
         } else if (response.status === 401) {
-          throw new Error(errorData.message || 'Authentication required. Please log in again.');
+          throw new Error(errorData.message || t('settings.email_channel.error_authentication_required', 'Authentication required. Please log in again.'));
         } else {
-          throw new Error(errorData.message || `Server error: ${response.status}. Please try again later.`);
+          throw new Error(errorData.message || t('settings.email_channel.error_server', 'Server error: {{status}}. Please try again later.', { status: response.status }));
         }
       }
 
@@ -126,8 +128,8 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
     } catch (error: any) {
       console.error('Error loading email configuration:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to load email configuration",
+        title: t('common.error', 'Error'),
+        description: error.message || t('settings.email_channel.load_failed_desc', 'Failed to load email configuration'),
         variant: "destructive"
       });
     } finally {
@@ -185,21 +187,21 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
       
       if (result.success) {
         toast({
-          title: "Connection Test Successful",
-          description: "Both IMAP and SMTP connections are working correctly",
+          title: t('email.connection_test_successful', 'Connection Test Successful'),
+          description: t('settings.email_channel.test_success_desc', 'Both IMAP and SMTP connections are working correctly'),
         });
       } else {
         toast({
-          title: "Connection Test Failed",
-          description: result.message || "Failed to connect to email server",
+          title: t('email.connection_test_failed', 'Connection Test Failed'),
+          description: result.message || t('email.failed_connect_server', 'Failed to connect to email server'),
           variant: "destructive"
         });
       }
     } catch (error: any) {
       console.error('Error testing connection:', error);
       toast({
-        title: "Connection Test Failed",
-        description: error.message || "Failed to test email connection",
+        title: t('email.connection_test_failed', 'Connection Test Failed'),
+        description: error.message || t('email.failed_test_connection', 'Failed to test email connection'),
         variant: "destructive"
       });
     } finally {
@@ -243,23 +245,23 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
       
       if (result.success) {
         toast({
-          title: "Email Channel Updated",
-          description: "Your email channel has been updated successfully",
+          title: t('settings.email_channel.updated_title', 'Email Channel Updated'),
+          description: t('settings.email_channel.updated_desc', 'Your email channel has been updated successfully'),
         });
         onSuccess();
         handleClose();
       } else {
         toast({
-          title: "Update Failed",
-          description: result.message || "Failed to update email channel",
+          title: t('settings.instagram_connection.update_failed', 'Update Failed'),
+          description: result.message || t('settings.email_channel.update_failed_desc', 'Failed to update email channel'),
           variant: "destructive"
         });
       }
     } catch (error: any) {
       console.error('Error updating email channel:', error);
       toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update email channel",
+        title: t('settings.instagram_connection.update_failed', 'Update Failed'),
+        description: error.message || t('settings.email_channel.update_failed_desc', 'Failed to update email channel'),
         variant: "destructive"
       });
     } finally {
@@ -279,7 +281,7 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
         <DialogContent className="sm:max-w-[600px]">
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-2">Loading email configuration...</span>
+            <span className="ml-2">{t('settings.email_channel.loading_configuration', 'Loading email configuration...')}</span>
           </div>
         </DialogContent>
       </Dialog>
@@ -292,80 +294,80 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Edit className="h-5 w-5 text-blue-500" />
-            Edit Email Channel
+            {t('settings.email_channel.edit_title', 'Edit Email Channel')}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Configuration */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Basic Configuration</h3>
+            <h3 className="text-lg font-medium">{t('email.basic_configuration', 'Basic Configuration')}</h3>
             
             <div className="grid gap-2">
-              <Label htmlFor="connectionName">Connection Name</Label>
+              <Label htmlFor="connectionName">{t('email.connection_name', 'Connection Name')}</Label>
               <Input
                 id="connectionName"
                 name="connectionName"
                 value={formData.connectionName}
                 onChange={handleInputChange}
-                placeholder="My Email Support"
+                placeholder={t('email.connection_name_placeholder', 'My Email Support')}
                 required
               />
               <p className="text-sm text-gray-500">
-                A friendly name for this email connection
+                {t('email.connection_name_help', 'A friendly name for this email connection')}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="emailAddress">Email Address</Label>
+              <Label htmlFor="emailAddress">{t('email.email_address', 'Email Address')}</Label>
               <Input
                 id="emailAddress"
                 name="emailAddress"
                 type="email"
                 value={formData.emailAddress}
                 onChange={handleInputChange}
-                placeholder="support@company.com"
+                placeholder={t('email.email_address_placeholder', 'support@company.com')}
                 required
               />
               <p className="text-sm text-gray-500">
-                The email address for sending and receiving messages
+                {t('email.email_address_help', 'The email address for sending and receiving messages')}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="displayName">Display Name (Optional)</Label>
+              <Label htmlFor="displayName">{t('admin.ai_credentials.display_name_optional', 'Display Name (Optional)')}</Label>
               <Input
                 id="displayName"
                 name="displayName"
                 value={formData.displayName}
                 onChange={handleInputChange}
-                placeholder="Support Team"
+                placeholder={t('settings.email_channel.display_name_placeholder', 'Support Team')}
               />
               <p className="text-sm text-gray-500">
-                The name that appears when sending emails
+                {t('settings.email_channel.display_name_help', 'The name that appears when sending emails')}
               </p>
             </div>
           </div>
 
           {/* IMAP Configuration */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">IMAP Settings (Receiving)</h3>
+            <h3 className="text-lg font-medium">{t('email.imap_settings', 'IMAP Settings (Receiving)')}</h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="imapHost">IMAP Host</Label>
+                <Label htmlFor="imapHost">{t('email.imap_host', 'IMAP Host')}</Label>
                 <Input
                   id="imapHost"
                   name="imapHost"
                   value={formData.imapHost}
                   onChange={handleInputChange}
-                  placeholder="imap.gmail.com"
+                  placeholder={t('email.imap_host_placeholder', 'imap.gmail.com')}
                   required
                 />
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="imapPort">IMAP Port</Label>
+                <Label htmlFor="imapPort">{t('email.imap_port', 'IMAP Port')}</Label>
                 <Input
                   id="imapPort"
                   name="imapPort"
@@ -384,26 +386,26 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
                 onCheckedChange={(checked) => handleCheckboxChange('imapSecure', checked as boolean)}
               />
               <Label htmlFor="imapSecure" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Use SSL/TLS for IMAP
+                {t('email.use_ssl_tls_imap', 'Use SSL/TLS for IMAP')}
               </Label>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="imapUsername">IMAP Username</Label>
+              <Label htmlFor="imapUsername">{t('settings.email_channel.imap_username_label', 'IMAP Username')}</Label>
               <Input
                 id="imapUsername"
                 name="imapUsername"
                 value={formData.imapUsername}
                 onChange={handleInputChange}
-                placeholder="Leave empty to use email address"
+                placeholder={t('email.imap_username_placeholder', 'Leave empty to use email address')}
               />
               <p className="text-sm text-gray-500">
-                Usually your email address. Leave empty to use the email address above.
+                {t('settings.email_channel.username_help', 'Usually your email address. Leave empty to use the email address above.')}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="imapPassword">IMAP Password</Label>
+              <Label htmlFor="imapPassword">{t('email.imap_password', 'IMAP Password')}</Label>
               <div className="relative">
                 <Input
                   id="imapPassword"
@@ -411,7 +413,7 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
                   type={showImapPassword ? "text" : "password"}
                   value={formData.imapPassword}
                   onChange={handleInputChange}
-                  placeholder="Leave empty to keep current password"
+                  placeholder={t('settings.email_channel.password_placeholder', 'Leave empty to keep current password')}
                 />
                 <Button
                   type="button"
@@ -428,30 +430,30 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
                 </Button>
               </div>
               <p className="text-sm text-gray-500">
-                Leave empty to keep the current password unchanged
+                {t('settings.email_channel.password_help', 'Leave empty to keep the current password unchanged')}
               </p>
             </div>
           </div>
 
           {/* SMTP Configuration */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">SMTP Settings (Sending)</h3>
+            <h3 className="text-lg font-medium">{t('email.smtp_settings', 'SMTP Settings (Sending)')}</h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="smtpHost">SMTP Host</Label>
+                <Label htmlFor="smtpHost">{t('email.smtp_host', 'SMTP Host')}</Label>
                 <Input
                   id="smtpHost"
                   name="smtpHost"
                   value={formData.smtpHost}
                   onChange={handleInputChange}
-                  placeholder="smtp.gmail.com"
+                  placeholder={t('email.smtp_host_placeholder', 'smtp.gmail.com')}
                   required
                 />
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="smtpPort">SMTP Port</Label>
+                <Label htmlFor="smtpPort">{t('email.smtp_port', 'SMTP Port')}</Label>
                 <Input
                   id="smtpPort"
                   name="smtpPort"
@@ -470,26 +472,26 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
                 onCheckedChange={(checked) => handleCheckboxChange('smtpSecure', checked as boolean)}
               />
               <Label htmlFor="smtpSecure" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Use SSL/TLS for SMTP
+                {t('email.use_ssl_tls_smtp', 'Use SSL/TLS for SMTP')}
               </Label>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="smtpUsername">SMTP Username</Label>
+              <Label htmlFor="smtpUsername">{t('settings.email_channel.smtp_username_label', 'SMTP Username')}</Label>
               <Input
                 id="smtpUsername"
                 name="smtpUsername"
                 value={formData.smtpUsername}
                 onChange={handleInputChange}
-                placeholder="Leave empty to use email address"
+                placeholder={t('email.smtp_username_placeholder', 'Leave empty to use email address')}
               />
               <p className="text-sm text-gray-500">
-                Usually your email address. Leave empty to use the email address above.
+                {t('settings.email_channel.username_help', 'Usually your email address. Leave empty to use the email address above.')}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="smtpPassword">SMTP Password</Label>
+              <Label htmlFor="smtpPassword">{t('email.smtp_password', 'SMTP Password')}</Label>
               <div className="relative">
                 <Input
                   id="smtpPassword"
@@ -497,7 +499,7 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
                   type={showSmtpPassword ? "text" : "password"}
                   value={formData.smtpPassword}
                   onChange={handleInputChange}
-                  placeholder="Leave empty to keep current password"
+                  placeholder={t('settings.email_channel.password_placeholder', 'Leave empty to keep current password')}
                 />
                 <Button
                   type="button"
@@ -514,46 +516,46 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
                 </Button>
               </div>
               <p className="text-sm text-gray-500">
-                Leave empty to keep the current password unchanged
+                {t('settings.email_channel.password_help', 'Leave empty to keep the current password unchanged')}
               </p>
             </div>
           </div>
 
           {/* Email Settings */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Email Settings</h3>
+            <h3 className="text-lg font-medium">{t('admin.settings.email', 'Email Settings')}</h3>
 
             <div className="grid gap-2">
-              <Label htmlFor="signature">Email Signature (Optional)</Label>
+              <Label htmlFor="signature">{t('settings.email_channel.signature_label', 'Email Signature (Optional)')}</Label>
               <Input
                 id="signature"
                 name="signature"
                 value={formData.signature}
                 onChange={handleInputChange}
-                placeholder="Best regards, Support Team"
+                placeholder={t('settings.email_channel.signature_placeholder', 'Best regards, Support Team')}
               />
               <p className="text-sm text-gray-500">
-                Signature to append to outgoing emails
+                {t('settings.email_channel.signature_help', 'Signature to append to outgoing emails')}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="syncFolder">Sync Folder</Label>
+                <Label htmlFor="syncFolder">{t('email.sync_folder', 'Sync Folder')}</Label>
                 <Select value={formData.syncFolder} onValueChange={(value) => handleSelectChange('syncFolder', value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select folder" />
+                    <SelectValue placeholder={t('settings.email_channel.select_folder_placeholder', 'Select folder')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="INBOX">INBOX</SelectItem>
-                    <SelectItem value="All">All Mail</SelectItem>
-                    <SelectItem value="Sent">Sent</SelectItem>
+                    <SelectItem value="All">{t('settings.email_channel.folder_all_mail', 'All Mail')}</SelectItem>
+                    <SelectItem value="Sent">{t('settings.email_channel.folder_sent', 'Sent')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="maxSyncMessages">Max Messages to Sync</Label>
+                <Label htmlFor="maxSyncMessages">{t('email.max_sync_messages', 'Max Messages to Sync')}</Label>
                 <Input
                   id="maxSyncMessages"
                   name="maxSyncMessages"
@@ -571,7 +573,7 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
           {/* Form Actions */}
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button type="button" variant="outline" onClick={handleClose}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               type="button"
@@ -585,7 +587,7 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
               ) : (
                 <TestTube className="h-4 w-4" />
               )}
-              {isValidating ? 'Testing...' : 'Test Connection'}
+              {isValidating ? t('email.testing', 'Testing...') : t('email.test_connection', 'Test Connection')}
             </Button>
             <Button
               type="submit"
@@ -597,7 +599,7 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
               ) : (
                 <Mail className="h-4 w-4" />
               )}
-              {isSubmitting ? 'Updating...' : 'Update Channel'}
+              {isSubmitting ? t('common.updating', 'Updating...') : t('settings.email_channel.update_button', 'Update Channel')}
             </Button>
           </div>
         </form>

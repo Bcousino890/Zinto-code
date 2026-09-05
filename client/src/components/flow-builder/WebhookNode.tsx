@@ -210,7 +210,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
     if (!url.trim()) {
       setTestResult({
         success: false,
-        error: 'Please enter a webhook URL'
+        error: t('flow_builder.webhook_error_url_required', 'Please enter a webhook URL')
       });
       setShowTestResult(true);
       return;
@@ -219,7 +219,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
     if (!isValidUrl(url)) {
       setTestResult({
         success: false,
-        error: 'Please enter a valid URL (must include http:// or https://)'
+        error: t('flow_builder.http_error_invalid_url', 'Please enter a valid URL (must include http:// or https://)')
       });
       setShowTestResult(true);
       return;
@@ -238,7 +238,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
       } catch {
         setTestResult({
           success: false,
-          error: 'Invalid JSON in request body'
+          error: t('flow_builder.http_error_invalid_json_body', 'Invalid JSON in request body')
         });
         setIsTesting(false);
         return;
@@ -361,7 +361,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
       <div className={cn('font-medium flex items-center gap-2', isEditing ? 'mb-2' : 'mb-1.5')}>
         <img 
           src="https://cdn-icons-png.flaticon.com/128/919/919829.png" 
-          alt="Webhook" 
+          alt={t('flow_builder.webhook', 'Webhook')} 
           className="h-4 w-4"
         />
         <span>{t('flow_builder.webhook', 'Webhook')}</span>
@@ -372,12 +372,12 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
                 {isEditing ? (
                   <>
                     <EyeOff className="h-3 w-3" />
-                    Hide
+                    {t('flow_builder.hide', 'Hide')}
                   </>
                 ) : (
                   <>
                     <Eye className="h-3 w-3" />
-                    Edit
+                    {t('flow_builder.edit', 'Edit')}
                   </>
                 )}
               </button>
@@ -396,12 +396,14 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
         <div className="mt-1 flex flex-wrap gap-1">
           {authType !== 'none' && (
             <span className="text-[10px] bg-primary/10 text-primary px-1 py-0.5 rounded">
-              Auth: {AUTH_TYPES.find(t => t.id === authType)?.name}
+              {t('flow_builder.http_summary_auth', 'Auth: {{type}}', { type: AUTH_TYPES.find((auth) => auth.id === authType)?.name })}
             </span>
           )}
           {headers.length > 0 && (
             <span className="text-[10px] bg-primary/10 text-primary px-1 py-0.5 rounded">
-              {headers.length} header{headers.length !== 1 ? 's' : ''}
+              {headers.length === 1
+                ? t('flow_builder.http_summary_one_header', '1 header')
+                : t('flow_builder.http_summary_n_headers', '{{count}} headers', { count: headers.length })}
             </span>
           )}
           {body && (method === 'POST' || method === 'PUT' || method === 'PATCH') && (
@@ -511,14 +513,14 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
             {authType === 'apikey' && (
               <div className="mt-2 space-y-2">
                 <Input
-                  placeholder="Header name (e.g., X-API-Key)"
+                  placeholder={t('flow_builder.http_auth_api_header_placeholder', 'Header name (e.g., X-API-Key)')}
                   value={authApiKeyHeader}
                   onChange={(e) => setAuthApiKeyHeader(e.target.value)}
                   className="text-xs h-7"
                 />
                 <Input
                   type="password"
-                  placeholder="API key value"
+                  placeholder={t('flow_builder.http_auth_api_value_placeholder', 'API key value')}
                   value={authApiKey}
                   onChange={(e) => setAuthApiKey(e.target.value)}
                   className="text-xs h-7"
@@ -529,7 +531,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <Label className="font-medium">Custom Headers</Label>
+              <Label className="font-medium">{t('flow_builder.http_custom_headers', 'Custom Headers')}</Label>
               <Button
                 variant="outline"
                 size="sm"
@@ -537,19 +539,19 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
                 onClick={addHeader}
               >
                 <Plus className="h-3 w-3 mr-1" />
-                Add
+                {t('common.add', 'Add')}
               </Button>
             </div>
             {headers.map((header, index) => (
               <div key={index} className="flex gap-2 mb-2">
                 <Input
-                  placeholder="Header name"
+                  placeholder={t('flow_builder.http_header_name', 'Header name')}
                   value={header.key}
                   onChange={(e) => updateHeader(index, 'key', e.target.value)}
                   className="text-xs h-7 flex-1"
                 />
                 <Input
-                  placeholder="Header value"
+                  placeholder={t('flow_builder.http_header_value', 'Header value')}
                   value={header.value}
                   onChange={(e) => updateHeader(index, 'value', e.target.value)}
                   className="text-xs h-7 flex-1"
@@ -568,22 +570,22 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
 
           {(method === 'POST' || method === 'PUT' || method === 'PATCH') && (
             <div>
-              <Label className="block mb-1 font-medium">Request Body (JSON)</Label>
+              <Label className="block mb-1 font-medium">{t('flow_builder.http_request_body_json', 'Request Body (JSON)')}</Label>
               <Textarea
-                placeholder='{"key": "value", "data": "{{contact.name}}"}'
+                placeholder={t('flow_builder.http_body_placeholder', '{"key": "value", "data": "{{contact.name}}"}')}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 className="text-xs min-h-[80px] resize-y font-mono"
               />
               <div className="text-[10px] text-muted-foreground mt-1">
-                Use &#123;&#123;variable&#125;&#125; syntax for dynamic values
+                {t('flow_builder.variable_syntax_help', 'Use {{variable}} syntax for dynamic values')}
               </div>
             </div>
           )}
 
           <div className="space-y-2 pt-2 border-t">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium">Timeout (seconds)</Label>
+              <Label className="text-xs font-medium">{t('flow_builder.http_timeout_seconds', 'Timeout (seconds)')}</Label>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -605,7 +607,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
 
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium cursor-pointer">
-                Follow redirects
+                {t('flow_builder.http_follow_redirects', 'Follow redirects')}
               </Label>
               <Switch
                 checked={followRedirects}
@@ -616,7 +618,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
 
           <div className="text-[10px] text-muted-foreground mt-2">
             <p>
-              The webhook node makes an HTTP request when reached in the flow and continues immediately to the next node. Response data is stored in variables (webhook.lastResponse, webhook.status, etc.) for use in subsequent nodes. The webhook executes only once per flow execution.
+              {t('flow_builder.webhook_node_footer', 'The webhook node makes an HTTP request when reached in the flow and continues immediately to the next node. Response data is stored in variables (webhook.lastResponse, webhook.status, etc.) for use in subsequent nodes. The webhook executes only once per flow execution.')}
             </p>
           </div>
 
@@ -630,7 +632,9 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
                     <XCircle className="h-4 w-4 text-destructive" />
                   )}
                   <span className="text-xs font-medium">
-                    {testResult.success ? 'Test Successful' : 'Test Failed'}
+                    {testResult.success
+                      ? t('flow_builder.webhook_test_successful', 'Test Successful')
+                      : t('flow_builder.webhook_test_failed', 'Test Failed')}
                   </span>
                   {testResult.duration && (
                     <span className="text-[10px] text-muted-foreground">
@@ -655,7 +659,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
               ) : (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="font-medium">Status:</span>
+                    <span className="font-medium">{t('flow_builder.http_status_label', 'Status:')}</span>
                     <span className={`px-1 py-0.5 rounded text-[10px] ${
                       testResult.success
                         ? 'bg-primary/10 text-primary'
@@ -671,7 +675,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
                         className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1"
                         onClick={() => setShowResponseHeaders(!showResponseHeaders)}
                       >
-                        Response Headers
+                        {t('flow_builder.http_response_headers', 'Response Headers')}
                         {showResponseHeaders ? (
                           <ChevronUp className="h-3 w-3" />
                         ) : (
@@ -693,7 +697,7 @@ export function WebhookNode({ id, data, isConnectable }: WebhookNodeProps) {
                   {testResult.data && (
                     <div>
                       <div className="text-xs font-medium text-muted-foreground mb-1">
-                        Response Body:
+                        {t('flow_builder.webhook_response_body_label', 'Response Body:')}
                       </div>
                       <div className="text-[10px] bg-muted/50 p-2 rounded font-mono max-h-32 overflow-y-auto">
                         {typeof testResult.data === 'string'

@@ -17,6 +17,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { 
   TestTube, 
   ExternalLink, 
@@ -62,6 +63,7 @@ interface StepStatus {
 
 export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: Props) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [testingWebhook, setTestingWebhook] = useState(false);
   const [currentStep, setCurrentStep] = useState<SetupStep>('intro');
@@ -89,12 +91,12 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
   });
 
   const steps: Array<{ key: SetupStep; title: string; description: string }> = [
-    { key: 'intro', title: 'Introduction', description: 'Overview of Instagram setup process' },
-    { key: 'meta-app', title: 'Meta App Setup', description: 'Create and configure Meta Developer app' },
-    { key: 'credentials', title: 'Account Details', description: 'Enter Instagram account information' },
-    { key: 'webhook', title: 'Webhook Configuration', description: 'Configure webhook settings' },
-    { key: 'test', title: 'Test Connection', description: 'Verify everything is working' },
-    { key: 'complete', title: 'Complete', description: 'Finalize Instagram connection' }
+    { key: 'intro', title: t('settings.instagram.step_intro_title', 'Introduction'), description: t('settings.instagram.step_intro_desc', 'Overview of Instagram setup process') },
+    { key: 'meta-app', title: t('settings.instagram.step_meta_app_title', 'Meta App Setup'), description: t('settings.instagram.step_meta_app_desc', 'Create and configure Meta Developer app') },
+    { key: 'credentials', title: t('settings.instagram.step_credentials_title', 'Account Details'), description: t('settings.instagram.step_credentials_desc', 'Enter Instagram account information') },
+    { key: 'webhook', title: t('settings.instagram_connection.webhook_configuration', 'Webhook Configuration'), description: t('settings.instagram.step_webhook_desc', 'Configure webhook settings') },
+    { key: 'test', title: t('email.test_connection', 'Test Connection'), description: t('settings.instagram.step_test_desc', 'Verify everything is working') },
+    { key: 'complete', title: t('emailCampaign.complete', 'Complete'), description: t('settings.instagram.step_complete_desc', 'Finalize Instagram connection') }
   ];
 
   const getCurrentStepIndex = () => steps.findIndex(step => step.key === currentStep);
@@ -112,13 +114,13 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
     try {
       await navigator.clipboard.writeText(text);
       toast({
-        title: "Copied!",
-        description: `${label} copied to clipboard`,
+        title: t('settings.channel.embed_copied_title', 'Copied!'),
+        description: t('settings.instagram.copied_to_clipboard', '{{label}} copied to clipboard', { label }),
       });
     } catch (err) {
       toast({
-        title: "Copy failed",
-        description: "Please copy the text manually",
+        title: t('admin.settings.copy_failed', 'Copy failed'),
+        description: t('settings.instagram.copy_failed_desc', 'Please copy the text manually'),
         variant: "destructive",
       });
     }
@@ -186,28 +188,28 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
           test: { completed: true }
         }));
         toast({
-          title: "Webhook test successful!",
-          description: "Your webhook configuration is working correctly.",
+          title: t('settings.instagram.webhook_test_successful', 'Webhook test successful!'),
+          description: t('settings.whatsapp_business_api.webhook_test_success_desc', 'Your webhook configuration is working correctly.'),
         });
       } else {
         setStepStatus(prev => ({
           ...prev,
-          test: { completed: false, error: result.message || 'Webhook test failed' }
+          test: { completed: false, error: result.message || t('settings.messenger_connection.webhook_test_failed_fallback', 'Webhook test failed') }
         }));
         toast({
-          title: "Webhook test failed",
-          description: result.message || "Please check your webhook configuration.",
+          title: t('settings.instagram.webhook_test_failed', 'Webhook test failed'),
+          description: result.message || t('settings.instagram.webhook_test_failed_desc', 'Please check your webhook configuration.'),
           variant: "destructive",
         });
       }
     } catch (error) {
       setStepStatus(prev => ({
         ...prev,
-        test: { completed: false, error: 'Network error during webhook test' }
+        test: { completed: false, error: t('settings.instagram.network_error_during_test', 'Network error during webhook test') }
       }));
       toast({
-        title: "Test failed",
-        description: "Network error. Please try again.",
+        title: t('whatsapp_business.test_failed', 'Test Failed'),
+        description: t('settings.instagram.network_error', 'Network error. Please try again.'),
         variant: "destructive",
       });
     } finally {
@@ -259,22 +261,22 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
 
         if (connectResponse.ok) {
           toast({
-            title: "Instagram connected successfully!",
-            description: "Your Instagram account is now connected and ready to use.",
+            title: t('settings.instagram.connected_successfully', 'Instagram connected successfully!'),
+            description: t('settings.instagram.connected_successfully_desc', 'Your Instagram account is now connected and ready to use.'),
           });
           setCurrentStep('complete');
           onSuccess();
         } else {
-          throw new Error('Failed to establish Instagram connection');
+          throw new Error(t('settings.instagram.establish_connection_failed', 'Failed to establish Instagram connection'));
         }
       } else {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to create connection');
+        throw new Error(error.message || t('settings.twilio_voice.create_connection_failed', 'Failed to create connection'));
       }
     } catch (error: any) {
       toast({
-        title: "Connection failed",
-        description: error.message || "Please check your configuration and try again.",
+        title: t('settings.instagram.connection_failed', 'Connection failed'),
+        description: error.message || t('settings.instagram.connection_failed_desc', 'Please check your configuration and try again.'),
         variant: "destructive",
       });
     } finally {
@@ -289,9 +291,9 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
           <div className="space-y-6">
             <div className="text-center">
               <MessageSquare className="mx-auto h-16 w-16 text-pink-500 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Connect Your Instagram Account</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('settings.instagram.intro_title', 'Connect Your Instagram Account')}</h3>
               <p className="text-gray-600 mb-6">
-                This guided setup will help you connect your Instagram Business account to enable messaging capabilities.
+                {t('settings.instagram.intro_description', 'This guided setup will help you connect your Instagram Business account to enable messaging capabilities.')}
               </p>
             </div>
 
@@ -299,22 +301,22 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
               <Card>
                 <CardContent className="pt-6">
                   <Shield className="h-8 w-8 text-blue-500 mb-2" />
-                  <h4 className="font-semibold mb-1">Secure</h4>
-                  <p className="text-sm text-gray-600">Your credentials are encrypted and stored securely</p>
+                  <h4 className="font-semibold mb-1">{t('settings.instagram.feature_secure_title', 'Secure')}</h4>
+                  <p className="text-sm text-gray-600">{t('settings.instagram.feature_secure_desc', 'Your credentials are encrypted and stored securely')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
                   <Zap className="h-8 w-8 text-yellow-500 mb-2" />
-                  <h4 className="font-semibold mb-1">Fast Setup</h4>
-                  <p className="text-sm text-gray-600">Complete setup in just a few minutes</p>
+                  <h4 className="font-semibold mb-1">{t('settings.instagram.feature_fast_title', 'Fast Setup')}</h4>
+                  <p className="text-sm text-gray-600">{t('settings.instagram.feature_fast_desc', 'Complete setup in just a few minutes')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
                   <MessageSquare className="h-8 w-8 text-green-500 mb-2" />
-                  <h4 className="font-semibold mb-1">Rich Messaging</h4>
-                  <p className="text-sm text-gray-600">Support for text, images, and quick replies</p>
+                  <h4 className="font-semibold mb-1">{t('settings.instagram.feature_messaging_title', 'Rich Messaging')}</h4>
+                  <p className="text-sm text-gray-600">{t('settings.instagram.feature_messaging_desc', 'Support for text, images, and quick replies')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -322,8 +324,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
             <Alert>
               <HelpCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Prerequisites:</strong> You'll need a Meta Developer account and an Instagram Business account. 
-                Don't worry - we'll guide you through each step!
+                <strong>{t('settings.instagram.prerequisites_label', 'Prerequisites:')}</strong> {t('settings.instagram.prerequisites_desc', "You'll need a Meta Developer account and an Instagram Business account. Don't worry - we'll guide you through each step!")}
               </AlertDescription>
             </Alert>
           </div>
@@ -333,9 +334,9 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Meta Developer App Setup</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('settings.instagram.meta_app_title', 'Meta Developer App Setup')}</h3>
               <p className="text-gray-600 mb-4">
-                First, you need to create a Meta Developer app to get your App ID and App Secret.
+                {t('settings.instagram.meta_app_description', 'First, you need to create a Meta Developer app to get your App ID and App Secret.')}
               </p>
             </div>
 
@@ -347,7 +348,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                 <Button variant="outline" className="w-full justify-between">
                   <span className="flex items-center">
                     <HelpCircle className="h-4 w-4 mr-2" />
-                    Step-by-step Meta Developer setup guide
+                    {t('settings.instagram.meta_setup_guide_toggle', 'Step-by-step Meta Developer setup guide')}
                   </span>
                   {expandedHelp === 'meta-setup' ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </Button>
@@ -356,13 +357,13 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                 <Card>
                   <CardContent className="pt-4">
                     <ol className="list-decimal list-inside space-y-3 text-sm">
-                      <li>Go to <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center">Meta for Developers <ExternalLink className="h-3 w-3 ml-1" /></a></li>
-                      <li>Click "My Apps" and then "Create App"</li>
-                      <li>Select "Business" as the app type</li>
-                      <li>Fill in your app details and create the app</li>
-                      <li>In the app dashboard, add the "Instagram Basic Display" product</li>
-                      <li>Go to App Settings → Basic to find your App ID and App Secret</li>
-                      <li>Copy the App ID and App Secret to the form below</li>
+                      <li>{t('settings.instagram.meta_step_go_to', 'Go to')} <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center">{t('settings.instagram.meta_for_developers', 'Meta for Developers')} <ExternalLink className="h-3 w-3 ml-1" /></a></li>
+                      <li>{t('settings.instagram.meta_step_create_app', 'Click "My Apps" and then "Create App"')}</li>
+                      <li>{t('settings.instagram.meta_step_select_business', 'Select "Business" as the app type')}</li>
+                      <li>{t('settings.instagram.meta_step_fill_details', 'Fill in your app details and create the app')}</li>
+                      <li>{t('settings.instagram.meta_step_add_product', 'In the app dashboard, add the "Instagram Basic Display" product')}</li>
+                      <li>{t('settings.instagram.meta_step_find_credentials', 'Go to App Settings → Basic to find your App ID and App Secret')}</li>
+                      <li>{t('settings.instagram.meta_step_copy_credentials', 'Copy the App ID and App Secret to the form below')}</li>
                     </ol>
                   </CardContent>
                 </Card>
@@ -371,18 +372,18 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="appId">App ID *</Label>
+                <Label htmlFor="appId">{t('settings.instagram_connection.app_id_label', 'App ID *')}</Label>
                 <Input
                   id="appId"
                   name="appId"
                   value={formData.appId}
                   onChange={handleInputChange}
-                  placeholder="Your Meta App ID"
+                  placeholder={t('settings.instagram.app_id_placeholder', 'Your Meta App ID')}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="appSecret">App Secret *</Label>
+                <Label htmlFor="appSecret">{t('settings.metaPartnerConfiguration.app_secret', 'App Secret *')}</Label>
                 <div className="relative">
                   <Input
                     id="appSecret"
@@ -390,7 +391,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                     type={showAppSecret ? "text" : "password"}
                     value={formData.appSecret}
                     onChange={handleInputChange}
-                    placeholder="Your Meta App Secret"
+                    placeholder={t('settings.instagram.app_secret_placeholder', 'Your Meta App Secret')}
                     required
                   />
                   <Button
@@ -409,7 +410,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
             <Alert>
               <Shield className="h-4 w-4" />
               <AlertDescription>
-                Your App Secret will be encrypted and stored securely. Never share it publicly.
+                {t('settings.instagram.app_secret_notice', 'Your App Secret will be encrypted and stored securely. Never share it publicly.')}
               </AlertDescription>
             </Alert>
           </div>
@@ -419,40 +420,40 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Instagram Account Details</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('settings.instagram.account_details_title', 'Instagram Account Details')}</h3>
               <p className="text-gray-600 mb-4">
-                Enter your Instagram Business account information and access token.
+                {t('settings.instagram.account_details_description', 'Enter your Instagram Business account information and access token.')}
               </p>
             </div>
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="accountName">Account Display Name *</Label>
+                <Label htmlFor="accountName">{t('settings.instagram.account_display_name_label', 'Account Display Name *')}</Label>
                 <Input
                   id="accountName"
                   name="accountName"
                   value={formData.accountName}
                   onChange={handleInputChange}
-                  placeholder="e.g., My Business Instagram"
+                  placeholder={t('settings.instagram.account_display_name_placeholder', 'e.g., My Business Instagram')}
                   required
                 />
-                <p className="text-xs text-gray-500">This is how the connection will appear in your dashboard</p>
+                <p className="text-xs text-gray-500">{t('settings.instagram.account_display_name_help', 'This is how the connection will appear in your dashboard')}</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="instagramAccountId">Instagram Account ID *</Label>
+                <Label htmlFor="instagramAccountId">{t('settings.instagram_connection.instagram_account_id_label', 'Instagram Account ID *')}</Label>
                 <Input
                   id="instagramAccountId"
                   name="instagramAccountId"
                   value={formData.instagramAccountId}
                   onChange={handleInputChange}
-                  placeholder="Your Instagram Business Account ID"
+                  placeholder={t('settings.instagram.instagram_account_id_placeholder', 'Your Instagram Business Account ID')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="accessToken">Access Token *</Label>
+                <Label htmlFor="accessToken">{t('settings.instagram_connection.access_token_label_required', 'Access Token *')}</Label>
                 <div className="relative">
                   <Input
                     id="accessToken"
@@ -460,7 +461,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                     type={showPassword ? "text" : "password"}
                     value={formData.accessToken}
                     onChange={handleInputChange}
-                    placeholder="Your long-lived page access token"
+                    placeholder={t('settings.instagram.access_token_placeholder', 'Your long-lived page access token')}
                     required
                   />
                   <Button
@@ -484,7 +485,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                 <Button variant="outline" className="w-full justify-between">
                   <span className="flex items-center">
                     <HelpCircle className="h-4 w-4 mr-2" />
-                    How to get your Instagram Account ID and Access Token
+                    {t('settings.instagram.token_help_toggle', 'How to get your Instagram Account ID and Access Token')}
                   </span>
                   {expandedHelp === 'token-help' ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </Button>
@@ -494,19 +495,19 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                   <CardContent className="pt-4">
                     <div className="space-y-4">
                       <div>
-                        <h4 className="font-semibold mb-2">Getting your Instagram Account ID:</h4>
+                        <h4 className="font-semibold mb-2">{t('settings.instagram.getting_account_id_title', 'Getting your Instagram Account ID:')}</h4>
                         <ol className="list-decimal list-inside space-y-1 text-sm">
-                          <li>Go to your Meta Developer app dashboard</li>
-                          <li>Navigate to Instagram Basic Display → Basic Display</li>
-                          <li>Your Instagram Account ID will be listed there</li>
+                          <li>{t('settings.instagram.help_step_go_dashboard', 'Go to your Meta Developer app dashboard')}</li>
+                          <li>{t('settings.instagram.help_step_navigate_basic_display', 'Navigate to Instagram Basic Display → Basic Display')}</li>
+                          <li>{t('settings.instagram.help_step_account_id_listed', 'Your Instagram Account ID will be listed there')}</li>
                         </ol>
                       </div>
                       <div>
-                        <h4 className="font-semibold mb-2">Getting your Access Token:</h4>
+                        <h4 className="font-semibold mb-2">{t('settings.instagram.getting_access_token_title', 'Getting your Access Token:')}</h4>
                         <ol className="list-decimal list-inside space-y-1 text-sm">
-                          <li>In your Meta app, go to Instagram Basic Display</li>
-                          <li>Generate a long-lived access token</li>
-                          <li>Make sure it has the necessary permissions for messaging</li>
+                          <li>{t('settings.instagram.help_step_go_basic_display', 'In your Meta app, go to Instagram Basic Display')}</li>
+                          <li>{t('settings.instagram.help_step_generate_token', 'Generate a long-lived access token')}</li>
+                          <li>{t('settings.instagram.help_step_token_permissions', 'Make sure it has the necessary permissions for messaging')}</li>
                         </ol>
                       </div>
                     </div>
@@ -521,15 +522,15 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Webhook Configuration</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('settings.instagram_connection.webhook_configuration', 'Webhook Configuration')}</h3>
               <p className="text-gray-600 mb-4">
-                Configure webhook settings to receive Instagram messages in real-time.
+                {t('settings.instagram.webhook_description', 'Configure webhook settings to receive Instagram messages in real-time.')}
               </p>
             </div>
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="webhookUrl">Webhook URL</Label>
+                <Label htmlFor="webhookUrl">{t('whatsapp_business.webhook_url', 'Webhook URL')}</Label>
                 <div className="flex space-x-2">
                   <Input
                     id="webhookUrl"
@@ -543,43 +544,42 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => copyToClipboard(formData.webhookUrl, 'Webhook URL')}
+                    onClick={() => copyToClipboard(formData.webhookUrl, t('whatsapp_business.webhook_url', 'Webhook URL'))}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-xs text-gray-500">This URL is automatically configured for your domain</p>
+                <p className="text-xs text-gray-500">{t('settings.instagram.webhook_url_help', 'This URL is automatically configured for your domain')}</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="verifyToken">Verify Token</Label>
+                <Label htmlFor="verifyToken">{t('settings.instagram.verify_token_label', 'Verify Token')}</Label>
                 <div className="flex space-x-2">
                   <Input
                     id="verifyToken"
                     name="verifyToken"
                     value={formData.verifyToken}
                     onChange={handleInputChange}
-                    placeholder="Enter a verify token"
+                    placeholder={t('settings.instagram.verify_token_placeholder', 'Enter a verify token')}
                     required
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => copyToClipboard(formData.verifyToken, 'Verify Token')}
+                    onClick={() => copyToClipboard(formData.verifyToken, t('settings.instagram.verify_token_label', 'Verify Token'))}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-xs text-gray-500">A random token has been generated for you</p>
+                <p className="text-xs text-gray-500">{t('settings.instagram.verify_token_help', 'A random token has been generated for you')}</p>
               </div>
             </div>
 
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Important:</strong> You'll need to configure these webhook settings in your Meta Developer app.
-                Copy the URL and verify token to use in your Meta app webhook configuration.
+                <strong>{t('settings.instagram.important_label', 'Important:')}</strong> {t('settings.instagram.webhook_important_desc', "You'll need to configure these webhook settings in your Meta Developer app. Copy the URL and verify token to use in your Meta app webhook configuration.")}
               </AlertDescription>
             </Alert>
 
@@ -591,7 +591,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                 <Button variant="outline" className="w-full justify-between">
                   <span className="flex items-center">
                     <HelpCircle className="h-4 w-4 mr-2" />
-                    How to configure webhooks in Meta Developer Console
+                    {t('settings.instagram.webhook_help_toggle', 'How to configure webhooks in Meta Developer Console')}
                   </span>
                   {expandedHelp === 'webhook-setup' ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </Button>
@@ -600,13 +600,13 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                 <Card>
                   <CardContent className="pt-4">
                     <ol className="list-decimal list-inside space-y-2 text-sm">
-                      <li>Go to your Meta Developer app dashboard</li>
-                      <li>Navigate to Instagram → Configuration</li>
-                      <li>In the Webhooks section, click "Add Callback URL"</li>
-                      <li>Paste the Webhook URL from above</li>
-                      <li>Enter the Verify Token from above</li>
-                      <li>Subscribe to "messages" events</li>
-                      <li>Save the configuration</li>
+                      <li>{t('settings.instagram.help_step_go_dashboard', 'Go to your Meta Developer app dashboard')}</li>
+                      <li>{t('settings.instagram.webhook_step_navigate_configuration', 'Navigate to Instagram → Configuration')}</li>
+                      <li>{t('settings.instagram.webhook_step_add_callback', 'In the Webhooks section, click "Add Callback URL"')}</li>
+                      <li>{t('settings.instagram.webhook_step_paste_url', 'Paste the Webhook URL from above')}</li>
+                      <li>{t('settings.instagram.webhook_step_enter_token', 'Enter the Verify Token from above')}</li>
+                      <li>{t('settings.instagram.webhook_step_subscribe_messages', 'Subscribe to "messages" events')}</li>
+                      <li>{t('settings.instagram.webhook_step_save', 'Save the configuration')}</li>
                     </ol>
                   </CardContent>
                 </Card>
@@ -619,9 +619,9 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Test Your Configuration</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('settings.instagram.test_title', 'Test Your Configuration')}</h3>
               <p className="text-gray-600 mb-4">
-                Let's test your webhook configuration to make sure everything is working correctly.
+                {t('settings.instagram.test_description', "Let's test your webhook configuration to make sure everything is working correctly.")}
               </p>
             </div>
 
@@ -629,8 +629,8 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold">Webhook Connection Test</h4>
-                    <p className="text-sm text-gray-600">Verify that your webhook URL is accessible and configured correctly</p>
+                    <h4 className="font-semibold">{t('settings.instagram.webhook_connection_test', 'Webhook Connection Test')}</h4>
+                    <p className="text-sm text-gray-600">{t('settings.instagram.webhook_connection_test_desc', 'Verify that your webhook URL is accessible and configured correctly')}</p>
                   </div>
                   <Button
                     onClick={testWebhookConnection}
@@ -644,7 +644,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                     ) : (
                       <TestTube className="h-4 w-4 mr-2" />
                     )}
-                    {testingWebhook ? 'Testing...' : stepStatus.test.completed ? 'Test Passed' : 'Test Webhook'}
+                    {testingWebhook ? t('settings.instagram_connection.testing_webhook', 'Testing...') : stepStatus.test.completed ? t('settings.instagram.test_passed', 'Test Passed') : t('whatsapp_business.test_webhook', 'Test Webhook')}
                   </Button>
                 </div>
 
@@ -661,7 +661,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                   <Alert className="mt-4">
                     <CheckCircle className="h-4 w-4" />
                     <AlertDescription>
-                      Webhook test successful! Your configuration is working correctly.
+                      {t('settings.instagram.test_success_alert', 'Webhook test successful! Your configuration is working correctly.')}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -671,7 +671,7 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
             <Alert>
               <HelpCircle className="h-4 w-4" />
               <AlertDescription>
-                If the test fails, please check that you've correctly configured the webhook URL and verify token in your Meta Developer app.
+                {t('settings.instagram.test_failure_hint', "If the test fails, please check that you've correctly configured the webhook URL and verify token in your Meta Developer app.")}
               </AlertDescription>
             </Alert>
           </div>
@@ -682,9 +682,9 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
           <div className="space-y-6 text-center">
             <div>
               <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Instagram Connected Successfully!</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('settings.instagram.complete_title', 'Instagram Connected Successfully!')}</h3>
               <p className="text-gray-600 mb-6">
-                Your Instagram Business account is now connected and ready to receive messages.
+                {t('settings.instagram.complete_description', 'Your Instagram Business account is now connected and ready to receive messages.')}
               </p>
             </div>
 
@@ -692,15 +692,15 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
               <Card>
                 <CardContent className="pt-6">
                   <MessageSquare className="h-8 w-8 text-blue-500 mb-2 mx-auto" />
-                  <h4 className="font-semibold mb-1">Message Management</h4>
-                  <p className="text-sm text-gray-600">Receive and respond to Instagram messages</p>
+                  <h4 className="font-semibold mb-1">{t('settings.instagram.feature_message_management_title', 'Message Management')}</h4>
+                  <p className="text-sm text-gray-600">{t('settings.instagram.feature_message_management_desc', 'Receive and respond to Instagram messages')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
                   <Zap className="h-8 w-8 text-yellow-500 mb-2 mx-auto" />
-                  <h4 className="font-semibold mb-1">Rich Media</h4>
-                  <p className="text-sm text-gray-600">Send images, videos, and quick replies</p>
+                  <h4 className="font-semibold mb-1">{t('settings.instagram.feature_rich_media_title', 'Rich Media')}</h4>
+                  <p className="text-sm text-gray-600">{t('settings.instagram.feature_rich_media_desc', 'Send images, videos, and quick replies')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -708,15 +708,14 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
             <Alert>
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Next steps:</strong> You can now start receiving Instagram messages.
-                Visit the conversations page to see incoming messages and respond to your customers.
+                <strong>{t('settings.instagram.next_steps_label', 'Next steps:')}</strong> {t('settings.instagram.next_steps_desc', 'You can now start receiving Instagram messages. Visit the conversations page to see incoming messages and respond to your customers.')}
               </AlertDescription>
             </Alert>
           </div>
         );
 
       default:
-        return <div>Step content for {currentStep}</div>;
+        return <div>{t('settings.instagram.step_content_fallback', 'Step content for {{step}}', { step: currentStep })}</div>;
     }
   };
 
@@ -726,10 +725,10 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <MessageSquare className="h-5 w-5 mr-2 text-pink-500" />
-            Instagram Connection Setup
+            {t('settings.instagram.setup_dialog_title', 'Instagram Connection Setup')}
           </DialogTitle>
           <DialogDescription>
-            Connect your Instagram Business account to enable messaging
+            {t('settings.instagram.setup_dialog_description', 'Connect your Instagram Business account to enable messaging')}
           </DialogDescription>
         </DialogHeader>
 
@@ -737,8 +736,8 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Step {getCurrentStepIndex() + 1} of {steps.length}</span>
-              <span>{Math.round(getProgress())}% Complete</span>
+              <span>{t('settings.instagram.step_progress', 'Step {{current}} of {{total}}', { current: getCurrentStepIndex() + 1, total: steps.length })}</span>
+              <span>{t('settings.instagram.percent_complete', '{{percent}}% Complete', { percent: Math.round(getProgress()) })}</span>
             </div>
             <Progress value={getProgress()} className="w-full" />
           </div>
@@ -776,18 +775,18 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
             disabled={getCurrentStepIndex() === 0}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Previous
+            {t('common.pagination.previous', 'Previous')}
           </Button>
           
           <div className="flex space-x-2">
             <Button variant="outline" onClick={onClose}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             
             {currentStep === 'complete' ? (
               <Button onClick={onClose}>
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Done
+                {t('erp.common.done', 'Done')}
               </Button>
             ) : currentStep === 'test' ? (
               <Button onClick={handleSubmit} disabled={loading || !validateStep(currentStep)}>
@@ -796,14 +795,14 @@ export function EnhancedInstagramConnectionForm({ isOpen, onClose, onSuccess }: 
                 ) : (
                   <CheckCircle className="h-4 w-4 mr-2" />
                 )}
-                Complete Setup
+                {t('settings.instagram.complete_setup_button', 'Complete Setup')}
               </Button>
             ) : (
               <Button
                 onClick={nextStep}
                 disabled={!validateStep(currentStep)}
               >
-                Next
+                {t('common.pagination.next', 'Next')}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             )}

@@ -372,7 +372,7 @@ export function MakeNode({ id, data, isConnectable }: MakeNodeProps) {
             <TooltipTrigger asChild>
               <img 
                 src="https://registry.npmmirror.com/@lobehub/icons-static-png/1.75.0/files/dark/make-color.png" 
-                alt="Make.com" 
+                alt={t('flow_builder.make_name', 'Make.com')} 
                 className="h-4 w-4"
               />
             </TooltipTrigger>
@@ -381,7 +381,7 @@ export function MakeNode({ id, data, isConnectable }: MakeNodeProps) {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <span>Make.com Integration</span>
+        <span>{t('flow_builder.make_node_title', 'Make.com Integration')}</span>
 
         {/* Configuration Progress Badge */}
         <TooltipProvider>
@@ -640,10 +640,10 @@ export function MakeNode({ id, data, isConnectable }: MakeNodeProps) {
                 onChange={(e) => setRegion(e.target.value)}
                 className="w-full text-xs h-7 border border-input rounded px-2 bg-background"
               >
-                <option value="us1">US1 (United States) - Recommended</option>
-                <option value="us2">US2 (United States)</option>
-                <option value="eu1">EU1 (Europe)</option>
-                <option value="eu2">EU2 (Europe)</option>
+                <option value="us1">{t('flow_builder.make_region_us1', 'US1 (United States) - Recommended')}</option>
+                <option value="us2">{t('flow_builder.make_region_us2', 'US2 (United States)')}</option>
+                <option value="eu1">{t('flow_builder.make_region_eu1', 'EU1 (Europe)')}</option>
+                <option value="eu2">{t('flow_builder.make_region_eu2', 'EU2 (Europe)')}</option>
               </select>
               <p className="text-[10px] text-muted-foreground mt-1">
                 {t('flow_builder.make_region_help_text', 'Select the region where your Make.com account is hosted')}
@@ -1240,7 +1240,7 @@ export function MakeNode({ id, data, isConnectable }: MakeNodeProps) {
                       {Object.entries(customParameters).map(([key, value], index) => (
                         <div key={index} className="flex gap-2">
                           <Input
-                            placeholder="Parameter name"
+                            placeholder={t('flow_builder.make_parameter_name_placeholder', 'Parameter name')}
                             value={key}
                             onChange={(e) => {
                               const newParams = { ...customParameters };
@@ -1251,7 +1251,7 @@ export function MakeNode({ id, data, isConnectable }: MakeNodeProps) {
                             className="text-xs h-7 flex-1"
                           />
                           <Input
-                            placeholder="Value (use {{variable}} for dynamic)"
+                            placeholder={t('flow_builder.make_parameter_value_placeholder', 'Value (use {{variable}} for dynamic)')}
                             value={value as string}
                             onChange={(e) => {
                               setCustomParameters({

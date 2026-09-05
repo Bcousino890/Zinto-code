@@ -292,16 +292,16 @@ export function InboxSettings() {
 
                         if (!result) {
                           toast({
-                            title: 'Test Failed',
-                            description: 'Could not show test notification. Check browser console for details.',
+                            title: t('whatsapp_business.test_failed', 'Test Failed'),
+                            description: t('settings.inbox.test_notification_failed_desc', 'Could not show test notification. Check browser console for details.'),
                             variant: 'destructive',
                           });
                         }
                       } catch (error) {
                         console.error('Test notification error:', error);
                         toast({
-                          title: 'Test Failed',
-                          description: 'Error showing test notification: ' + (error instanceof Error ? error.message : String(error)),
+                          title: t('whatsapp_business.test_failed', 'Test Failed'),
+                          description: t('settings.inbox.test_notification_error_desc', 'Error showing test notification: {{message}}', { message: error instanceof Error ? error.message : String(error) }),
                           variant: 'destructive',
                         });
                       }
@@ -439,7 +439,7 @@ function AudioTranscriptionSettings() {
       queryClient.invalidateQueries({ queryKey: ['/api/settings/inbox'] });
       toast({ title: t('settings.updated', 'Settings Updated'), description: enabled ? t('settings.inbox.audio_transcription_enabled', 'Audio transcription enabled') : t('settings.inbox.audio_transcription_disabled', 'Audio transcription disabled') });
     } catch (error) {
-      toast({ title: t('common.error', 'Error'), description: 'Failed to update transcription setting', variant: 'destructive' });
+      toast({ title: t('common.error', 'Error'), description: t('settings.inbox.audio_transcription_update_failed', 'Failed to update transcription setting'), variant: 'destructive' });
     } finally {
       setIsUpdatingTranscription(false);
     }
@@ -461,7 +461,7 @@ function AudioTranscriptionSettings() {
       queryClient.invalidateQueries({ queryKey: ['/api/settings/inbox'] });
       toast({ title: t('settings.updated', 'Settings Updated'), description: t('settings.inbox.audio_transcription_settings_saved', 'Transcription settings saved') });
     } catch (error) {
-      toast({ title: t('common.error', 'Error'), description: 'Failed to update transcription settings', variant: 'destructive' });
+      toast({ title: t('common.error', 'Error'), description: t('settings.inbox.audio_transcription_settings_update_failed', 'Failed to update transcription settings'), variant: 'destructive' });
     } finally {
       setIsUpdatingTranscription(false);
     }
@@ -1069,8 +1069,8 @@ function WhatsAppHistorySyncSettings() {
     } catch (error) {
       console.error('Error updating history sync:', error);
       toast({
-        title: "Error",
-        description: "Failed to update history sync setting",
+        title: t('common.error', 'Error'),
+        description: t('settings.inbox.update_history_sync_failed', 'Failed to update history sync setting'),
         variant: "destructive"
       });
     }
@@ -1083,18 +1083,18 @@ function WhatsAppHistorySyncSettings() {
       const response = await apiRequest('POST', `/api/channel-connections/${connectionId}/sync-history`);
 
       if (!response.ok) {
-        throw new Error('Failed to start history sync');
+        throw new Error(t('settings.inbox.start_history_sync_failed', 'Failed to start history sync'));
       }
 
       toast({
-        title: "History Sync Started",
-        description: "WhatsApp will reconnect to sync message history from the last 7 days. You may need to scan the QR code again."
+        title: t('settings.inbox.history_sync_started', 'History Sync Started'),
+        description: t('settings.inbox.history_sync_started_desc', 'WhatsApp will reconnect to sync message history from the last 7 days. You may need to scan the QR code again.')
       });
     } catch (error) {
       console.error('Error starting history sync:', error);
       toast({
-        title: "Error",
-        description: "Failed to start history sync",
+        title: t('common.error', 'Error'),
+        description: t('settings.inbox.start_history_sync_failed', 'Failed to start history sync'),
         variant: "destructive"
       });
     } finally {

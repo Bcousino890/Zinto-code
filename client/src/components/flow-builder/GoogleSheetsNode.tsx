@@ -977,7 +977,7 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
     } catch (e) {
       toast({
         title: t('flow_builder.google_sheets.workbook_create_failed_title', 'Could not create spreadsheet'),
-        description: e instanceof Error ? e.message : 'Error',
+        description: e instanceof Error ? e.message : t('common.error', 'Error'),
         variant: 'destructive'
       });
     } finally {
@@ -1452,13 +1452,13 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Badge variant="outline" className="text-[9px] px-1 py-0">
-                    ⚙️ Config
+                    {t('flow_builder.google_sheets.badge_config', '⚙️ Config')}
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p className="text-xs">Operation configuration completed</p>
+                  <p className="text-xs">{t('flow_builder.google_sheets.badge_config_tooltip', 'Operation configuration completed')}</p>
                   <p className="text-xs text-muted-foreground">
-                    {Object.keys(config).length} configuration option(s) set
+                    {t('flow_builder.google_sheets.badge_config_tooltip_sub', '{{count}} configuration option(s) set', { count: Object.keys(config).length })}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -1470,13 +1470,13 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Badge variant="outline" className="text-[9px] px-1 py-0">
-                    🔗 {variableMappings.length} Vars
+                    {t('flow_builder.google_sheets.badge_vars', '🔗 {{count}} Vars', { count: variableMappings.length })}
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p className="text-xs">Variable mappings configured</p>
+                  <p className="text-xs">{t('flow_builder.google_sheets.badge_vars_tooltip', 'Variable mappings configured')}</p>
                   <p className="text-xs text-muted-foreground">
-                    {variableMappings.length} output variable(s) will be created
+                    {t('flow_builder.google_sheets.badge_vars_tooltip_sub', '{{count}} output variable(s) will be created', { count: variableMappings.length })}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -1519,7 +1519,7 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
             >
               <SelectTrigger className="text-xs h-7">
                 <SelectValue placeholder={t('flow_builder.google_sheets.choose_template', 'Choose a template...')}>
-                  {selectedTemplate ? GOOGLE_SHEETS_TEMPLATES.find(tmpl => tmpl.id === selectedTemplate)?.name : t('flow_builder.google_sheets.choose_template', 'Choose a template...')}
+                  {selectedTemplate ? t(`flow_builder.google_sheets.template_${selectedTemplate}` as const, GOOGLE_SHEETS_TEMPLATES.find(tmpl => tmpl.id === selectedTemplate)?.name || '') : t('flow_builder.google_sheets.choose_template', 'Choose a template...')}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -2062,26 +2062,26 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
             <div className="text-[10px] text-primary space-y-1">
               {operation === 'append_row' && (
                 <>
-                  <p>• Column mapping: {"{"}"Name": "{"{{contact.name}}"}", "Phone": "{"{{contact.phone}}"}", "Message": "{"{{message.content}}"}"{"}"}</p>
-                  <p>• Use variables from conversation context</p>
+                  <p>• {t('flow_builder.google_sheets.example_column_mapping', 'Column mapping:')} {"{"}"Name": "{"{{contact.name}}"}", "Phone": "{"{{contact.phone}}"}", "Message": "{"{{message.content}}"}"{"}"}</p>
+                  <p>• {t('flow_builder.google_sheets.example_use_variables', 'Use variables from conversation context')}</p>
                 </>
               )}
               {operation === 'read_rows' && (
                 <>
-                  <p>• Filter by phone: filterColumn="Phone", filterValue="{"{{contact.phone}}"}"</p>
-                  <p>• Limit results with maxRows for better performance</p>
+                  <p>• {t('flow_builder.google_sheets.example_filter_by_phone', 'Filter by phone:')} filterColumn="Phone", filterValue="{"{{contact.phone}}"}"</p>
+                  <p>• {t('flow_builder.google_sheets.example_limit_results', 'Limit results with maxRows for better performance')}</p>
                 </>
               )}
               {operation === 'update_row' && (
                 <>
-                  <p>• Match by ID: matchColumn="Order ID", matchValue="{"{{order.id}}"}"</p>
-                  <p>• Update specific columns: {"{"}"Status": "{"{{order.status}}"}", "Updated": "{"{{current.timestamp}}"}"{"}"}</p>
+                  <p>• {t('flow_builder.google_sheets.example_match_by_id', 'Match by ID:')} matchColumn="Order ID", matchValue="{"{{order.id}}"}"</p>
+                  <p>• {t('flow_builder.google_sheets.example_update_columns', 'Update specific columns:')} {"{"}"Status": "{"{{order.status}}"}", "Updated": "{"{{current.timestamp}}"}"{"}"}</p>
                 </>
               )}
               {operation === 'get_sheet_info' && (
                 <>
-                  <p>• No configuration needed - returns sheet metadata</p>
-                  <p>• Use to get column headers and sheet information</p>
+                  <p>• {t('flow_builder.google_sheets.example_no_config_needed', 'No configuration needed - returns sheet metadata')}</p>
+                  <p>• {t('flow_builder.google_sheets.example_get_headers', 'Use to get column headers and sheet information')}</p>
                 </>
               )}
             </div>

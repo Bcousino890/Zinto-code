@@ -774,7 +774,7 @@ export function CallAgentNode({ id, data, isConnectable }: CallAgentNodeProps) {
         <div className="font-medium flex items-center gap-2">
           <img 
             src="https://cdn-icons-png.flaticon.com/128/8898/8898892.png" 
-            alt="Call Agent" 
+            alt={t('flow_builder.call_agent', 'Call Agent')} 
             className="h-4 w-4"
           />
           <span>{t('flow_builder.call_agent', 'Call Agent')}</span>
@@ -1369,7 +1369,7 @@ export function CallAgentNode({ id, data, isConnectable }: CallAgentNodeProps) {
               <div>
                 <Label className="text-xs font-medium mb-1 block">{t('flow_builder.call_agent.to_phone_number', 'To Phone Number')}</Label>
                 <Input
-                  placeholder="+1234567890 or {{contact.phone}}"
+                  placeholder={t('flow_builder.call_agent.to_phone_placeholder', '+1234567890 or {{contact.phone}}')}
                   value={toPhoneNumber}
                   onChange={(e) => {
                     setToPhoneNumber(e.target.value);

@@ -55006,5 +55006,1425 @@
     {
         "key": "erp.salesOrders.updated",
         "value": "Actualizado"
+    },
+    {
+        "key": "flow_builder.keyword_match_value_label",
+        "value": "Valor a coincidir:"
+    },
+    {
+        "key": "flow_builder.keyword_match_value_placeholder",
+        "value": "Texto a coincidir"
+    },
+    {
+        "key": "flow_builder.keyword_trigger_no_match_output",
+        "value": "Habrá una salida \"sin coincidencia\" disponible para las respuestas no coincidentes."
+    },
+    {
+        "key": "flow_builder.keyword_case_sensitive_suffix",
+        "value": "(distingue mayúsculas y minúsculas)"
+    },
+    {
+        "key": "flow_builder.call_agent",
+        "value": "Agente de llamadas"
+    },
+    {
+        "key": "flow_builder.call_agent.to_phone_placeholder",
+        "value": "+1234567890 o {{contact.phone}}"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_config",
+        "value": "⚙️ Configuración"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_config_tooltip",
+        "value": "Configuración de la operación completada"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_config_tooltip_sub",
+        "value": "{{count}} opción(es) de configuración establecidas"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_vars",
+        "value": "🔗 {{count}} variables"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_vars_tooltip",
+        "value": "Asignaciones de variables configuradas"
+    },
+    {
+        "key": "flow_builder.google_sheets.badge_vars_tooltip_sub",
+        "value": "Se crearán {{count}} variable(s) de salida"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_column_mapping",
+        "value": "Asignación de columnas:"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_use_variables",
+        "value": "Use variables del contexto de la conversación"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_filter_by_phone",
+        "value": "Filtrar por teléfono:"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_limit_results",
+        "value": "Limite los resultados con maxRows para un mejor rendimiento"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_match_by_id",
+        "value": "Coincidir por ID:"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_update_columns",
+        "value": "Actualizar columnas específicas:"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_no_config_needed",
+        "value": "No se necesita configuración: devuelve los metadatos de la hoja"
+    },
+    {
+        "key": "flow_builder.google_sheets.example_get_headers",
+        "value": "Úselo para obtener los encabezados de columna y la información de la hoja"
+    },
+    {
+        "key": "flow_builder.make_node_title",
+        "value": "Integración con Make.com"
+    },
+    {
+        "key": "flow_builder.make_region_us1",
+        "value": "US1 (Estados Unidos) - Recomendado"
+    },
+    {
+        "key": "flow_builder.make_region_us2",
+        "value": "US2 (Estados Unidos)"
+    },
+    {
+        "key": "flow_builder.make_region_eu1",
+        "value": "EU1 (Europa)"
+    },
+    {
+        "key": "flow_builder.make_region_eu2",
+        "value": "EU2 (Europa)"
+    },
+    {
+        "key": "flow_builder.make_parameter_name_placeholder",
+        "value": "Nombre del parámetro"
+    },
+    {
+        "key": "flow_builder.make_parameter_value_placeholder",
+        "value": "Valor (use {{variable}} para valores dinámicos)"
+    },
+    {
+        "key": "flow_builder.shopify_api_connected",
+        "value": "API conectada"
+    },
+    {
+        "key": "flow_builder.shopify_quick_templates",
+        "value": "Plantillas rápidas"
+    },
+    {
+        "key": "flow_builder.shopify_choose_operation",
+        "value": "Elija una operación de Shopify..."
+    },
+    {
+        "key": "flow_builder.shopify_shop_configuration",
+        "value": "Configuración de la tienda"
+    },
+    {
+        "key": "flow_builder.shopify_shop_domain",
+        "value": "Dominio de la tienda"
+    },
+    {
+        "key": "flow_builder.shopify_shop_domain_placeholder",
+        "value": "mitienda.myshopify.com"
+    },
+    {
+        "key": "flow_builder.shopify_api_key",
+        "value": "Clave de API"
+    },
+    {
+        "key": "flow_builder.shopify_api_key_placeholder",
+        "value": "Su clave de API de Shopify"
+    },
+    {
+        "key": "flow_builder.shopify_api_password",
+        "value": "Contraseña de API"
+    },
+    {
+        "key": "flow_builder.shopify_api_password_placeholder",
+        "value": "Su contraseña de API de Shopify"
+    },
+    {
+        "key": "flow_builder.shopify_test_connection_tooltip",
+        "value": "Probar la conexión con su tienda de Shopify"
+    },
+    {
+        "key": "flow_builder.shopify_test_connection",
+        "value": "Probar conexión"
+    },
+    {
+        "key": "flow_builder.shopify_resource",
+        "value": "Recurso de Shopify"
+    },
+    {
+        "key": "flow_builder.shopify_select_resource",
+        "value": "Seleccionar recurso"
+    },
+    {
+        "key": "flow_builder.shopify_action_type",
+        "value": "Tipo de acción"
+    },
+    {
+        "key": "flow_builder.shopify_select_action",
+        "value": "Seleccionar acción"
+    },
+    {
+        "key": "flow_builder.shopify_filters_parameters",
+        "value": "Filtros y parámetros"
+    },
+    {
+        "key": "flow_builder.shopify_select_filter_placeholder",
+        "value": "Seleccionar {{label}}"
+    },
+    {
+        "key": "flow_builder.shopify_enter_filter_placeholder",
+        "value": "Introduzca {{label}}"
+    },
+    {
+        "key": "flow_builder.shopify_response_field_placeholder",
+        "value": "orders.0.id"
+    },
+    {
+        "key": "flow_builder.shopify_variable_name_placeholder",
+        "value": "shopify.order_id"
+    },
+    {
+        "key": "flow_builder.shopify_mapping_help",
+        "value": "Asigne los campos de respuesta de Shopify a variables del flujo para usarlas en los nodos siguientes"
+    },
+    {
+        "key": "flow_builder.shopify_rate_limit_delay",
+        "value": "Retraso por límite de tasa (ms)"
+    },
+    {
+        "key": "flow_builder.shopify_rate_limit_help",
+        "value": "Retraso entre solicitudes para respetar los límites de tasa de Shopify"
+    },
+    {
+        "key": "flow_builder.shopify_var_resource_data",
+        "value": "Datos de {{resource}}"
+    },
+    {
+        "key": "flow_builder.shopify_var_response_count",
+        "value": "Número de resultados devueltos"
+    },
+    {
+        "key": "flow_builder.shopify_var_rate_limit_remaining",
+        "value": "Llamadas a la API restantes"
+    },
+    {
+        "key": "flow_builder.shopify_var_success",
+        "value": "Estado de éxito de la solicitud"
+    },
+    {
+        "key": "flow_builder.shopify_var_order_id",
+        "value": "ID del pedido"
+    },
+    {
+        "key": "flow_builder.shopify_var_order_total",
+        "value": "Total del pedido"
+    },
+    {
+        "key": "flow_builder.shopify_var_customer_email",
+        "value": "Correo electrónico del cliente"
+    },
+    {
+        "key": "flow_builder.shopify_var_product_id",
+        "value": "ID del producto"
+    },
+    {
+        "key": "flow_builder.shopify_var_product_title",
+        "value": "Título del producto"
+    },
+    {
+        "key": "flow_builder.shopify_var_product_vendor",
+        "value": "Proveedor del producto"
+    },
+    {
+        "key": "flow_builder.shopify_var_customer_id",
+        "value": "ID del cliente"
+    },
+    {
+        "key": "flow_builder.shopify_var_customer_first_name",
+        "value": "Nombre"
+    },
+    {
+        "key": "flow_builder.shopify_node_footer",
+        "value": "El nodo de integración con Shopify se conecta a la API de administración de su tienda de Shopify. Los datos de la respuesta estarán disponibles como variables en los nodos siguientes."
+    },
+    {
+        "key": "flow_builder.shopify_connection_successful",
+        "value": "Conexión exitosa"
+    },
+    {
+        "key": "flow_builder.shopify_connection_failed_title",
+        "value": "Conexión fallida"
+    },
+    {
+        "key": "flow_builder.shopify_one_result",
+        "value": "1 resultado"
+    },
+    {
+        "key": "flow_builder.shopify_n_results",
+        "value": "{{count}} resultados"
+    },
+    {
+        "key": "flow_builder.shopify_api_calls_remaining",
+        "value": "{{count}} llamadas a la API restantes"
+    },
+    {
+        "key": "flow_builder.shopify_connection_success_detail",
+        "value": "Se conectó correctamente a la tienda de Shopify y se obtuvieron los datos de {{resource}}."
+    },
+    {
+        "key": "flow_builder.shopify_sample_response_data",
+        "value": "Ejemplo de datos de respuesta:"
+    },
+    {
+        "key": "flow_builder.webhook_error_url_required",
+        "value": "Por favor, introduzca una URL de webhook"
+    },
+    {
+        "key": "flow_builder.webhook_node_footer",
+        "value": "El nodo de webhook realiza una solicitud HTTP cuando se alcanza en el flujo y continúa inmediatamente al siguiente nodo. Los datos de la respuesta se guardan en variables (webhook.lastResponse, webhook.status, etc.) para usarlas en los nodos siguientes. El webhook se ejecuta solo una vez por ejecución del flujo."
+    },
+    {
+        "key": "flow_builder.webhook_test_successful",
+        "value": "Prueba exitosa"
+    },
+    {
+        "key": "flow_builder.webhook_test_failed",
+        "value": "Prueba fallida"
+    },
+    {
+        "key": "flow_builder.webhook_response_body_label",
+        "value": "Cuerpo de la respuesta:"
+    },
+    {
+        "key": "flow_builder.webhook_help_label",
+        "value": "Ayuda"
+    },
+    {
+        "key": "flow_builder.webhook_help.dialog_title",
+        "value": "Disparador de webhook: ayuda y documentación"
+    },
+    {
+        "key": "flow_builder.webhook_help.dialog_description",
+        "value": "Configure webhooks para recibir eventos de sistemas externos (Shopify, Stripe, CRM, etc.)"
+    },
+    {
+        "key": "flow_builder.webhook_filter_field_placeholder",
+        "value": "event_type u order.status"
+    },
+    {
+        "key": "flow_builder.webhook_filter_case",
+        "value": "Mayús./minús."
+    },
+    {
+        "key": "flow_builder.webhook_help.overview_title",
+        "value": "Descripción general del disparador de webhook"
+    },
+    {
+        "key": "flow_builder.webhook_help.overview_prefix",
+        "value": "El nodo"
+    },
+    {
+        "key": "flow_builder.webhook_help.overview_text",
+        "value": "recibe solicitudes HTTP POST de sistemas externos e inicia su flujo. Úselo para integrarse con Shopify, Stripe, CRM o cualquier servicio que pueda enviar webhooks."
+    },
+    {
+        "key": "flow_builder.webhook_help.key_features_label",
+        "value": "Funciones principales:"
+    },
+    {
+        "key": "flow_builder.webhook_help.key_features_text",
+        "value": "URL única por flujo, filtros de carga útil opcionales, asociación de contactos (extraer o crear), respuesta configurable (asíncrona/síncrona) y herramientas de prueba."
+    },
+    {
+        "key": "flow_builder.webhook_help.url_title",
+        "value": "Configuración de la URL y seguridad"
+    },
+    {
+        "key": "flow_builder.webhook_help.url_text_before",
+        "value": "Después de guardar el flujo, se genera una URL de webhook única. Puede usar la predeterminada (ID del flujo + token) o habilitar"
+    },
+    {
+        "key": "flow_builder.webhook_help.url_text_example",
+        "value": "para una ruta memorable (ej."
+    },
+    {
+        "key": "flow_builder.webhook_help.url_text_after",
+        "value": "). Las rutas personalizadas deben ser únicas entre todos los disparadores de webhook y usar solo letras, números, guiones y guiones bajos."
+    },
+    {
+        "key": "flow_builder.webhook_help.url_regenerate_before",
+        "value": "Use"
+    },
+    {
+        "key": "flow_builder.webhook_help.url_regenerate_after",
+        "value": "si la URL se ve comprometida. Actualice la nueva URL en su sistema externo."
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_title",
+        "value": "Estrategias de asignación de contactos"
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_extract_before",
+        "value": "Use una ruta de campo (ej."
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_extract_after",
+        "value": ") para identificar un contacto existente. Ideal cuando la carga útil incluye identificadores del cliente."
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_create_desc",
+        "value": "Asigne campos de la carga útil a nombre, correo electrónico y teléfono para crear un contacto nuevo con cada webhook. Ideal para generación de leads o nuevos registros."
+    },
+    {
+        "key": "flow_builder.webhook_help.contact_system_desc",
+        "value": "Ejecute el flujo sin asociar un contacto. Úselo para trabajos en segundo plano, notificaciones o eventos del sistema."
+    },
+    {
+        "key": "flow_builder.webhook_help.filtering_title",
+        "value": "Filtrado de la carga útil"
+    },
+    {
+        "key": "flow_builder.webhook_help.filtering_before",
+        "value": "Agregue condiciones para que el flujo se ejecute solo cuando la carga útil coincida (ej."
+    },
+    {
+        "key": "flow_builder.webhook_help.filtering_equals",
+        "value": "es igual a"
+    },
+    {
+        "key": "flow_builder.webhook_help.filtering_after",
+        "value": "). Todas las condiciones se combinan con Y. Use notación de punto para campos anidados."
+    },
+    {
+        "key": "flow_builder.webhook_help.response_async_desc",
+        "value": "(recomendado): devuelve 202 Accepted de inmediato; el flujo se ejecuta en segundo plano."
+    },
+    {
+        "key": "flow_builder.webhook_help.response_sync_desc",
+        "value": ": espera a que el flujo termine (con tiempo de espera) antes de responder; úselo cuando quien llama necesita el resultado (ej. pasarelas de pago)."
+    },
+    {
+        "key": "flow_builder.webhook_help.response_body_before",
+        "value": "Puede definir el código de estado, la plantilla del cuerpo de la respuesta (con variables como"
+    },
+    {
+        "key": "flow_builder.webhook_help.response_body_after",
+        "value": ") y encabezados personalizados."
+    },
+    {
+        "key": "flow_builder.webhook_help.examples_title",
+        "value": "Ejemplos de integración"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_shopify_before",
+        "value": "Pedido creado, datos del cliente: use Extraer con"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_shopify_middle",
+        "value": "; filtre por"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_stripe_before",
+        "value": "Eventos de pago: filtre por"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_stripe_middle",
+        "value": "(ej."
+    },
+    {
+        "key": "flow_builder.webhook_help.example_stripe_after",
+        "value": "); use el modo síncrono si necesita devolver una respuesta."
+    },
+    {
+        "key": "flow_builder.webhook_help.example_crm_title",
+        "value": "CRM / Formularios"
+    },
+    {
+        "key": "flow_builder.webhook_help.example_crm_desc",
+        "value": "Nuevo lead: use Crear contacto nuevo y asigne los campos del formulario a nombre, correo electrónico y teléfono."
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_title",
+        "value": "Resolución de problemas"
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_save_flow",
+        "value": "Guarde el flujo primero para obtener una URL de webhook válida."
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_test",
+        "value": "Use la sección Probar webhook para enviar una carga útil de ejemplo y verificar los filtros y la resolución de contactos."
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_logs",
+        "value": "Consulte el botón Registros para ver las solicitudes entrantes y los errores."
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_content_type_before",
+        "value": "Asegúrese de que el sistema externo envíe"
+    },
+    {
+        "key": "flow_builder.webhook_help.troubleshooting_content_type_after",
+        "value": "para cargas útiles JSON."
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.official_api",
+        "value": "API oficial"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.no_flow_id",
+        "value": "Sin ID de flujo"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.managed_in_business_manager",
+        "value": "El contenido del flujo se administra en Facebook Business Manager"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.flow_id",
+        "value": "ID del flujo"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.create_flow",
+        "value": "Crear flujo"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.flow_id_placeholder",
+        "value": "Pegue la URL del flujo o introduzca el ID del flujo (ej., 1501195611215264)"
+    },
+    {
+        "key": "flow_builder.whatsapp_flows.flow_id_help",
+        "value": "Pegue la URL completa del flujo de Facebook o solo el ID del flujo. El ID se extraerá automáticamente."
+    },
+    {
+        "key": "settings.email_channel.error_not_found",
+        "value": "No se encontró la configuración de correo. Verifique que el canal de correo esté configurado correctamente."
+    },
+    {
+        "key": "settings.email_channel.error_access_denied",
+        "value": "Acceso denegado. No tiene permiso para editar este canal de correo."
+    },
+    {
+        "key": "settings.email_channel.error_authentication_required",
+        "value": "Se requiere autenticación. Inicie sesión de nuevo."
+    },
+    {
+        "key": "settings.email_channel.error_server",
+        "value": "Error del servidor: {{status}}. Inténtelo de nuevo más tarde."
+    },
+    {
+        "key": "settings.email_channel.load_failed_desc",
+        "value": "Error al cargar la configuración de correo"
+    },
+    {
+        "key": "settings.email_channel.test_success_desc",
+        "value": "Las conexiones IMAP y SMTP funcionan correctamente"
+    },
+    {
+        "key": "settings.email_channel.updated_title",
+        "value": "Canal de correo actualizado"
+    },
+    {
+        "key": "settings.email_channel.updated_desc",
+        "value": "Su canal de correo se ha actualizado correctamente"
+    },
+    {
+        "key": "settings.email_channel.update_failed_desc",
+        "value": "Error al actualizar el canal de correo"
+    },
+    {
+        "key": "settings.email_channel.loading_configuration",
+        "value": "Cargando la configuración de correo..."
+    },
+    {
+        "key": "settings.email_channel.edit_title",
+        "value": "Editar canal de correo"
+    },
+    {
+        "key": "settings.email_channel.display_name_placeholder",
+        "value": "Equipo de soporte"
+    },
+    {
+        "key": "settings.email_channel.display_name_help",
+        "value": "El nombre que aparece al enviar correos"
+    },
+    {
+        "key": "settings.email_channel.imap_username_label",
+        "value": "Usuario IMAP"
+    },
+    {
+        "key": "settings.email_channel.username_help",
+        "value": "Normalmente su dirección de correo. Deje vacío para usar la dirección de arriba."
+    },
+    {
+        "key": "settings.email_channel.password_placeholder",
+        "value": "Deje vacío para mantener la contraseña actual"
+    },
+    {
+        "key": "settings.email_channel.password_help",
+        "value": "Deje vacío para mantener la contraseña actual sin cambios"
+    },
+    {
+        "key": "settings.email_channel.smtp_username_label",
+        "value": "Usuario SMTP"
+    },
+    {
+        "key": "settings.email_channel.signature_label",
+        "value": "Firma de correo (opcional)"
+    },
+    {
+        "key": "settings.email_channel.signature_placeholder",
+        "value": "Saludos cordiales, Equipo de soporte"
+    },
+    {
+        "key": "settings.email_channel.signature_help",
+        "value": "Firma que se añadirá a los correos salientes"
+    },
+    {
+        "key": "settings.email_channel.select_folder_placeholder",
+        "value": "Seleccionar carpeta"
+    },
+    {
+        "key": "settings.email_channel.folder_all_mail",
+        "value": "Todos los mensajes"
+    },
+    {
+        "key": "settings.email_channel.folder_sent",
+        "value": "Enviados"
+    },
+    {
+        "key": "settings.email_channel.update_button",
+        "value": "Actualizar canal"
+    },
+    {
+        "key": "settings.messenger_connection.update_failed",
+        "value": "Error al actualizar la conexión de Messenger"
+    },
+    {
+        "key": "settings.messenger_connection.updated_title",
+        "value": "Messenger actualizado"
+    },
+    {
+        "key": "settings.messenger_connection.updated_desc",
+        "value": "La conexión con su página de Facebook se ha actualizado correctamente."
+    },
+    {
+        "key": "settings.messenger_connection.update_failed_desc",
+        "value": "Error al actualizar la conexión con la página de Facebook. Verifique sus credenciales e inténtelo de nuevo."
+    },
+    {
+        "key": "settings.messenger_connection.edit_title",
+        "value": "Editar conexión de Facebook Messenger"
+    },
+    {
+        "key": "settings.messenger_connection.edit_description",
+        "value": "Actualice la configuración de conexión de su página de Facebook. Necesitará sus credenciales de Meta for Developers."
+    },
+    {
+        "key": "settings.messenger_connection.account_name_placeholder",
+        "value": "ej. Mi página de Facebook"
+    },
+    {
+        "key": "settings.messenger_connection.page_id_label",
+        "value": "ID de página de Facebook *"
+    },
+    {
+        "key": "settings.messenger_connection.page_id_help",
+        "value": "El ID de su página de Facebook, desde Meta for Developers"
+    },
+    {
+        "key": "settings.messenger_connection.page_access_token_label",
+        "value": "Token de acceso de la página"
+    },
+    {
+        "key": "settings.messenger_connection.page_access_token_help",
+        "value": "Token de acceso de página de larga duración de Meta for Developers. Deje vacío para mantener el token actual."
+    },
+    {
+        "key": "settings.messenger_connection.app_secret_update_help",
+        "value": "El secreto de su aplicación de Meta (opcional, para la verificación del webhook). Deje vacío para mantener el secreto actual."
+    },
+    {
+        "key": "settings.messenger_connection.setup_step_subscribe_fields",
+        "value": "Suscríbase a los campos de webhook 'messages' y 'messaging_postbacks'"
+    },
+    {
+        "key": "settings.messenger_connection.setup_step_permissions",
+        "value": "Asegúrese de que su página tenga los permisos necesarios"
+    },
+    {
+        "key": "settings.twilio_sms.load_failed_desc",
+        "value": "Error al cargar la configuración de Twilio SMS"
+    },
+    {
+        "key": "settings.twilio_sms.invalid_channel_type",
+        "value": "Tipo de canal no válido"
+    },
+    {
+        "key": "settings.twilio_sms.update_failed",
+        "value": "Error al actualizar la conexión de Twilio SMS"
+    },
+    {
+        "key": "settings.twilio_sms.updated_title",
+        "value": "Twilio SMS actualizado"
+    },
+    {
+        "key": "settings.twilio_sms.updated_desc",
+        "value": "Su canal de Twilio SMS se ha actualizado correctamente."
+    },
+    {
+        "key": "settings.twilio_sms.update_failed_desc",
+        "value": "Error al actualizar la conexión de Twilio SMS."
+    },
+    {
+        "key": "settings.twilio_sms.edit_dialog_title",
+        "value": "Editar conexión de Twilio SMS"
+    },
+    {
+        "key": "settings.twilio_sms.edit_dialog_description",
+        "value": "Actualice su configuración de Twilio Programmable Messaging."
+    },
+    {
+        "key": "settings.whatsapp_business_api.error_not_found",
+        "value": "No se encontró la conexión de WhatsApp."
+    },
+    {
+        "key": "settings.whatsapp_business_api.error_access_denied",
+        "value": "Acceso denegado. No tiene permiso para editar esta conexión."
+    },
+    {
+        "key": "settings.whatsapp_business_api.load_failed_desc",
+        "value": "Error al cargar la configuración de WhatsApp"
+    },
+    {
+        "key": "settings.whatsapp_business_api.connection_id_required",
+        "value": "Se requiere el ID de conexión para realizar la prueba."
+    },
+    {
+        "key": "settings.whatsapp_business_api.webhook_test_success_desc",
+        "value": "Su configuración de webhook funciona correctamente."
+    },
+    {
+        "key": "settings.whatsapp_business_api.update_failed",
+        "value": "Error al actualizar la conexión de la API de WhatsApp Business"
+    },
+    {
+        "key": "settings.whatsapp_business_api.updated_title",
+        "value": "API de WhatsApp Business actualizada"
+    },
+    {
+        "key": "settings.whatsapp_business_api.updated_desc",
+        "value": "¡Su conexión de la API de WhatsApp Business se ha actualizado correctamente!"
+    },
+    {
+        "key": "settings.whatsapp_business_api.update_error_title",
+        "value": "Error de actualización"
+    },
+    {
+        "key": "settings.whatsapp_business_api.loading_configuration",
+        "value": "Cargando la configuración de WhatsApp..."
+    },
+    {
+        "key": "settings.whatsapp_business_api.edit_title",
+        "value": "Editar API de WhatsApp Business"
+    },
+    {
+        "key": "settings.whatsapp_business_api.access_token_placeholder",
+        "value": "Deje vacío para mantener el token actual"
+    },
+    {
+        "key": "settings.whatsapp_business_api.access_token_help",
+        "value": "Deje vacío para mantener el token de acceso actual sin cambios"
+    },
+    {
+        "key": "settings.whatsapp_business_api.app_secret_placeholder",
+        "value": "Deje vacío para mantener el secreto actual"
+    },
+    {
+        "key": "settings.whatsapp_business_api.app_secret_help",
+        "value": "Deje vacío para mantener el secreto de la aplicación actual sin cambios"
+    },
+    {
+        "key": "settings.whatsapp_business_api.verify_token_help",
+        "value": "Este token se almacena con su conexión de la API de WhatsApp Business. Cópielo y péguelo en el campo \"Verify token\" de la configuración del webhook en Meta for Developers."
+    },
+    {
+        "key": "settings.whatsapp_business_api.connection_token_label",
+        "value": "✅ Token de la conexión:"
+    },
+    {
+        "key": "settings.whatsapp_business_api.connection_token_desc",
+        "value": "Este token de verificación está almacenado con su conexión:"
+    },
+    {
+        "key": "settings.whatsapp_business_api.token_instructions",
+        "value": "Asegúrese de introducir este token exacto en la configuración del webhook de Meta Developer Console."
+    },
+    {
+        "key": "settings.whatsapp_business_api.test_webhook_short_desc",
+        "value": "Pruebe la configuración de su webhook"
+    },
+    {
+        "key": "settings.whatsapp_business_api.note_label",
+        "value": "Nota:"
+    },
+    {
+        "key": "settings.instagram.step_intro_title",
+        "value": "Introducción"
+    },
+    {
+        "key": "settings.instagram.step_intro_desc",
+        "value": "Descripción general del proceso de configuración de Instagram"
+    },
+    {
+        "key": "settings.instagram.step_meta_app_title",
+        "value": "Configuración de la aplicación de Meta"
+    },
+    {
+        "key": "settings.instagram.step_meta_app_desc",
+        "value": "Cree y configure la aplicación de Meta for Developers"
+    },
+    {
+        "key": "settings.instagram.step_credentials_title",
+        "value": "Datos de la cuenta"
+    },
+    {
+        "key": "settings.instagram.step_credentials_desc",
+        "value": "Introduzca la información de la cuenta de Instagram"
+    },
+    {
+        "key": "settings.instagram.step_webhook_desc",
+        "value": "Configure los ajustes del webhook"
+    },
+    {
+        "key": "settings.instagram.step_test_desc",
+        "value": "Verifique que todo funcione"
+    },
+    {
+        "key": "settings.instagram.step_complete_desc",
+        "value": "Finalice la conexión con Instagram"
+    },
+    {
+        "key": "settings.instagram.copied_to_clipboard",
+        "value": "{{label}} copiado al portapapeles"
+    },
+    {
+        "key": "settings.instagram.copy_failed_desc",
+        "value": "Copie el texto manualmente"
+    },
+    {
+        "key": "settings.instagram.webhook_test_successful",
+        "value": "¡Prueba de webhook exitosa!"
+    },
+    {
+        "key": "settings.instagram.webhook_test_failed",
+        "value": "La prueba del webhook falló"
+    },
+    {
+        "key": "settings.instagram.webhook_test_failed_desc",
+        "value": "Verifique la configuración de su webhook."
+    },
+    {
+        "key": "settings.instagram.network_error_during_test",
+        "value": "Error de red durante la prueba del webhook"
+    },
+    {
+        "key": "settings.instagram.network_error",
+        "value": "Error de red. Inténtelo de nuevo."
+    },
+    {
+        "key": "settings.instagram.connected_successfully",
+        "value": "¡Instagram conectado correctamente!"
+    },
+    {
+        "key": "settings.instagram.connected_successfully_desc",
+        "value": "Su cuenta de Instagram ya está conectada y lista para usar."
+    },
+    {
+        "key": "settings.instagram.establish_connection_failed",
+        "value": "Error al establecer la conexión con Instagram"
+    },
+    {
+        "key": "settings.instagram.connection_failed",
+        "value": "Conexión fallida"
+    },
+    {
+        "key": "settings.instagram.connection_failed_desc",
+        "value": "Verifique su configuración e inténtelo de nuevo."
+    },
+    {
+        "key": "settings.instagram.intro_title",
+        "value": "Conecte su cuenta de Instagram"
+    },
+    {
+        "key": "settings.instagram.intro_description",
+        "value": "Esta configuración guiada le ayudará a conectar su cuenta de Instagram Business para habilitar la mensajería."
+    },
+    {
+        "key": "settings.instagram.feature_secure_title",
+        "value": "Seguro"
+    },
+    {
+        "key": "settings.instagram.feature_secure_desc",
+        "value": "Sus credenciales se cifran y almacenan de forma segura"
+    },
+    {
+        "key": "settings.instagram.feature_fast_title",
+        "value": "Configuración rápida"
+    },
+    {
+        "key": "settings.instagram.feature_fast_desc",
+        "value": "Complete la configuración en solo unos minutos"
+    },
+    {
+        "key": "settings.instagram.feature_messaging_title",
+        "value": "Mensajería enriquecida"
+    },
+    {
+        "key": "settings.instagram.feature_messaging_desc",
+        "value": "Compatible con texto, imágenes y respuestas rápidas"
+    },
+    {
+        "key": "settings.instagram.prerequisites_label",
+        "value": "Requisitos previos:"
+    },
+    {
+        "key": "settings.instagram.prerequisites_desc",
+        "value": "Necesitará una cuenta de Meta for Developers y una cuenta de Instagram Business. No se preocupe: le guiaremos en cada paso."
+    },
+    {
+        "key": "settings.instagram.meta_app_title",
+        "value": "Configuración de la aplicación de Meta for Developers"
+    },
+    {
+        "key": "settings.instagram.meta_app_description",
+        "value": "Primero debe crear una aplicación de Meta for Developers para obtener su ID de aplicación y su secreto de aplicación."
+    },
+    {
+        "key": "settings.instagram.meta_setup_guide_toggle",
+        "value": "Guía paso a paso de configuración de Meta for Developers"
+    },
+    {
+        "key": "settings.instagram.meta_step_go_to",
+        "value": "Vaya a"
+    },
+    {
+        "key": "settings.instagram.meta_for_developers",
+        "value": "Meta for Developers"
+    },
+    {
+        "key": "settings.instagram.meta_step_create_app",
+        "value": "Haga clic en \"My Apps\" y luego en \"Create App\""
+    },
+    {
+        "key": "settings.instagram.meta_step_select_business",
+        "value": "Seleccione \"Business\" como tipo de aplicación"
+    },
+    {
+        "key": "settings.instagram.meta_step_fill_details",
+        "value": "Complete los datos de su aplicación y créela"
+    },
+    {
+        "key": "settings.instagram.meta_step_add_product",
+        "value": "En el panel de la aplicación, agregue el producto \"Instagram Basic Display\""
+    },
+    {
+        "key": "settings.instagram.meta_step_find_credentials",
+        "value": "Vaya a App Settings → Basic para encontrar su ID de aplicación y su secreto de aplicación"
+    },
+    {
+        "key": "settings.instagram.meta_step_copy_credentials",
+        "value": "Copie el ID de aplicación y el secreto de aplicación en el formulario de abajo"
+    },
+    {
+        "key": "settings.instagram.app_id_placeholder",
+        "value": "Su ID de aplicación de Meta"
+    },
+    {
+        "key": "settings.instagram.app_secret_placeholder",
+        "value": "Su secreto de aplicación de Meta"
+    },
+    {
+        "key": "settings.instagram.app_secret_notice",
+        "value": "Su secreto de aplicación se cifrará y almacenará de forma segura. Nunca lo comparta públicamente."
+    },
+    {
+        "key": "settings.instagram.account_details_title",
+        "value": "Datos de la cuenta de Instagram"
+    },
+    {
+        "key": "settings.instagram.account_details_description",
+        "value": "Introduzca la información de su cuenta de Instagram Business y su token de acceso."
+    },
+    {
+        "key": "settings.instagram.account_display_name_label",
+        "value": "Nombre visible de la cuenta *"
+    },
+    {
+        "key": "settings.instagram.account_display_name_placeholder",
+        "value": "ej., Instagram de mi empresa"
+    },
+    {
+        "key": "settings.instagram.account_display_name_help",
+        "value": "Así aparecerá la conexión en su panel de control"
+    },
+    {
+        "key": "settings.instagram.instagram_account_id_placeholder",
+        "value": "El ID de su cuenta de Instagram Business"
+    },
+    {
+        "key": "settings.instagram.access_token_placeholder",
+        "value": "Su token de acceso de página de larga duración"
+    },
+    {
+        "key": "settings.instagram.token_help_toggle",
+        "value": "Cómo obtener su ID de cuenta de Instagram y su token de acceso"
+    },
+    {
+        "key": "settings.instagram.getting_account_id_title",
+        "value": "Cómo obtener su ID de cuenta de Instagram:"
+    },
+    {
+        "key": "settings.instagram.help_step_go_dashboard",
+        "value": "Vaya al panel de su aplicación de Meta for Developers"
+    },
+    {
+        "key": "settings.instagram.help_step_navigate_basic_display",
+        "value": "Navegue a Instagram Basic Display → Basic Display"
+    },
+    {
+        "key": "settings.instagram.help_step_account_id_listed",
+        "value": "Allí aparecerá el ID de su cuenta de Instagram"
+    },
+    {
+        "key": "settings.instagram.getting_access_token_title",
+        "value": "Cómo obtener su token de acceso:"
+    },
+    {
+        "key": "settings.instagram.help_step_go_basic_display",
+        "value": "En su aplicación de Meta, vaya a Instagram Basic Display"
+    },
+    {
+        "key": "settings.instagram.help_step_generate_token",
+        "value": "Genere un token de acceso de larga duración"
+    },
+    {
+        "key": "settings.instagram.help_step_token_permissions",
+        "value": "Asegúrese de que tenga los permisos necesarios para la mensajería"
+    },
+    {
+        "key": "settings.instagram.webhook_description",
+        "value": "Configure los ajustes del webhook para recibir mensajes de Instagram en tiempo real."
+    },
+    {
+        "key": "settings.instagram.webhook_url_help",
+        "value": "Esta URL se configura automáticamente para su dominio"
+    },
+    {
+        "key": "settings.instagram.verify_token_label",
+        "value": "Token de verificación"
+    },
+    {
+        "key": "settings.instagram.verify_token_placeholder",
+        "value": "Introduzca un token de verificación"
+    },
+    {
+        "key": "settings.instagram.verify_token_help",
+        "value": "Se ha generado un token aleatorio para usted"
+    },
+    {
+        "key": "settings.instagram.important_label",
+        "value": "Importante:"
+    },
+    {
+        "key": "settings.instagram.webhook_important_desc",
+        "value": "Deberá configurar estos ajustes de webhook en su aplicación de Meta for Developers. Copie la URL y el token de verificación para usarlos en la configuración del webhook de su aplicación de Meta."
+    },
+    {
+        "key": "settings.instagram.webhook_help_toggle",
+        "value": "Cómo configurar webhooks en Meta Developer Console"
+    },
+    {
+        "key": "settings.instagram.webhook_step_navigate_configuration",
+        "value": "Navegue a Instagram → Configuration"
+    },
+    {
+        "key": "settings.instagram.webhook_step_add_callback",
+        "value": "En la sección Webhooks, haga clic en \"Add Callback URL\""
+    },
+    {
+        "key": "settings.instagram.webhook_step_paste_url",
+        "value": "Pegue la URL del webhook de arriba"
+    },
+    {
+        "key": "settings.instagram.webhook_step_enter_token",
+        "value": "Introduzca el token de verificación de arriba"
+    },
+    {
+        "key": "settings.instagram.webhook_step_subscribe_messages",
+        "value": "Suscríbase a los eventos \"messages\""
+    },
+    {
+        "key": "settings.instagram.webhook_step_save",
+        "value": "Guarde la configuración"
+    },
+    {
+        "key": "settings.instagram.test_title",
+        "value": "Pruebe su configuración"
+    },
+    {
+        "key": "settings.instagram.test_description",
+        "value": "Probemos la configuración de su webhook para asegurarnos de que todo funcione correctamente."
+    },
+    {
+        "key": "settings.instagram.webhook_connection_test",
+        "value": "Prueba de conexión del webhook"
+    },
+    {
+        "key": "settings.instagram.webhook_connection_test_desc",
+        "value": "Verifique que la URL de su webhook sea accesible y esté configurada correctamente"
+    },
+    {
+        "key": "settings.instagram.test_passed",
+        "value": "Prueba superada"
+    },
+    {
+        "key": "settings.instagram.test_success_alert",
+        "value": "¡Prueba de webhook exitosa! Su configuración funciona correctamente."
+    },
+    {
+        "key": "settings.instagram.test_failure_hint",
+        "value": "Si la prueba falla, verifique que haya configurado correctamente la URL del webhook y el token de verificación en su aplicación de Meta for Developers."
+    },
+    {
+        "key": "settings.instagram.complete_title",
+        "value": "¡Instagram conectado correctamente!"
+    },
+    {
+        "key": "settings.instagram.complete_description",
+        "value": "Su cuenta de Instagram Business ya está conectada y lista para recibir mensajes."
+    },
+    {
+        "key": "settings.instagram.feature_message_management_title",
+        "value": "Gestión de mensajes"
+    },
+    {
+        "key": "settings.instagram.feature_message_management_desc",
+        "value": "Reciba y responda mensajes de Instagram"
+    },
+    {
+        "key": "settings.instagram.feature_rich_media_title",
+        "value": "Contenido multimedia enriquecido"
+    },
+    {
+        "key": "settings.instagram.feature_rich_media_desc",
+        "value": "Envíe imágenes, videos y respuestas rápidas"
+    },
+    {
+        "key": "settings.instagram.next_steps_label",
+        "value": "Próximos pasos:"
+    },
+    {
+        "key": "settings.instagram.next_steps_desc",
+        "value": "Ya puede empezar a recibir mensajes de Instagram. Visite la página de conversaciones para ver los mensajes entrantes y responder a sus clientes."
+    },
+    {
+        "key": "settings.instagram.step_content_fallback",
+        "value": "Contenido del paso {{step}}"
+    },
+    {
+        "key": "settings.instagram.setup_dialog_title",
+        "value": "Configuración de la conexión con Instagram"
+    },
+    {
+        "key": "settings.instagram.setup_dialog_description",
+        "value": "Conecte su cuenta de Instagram Business para habilitar la mensajería"
+    },
+    {
+        "key": "settings.instagram.step_progress",
+        "value": "Paso {{current}} de {{total}}"
+    },
+    {
+        "key": "settings.instagram.percent_complete",
+        "value": "{{percent}}% completado"
+    },
+    {
+        "key": "settings.instagram.complete_setup_button",
+        "value": "Completar configuración"
+    },
+    {
+        "key": "settings.inbox.test_notification_failed_desc",
+        "value": "No se pudo mostrar la notificación de prueba. Consulte la consola del navegador para más detalles."
+    },
+    {
+        "key": "settings.inbox.test_notification_error_desc",
+        "value": "Error al mostrar la notificación de prueba: {{message}}"
+    },
+    {
+        "key": "settings.inbox.audio_transcription_update_failed",
+        "value": "Error al actualizar la configuración de transcripción"
+    },
+    {
+        "key": "settings.inbox.audio_transcription_settings_update_failed",
+        "value": "Error al actualizar los ajustes de transcripción"
+    },
+    {
+        "key": "settings.inbox.start_history_sync_failed",
+        "value": "Error al iniciar la sincronización del historial"
+    },
+    {
+        "key": "settings.inbox.history_sync_started",
+        "value": "Sincronización del historial iniciada"
+    },
+    {
+        "key": "settings.inbox.history_sync_started_desc",
+        "value": "WhatsApp se reconectará para sincronizar el historial de mensajes de los últimos 7 días. Es posible que deba escanear el código QR de nuevo."
+    },
+    {
+        "key": "settings.messenger_connection.connect_failed_desc",
+        "value": "Error al conectar la página de Facebook. Verifique sus credenciales e inténtelo de nuevo."
+    },
+    {
+        "key": "settings.messenger_connection.connect_title",
+        "value": "Conectar Facebook Messenger"
+    },
+    {
+        "key": "settings.messenger_connection.connect_description",
+        "value": "Conecte su página de Facebook para recibir y enviar mensajes por Messenger. Necesitará sus credenciales de Meta for Developers."
+    },
+    {
+        "key": "settings.messenger_connection.app_secret_placeholder",
+        "value": "El secreto de su aplicación (opcional)"
+    },
+    {
+        "key": "settings.messenger_connection.app_secret_help",
+        "value": "El secreto de su aplicación de Meta (opcional, para la verificación del webhook)"
+    },
+    {
+        "key": "settings.messenger_connection.connect_button",
+        "value": "Conectar Messenger"
+    },
+    {
+        "key": "settings.ses.saved_title",
+        "value": "Configuración de Amazon SES guardada"
+    },
+    {
+        "key": "settings.ses.saved_desc",
+        "value": "Sus ajustes de SES se han actualizado correctamente"
+    },
+    {
+        "key": "settings.ses.update_failed_desc",
+        "value": "Error al actualizar la configuración de SES: {{message}}"
+    },
+    {
+        "key": "settings.ses.test_email_sent_title",
+        "value": "Correo de prueba enviado"
+    },
+    {
+        "key": "settings.ses.test_email_sent_desc",
+        "value": "Se ha enviado un correo de prueba correctamente"
+    },
+    {
+        "key": "settings.ses.test_email_failed_desc",
+        "value": "Error al enviar el correo de prueba: {{message}}"
+    },
+    {
+        "key": "settings.ses.validation_region_required",
+        "value": "La región de AWS es obligatoria"
+    },
+    {
+        "key": "settings.ses.validation_access_key_required",
+        "value": "El ID de clave de acceso es obligatorio"
+    },
+    {
+        "key": "settings.ses.validation_secret_key_required",
+        "value": "La clave de acceso secreta es obligatoria"
+    },
+    {
+        "key": "settings.ses.validation_from_email_required",
+        "value": "La dirección de correo del remitente es obligatoria"
+    },
+    {
+        "key": "settings.ses.validation_test_email_required",
+        "value": "Introduzca una dirección de correo a la que enviar el correo de prueba"
+    },
+    {
+        "key": "settings.ses.validation_complete_config",
+        "value": "Complete primero todos los campos obligatorios de la configuración de SES"
+    },
+    {
+        "key": "settings.ses.section_title",
+        "value": "Configuración de Amazon SES"
+    },
+    {
+        "key": "settings.ses.section_description",
+        "value": "Configure Amazon Simple Email Service (SES) para enviar correos de notificaciones, invitaciones y campañas."
+    },
+    {
+        "key": "settings.ses.sandbox_notice",
+        "value": "Asegúrese de que su cuenta de SES esté fuera del modo sandbox y de que la dirección de correo del remitente esté verificada en AWS SES."
+    },
+    {
+        "key": "settings.ses.region_label",
+        "value": "Región de AWS"
+    },
+    {
+        "key": "settings.ses.region_help",
+        "value": "Región de AWS donde está configurado su servicio de SES (ej., us-east-1, eu-west-1)"
+    },
+    {
+        "key": "settings.ses.port_label",
+        "value": "Puerto"
+    },
+    {
+        "key": "settings.ses.port_help",
+        "value": "Opcional. Puerto SMTP de SES (ej. 587, 465). Déjelo en blanco para usar el endpoint HTTPS predeterminado."
+    },
+    {
+        "key": "settings.ses.access_key_id_label",
+        "value": "ID de clave de acceso"
+    },
+    {
+        "key": "settings.ses.secret_access_key_label",
+        "value": "Clave de acceso secreta"
+    },
+    {
+        "key": "settings.ses.secret_access_key_stored_placeholder",
+        "value": "Deje vacío para mantener la clave actual"
+    },
+    {
+        "key": "settings.ses.secret_access_key_placeholder",
+        "value": "Introduzca la clave de acceso secreta"
+    },
+    {
+        "key": "settings.ses.secret_access_key_stored_help",
+        "value": "La clave secreta está definida. Deje vacío para mantenerla sin cambios o introduzca una nueva."
+    },
+    {
+        "key": "settings.ses.secret_access_key_help",
+        "value": "Su clave de acceso secreta de AWS"
+    },
+    {
+        "key": "settings.ses.from_email_label",
+        "value": "Correo del remitente"
+    },
+    {
+        "key": "settings.ses.from_email_help",
+        "value": "Dirección de correo del remitente verificada en AWS SES"
+    },
+    {
+        "key": "settings.ses.from_name_label",
+        "value": "Nombre del remitente"
+    },
+    {
+        "key": "settings.ses.enable_label",
+        "value": "Habilitar Amazon SES"
+    },
+    {
+        "key": "settings.ses.enable_help",
+        "value": "Habilite o deshabilite Amazon SES para el envío de correos"
+    },
+    {
+        "key": "settings.ses.test_section_title",
+        "value": "Probar la configuración de correo"
+    },
+    {
+        "key": "settings.ses.test_email_placeholder",
+        "value": "Introduzca una dirección de correo para recibir un mensaje de prueba"
+    },
+    {
+        "key": "settings.ses.send_test_email",
+        "value": "Enviar correo de prueba"
+    },
+    {
+        "key": "settings.smtp.saved_title",
+        "value": "Configuración SMTP guardada"
+    },
+    {
+        "key": "settings.smtp.saved_desc",
+        "value": "Sus ajustes de correo se han actualizado correctamente"
+    },
+    {
+        "key": "settings.smtp.update_failed_desc",
+        "value": "Error al actualizar la configuración SMTP: {{message}}"
+    },
+    {
+        "key": "settings.smtp.validation_host_required",
+        "value": "El servidor SMTP es obligatorio"
+    },
+    {
+        "key": "settings.smtp.validation_credentials_required",
+        "value": "El usuario y la contraseña SMTP son obligatorios"
+    },
+    {
+        "key": "settings.smtp.validation_sender_email_required",
+        "value": "La dirección de correo del remitente es obligatoria"
+    },
+    {
+        "key": "settings.smtp.validation_complete_config",
+        "value": "Complete primero todos los campos obligatorios de la configuración SMTP"
+    },
+    {
+        "key": "settings.smtp.section_title",
+        "value": "Configuración del servidor SMTP"
+    },
+    {
+        "key": "settings.smtp.section_description",
+        "value": "Configure los ajustes de su servidor de correo para habilitar el envío de correos de verificación, notificaciones y otras comunicaciones."
+    },
+    {
+        "key": "settings.smtp.important_notice",
+        "value": "La funcionalidad de correo es necesaria para las invitaciones a miembros del equipo y el restablecimiento de contraseñas."
+    },
+    {
+        "key": "settings.smtp.secure_label",
+        "value": "Usar conexión segura (SSL/TLS)"
+    },
+    {
+        "key": "settings.smtp.secure_help",
+        "value": "Habilítelo para conexiones SSL/TLS. Normalmente el puerto 465 para SSL y el puerto 465 para TLS."
+    },
+    {
+        "key": "settings.smtp.username_label",
+        "value": "Usuario SMTP"
+    },
+    {
+        "key": "settings.smtp.password_stored_placeholder",
+        "value": "Deje vacío para mantener la contraseña actual"
+    },
+    {
+        "key": "settings.smtp.password_placeholder",
+        "value": "Introduzca la contraseña"
+    },
+    {
+        "key": "settings.smtp.password_stored_help",
+        "value": "La contraseña está definida. Deje vacío para mantenerla sin cambios o introduzca una nueva."
+    },
+    {
+        "key": "settings.smtp.password_help",
+        "value": "Para Gmail, use una contraseña de aplicación en lugar de su contraseña habitual"
+    },
+    {
+        "key": "settings.smtp.sender_email_label",
+        "value": "Dirección de correo del remitente"
+    },
+    {
+        "key": "settings.smtp.sender_name_label",
+        "value": "Nombre del remitente"
     }
 ]

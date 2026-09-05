@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +49,7 @@ export function SmtpConfiguration() {
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [storedPassword, setStoredPassword] = useState('');
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   const { data: smtpData, isLoading } = useQuery<SmtpConfig>({
     queryKey: ['/api/smtp-config'],
@@ -74,15 +76,15 @@ export function SmtpConfiguration() {
     },
     onSuccess: () => {
       toast({
-        title: 'SMTP Configuration Saved',
-        description: 'Your email settings have been updated successfully',
+        title: t('settings.smtp.saved_title', 'SMTP Configuration Saved'),
+        description: t('settings.smtp.saved_desc', 'Your email settings have been updated successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/smtp-config'] });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Error',
-        description: `Failed to update SMTP configuration: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('settings.smtp.update_failed_desc', 'Failed to update SMTP configuration: {{message}}', { message: error.message }),
         variant: 'destructive',
       });
     },
@@ -95,14 +97,14 @@ export function SmtpConfiguration() {
     },
     onSuccess: () => {
       toast({
-        title: 'Test Email Sent',
-        description: 'A test email has been sent successfully',
+        title: t('settings.ses.test_email_sent_title', 'Test Email Sent'),
+        description: t('settings.ses.test_email_sent_desc', 'A test email has been sent successfully'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Error',
-        description: `Failed to send test email: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('settings.ses.test_email_failed_desc', 'Failed to send test email: {{message}}', { message: error.message }),
         variant: 'destructive',
       });
     },
@@ -144,8 +146,8 @@ export function SmtpConfiguration() {
   const handleSaveConfig = () => {
     if (!smtpConfig.host) {
       toast({
-        title: 'Validation Error',
-        description: 'SMTP host is required',
+        title: t('common.validation_error', 'Validation Error'),
+        description: t('settings.smtp.validation_host_required', 'SMTP host is required'),
         variant: 'destructive',
       });
       return;
@@ -153,8 +155,8 @@ export function SmtpConfiguration() {
     
     if (!smtpConfig.auth.user || (!smtpConfig.auth.pass && !storedPassword)) {
       toast({
-        title: 'Validation Error',
-        description: 'SMTP username and password are required',
+        title: t('common.validation_error', 'Validation Error'),
+        description: t('settings.smtp.validation_credentials_required', 'SMTP username and password are required'),
         variant: 'destructive',
       });
       return;
@@ -162,8 +164,8 @@ export function SmtpConfiguration() {
     
     if (!smtpConfig.senderEmail) {
       toast({
-        title: 'Validation Error',
-        description: 'Sender email address is required',
+        title: t('common.validation_error', 'Validation Error'),
+        description: t('settings.smtp.validation_sender_email_required', 'Sender email address is required'),
         variant: 'destructive',
       });
       return;
@@ -184,8 +186,8 @@ export function SmtpConfiguration() {
   const handleTestEmail = () => {
     if (!testEmailAddress) {
       toast({
-        title: 'Validation Error',
-        description: 'Please enter an email address to send the test email to',
+        title: t('common.validation_error', 'Validation Error'),
+        description: t('settings.ses.validation_test_email_required', 'Please enter an email address to send the test email to'),
         variant: 'destructive',
       });
       return;
@@ -193,8 +195,8 @@ export function SmtpConfiguration() {
     
     if (!smtpConfig.host || !smtpConfig.auth.user || (!smtpConfig.auth.pass && !storedPassword) || !smtpConfig.senderEmail) {
       toast({
-        title: 'Validation Error',
-        description: 'Please complete all required SMTP configuration fields first',
+        title: t('common.validation_error', 'Validation Error'),
+        description: t('settings.smtp.validation_complete_config', 'Please complete all required SMTP configuration fields first'),
         variant: 'destructive',
       });
       return;
@@ -223,24 +225,24 @@ export function SmtpConfiguration() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium mb-2">SMTP Server Configuration</h3>
+        <h3 className="text-lg font-medium mb-2">{t('settings.smtp.section_title', 'SMTP Server Configuration')}</h3>
         <p className="text-sm text-gray-500 mb-4">
-          Configure your email server settings to enable sending verification emails, notifications, and other communications.
+          {t('settings.smtp.section_description', 'Configure your email server settings to enable sending verification emails, notifications, and other communications.')}
         </p>
       </div>
       
       <Alert>
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Important</AlertTitle>
+        <AlertTitle>{t('campaigns.builder.launch.warning_title', 'Important')}</AlertTitle>
         <AlertDescription>
-          Email functionality is required for team member invitations and password reset features.
+          {t('settings.smtp.important_notice', 'Email functionality is required for team member invitations and password reset features.')}
         </AlertDescription>
       </Alert>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="host">SMTP Host</Label>
+            <Label htmlFor="host">{t('email.smtp_host', 'SMTP Host')}</Label>
             <Input
               id="host"
               name="host"
@@ -251,7 +253,7 @@ export function SmtpConfiguration() {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="port">SMTP Port</Label>
+            <Label htmlFor="port">{t('email.smtp_port', 'SMTP Port')}</Label>
             <Input
               id="port"
               name="port"
@@ -264,7 +266,7 @@ export function SmtpConfiguration() {
           
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <Label htmlFor="secure">Use Secure Connection (SSL/TLS)</Label>
+              <Label htmlFor="secure">{t('settings.smtp.secure_label', 'Use Secure Connection (SSL/TLS)')}</Label>
               <Switch 
                 id="secure"
                 checked={smtpConfig.secure}
@@ -272,14 +274,14 @@ export function SmtpConfiguration() {
               />
             </div>
             <p className="text-xs text-gray-500">
-              Enable for SSL/TLS connections. Usually port 465 for SSL and port 465 for TLS.
+              {t('settings.smtp.secure_help', 'Enable for SSL/TLS connections. Usually port 465 for SSL and port 465 for TLS.')}
             </p>
           </div>
         </div>
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="auth.user">SMTP Username</Label>
+            <Label htmlFor="auth.user">{t('settings.smtp.username_label', 'SMTP Username')}</Label>
             <Input
               id="auth.user"
               name="auth.user"
@@ -290,22 +292,22 @@ export function SmtpConfiguration() {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="auth.pass">SMTP Password</Label>
+            <Label htmlFor="auth.pass">{t('email.smtp_password', 'SMTP Password')}</Label>
             <Input
               id="auth.pass"
               name="auth.pass"
               type="password"
               value={smtpConfig.auth.pass}
               onChange={handleInputChange}
-              placeholder={storedPassword ? "Leave empty to keep current password" : "Enter password"}
+              placeholder={storedPassword ? t('settings.smtp.password_stored_placeholder', 'Leave empty to keep current password') : t('settings.smtp.password_placeholder', 'Enter password')}
             />
             <p className="text-xs text-gray-500">
-              {storedPassword ? "Password is set. Leave empty to keep it unchanged, or enter new password." : "For Gmail, use an App Password instead of your regular password"}
+              {storedPassword ? t('settings.smtp.password_stored_help', 'Password is set. Leave empty to keep it unchanged, or enter new password.') : t('settings.smtp.password_help', 'For Gmail, use an App Password instead of your regular password')}
             </p>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="senderEmail">Sender Email Address</Label>
+            <Label htmlFor="senderEmail">{t('settings.smtp.sender_email_label', 'Sender Email Address')}</Label>
             <Input
               id="senderEmail"
               name="senderEmail"
@@ -316,44 +318,44 @@ export function SmtpConfiguration() {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="senderName">Sender Name</Label>
+            <Label htmlFor="senderName">{t('settings.smtp.sender_name_label', 'Sender Name')}</Label>
             <Input
               id="senderName"
               name="senderName"
               value={smtpConfig.senderName}
               onChange={handleInputChange}
-              placeholder="Your Company Name"
+              placeholder={t('meta.partner.config.company_name_placeholder', 'Your Company Name')}
             />
           </div>
         </div>
       </div>
       
       <div className="border-t pt-6 space-y-4">
-        <h4 className="font-medium">Test Email Configuration</h4>
+        <h4 className="font-medium">{t('settings.ses.test_section_title', 'Test Email Configuration')}</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2">
             <Input
               value={testEmailAddress}
               onChange={(e) => setTestEmailAddress(e.target.value)}
-              placeholder="Enter an email address to receive a test message"
+              placeholder={t('settings.ses.test_email_placeholder', 'Enter an email address to receive a test message')}
             />
           </div>
           <Button onClick={handleTestEmail} disabled={testSmtpConfig.isPending} className="w-full btn-brand-primary">
             {testSmtpConfig.isPending && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Send Test Email
+            {t('settings.ses.send_test_email', 'Send Test Email')}
           </Button>
         </div>
       </div>
       
       <div className="flex justify-end space-x-2">
-        <Button variant="brand">Cancel</Button>
+        <Button variant="brand">{t('common.cancel', 'Cancel')}</Button>
         <Button className='btn-brand-primary' onClick={handleSaveConfig} disabled={updateSmtpConfig.isPending}>
           {updateSmtpConfig.isPending && (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           )}
-          Save Configuration
+          {t('settings.twilio_voice.save_configuration', 'Save Configuration')}
         </Button>
       </div>
     </div>

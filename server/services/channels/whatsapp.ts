@@ -485,8 +485,8 @@ const RECONNECT_CATCHUP_CONFIG = {
   messagesPerChat: 30,
   concurrency: 2,
   lookbackDays: 7,
-  /** Only ingest catch-up messages newer than this window (hours). */
-  messageWindowHours: 48,
+  /** Only ingest catch-up messages newer than this window (hours). Matches lookbackDays. */
+  messageWindowHours: 7 * 24,
 };
 
 const WA_VERSION_FILE_PATH = '/app/data/wa-version.json';
@@ -3334,13 +3334,11 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
       }
 
       // Run auth state, version fetch, and connection refresh in parallel (no proxy)
-      const [{ state: authState, saveCreds }, version, refreshedConnection] = await Promise.all([
+      const [{ state: authState, saveCreds }, version] = await Promise.all([
         usePostgresAuthState(connectionId, storage),
         getCachedWaWebVersion(),
-        storage.getChannelConnection(connectionId),
       ]);
 
-      const shouldSyncHistory = refreshedConnection?.historySyncEnabled || false;
       const useFallbackVersionForConnect = waVersionFallbackRetries.get(connectionId) === true;
       const resolvedVersion = useFallbackVersionForConnect ? WA_VERSION_FALLBACK : (version ?? WA_VERSION_FALLBACK);
 
@@ -3813,16 +3811,16 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
                     syncType === proto.HistorySync.HistorySyncType.ON_DEMAND
                   ? 'incremental'
                   : 'manual',
-              totalChats: shouldSyncHistory ? (newChats?.length || 0) : 0,
+              totalChats: newChats?.length || 0,
               totalMessages: filteredMessages.length,
-              totalContacts: shouldSyncHistory ? (newContacts?.length || 0) : 0
+              totalContacts: newContacts?.length || 0
             });
           }
 
           await storage.updateChannelConnection(connectionId, {
             historySyncStatus: 'syncing',
             historySyncProgress: 0,
-            historySyncTotal: filteredMessages.length + (shouldSyncHistory ? ((newChats?.length || 0) + (newContacts?.length || 0)) : 0)
+            historySyncTotal: filteredMessages.length + (newChats?.length || 0) + (newContacts?.length || 0)
           });
 
           emitWhatsAppEvent('historySyncProgress', {
@@ -3833,11 +3831,12 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
             status: 'syncing'
           });
 
-          // Always ingest catch-up messages (RECENT / ON_DEMAND / INITIAL_BOOTSTRAP).
-          // Contact/chat bootstrap remains gated on historySyncEnabled to avoid heavy first-link load.
+          // Ingest catch-up messages plus their chats/contacts (RECENT / ON_DEMAND /
+          // INITIAL_BOOTSTRAP), so threads absent from the CRM are created rather than
+          // silently dropped. processHistorySyncData is idempotent per contact/conversation.
           await processHistorySyncData(connectionId, userId, {
-            chats: shouldSyncHistory ? (newChats || []) : [],
-            contacts: shouldSyncHistory ? (newContacts || []) : [],
+            chats: newChats || [],
+            contacts: newContacts || [],
             messages: filteredMessages,
             batchId
           });
@@ -3852,9 +3851,9 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
             connectionId,
             companyId: syncUser?.companyId,
             batchId,
-            totalChats: shouldSyncHistory ? (newChats?.length || 0) : 0,
+            totalChats: newChats?.length || 0,
             totalMessages: filteredMessages.length,
-            totalContacts: shouldSyncHistory ? (newContacts?.length || 0) : 0
+            totalContacts: newContacts?.length || 0
           });
         } catch (error) {
           console.error('Error processing history sync:', error);

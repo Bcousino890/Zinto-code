@@ -23494,6 +23494,70 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
     }
   });
 
+  app.post('/api/google/sheets/test-update-row', ensureAuthenticated, async (req: any, res: Response) => {
+    try {
+      const { serviceAccountJson, spreadsheetId, sheetName, useOAuth, matchColumn, matchValue, columnMappings } = req.body;
+
+      if (!matchColumn || !matchValue) {
+        return res.status(400).json({
+          success: false,
+          error: 'Match column and match value are required for update row test'
+        });
+      }
+
+      if (!columnMappings || Object.keys(columnMappings).length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Column mappings are required for update row test'
+        });
+      }
+
+      if (useOAuth || !serviceAccountJson) {
+        try {
+          const result = await googleSheetsService.testUpdateRowWithOAuth(
+            req.user.id,
+            req.user.companyId,
+            spreadsheetId,
+            sheetName || 'Sheet1',
+            matchColumn,
+            matchValue,
+            columnMappings
+          );
+          return res.json(result);
+        } catch (oauthError) {
+          if (!serviceAccountJson) {
+            return res.status(400).json({
+              success: false,
+              error: 'Please connect your Google Sheets account using OAuth authentication'
+            });
+          }
+        }
+      }
+
+      if (!serviceAccountJson || !spreadsheetId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Service Account JSON and Spreadsheet ID are required'
+        });
+      }
+
+      const config = {
+        serviceAccountJson,
+        spreadsheetId,
+        sheetName: sheetName || 'Sheet1'
+      };
+
+      const result = await googleSheetsService.testUpdateRow(config, matchColumn, matchValue, columnMappings);
+      return res.json(result);
+    } catch (error) {
+      console.error('Error testing update row:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Error testing update row'
+      });
+    }
+  });
+
   app.post('/api/google/sheets/get-info', ensureAuthenticated, async (req: Request, res: Response) => {
     try {
       const { serviceAccountJson, spreadsheetId, sheetName } = req.body;

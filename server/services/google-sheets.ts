@@ -1573,6 +1573,178 @@ class GoogleSheetsService {
   }
 
   /**
+   * Test update row functionality - checks if rows matching criteria exist
+   */
+  async testUpdateRow(config: GoogleSheetsConfig, matchColumn: string, matchValue: string, columnMappings: Record<string, any>): Promise<GoogleSheetsResponse> {
+    try {
+      const sheets = await this.getSheetsClient(config);
+
+      const dataResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId: config.spreadsheetId,
+        range: `${config.sheetName}!A:ZZ`
+      });
+
+      const allRows = dataResponse.data.values || [];
+      if (allRows.length < 2) {
+        return {
+          success: false,
+          error: 'No data rows found in sheet - cannot test update'
+        };
+      }
+
+      const headers = allRows[0];
+      const dataRows = allRows.slice(1);
+
+      const matchColumnIndex = headers.findIndex(header =>
+        header.toString().toLowerCase() === matchColumn.toLowerCase()
+      );
+
+      if (matchColumnIndex === -1) {
+        return {
+          success: false,
+          error: `Match column "${matchColumn}" not found in sheet headers. Available columns: ${headers.join(', ')}`
+        };
+      }
+
+      const matchingRowIndices: number[] = [];
+      dataRows.forEach((row, index) => {
+        if (row[matchColumnIndex]?.toString().toLowerCase() ===
+            matchValue?.toString().toLowerCase()) {
+          matchingRowIndices.push(index + 2);
+        }
+      });
+
+      if (matchingRowIndices.length === 0) {
+        return {
+          success: false,
+          error: `No rows found matching ${matchColumn} = "${matchValue}". Verify the match value exists in your sheet.`,
+          data: {
+            matchColumn,
+            matchValue,
+            availableValues: dataRows.map(row => row[matchColumnIndex]).filter(Boolean)
+          }
+        };
+      }
+
+      // Validate column mappings
+      const invalidColumns = Object.keys(columnMappings).filter(col =>
+        !headers.some(h => h.toString().toLowerCase() === col.toLowerCase())
+      );
+
+      if (invalidColumns.length > 0) {
+        return {
+          success: false,
+          error: `These columns to update don't exist in the sheet: ${invalidColumns.join(', ')}. Available columns: ${headers.join(', ')}`
+        };
+      }
+
+      return {
+        success: true,
+        data: {
+          message: `✅ Test successful! Found ${matchingRowIndices.length} row(s) to update`,
+          matchingRows: matchingRowIndices.length,
+          columnsToupdate: Object.keys(columnMappings),
+          rowNumbers: matchingRowIndices
+        }
+      };
+    } catch (error) {
+      console.error('Error testing update row:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to test update row'
+      };
+    }
+  }
+
+  /**
+   * Test update row functionality with OAuth - checks if rows matching criteria exist
+   */
+  async testUpdateRowWithOAuth(userId: number, companyId: number, spreadsheetId: string, sheetName: string, matchColumn: string, matchValue: string, columnMappings: Record<string, any>): Promise<GoogleSheetsResponse> {
+    try {
+      const sheets = await this.getSheetsClientWithOAuth(userId, companyId);
+
+      const headerResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId: spreadsheetId,
+        range: `${sheetName}!1:1`
+      });
+
+      let headers = headerResponse.data.values?.[0] || [];
+
+      if (headers.length === 0) {
+        return {
+          success: false,
+          error: 'No headers found in the sheet'
+        };
+      }
+
+      const matchColumnIndex = headers.indexOf(matchColumn);
+      if (matchColumnIndex === -1) {
+        return {
+          success: false,
+          error: `Match column '${matchColumn}' not found in headers. Available columns: ${headers.join(', ')}`
+        };
+      }
+
+      const endColumn = String.fromCharCode(65 + headers.length - 1);
+      const allDataResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId: spreadsheetId,
+        range: `${sheetName}!A:${endColumn}`
+      });
+
+      const allRows = allDataResponse.data.values || [];
+      const dataRows = allRows.slice(1);
+
+      const matchingRowIndices: number[] = [];
+      dataRows.forEach((row: any[], index: number) => {
+        const cellValue = row[matchColumnIndex] || '';
+        if (cellValue.toString() === matchValue.toString()) {
+          matchingRowIndices.push(index + 2);
+        }
+      });
+
+      if (matchingRowIndices.length === 0) {
+        return {
+          success: false,
+          error: `No rows found with ${matchColumn} = '${matchValue}'. Verify the match value exists in your sheet.`,
+          data: {
+            matchColumn,
+            matchValue,
+            availableValues: dataRows.map((row: any[]) => row[matchColumnIndex]).filter(Boolean)
+          }
+        };
+      }
+
+      // Validate column mappings
+      const invalidColumns = Object.keys(columnMappings).filter(col =>
+        !headers.includes(col)
+      );
+
+      if (invalidColumns.length > 0) {
+        return {
+          success: false,
+          error: `These columns to update don't exist in the sheet: ${invalidColumns.join(', ')}. Available columns: ${headers.join(', ')}`
+        };
+      }
+
+      return {
+        success: true,
+        data: {
+          message: `✅ Test successful! Found ${matchingRowIndices.length} row(s) to update`,
+          matchingRows: matchingRowIndices.length,
+          columnsToUpdate: Object.keys(columnMappings),
+          rowNumbers: matchingRowIndices
+        }
+      };
+    } catch (error: any) {
+      console.error('Error testing update row with OAuth:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to test update row'
+      };
+    }
+  }
+
+  /**
    * Get sheet information using OAuth authentication
    */
   async getSheetInfoWithOAuth(userId: number, companyId: number, spreadsheetId: string, sheetName: string): Promise<GoogleSheetsResponse> {

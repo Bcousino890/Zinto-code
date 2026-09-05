@@ -1100,6 +1100,114 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
     }
   };
 
+  const testUpdateRow = async () => {
+    if (!isGoogleSheetsConnected) {
+      setTestResult({
+        success: false,
+        message: t('flow_builder.google_sheets.test_connect_first', 'Please connect your Google account above to test the connection')
+      });
+      setShowTestResult(true);
+      return;
+    }
+
+    if (!spreadsheetId.trim()) {
+      setTestResult({
+        success: false,
+        message: t('flow_builder.google_sheets.provide_spreadsheet_id', 'Please provide a Spreadsheet ID')
+      });
+      setShowTestResult(true);
+      return;
+    }
+
+    const matchColumn = (config.matchColumn as string)?.trim();
+    const matchValue = (config.matchValue as string)?.trim();
+    const columnMappings = config.columnMappings as Record<string, any>;
+
+    if (!matchColumn) {
+      setTestResult({
+        success: false,
+        message: 'Please specify a "Match Column" to identify which row to update'
+      });
+      setShowTestResult(true);
+      return;
+    }
+
+    if (!matchValue) {
+      setTestResult({
+        success: false,
+        message: 'Please specify a "Match Value" to search for in the match column'
+      });
+      setShowTestResult(true);
+      return;
+    }
+
+    if (!columnMappings || Object.keys(columnMappings).length === 0) {
+      setTestResult({
+        success: false,
+        message: 'Please specify at least one column to update in "Column Updates"'
+      });
+      setShowTestResult(true);
+      return;
+    }
+
+    setIsTesting(true);
+    setTestResult(null);
+
+    try {
+      const response = await fetch('/api/google/sheets/test-update-row', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          spreadsheetId,
+          sheetName: sheetName || 'Sheet1',
+          useOAuth: true,
+          matchColumn,
+          matchValue,
+          columnMappings
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const rowInfo = result.data?.rowNumbers?.length > 0
+          ? `\n🎯 Will update row(s): ${result.data.rowNumbers.join(', ')}`
+          : '';
+        const columnsInfo = result.data?.columnsToUpdate?.length > 0
+          ? `\n📝 Columns to update: ${result.data.columnsToUpdate.join(', ')}`
+          : '';
+
+        setTestResult({
+          success: true,
+          message: `${result.data?.message || '✅ Test successful!'}${rowInfo}${columnsInfo}`,
+          data: result.data
+        });
+      } else {
+        let errorMsg = result.error || 'Failed to test update row';
+        if (result.data?.availableValues?.length > 0) {
+          errorMsg += `\n\n📋 Available values in "${matchColumn}": ${result.data.availableValues.slice(0, 5).join(', ')}${result.data.availableValues.length > 5 ? '...' : ''}`;
+        }
+        setTestResult({
+          success: false,
+          message: errorMsg,
+          data: result.data
+        });
+      }
+    } catch (error) {
+      console.error('Test update row error:', error);
+      setTestResult({
+        success: false,
+        message: t('flow_builder.google_sheets.network_error', 'Network error: Unable to test update row')
+      });
+    } finally {
+      setIsTesting(false);
+      setShowTestResult(true);
+    }
+  };
+
   const fetchGoogleSheets = async () => {
     if (!isGoogleSheetsConnected) {
       setTestResult({
@@ -1812,7 +1920,7 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
                     variant="outline"
                     size="sm"
                     className="h-7 px-2 flex-1"
-                    onClick={testConnection}
+                    onClick={operation === 'update_row' ? testUpdateRow : testConnection}
                     disabled={isTesting || !isGoogleSheetsConnected || !spreadsheetId.trim()}
                   >
                     {isTesting ? (
@@ -1820,20 +1928,38 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
                     ) : (
                       <Play className="h-3 w-3 mr-1" />
                     )}
-                    {t('flow_builder.google_sheets.test_add_sample', 'Test & Add Sample Data')}
+                    {operation === 'update_row'
+                      ? t('flow_builder.google_sheets.test_update_row', 'Test Update Row')
+                      : t('flow_builder.google_sheets.test_add_sample', 'Test & Add Sample Data')}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p className="text-xs">{t('flow_builder.google_sheets.test_tooltip', 'Test connection and add sample data')}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {!isGoogleSheetsConnected || !spreadsheetId.trim()
-                      ? t('flow_builder.google_sheets.test_tooltip_connect', 'Connect your Google account and enter Spreadsheet ID to enable testing')
-                      : t('flow_builder.google_sheets.test_tooltip_verify', 'Verify your configuration and add test data to the sheet')
-                    }
-                  </p>
-                  <p className="text-xs text-primary mt-1">
-                    {t('flow_builder.google_sheets.test_sample_row', '📊 Will add a sample row with contact information')}
-                  </p>
+                  {operation === 'update_row' ? (
+                    <>
+                      <p className="text-xs">Test if rows matching your criteria exist</p>
+                      <p className="text-xs text-muted-foreground">
+                        {!isGoogleSheetsConnected || !spreadsheetId.trim()
+                          ? 'Connect your Google account and enter Spreadsheet ID to enable testing'
+                          : 'Verifies the match column/value finds rows in your sheet'}
+                      </p>
+                      <p className="text-xs text-primary mt-1">
+                        ✏️ Will find rows where {config.matchColumn || '[Match Column]'} = {config.matchValue || '[Match Value]'}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs">{t('flow_builder.google_sheets.test_tooltip', 'Test connection and add sample data')}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {!isGoogleSheetsConnected || !spreadsheetId.trim()
+                          ? t('flow_builder.google_sheets.test_tooltip_connect', 'Connect your Google account and enter Spreadsheet ID to enable testing')
+                          : t('flow_builder.google_sheets.test_tooltip_verify', 'Verify your configuration and add test data to the sheet')
+                        }
+                      </p>
+                      <p className="text-xs text-primary mt-1">
+                        {t('flow_builder.google_sheets.test_sample_row', '📊 Will add a sample row with contact information')}
+                      </p>
+                    </>
+                  )}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

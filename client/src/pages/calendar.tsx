@@ -2864,7 +2864,7 @@ export default function Calendar() {
                 value={newScheduleName}
                 onChange={(e) => setNewScheduleName(e.target.value)}
                 className="col-span-3"
-                placeholder="Work, Personal, etc."
+                placeholder={t('calendar.schedule_name_placeholder', 'Work, Personal, etc.')}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -2876,7 +2876,7 @@ export default function Calendar() {
                 onValueChange={setNewScheduleColor}
               >
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select color">
+                  <SelectValue placeholder={t('calendar.select_color', 'Select color')}>
                     {newScheduleColor && (
                       <div className="flex items-center">
                         <div className={`w-3 h-3 rounded-full ${SCHEDULE_COLORS[newScheduleColor]} mr-2`}></div>

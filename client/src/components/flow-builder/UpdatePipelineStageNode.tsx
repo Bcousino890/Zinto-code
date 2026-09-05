@@ -185,6 +185,7 @@ interface VariablePickerProps {
 }
 
 function VariablePicker({ value, onChange, placeholder, className }: VariablePickerProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
@@ -237,11 +238,11 @@ function VariablePicker({ value, onChange, placeholder, className }: VariablePic
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
-      case 'contact': return 'Contact';
-      case 'message': return 'Message';
-      case 'system': return 'System';
-      case 'deal': return 'Deal';
-      case 'pipeline': return 'Pipeline';
+      case 'contact': return t('flow_builder.condition_domains.contact', 'Contact');
+      case 'message': return t('flow_builder.condition_domains.message', 'Message');
+      case 'system': return t('flow_builder.move_deal_node.category_system', 'System');
+      case 'deal': return t('flow_builder.condition_domains.deal', 'Deal');
+      case 'pipeline': return t('flow_builder.node_types.pipeline', 'Pipeline');
       default: return category;
     }
   };
@@ -271,12 +272,12 @@ function VariablePicker({ value, onChange, placeholder, className }: VariablePic
         <PopoverContent className="w-80 p-0" align="start">
           <Command>
             <CommandInput
-              placeholder="Search variables..."
+              placeholder={t('flow_builder.variable_browser_search_placeholder', 'Search variables...')}
               value={searchValue}
               onValueChange={setSearchValue}
             />
             <CommandList>
-              <CommandEmpty>No variables found.</CommandEmpty>
+              <CommandEmpty>{t('flow_builder.google_sheets.no_variables_found', 'No variables found.')}</CommandEmpty>
 
               {Object.entries(groupedVariables).map(([category, variables]) => (
                 <CommandGroup
@@ -363,6 +364,7 @@ function UpdatePipelineStageNode({
   selected,
   isConnectable
 }: NodeProps<UpdatePipelineStageData>) {
+  const { t } = useTranslation();
   const { onDeleteNode, onDuplicateNode } = useFlowContext();
   const { getNodes, setNodes } = useReactFlow();
   const [showToolbar, setShowToolbar] = useState(false);
@@ -654,7 +656,7 @@ function UpdatePipelineStageNode({
                 onValueChange={handleOperationChange}
               >
                 <SelectTrigger className="h-8">
-                  <SelectValue placeholder="Select operation" />
+                  <SelectValue placeholder={t('flow_builder.select_operation', 'Select operation')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="update_stage">
@@ -713,7 +715,7 @@ function UpdatePipelineStageNode({
                   })}
                 >
                   <SelectTrigger className="h-8">
-                    <SelectValue placeholder="Select pipeline" />
+                    <SelectValue placeholder={t('flow_builder.select_pipeline', 'Select pipeline')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="default">Default Pipeline</SelectItem>
@@ -742,7 +744,7 @@ function UpdatePipelineStageNode({
                   onValueChange={handleStageChange}
                 >
                   <SelectTrigger className="h-8">
-                    <SelectValue placeholder="Select a stage" />
+                    <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.select_a_stage', 'Select a stage')} />
                   </SelectTrigger>
                   <SelectContent>
                     {isLoading ? (
@@ -779,7 +781,7 @@ function UpdatePipelineStageNode({
                   <Input
                     value={data.stageName || ''}
                     onChange={handleInputChange('stageName')}
-                    placeholder="Enter stage name"
+                    placeholder={t('flow_builder.update_pipeline_stage_node.enter_stage_name', 'Enter stage name')}
                     className="h-8"
                   />
                 </div>
@@ -860,7 +862,7 @@ function UpdatePipelineStageNode({
                     onValueChange={handleStageChange}
                   >
                     <SelectTrigger className="h-8">
-                      <SelectValue placeholder="Select initial stage" />
+                      <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.select_initial_stage', 'Select initial stage')} />
                     </SelectTrigger>
                     <SelectContent>
                       {pipelineStages && pipelineStages.length > 0 ? (
@@ -890,7 +892,7 @@ function UpdatePipelineStageNode({
                   <VariablePicker
                     value={data.dealDescription || ''}
                     onChange={(value) => updateNodeData({ dealDescription: value })}
-                    placeholder="Deal description..."
+                    placeholder={t('flow_builder.update_pipeline_stage_node.deal_description_placeholder', 'Deal description...')}
                     className="h-16"
                   />
                 </div>
@@ -916,7 +918,7 @@ function UpdatePipelineStageNode({
                               onChange={(value) => updateNodeData({
                                 customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                               })}
-                              placeholder="Enter value or {{variable}}"
+                              placeholder={t('flow_builder.update_pipeline_stage_node.enter_value_or_variable', 'Enter value or {{variable}}')}
                               className="h-8"
                             />
                           )}
@@ -926,7 +928,7 @@ function UpdatePipelineStageNode({
                               onChange={(value) => updateNodeData({
                                 customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                               })}
-                              placeholder="0 or {{variable}}"
+                              placeholder={t('flow_builder.placeholder_number_or_variable', '0 or {{variable}}')}
                               className="h-8"
                             />
                           )}
@@ -936,7 +938,7 @@ function UpdatePipelineStageNode({
                               onChange={(value) => updateNodeData({
                                 customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                               })}
-                              placeholder="YYYY-MM-DD or {{date.today}}"
+                              placeholder={t('flow_builder.placeholder_date_or_variable', 'YYYY-MM-DD or {{date.today}}')}
                               className="h-8"
                             />
                           )}
@@ -947,7 +949,7 @@ function UpdatePipelineStageNode({
                                 onChange={(value) => updateNodeData({
                                   customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                 })}
-                                placeholder="Value or {{variable}}"
+                                placeholder={t('flow_builder.update_pipeline_stage_node.value_or_variable', 'Value or {{variable}}')}
                                 className="h-8"
                               />
                               {(field.options && Array.isArray(field.options) && field.options.length > 0) && (
@@ -1051,7 +1053,7 @@ function UpdatePipelineStageNode({
                       <VariablePicker
                         value={data.dealTitle || ''}
                         onChange={(value) => updateNodeData({ dealTitle: value })}
-                        placeholder="Leave empty to keep current"
+                        placeholder={t('flow_builder.update_pipeline_stage_node.leave_empty_to_keep_current', 'Leave empty to keep current')}
                         className="h-8"
                       />
                     </div>
@@ -1062,7 +1064,7 @@ function UpdatePipelineStageNode({
                         <VariablePicker
                           value={data.dealValue || ''}
                           onChange={(value) => updateNodeData({ dealValue: value })}
-                          placeholder="Leave empty to keep current"
+                          placeholder={t('flow_builder.update_pipeline_stage_node.leave_empty_to_keep_current', 'Leave empty to keep current')}
                           className="h-8"
                         />
                       </div>
@@ -1076,7 +1078,7 @@ function UpdatePipelineStageNode({
                           }}
                         >
                           <SelectTrigger className="h-8">
-                            <SelectValue placeholder="Keep current" />
+                            <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.keep_current', 'Keep current')} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="keep_current">Keep current</SelectItem>
@@ -1098,7 +1100,7 @@ function UpdatePipelineStageNode({
                         }}
                       >
                         <SelectTrigger className="h-8">
-                          <SelectValue placeholder="Keep current stage" />
+                          <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.keep_current_stage', 'Keep current stage')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="keep_current">Keep current</SelectItem>
@@ -1139,7 +1141,7 @@ function UpdatePipelineStageNode({
                                 onChange={(value) => updateNodeData({
                                   customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                 })}
-                                placeholder="Leave empty to keep current"
+                                placeholder={t('flow_builder.update_pipeline_stage_node.leave_empty_to_keep_current', 'Leave empty to keep current')}
                                 className="h-8"
                               />
                             )}
@@ -1149,7 +1151,7 @@ function UpdatePipelineStageNode({
                                 onChange={(value) => updateNodeData({
                                   customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                 })}
-                                placeholder="Leave empty to keep current"
+                                placeholder={t('flow_builder.update_pipeline_stage_node.leave_empty_to_keep_current', 'Leave empty to keep current')}
                                 className="h-8"
                               />
                             )}
@@ -1159,7 +1161,7 @@ function UpdatePipelineStageNode({
                                 onChange={(value) => updateNodeData({
                                   customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                 })}
-                                placeholder="YYYY-MM-DD or {{date.today}}"
+                                placeholder={t('flow_builder.placeholder_date_or_variable', 'YYYY-MM-DD or {{date.today}}')}
                                 className="h-8"
                               />
                             )}
@@ -1170,7 +1172,7 @@ function UpdatePipelineStageNode({
                                   onChange={(value) => updateNodeData({
                                     customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                   })}
-                                  placeholder="Value or {{variable}}"
+                                  placeholder={t('flow_builder.update_pipeline_stage_node.value_or_variable', 'Value or {{variable}}')}
                                   className="h-8"
                                 />
                                 {(field.options && Array.isArray(field.options) && field.options.length > 0) && (
@@ -1279,7 +1281,7 @@ function UpdatePipelineStageNode({
                         <Input
                           value={data.tagInput || ''}
                           onChange={handleInputChange('tagInput')}
-                          placeholder="Enter tag name"
+                          placeholder={t('flow_builder.enter_tag_name', 'Enter tag name')}
                           className="h-8 text-xs"
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
@@ -1346,7 +1348,7 @@ function UpdatePipelineStageNode({
                       <div className="flex gap-1">
                         <Select onValueChange={handleAddRemoveTag}>
                           <SelectTrigger className="h-8">
-                            <SelectValue placeholder="Select tag to remove" />
+                            <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.select_tag_to_remove', 'Select tag to remove')} />
                           </SelectTrigger>
                           <SelectContent>
                             {dealTags?.map((tag) => (
@@ -1543,7 +1545,7 @@ function UpdatePipelineStageNode({
                             "h-8",
                             data.enableStageRevert && !data.revertToStageId && "border-red-500"
                           )}>
-                            <SelectValue placeholder="Select stage to revert to" />
+                            <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.select_stage_to_revert_to', 'Select stage to revert to')} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="none">None</SelectItem>

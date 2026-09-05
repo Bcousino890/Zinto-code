@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/use-translation";
 import { Download, Upload, Loader2, FileJson } from "lucide-react";
 import {
   Dialog,
@@ -40,6 +41,7 @@ export function TwilioVoiceConfigManager({
   showBulkExport = false
 }: TwilioVoiceConfigManagerProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [importOpen, setImportOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importPreview, setImportPreview] = useState<any>(null);
@@ -58,13 +60,13 @@ export function TwilioVoiceConfigManager({
 
   const handleExport = async () => {
     if (!connectionId) {
-      toast({ title: "No connection", description: "Select a connection to export.", variant: "destructive" });
+      toast({ title: t('settings.twilio_voice.no_connection_title', 'No connection'), description: t('settings.twilio_voice.no_connection_desc', 'Select a connection to export.'), variant: "destructive" });
       return;
     }
     setExporting(true);
     try {
       const res = await fetch(`/api/channel-connections/${connectionId}/export`, { credentials: "include" });
-      if (!res.ok) throw new Error("Export failed");
+      if (!res.ok) throw new Error(t('settings.twilio_voice.export_failed', 'Export failed'));
       const data = await res.json();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -73,10 +75,10 @@ export function TwilioVoiceConfigManager({
       a.download = `voice-channel-${connectionId}-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast({ title: "Exported", description: "Configuration saved as JSON." });
+      toast({ title: t('settings.twilio_voice.exported_title', 'Exported'), description: t('settings.twilio_voice.exported_desc', 'Configuration saved as JSON.') });
       onExport?.();
     } catch (err: any) {
-      toast({ title: "Export failed", description: err.message, variant: "destructive" });
+      toast({ title: t('settings.twilio_voice.export_failed', 'Export failed'), description: err.message, variant: "destructive" });
     } finally {
       setExporting(false);
     }
@@ -126,7 +128,7 @@ export function TwilioVoiceConfigManager({
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.name.endsWith(".json")) {
-      toast({ title: "Invalid file", description: "Please select a JSON file.", variant: "destructive" });
+      toast({ title: t('settings.twilio_voice.invalid_file_title', 'Invalid file'), description: t('settings.twilio_voice.invalid_file_desc', 'Please select a JSON file.'), variant: "destructive" });
       return;
     }
     const reader = new FileReader();
@@ -137,7 +139,7 @@ export function TwilioVoiceConfigManager({
         setImportFile(file);
         setSecrets({ accountSid: "", authToken: "", apiKey: "", apiSecret: "", telnyxApiKey: "", elevenLabsApiKey: "", vapiApiKey: "", fromNumber: "" });
       } catch {
-        toast({ title: "Invalid JSON", description: "Could not parse file.", variant: "destructive" });
+        toast({ title: t('settings.twilio_voice.invalid_json_title', 'Invalid JSON'), description: t('settings.twilio_voice.invalid_json_desc', 'Could not parse file.'), variant: "destructive" });
       }
     };
     reader.readAsText(file);
@@ -149,11 +151,11 @@ export function TwilioVoiceConfigManager({
 
   const handleImportSubmit = async () => {
     if (!importPreview?.configuration) {
-      toast({ title: "Invalid file", description: "Missing configuration.", variant: "destructive" });
+      toast({ title: t('settings.twilio_voice.invalid_file_title', 'Invalid file'), description: t('settings.twilio_voice.missing_configuration', 'Missing configuration.'), variant: "destructive" });
       return;
     }
     if (!secretsComplete) {
-      toast({ title: "Missing credentials", description: "Fill in all required masked fields for the selected provider stack.", variant: "destructive" });
+      toast({ title: t('settings.twilio_voice.missing_credentials_title', 'Missing credentials'), description: t('settings.twilio_voice.missing_credentials_desc', 'Fill in all required masked fields for the selected provider stack.'), variant: "destructive" });
       return;
     }
     const mergedConfig = { ...config };
@@ -172,16 +174,16 @@ export function TwilioVoiceConfigManager({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || data.error || "Import failed");
+        throw new Error(data.message || data.error || t('settings.twilio_voice.import_failed', 'Import failed'));
       }
-      toast({ title: "Imported", description: `${getVoiceProviderStackLabel(mergedConfig.providerStack)} voice channel created.` });
+      toast({ title: t('settings.twilio_voice.imported_title', 'Imported'), description: t('settings.twilio_voice.imported_desc', '{{provider}} voice channel created.', { provider: getVoiceProviderStackLabel(mergedConfig.providerStack) }) });
       setImportOpen(false);
       setImportFile(null);
       setImportPreview(null);
       setSecrets({ accountSid: "", authToken: "", apiKey: "", apiSecret: "", telnyxApiKey: "", elevenLabsApiKey: "", vapiApiKey: "", fromNumber: "" });
       onImportComplete?.();
     } catch (err: any) {
-      toast({ title: "Import failed", description: err.message, variant: "destructive" });
+      toast({ title: t('settings.twilio_voice.import_failed', 'Import failed'), description: err.message, variant: "destructive" });
     } finally {
       setImporting(false);
     }
@@ -192,52 +194,52 @@ export function TwilioVoiceConfigManager({
       {connectionId && (
         <Button type="button" variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
           {exporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
-          Export config
+          {t('settings.twilio_voice.export_config', 'Export config')}
         </Button>
       )}
       <Button type="button" variant="outline" size="sm" onClick={() => setImportOpen(true)}>
         <Upload className="h-4 w-4 mr-2" />
-        Import config
+        {t('settings.twilio_voice.import_config', 'Import config')}
       </Button>
 
       <Dialog open={importOpen} onOpenChange={setImportOpen}>
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
-            <DialogTitle>Import Voice Channel Config</DialogTitle>
+            <DialogTitle>{t('settings.twilio_voice.import_dialog_title', 'Import Voice Channel Config')}</DialogTitle>
             <DialogDescription>
-              Upload a JSON config file. Masked credentials must be filled in before saving.
+              {t('settings.twilio_voice.import_dialog_description', 'Upload a JSON config file. Masked credentials must be filled in before saving.')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid gap-2">
-              <Label>JSON file</Label>
+              <Label>{t('settings.twilio_voice.json_file', 'JSON file')}</Label>
               <Input type="file" accept=".json" onChange={handleImportFileChange} />
             </div>
             {importPreview?.configuration && (
               <>
                 <div className="rounded-md border p-2 text-xs space-y-1">
-                  <p><strong>Connection type:</strong> {importPreview.connectionType}</p>
-                  <p><strong>Provider stack:</strong> {getVoiceProviderStackLabel(config.providerStack)}</p>
-                  <p><strong>Account name:</strong> {importPreview.configuration?.accountName}</p>
-                  <p><strong>From number:</strong> {isMasked(importPreview.configuration?.fromNumber) ? "(masked — fill below)" : importPreview.configuration?.fromNumber}</p>
+                  <p><strong>{t('settings.twilio_voice.connection_type', 'Connection type:')}</strong> {importPreview.connectionType}</p>
+                  <p><strong>{t('settings.twilio_voice.provider_stack', 'Provider stack:')}</strong> {getVoiceProviderStackLabel(config.providerStack)}</p>
+                  <p><strong>{t('settings.twilio_voice.account_name_field', 'Account name:')}</strong> {importPreview.configuration?.accountName}</p>
+                  <p><strong>{t('settings.twilio_voice.from_number_field', 'From number:')}</strong> {isMasked(importPreview.configuration?.fromNumber) ? t('settings.twilio_voice.masked_fill_below', '(masked — fill below)') : importPreview.configuration?.fromNumber}</p>
                   {config.providerStack === "telnyx-vapi" && (
                     <p className="break-all">
-                      <strong>Telnyx webhook verification key:</strong>{" "}
+                      <strong>{t('settings.twilio_voice.telnyx_webhook_verification_key', 'Telnyx webhook verification key:')}</strong>{" "}
                       {config.telnyxWebhookVerificationKey?.trim()
                         ? config.telnyxWebhookVerificationKey.trim().length > 64
                           ? `${config.telnyxWebhookVerificationKey.trim().slice(0, 64)}…`
                           : config.telnyxWebhookVerificationKey.trim()
-                        : "(not set)"}
+                        : t('settings.twilio_voice.not_set', '(not set)')}
                     </p>
                   )}
-                  <p className="text-muted-foreground">Provide real values for any masked credentials below. Import is blocked until required secrets are provided.</p>
+                  <p className="text-muted-foreground">{t('settings.twilio_voice.masked_credentials_notice', 'Provide real values for any masked credentials below. Import is blocked until required secrets are provided.')}</p>
                 </div>
                 {(maskedFields.length > 0 || requiredForSubmit.includes("fromNumber")) && (
                   <div className="space-y-3">
-                    <Label className="text-sm font-medium">Masked credentials (fill with real values)</Label>
+                    <Label className="text-sm font-medium">{t('settings.twilio_voice.masked_credentials_label', 'Masked credentials (fill with real values)')}</Label>
                     {(maskedFields.includes("accountSid") || requiredForSubmit.includes("accountSid")) && (
                       <div className="grid gap-1">
-                        <Label className="text-xs">Account SID *</Label>
+                        <Label className="text-xs">{t('settings.twilio_voice.account_sid', 'Account SID *')}</Label>
                         <Input
                           type="text"
                           placeholder="ACxxxxxxxx..."
@@ -249,10 +251,10 @@ export function TwilioVoiceConfigManager({
                     )}
                     {(maskedFields.includes("authToken") || requiredForSubmit.includes("authToken")) && (
                       <div className="grid gap-1">
-                        <Label className="text-xs">Auth Token *</Label>
+                        <Label className="text-xs">{t('settings.twilio_voice.auth_token', 'Auth Token *')}</Label>
                         <Input
                           type="password"
-                          placeholder="Your Twilio Auth Token"
+                          placeholder={t('settings.twilio_sms.auth_token_placeholder', 'Your Twilio Auth Token')}
                           value={secrets.authToken}
                           onChange={(e) => handleSecretChange("authToken", e.target.value)}
                           className="font-mono text-sm"
@@ -261,13 +263,13 @@ export function TwilioVoiceConfigManager({
                     )}
                     {(maskedFields.includes("telnyxApiKey") || requiredForSubmit.includes("telnyxApiKey")) && (
                       <div className="grid gap-1">
-                        <Label className="text-xs">Telnyx API Key *</Label>
+                        <Label className="text-xs">{t('settings.twilio_voice.telnyx_api_key', 'Telnyx API Key *')}</Label>
                         <Input type="password" placeholder="KEY..." value={secrets.telnyxApiKey} onChange={(e) => handleSecretChange("telnyxApiKey", e.target.value)} className="font-mono text-sm" />
                       </div>
                     )}
                     {requiredForSubmit.includes("fromNumber") && (
                       <div className="grid gap-1">
-                        <Label className="text-xs">From Number (E.164) *</Label>
+                        <Label className="text-xs">{t('settings.twilio_sms.from_number', 'From Number (E.164) *')}</Label>
                         <Input
                           type="text"
                           placeholder="+15551234567"
@@ -279,7 +281,7 @@ export function TwilioVoiceConfigManager({
                     )}
                     {maskedFields.includes("apiKey") && (
                       <div className="grid gap-1">
-                        <Label className="text-xs">API Key (SID)</Label>
+                        <Label className="text-xs">{t('settings.twilio_voice.api_key_sid', 'API Key (SID)')}</Label>
                         <Input
                           type="text"
                           placeholder="SKxxxxxxxx..."
@@ -291,10 +293,10 @@ export function TwilioVoiceConfigManager({
                     )}
                     {maskedFields.includes("apiSecret") && (
                       <div className="grid gap-1">
-                        <Label className="text-xs">API Secret</Label>
+                        <Label className="text-xs">{t('settings.twilio_voice.api_secret', 'API Secret')}</Label>
                         <Input
                           type="password"
-                          placeholder="API Key secret"
+                          placeholder={t('settings.twilio_voice.api_key_secret_placeholder', 'API Key secret')}
                           value={secrets.apiSecret}
                           onChange={(e) => handleSecretChange("apiSecret", e.target.value)}
                           className="font-mono text-sm"
@@ -303,10 +305,10 @@ export function TwilioVoiceConfigManager({
                     )}
                     {maskedFields.includes("elevenLabsApiKey") && (
                       <div className="grid gap-1">
-                        <Label className="text-xs">ElevenLabs API Key {requiredForSubmit.includes("elevenLabsApiKey") ? "*" : ""}</Label>
+                        <Label className="text-xs">{t('settings.twilio_voice.elevenlabs_api_key', 'ElevenLabs API Key')} {requiredForSubmit.includes("elevenLabsApiKey") ? "*" : ""}</Label>
                         <Input
                           type="password"
-                          placeholder="ElevenLabs API key"
+                          placeholder={t('settings.twilio_voice.elevenlabs_api_key_placeholder', 'ElevenLabs API key')}
                           value={secrets.elevenLabsApiKey}
                           onChange={(e) => handleSecretChange("elevenLabsApiKey", e.target.value)}
                           className="font-mono text-sm"
@@ -315,8 +317,8 @@ export function TwilioVoiceConfigManager({
                     )}
                     {maskedFields.includes("vapiApiKey") && (
                       <div className="grid gap-1">
-                        <Label className="text-xs">Vapi.ai API Key {requiredForSubmit.includes("vapiApiKey") ? "*" : ""}</Label>
-                        <Input type="password" placeholder="Vapi.ai API key" value={secrets.vapiApiKey} onChange={(e) => handleSecretChange("vapiApiKey", e.target.value)} className="font-mono text-sm" />
+                        <Label className="text-xs">{t('settings.twilio_voice.vapi_api_key', 'Vapi.ai API Key')} {requiredForSubmit.includes("vapiApiKey") ? "*" : ""}</Label>
+                        <Input type="password" placeholder={t('settings.twilio_voice.vapi_api_key_placeholder', 'Vapi.ai API key')} value={secrets.vapiApiKey} onChange={(e) => handleSecretChange("vapiApiKey", e.target.value)} className="font-mono text-sm" />
                       </div>
                     )}
                   </div>
@@ -325,10 +327,10 @@ export function TwilioVoiceConfigManager({
             )}
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setImportOpen(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => setImportOpen(false)}>{t('common.cancel', 'Cancel')}</Button>
             <Button type="button" onClick={handleImportSubmit} disabled={!importPreview?.configuration || !secretsComplete || importing}>
               {importing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <FileJson className="h-4 w-4 mr-2" />}
-              Import
+              {t('flows.import', 'Import')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,6 +3,7 @@ import { ExternalLink, AlertCircle, CheckCircle2, Loader2, LogOut, RefreshCw } f
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useCalendlyCalendarAuth } from '@/hooks/useCalendlyCalendarAuth';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface CalendlyCalendarOAuthStatusProps {
   onAuthSuccess?: () => void;
@@ -12,6 +13,7 @@ interface CalendlyCalendarOAuthStatusProps {
 }
 
 export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, className, compact }: CalendlyCalendarOAuthStatusProps) {
+  const { t } = useTranslation();
   const {
     isConnected,
     isLoadingStatus,
@@ -32,7 +34,7 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
 
   const handleDisconnectClick = async () => {
 
-    if (!confirm('Are you sure you want to disconnect your Calendly account? You will need to reconnect to use Calendly features.')) {
+    if (!confirm(t('flow_builder.calendar_oauth.confirm_disconnect', 'Are you sure you want to disconnect your {{provider}} account? You will need to reconnect to use {{provider}} features.', { provider: 'Calendly' }))) {
       return;
     }
 
@@ -55,7 +57,7 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
           <Alert className="py-2 px-3">
             <div className="flex items-center gap-2 text-sm">
               <Loader2 className="h-3.5 w-3.5 animate-spin flex-shrink-0" />
-              <span>Checking connection...</span>
+              <span>{t('flow_builder.calendar_oauth.checking_connection_compact', 'Checking connection...')}</span>
             </div>
           </Alert>
         </div>
@@ -65,9 +67,9 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
       <div className={className}>
         <Alert>
           <Loader2 className="h-4 w-4 animate-spin" />
-          <AlertTitle>Checking Connection</AlertTitle>
+          <AlertTitle>{t('flow_builder.calendar_oauth.checking_connection_title', 'Checking Connection')}</AlertTitle>
           <AlertDescription>
-            Verifying your Calendly connection status...
+            {t('flow_builder.calendar_oauth.verifying_status', 'Verifying your {{provider}} connection status...', { provider: 'Calendly' })}
           </AlertDescription>
         </Alert>
       </div>
@@ -81,7 +83,7 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
           <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 py-2 px-3">
             <div className="flex items-center gap-2 flex-wrap">
               <CheckCircle2 className="h-3.5 w-3.5 text-green-500 dark:text-green-400 flex-shrink-0" />
-              <span className="text-sm text-green-600 dark:text-green-400">Connected</span>
+              <span className="text-sm text-green-600 dark:text-green-400">{t('flow_builder.calendar_oauth.connected', 'Connected')}</span>
               <div className="flex items-center gap-1.5 ml-auto">
                 <Button
                   onClick={handleConnectClick}
@@ -89,10 +91,10 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
                   variant="outline"
                   size="sm"
                   className="h-7 text-xs border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400"
-                  title="Connect a different Calendly account"
+                  title={t('flow_builder.calendar_oauth.switch_account_title', 'Connect a different {{provider}} account', { provider: 'Calendly' })}
                 >
                   {isAuthenticating ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-                  <span className="ml-1">{isAuthenticating ? 'Switching...' : 'Switch'}</span>
+                  <span className="ml-1">{isAuthenticating ? t('flow_builder.calendar_oauth.switching', 'Switching...') : t('flow_builder.calendar_oauth.switch', 'Switch')}</span>
                 </Button>
                 <Button
                   onClick={handleDisconnectClick}
@@ -100,7 +102,7 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
                   variant="outline"
                   size="sm"
                   className="h-7 text-xs border-red-200 dark:border-red-800 text-red-600 dark:text-red-400"
-                  title="Disconnect Calendly"
+                  title={t('flow_builder.calendar_oauth.disconnect_title_compact', 'Disconnect {{provider}}', { provider: 'Calendly' })}
                 >
                   {isDisconnecting ? <Loader2 className="h-3 w-3 animate-spin" /> : <LogOut className="h-3 w-3" />}
                   <span className="ml-1">{isDisconnecting ? '...' : 'Disconnect'}</span>
@@ -115,9 +117,9 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
       <div className={className}>
         <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
           <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" />
-          <AlertTitle className="text-green-700 dark:text-green-200">Connected</AlertTitle>
+          <AlertTitle className="text-green-700 dark:text-green-200">{t('flow_builder.calendar_oauth.connected', 'Connected')}</AlertTitle>
           <AlertDescription className="text-green-600 dark:text-green-400 space-y-3">
-            <p>Your Calendly is connected and ready to use.</p>
+            <p>{t('flow_builder.calendar_oauth.connected_ready', 'Your {{provider}} is connected and ready to use.', { provider: 'Calendly' })}</p>
             <div className="flex flex-wrap gap-2">
               <Button
                 onClick={handleConnectClick}
@@ -125,17 +127,17 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
                 variant="outline"
                 size="sm"
                 className="border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700"
-                title="Connect a different Calendly account"
+                title={t('flow_builder.calendar_oauth.switch_account_title', 'Connect a different {{provider}} account', { provider: 'Calendly' })}
               >
                 {isAuthenticating ? (
                   <>
                     <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                    Switching...
+                    {t('flow_builder.calendar_oauth.switching', 'Switching...')}
                   </>
                 ) : (
                   <>
                     <RefreshCw className="mr-2 h-3 w-3" />
-                    Switch Account
+                    {t('flow_builder.calendar_oauth.switch_account_btn', 'Switch Account')}
                   </>
                 )}
               </Button>
@@ -145,17 +147,17 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
                 variant="outline"
                 size="sm"
                 className="border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-700"
-                title="Disconnect Calendly integration"
+                title={t('flow_builder.calendar_oauth.disconnect_title_full', 'Disconnect {{provider}} integration', { provider: 'Calendly' })}
               >
                 {isDisconnecting ? (
                   <>
                     <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                    Disconnecting...
+                    {t('flow_builder.calendar_oauth.disconnecting', 'Disconnecting...')}
                   </>
                 ) : (
                   <>
                     <LogOut className="mr-2 h-3 w-3" />
-                    Disconnect
+                    {t('flow_builder.calendar_oauth.disconnect', 'Disconnect')}
                   </>
                 )}
               </Button>
@@ -172,8 +174,8 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
         <Alert className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 py-2 px-3">
           <div className="flex items-center gap-2 flex-wrap">
             <AlertCircle className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400 flex-shrink-0" />
-            <span className="text-sm text-amber-700 dark:text-amber-200">Authentication required.</span>
-            <span className="text-sm text-amber-600 dark:text-amber-300">Connect your Calendly to use this.</span>
+            <span className="text-sm text-amber-700 dark:text-amber-200">{t('flow_builder.calendar_oauth.auth_required_compact', 'Authentication required.')}</span>
+            <span className="text-sm text-amber-600 dark:text-amber-300">{t('flow_builder.calendar_oauth.connect_to_use_compact', 'Connect your {{provider}} to use this.', { provider: 'Calendly' })}</span>
             <Button
               onClick={handleConnectClick}
               disabled={isAuthenticating}
@@ -185,7 +187,7 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
               ) : (
                 <>
                   <ExternalLink className="h-3 w-3 mr-1" />
-                  Connect Calendly
+                  {t('flow_builder.calendar_oauth.connect_btn', 'Connect {{provider}}', { provider: 'Calendly' })}
                 </>
               )}
             </Button>
@@ -199,9 +201,9 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
     <div className={className}>
       <Alert className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
         <AlertCircle className="h-4 w-4 text-amber-500 dark:text-amber-400" />
-        <AlertTitle className="text-amber-700 dark:text-amber-200">Authentication Required</AlertTitle>
+        <AlertTitle className="text-amber-700 dark:text-amber-200">{t('flow_builder.calendar_oauth.auth_required_title', 'Authentication Required')}</AlertTitle>
         <AlertDescription className="text-amber-600 dark:text-amber-300 space-y-3">
-          <p>Connect your Calendly account to use this.</p>
+          <p>{t('flow_builder.calendar_oauth.connect_to_use_full', 'Connect your {{provider}} account to use this.', { provider: 'Calendly' })}</p>
           <Button
             onClick={handleConnectClick}
             disabled={isAuthenticating}
@@ -211,12 +213,12 @@ export function CalendlyCalendarOAuthStatus({ onAuthSuccess, onDisconnect, class
             {isAuthenticating ? (
               <>
                 <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                Connecting...
+                {t('flow_builder.calendar_oauth.connecting', 'Connecting...')}
               </>
             ) : (
               <>
                 <ExternalLink className="mr-2 h-3 w-3" />
-                Connect Calendly
+                {t('flow_builder.calendar_oauth.connect_btn', 'Connect {{provider}}', { provider: 'Calendly' })}
               </>
             )}
           </Button>

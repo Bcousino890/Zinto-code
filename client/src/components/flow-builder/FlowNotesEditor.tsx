@@ -3,6 +3,7 @@ import { Bold, Italic, Underline, List, ListOrdered, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface FlowNotesEditorProps {
   value: string;
@@ -18,13 +19,16 @@ interface FlowNotesEditorProps {
 export function FlowNotesEditor({
   value,
   onChange,
-  placeholder = 'Write your note…',
-  linkPrompt = 'Enter URL:',
+  placeholder,
+  linkPrompt,
   className = '',
   minHeight = 96,
   readOnly = false,
   onContentHeightChange,
 }: FlowNotesEditorProps) {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t('flow_builder.notes_body_placeholder', 'Add details, context, or reminders…');
+  const resolvedLinkPrompt = linkPrompt ?? t('flow_builder.notes_link_prompt', 'Enter URL:');
   const editorRef = useRef<HTMLDivElement>(null);
   const isUpdatingRef = useRef(false);
 
@@ -65,7 +69,7 @@ export function FlowNotesEditor({
   };
 
   const insertLink = () => {
-    const url = window.prompt(linkPrompt);
+    const url = window.prompt(resolvedLinkPrompt);
     if (url) {
       execCommand('createLink', url);
     }
@@ -154,7 +158,7 @@ export function FlowNotesEditor({
         contentEditable
         suppressContentEditableWarning
         onInput={handleInput}
-        data-placeholder={placeholder}
+        data-placeholder={resolvedPlaceholder}
         className="flow-notes-editor nodrag nopan min-h-0 flex-1 overflow-y-auto p-2 text-sm leading-relaxed focus:outline-none"
         style={{ minHeight }}
       />

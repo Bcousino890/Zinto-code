@@ -54154,5 +54154,857 @@
     {
         "key": "common.wysiwyg.html_placeholder",
         "value": "Introduzca el código HTML aquí..."
+    },
+    {
+        "key": "erp.settings.paymentGateways.webhookUrlCopied",
+        "value": "URL del webhook copiada"
+    },
+    {
+        "key": "erp.settings.paymentGateways.testConnectionSuccess",
+        "value": "Conexión exitosa"
+    },
+    {
+        "key": "erp.variant_picker.select_variant",
+        "value": "Seleccionar variante"
+    },
+    {
+        "key": "erp.variant_picker.base_product_no_variant",
+        "value": "Producto base (sin variante)"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.confirm_disconnect",
+        "value": "¿Está seguro de que desea desconectar su cuenta de {{provider}}? Deberá volver a conectarla para usar las funciones de {{provider}}."
+    },
+    {
+        "key": "flow_builder.calendar_oauth.checking_connection_compact",
+        "value": "Comprobando conexión..."
+    },
+    {
+        "key": "flow_builder.calendar_oauth.checking_connection_title",
+        "value": "Comprobando conexión"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.verifying_status",
+        "value": "Verificando el estado de su conexión con {{provider}}..."
+    },
+    {
+        "key": "flow_builder.calendar_oauth.connected",
+        "value": "Conectado"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.switch_account_title",
+        "value": "Conectar una cuenta diferente de {{provider}}"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.switching",
+        "value": "Cambiando..."
+    },
+    {
+        "key": "flow_builder.calendar_oauth.switch",
+        "value": "Cambiar"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.disconnect_title_compact",
+        "value": "Desconectar {{provider}}"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.connected_ready",
+        "value": "Su {{provider}} está conectado y listo para usar."
+    },
+    {
+        "key": "flow_builder.calendar_oauth.switch_account_btn",
+        "value": "Cambiar de cuenta"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.disconnect_title_full",
+        "value": "Desconectar la integración de {{provider}}"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.disconnecting",
+        "value": "Desconectando..."
+    },
+    {
+        "key": "flow_builder.calendar_oauth.disconnect",
+        "value": "Desconectar"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.auth_required_compact",
+        "value": "Se requiere autenticación."
+    },
+    {
+        "key": "flow_builder.calendar_oauth.connect_to_use_compact",
+        "value": "Conecte su {{provider}} para usar esto."
+    },
+    {
+        "key": "flow_builder.calendar_oauth.connect_btn",
+        "value": "Conectar {{provider}}"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.auth_required_title",
+        "value": "Se requiere autenticación"
+    },
+    {
+        "key": "flow_builder.calendar_oauth.connect_to_use_full",
+        "value": "Conecte su cuenta de {{provider}} para usar esto."
+    },
+    {
+        "key": "flow_builder.calendar_oauth.connecting",
+        "value": "Conectando..."
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.select_a_stage",
+        "value": "Seleccionar una etapa"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.enter_stage_name",
+        "value": "Introduzca el nombre de la etapa"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.select_initial_stage",
+        "value": "Seleccionar etapa inicial"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.deal_description_placeholder",
+        "value": "Descripción del negocio..."
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.enter_value_or_variable",
+        "value": "Introduzca un valor o {{variable}}"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.value_or_variable",
+        "value": "Valor o {{variable}}"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.leave_empty_to_keep_current",
+        "value": "Deje vacío para mantener el actual"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.keep_current",
+        "value": "Mantener actual"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.keep_current_stage",
+        "value": "Mantener la etapa actual"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.select_tag_to_remove",
+        "value": "Seleccionar etiqueta a eliminar"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.select_stage_to_revert_to",
+        "value": "Seleccionar la etapa a la que revertir"
+    },
+    {
+        "key": "settings.messenger_connection.invalid_webhook_url_desc",
+        "value": "La URL del webhook debe ser HTTPS y apuntar al endpoint /api/webhooks/messenger."
+    },
+    {
+        "key": "settings.messenger_connection.webhook_test_failed_fallback",
+        "value": "La prueba del webhook falló"
+    },
+    {
+        "key": "settings.messenger_connection.create_failed",
+        "value": "Error al crear la conexión de Messenger"
+    },
+    {
+        "key": "settings.messenger_connection.connected_title",
+        "value": "Messenger conectado"
+    },
+    {
+        "key": "settings.messenger_connection.connected_desc",
+        "value": "Su página de Facebook se ha conectado correctamente."
+    },
+    {
+        "key": "settings.twilio_sms.validation_required_fields",
+        "value": "Por favor, complete todos los campos obligatorios."
+    },
+    {
+        "key": "settings.twilio_sms.validation_from_number_format",
+        "value": "El número de origen debe estar en formato E.164 (ej., +15551234567)."
+    },
+    {
+        "key": "settings.twilio_sms.validation_https_required",
+        "value": "Las URL de webhook deben ser HTTPS."
+    },
+    {
+        "key": "settings.twilio_sms.validation_invalid_urls",
+        "value": "Las URL de webhook no son válidas."
+    },
+    {
+        "key": "settings.twilio_sms.create_failed",
+        "value": "Error al crear la conexión de Twilio SMS"
+    },
+    {
+        "key": "settings.twilio_sms.connected_title",
+        "value": "Twilio SMS conectado"
+    },
+    {
+        "key": "settings.twilio_sms.connected_desc",
+        "value": "Su canal de Twilio SMS se ha agregado."
+    },
+    {
+        "key": "settings.twilio_sms.connect_failed_desc",
+        "value": "Error al conectar Twilio SMS."
+    },
+    {
+        "key": "settings.twilio_sms.webhook_test_tip_title",
+        "value": "Consejo para probar el webhook"
+    },
+    {
+        "key": "settings.twilio_sms.webhook_test_tip_desc",
+        "value": "Use la opción “Try It Out” de la consola de Twilio o envíe un SMS real a su número de origen para probar los webhooks entrantes."
+    },
+    {
+        "key": "settings.twilio_sms.dialog_title",
+        "value": "Conectar Twilio SMS"
+    },
+    {
+        "key": "settings.twilio_sms.dialog_description",
+        "value": "Configure Twilio Programmable Messaging para habilitar SMS y MMS bidireccionales."
+    },
+    {
+        "key": "settings.twilio_sms.account_name",
+        "value": "Nombre de la cuenta *"
+    },
+    {
+        "key": "settings.twilio_sms.account_name_placeholder",
+        "value": "ej. Número principal de soporte"
+    },
+    {
+        "key": "settings.twilio_sms.account_sid",
+        "value": "SID de cuenta de Twilio *"
+    },
+    {
+        "key": "settings.twilio_sms.auth_token",
+        "value": "Token de autenticación de Twilio *"
+    },
+    {
+        "key": "settings.twilio_sms.auth_token_placeholder",
+        "value": "Su token de autenticación de Twilio"
+    },
+    {
+        "key": "settings.twilio_sms.from_number",
+        "value": "Número de origen (E.164) *"
+    },
+    {
+        "key": "settings.twilio_sms.inbound_webhook_url",
+        "value": "URL del webhook entrante"
+    },
+    {
+        "key": "settings.twilio_sms.status_callback_url",
+        "value": "URL de devolución de llamada de estado"
+    },
+    {
+        "key": "settings.twilio_sms.https_notice",
+        "value": "Asegúrese de que ambas URL sean accesibles públicamente mediante HTTPS. Verificamos las solicitudes de Twilio con X-Twilio-Signature."
+    },
+    {
+        "key": "settings.twilio_sms.connect_button",
+        "value": "Conectar Twilio SMS"
+    },
+    {
+        "key": "settings.twilio_sms.setup_dialog_title",
+        "value": "Instrucciones de configuración de Twilio SMS"
+    },
+    {
+        "key": "settings.twilio_sms.setup_dialog_description",
+        "value": "Siga estos pasos para completar la integración."
+    },
+    {
+        "key": "settings.twilio_sms.setup_step_buy_number",
+        "value": "Compre o seleccione un número de teléfono de Twilio habilitado para SMS."
+    },
+    {
+        "key": "settings.twilio_sms.setup_step_messaging_webhook",
+        "value": "En la consola de Twilio, configure el webhook de mensajería en:"
+    },
+    {
+        "key": "settings.twilio_sms.setup_step_status_callback",
+        "value": "Configure la URL de devolución de llamada de estado en:"
+    },
+    {
+        "key": "settings.twilio_sms.setup_step_paste_credentials",
+        "value": "Pegue aquí su SID de cuenta y su token de autenticación, y el número de origen en formato E.164 (ej., +15551234567)."
+    },
+    {
+        "key": "settings.twilio_sms.setup_step_save",
+        "value": "Guarde. Los SMS entrantes aparecerán en la bandeja de entrada bajo el canal de Twilio SMS. Las actualizaciones de entrega cambiarán el estado del mensaje a entregado/fallido."
+    },
+    {
+        "key": "settings.twilio_sms.setup_step_stop_start_help",
+        "value": "STOP/START/HELP: cuando los clientes envían STOP, los damos de baja automáticamente y bloqueamos los envíos salientes hasta que envíen START/UNSTOP."
+    },
+    {
+        "key": "settings.twilio_sms.docs_link",
+        "value": "Documentación de Twilio SMS (externa)"
+    },
+    {
+        "key": "settings.twilio_voice.no_connection_title",
+        "value": "Sin conexión"
+    },
+    {
+        "key": "settings.twilio_voice.no_connection_desc",
+        "value": "Seleccione una conexión para exportar."
+    },
+    {
+        "key": "settings.twilio_voice.export_failed",
+        "value": "Error al exportar"
+    },
+    {
+        "key": "settings.twilio_voice.exported_title",
+        "value": "Exportado"
+    },
+    {
+        "key": "settings.twilio_voice.exported_desc",
+        "value": "Configuración guardada como JSON."
+    },
+    {
+        "key": "settings.twilio_voice.invalid_file_title",
+        "value": "Archivo no válido"
+    },
+    {
+        "key": "settings.twilio_voice.invalid_file_desc",
+        "value": "Seleccione un archivo JSON."
+    },
+    {
+        "key": "settings.twilio_voice.invalid_json_title",
+        "value": "JSON no válido"
+    },
+    {
+        "key": "settings.twilio_voice.invalid_json_desc",
+        "value": "No se pudo analizar el archivo."
+    },
+    {
+        "key": "settings.twilio_voice.missing_configuration",
+        "value": "Falta la configuración."
+    },
+    {
+        "key": "settings.twilio_voice.missing_credentials_title",
+        "value": "Faltan credenciales"
+    },
+    {
+        "key": "settings.twilio_voice.missing_credentials_desc",
+        "value": "Complete todos los campos enmascarados obligatorios para el stack de proveedor seleccionado."
+    },
+    {
+        "key": "settings.twilio_voice.import_failed",
+        "value": "Error al importar"
+    },
+    {
+        "key": "settings.twilio_voice.imported_title",
+        "value": "Importado"
+    },
+    {
+        "key": "settings.twilio_voice.imported_desc",
+        "value": "Canal de voz de {{provider}} creado."
+    },
+    {
+        "key": "settings.twilio_voice.export_config",
+        "value": "Exportar configuración"
+    },
+    {
+        "key": "settings.twilio_voice.import_config",
+        "value": "Importar configuración"
+    },
+    {
+        "key": "settings.twilio_voice.import_dialog_title",
+        "value": "Importar configuración del canal de voz"
+    },
+    {
+        "key": "settings.twilio_voice.import_dialog_description",
+        "value": "Suba un archivo de configuración JSON. Las credenciales enmascaradas deben completarse antes de guardar."
+    },
+    {
+        "key": "settings.twilio_voice.json_file",
+        "value": "Archivo JSON"
+    },
+    {
+        "key": "settings.twilio_voice.connection_type",
+        "value": "Tipo de conexión:"
+    },
+    {
+        "key": "settings.twilio_voice.provider_stack",
+        "value": "Stack del proveedor:"
+    },
+    {
+        "key": "settings.twilio_voice.account_name_field",
+        "value": "Nombre de la cuenta:"
+    },
+    {
+        "key": "settings.twilio_voice.from_number_field",
+        "value": "Número de origen:"
+    },
+    {
+        "key": "settings.twilio_voice.masked_fill_below",
+        "value": "(enmascarado: complete abajo)"
+    },
+    {
+        "key": "settings.twilio_voice.telnyx_webhook_verification_key",
+        "value": "Clave de verificación del webhook de Telnyx:"
+    },
+    {
+        "key": "settings.twilio_voice.not_set",
+        "value": "(sin definir)"
+    },
+    {
+        "key": "settings.twilio_voice.masked_credentials_notice",
+        "value": "Proporcione valores reales para las credenciales enmascaradas de abajo. La importación se bloquea hasta que se proporcionen los secretos requeridos."
+    },
+    {
+        "key": "settings.twilio_voice.masked_credentials_label",
+        "value": "Credenciales enmascaradas (complete con valores reales)"
+    },
+    {
+        "key": "settings.twilio_voice.account_sid",
+        "value": "SID de cuenta *"
+    },
+    {
+        "key": "settings.twilio_voice.auth_token",
+        "value": "Token de autenticación *"
+    },
+    {
+        "key": "settings.twilio_voice.telnyx_api_key",
+        "value": "Clave de API de Telnyx *"
+    },
+    {
+        "key": "settings.twilio_voice.api_key_sid",
+        "value": "Clave de API (SID)"
+    },
+    {
+        "key": "settings.twilio_voice.api_secret",
+        "value": "Secreto de API"
+    },
+    {
+        "key": "settings.twilio_voice.api_key_secret_placeholder",
+        "value": "Secreto de la clave de API"
+    },
+    {
+        "key": "settings.twilio_voice.elevenlabs_api_key",
+        "value": "Clave de API de ElevenLabs"
+    },
+    {
+        "key": "settings.twilio_voice.elevenlabs_api_key_placeholder",
+        "value": "Clave de API de ElevenLabs"
+    },
+    {
+        "key": "settings.twilio_voice.vapi_api_key",
+        "value": "Clave de API de Vapi.ai"
+    },
+    {
+        "key": "settings.twilio_voice.vapi_api_key_placeholder",
+        "value": "Clave de API de Vapi.ai"
+    },
+    {
+        "key": "settings.twilio_voice.step_twilio_account",
+        "value": "Cuenta de Twilio"
+    },
+    {
+        "key": "settings.twilio_voice.step_voice_sdk",
+        "value": "SDK de voz"
+    },
+    {
+        "key": "settings.twilio_voice.step_call_mode",
+        "value": "Modo de llamada"
+    },
+    {
+        "key": "settings.twilio_voice.step_elevenlabs",
+        "value": "ElevenLabs"
+    },
+    {
+        "key": "settings.twilio_voice.step_webhooks",
+        "value": "Webhooks"
+    },
+    {
+        "key": "settings.twilio_voice.step_review_save",
+        "value": "Revisar y guardar"
+    },
+    {
+        "key": "settings.twilio_voice.section_twilio_account",
+        "value": "Cuenta de Twilio"
+    },
+    {
+        "key": "settings.twilio_voice.twiml_app_ok",
+        "value": "Aplicación TwiML correcta"
+    },
+    {
+        "key": "settings.twilio_voice.voice_url_mismatch",
+        "value": "La URL de voz no coincide. Esperada: {{expected}}, Recibida: {{actual}}"
+    },
+    {
+        "key": "settings.twilio_voice.twiml_app_validation_failed",
+        "value": "Error al validar la aplicación TwiML"
+    },
+    {
+        "key": "settings.twilio_voice.section_twiml_app",
+        "value": "Aplicación TwiML"
+    },
+    {
+        "key": "settings.twilio_voice.section_webhook_accessibility",
+        "value": "Accesibilidad del webhook"
+    },
+    {
+        "key": "settings.twilio_voice.status_callback_reachable",
+        "value": "URL de devolución de llamada de estado accesible"
+    },
+    {
+        "key": "settings.twilio_voice.url_not_reachable",
+        "value": "URL no accesible"
+    },
+    {
+        "key": "settings.twilio_voice.fill_required_fields",
+        "value": "Complete los campos obligatorios"
+    },
+    {
+        "key": "settings.twilio_voice.required_fields_step1",
+        "value": "SID de cuenta, token de autenticación, número de origen"
+    },
+    {
+        "key": "settings.twilio_voice.credentials_valid",
+        "value": "Credenciales de Twilio válidas"
+    },
+    {
+        "key": "settings.twilio_voice.account_label",
+        "value": "Cuenta: {{name}}"
+    },
+    {
+        "key": "settings.twilio_voice.validation_failed",
+        "value": "Error de validación"
+    },
+    {
+        "key": "settings.twilio_voice.fill_required_fields_step2",
+        "value": "Complete la clave de API, el secreto de API y el SID de la aplicación TwiML"
+    },
+    {
+        "key": "settings.twilio_voice.voice_sdk_valid",
+        "value": "SDK de voz válido"
+    },
+    {
+        "key": "settings.twilio_voice.voice_sdk_valid_desc",
+        "value": "Generación de token y aplicación TwiML correctas"
+    },
+    {
+        "key": "settings.twilio_voice.url_copied_desc",
+        "value": "URL copiada al portapapeles"
+    },
+    {
+        "key": "settings.twilio_voice.elevenlabs_key_required",
+        "value": "Se requiere la clave de API de ElevenLabs para el modo con IA"
+    },
+    {
+        "key": "settings.twilio_voice.fix_issues_below",
+        "value": "Corrija los problemas de abajo antes de continuar."
+    },
+    {
+        "key": "settings.twilio_voice.fix_validation_errors",
+        "value": "Corrija los errores de validación antes de guardar."
+    },
+    {
+        "key": "settings.twilio_voice.create_connection_failed",
+        "value": "Error al crear la conexión"
+    },
+    {
+        "key": "settings.twilio_voice.setup_complete",
+        "value": "Configuración completada"
+    },
+    {
+        "key": "settings.twilio_voice.setup_complete_desc",
+        "value": "Canal de voz guardado. Configure los webhooks del proveedor seleccionado según sea necesario y luego pruebe una llamada."
+    },
+    {
+        "key": "settings.twilio_voice.save_failed",
+        "value": "Error al guardar"
+    },
+    {
+        "key": "settings.twilio_voice.export_config_saved_desc",
+        "value": "Configuración guardada como JSON"
+    },
+    {
+        "key": "settings.twilio_voice.wizard_title",
+        "value": "Asistente de configuración del canal de voz"
+    },
+    {
+        "key": "settings.twilio_voice.wizard_step_progress",
+        "value": "Paso {{current}} de {{total}}: {{title}}"
+    },
+    {
+        "key": "settings.twilio_voice.account_name_placeholder",
+        "value": "ej. Línea de voz principal"
+    },
+    {
+        "key": "settings.twilio_voice.account_check_valid",
+        "value": "✓ Cuenta: {{name}}"
+    },
+    {
+        "key": "settings.twilio_voice.valid_label",
+        "value": "Válido"
+    },
+    {
+        "key": "settings.twilio_voice.validate_credentials",
+        "value": "Validar credenciales"
+    },
+    {
+        "key": "settings.twilio_voice.create_api_key_twiml_app",
+        "value": "Cree una clave de API y una aplicación TwiML en la consola de Twilio → Account → API Keys y Voice → TwiML Apps."
+    },
+    {
+        "key": "settings.twilio_voice.api_secret_shown_once",
+        "value": "Se muestra una sola vez al crear la clave de API"
+    },
+    {
+        "key": "settings.twilio_voice.twiml_app_sid",
+        "value": "SID de la aplicación TwiML *"
+    },
+    {
+        "key": "settings.twilio_voice.twiml_app_voice_request_url",
+        "value": "URL de solicitud de voz de la aplicación TwiML"
+    },
+    {
+        "key": "settings.twilio_voice.twiml_app_voice_request_url_help",
+        "value": "Copie esta URL y péguela como Voice Request URL en su aplicación TwiML de Twilio (consola de Twilio → Voice → TwiML Apps)."
+    },
+    {
+        "key": "settings.twilio_voice.token_generated",
+        "value": "✓ Token generado"
+    },
+    {
+        "key": "settings.twilio_voice.twiml_app_status_ok",
+        "value": " • Aplicación TwiML: {{name}}"
+    },
+    {
+        "key": "settings.twilio_voice.ok_label",
+        "value": "Correcto"
+    },
+    {
+        "key": "settings.twilio_voice.twiml_app_status_error",
+        "value": " • TwiML: {{error}}"
+    },
+    {
+        "key": "settings.twilio_voice.validate_voice_sdk",
+        "value": "Validar SDK de voz"
+    },
+    {
+        "key": "settings.twilio_voice.call_mode",
+        "value": "Modo de llamada *"
+    },
+    {
+        "key": "settings.twilio_voice.basic_calls",
+        "value": "Llamadas básicas"
+    },
+    {
+        "key": "settings.twilio_voice.ai_powered_calls",
+        "value": "Llamadas con IA"
+    },
+    {
+        "key": "settings.twilio_voice.feature_column",
+        "value": "Función"
+    },
+    {
+        "key": "settings.twilio_voice.basic_column",
+        "value": "Básico"
+    },
+    {
+        "key": "settings.twilio_voice.ai_powered_column",
+        "value": "Con IA"
+    },
+    {
+        "key": "settings.twilio_voice.feature_webrtc_direct",
+        "value": "WebRTC / Directo"
+    },
+    {
+        "key": "settings.twilio_voice.feature_elevenlabs_voice",
+        "value": "Voz con IA de ElevenLabs"
+    },
+    {
+        "key": "settings.twilio_voice.feature_conversational_ai",
+        "value": "IA conversacional"
+    },
+    {
+        "key": "settings.twilio_voice.elevenlabs_api_key_placeholder2",
+        "value": "Su clave de API de ElevenLabs"
+    },
+    {
+        "key": "settings.twilio_voice.elevenlabs_agent_id",
+        "value": "ID del agente de ElevenLabs (opcional)"
+    },
+    {
+        "key": "settings.twilio_voice.preconfigured_agent_id",
+        "value": "ID de agente preconfigurado"
+    },
+    {
+        "key": "settings.twilio_voice.elevenlabs_agent_phone_number_id",
+        "value": "ID del número de teléfono del agente de ElevenLabs *"
+    },
+    {
+        "key": "settings.twilio_voice.from_elevenlabs_phone_numbers",
+        "value": "Desde ElevenLabs → Phone Numbers"
+    },
+    {
+        "key": "settings.twilio_voice.agent_phone_number_help",
+        "value": "Obligatorio para las llamadas salientes con \"Usar agente de IA\". Obténgalo en ElevenLabs → Phone Numbers → su número de Twilio."
+    },
+    {
+        "key": "settings.twilio_voice.post_call_webhook_url",
+        "value": "URL del webhook posterior a la llamada"
+    },
+    {
+        "key": "settings.twilio_voice.post_call_webhook_help",
+        "value": "Cópiela en ElevenLabs → Agents → Settings → Post-call webhooks."
+    },
+    {
+        "key": "settings.twilio_voice.webhook_secret",
+        "value": "Secreto del webhook"
+    },
+    {
+        "key": "settings.twilio_voice.webhook_secret_placeholder",
+        "value": "Secreto de la configuración de webhooks de ElevenLabs"
+    },
+    {
+        "key": "settings.twilio_voice.voice_id",
+        "value": "ID de voz (opcional)"
+    },
+    {
+        "key": "settings.twilio_voice.voice_id_placeholder",
+        "value": "Identificador de voz de ElevenLabs"
+    },
+    {
+        "key": "settings.twilio_voice.audio_format",
+        "value": "Formato de audio"
+    },
+    {
+        "key": "settings.twilio_voice.audio_format_ulaw",
+        "value": "μ-law 8000 Hz telefonía (recomendado para Twilio)"
+    },
+    {
+        "key": "settings.twilio_voice.audio_format_pcm8",
+        "value": "PCM 8 kHz"
+    },
+    {
+        "key": "settings.twilio_voice.audio_format_pcm16",
+        "value": "PCM 16 kHz"
+    },
+    {
+        "key": "settings.twilio_voice.audio_format_help",
+        "value": "En ElevenLabs, configure \"User input audio format\" en"
+    },
+    {
+        "key": "settings.twilio_voice.ulaw_telephony_label",
+        "value": "μ-law 8000 Hz telefonía"
+    },
+    {
+        "key": "settings.twilio_voice.for_twilio",
+        "value": "para Twilio."
+    },
+    {
+        "key": "settings.twilio_voice.elevenlabs_configured",
+        "value": "✓ ElevenLabs configurado"
+    },
+    {
+        "key": "settings.twilio_voice.set_urls_notice",
+        "value": "Configure estas URL en la consola de Twilio para su número de teléfono y su aplicación TwiML."
+    },
+    {
+        "key": "settings.twilio_voice.voice_webhook_url",
+        "value": "URL del webhook de voz"
+    },
+    {
+        "key": "settings.twilio_voice.voice_webhook_url_help",
+        "value": "Configure esta URL como el webhook de voz de su número de teléfono de Twilio cuando corresponda."
+    },
+    {
+        "key": "settings.twilio_voice.localhost_warning",
+        "value": "Está ejecutando en localhost. Twilio no puede acceder a URL de localhost. Use una herramienta de túnel como ngrok o publique en un dominio público."
+    },
+    {
+        "key": "settings.twilio_voice.status_callback_reachable_check",
+        "value": "✓ URL de devolución de llamada de estado accesible"
+    },
+    {
+        "key": "settings.twilio_voice.status_callback_not_reachable",
+        "value": "URL de devolución de llamada de estado no accesible"
+    },
+    {
+        "key": "settings.twilio_voice.twilio_console_configuration",
+        "value": "Configuración de la consola de Twilio"
+    },
+    {
+        "key": "settings.twilio_voice.account_field_label",
+        "value": "Cuenta:"
+    },
+    {
+        "key": "settings.twilio_voice.call_mode_field_label",
+        "value": "Modo de llamada:"
+    },
+    {
+        "key": "settings.twilio_voice.elevenlabs_field_label",
+        "value": "ElevenLabs:"
+    },
+    {
+        "key": "settings.twilio_voice.custom_prompt",
+        "value": "Prompt personalizado"
+    },
+    {
+        "key": "settings.twilio_voice.export_config_as_json",
+        "value": "Exportar configuración como JSON"
+    },
+    {
+        "key": "settings.twilio_voice.test_call_title",
+        "value": "Llamada de prueba"
+    },
+    {
+        "key": "settings.twilio_voice.test_call_desc",
+        "value": "Use la función de llamada desde una conversación para realizar una llamada de prueba."
+    },
+    {
+        "key": "settings.twilio_voice.back_button",
+        "value": "Atrás"
+    },
+    {
+        "key": "settings.twilio_voice.next_button",
+        "value": "Siguiente"
+    },
+    {
+        "key": "settings.twilio_voice.save_configuration",
+        "value": "Guardar configuración"
+    },
+    {
+        "key": "analytics.date_range.invalid_title",
+        "value": "Rango de fechas no válido"
+    },
+    {
+        "key": "calendar.schedule_name_placeholder",
+        "value": "Trabajo, Personal, etc."
+    },
+    {
+        "key": "erp.salesOrders.kanban.columnNameSaved",
+        "value": "Nombre de la columna Kanban guardado"
+    },
+    {
+        "key": "erp.salesOrders.quotationCreated",
+        "value": "Cotización creada"
+    },
+    {
+        "key": "erp.salesOrders.orderCreated",
+        "value": "Pedido creado"
+    },
+    {
+        "key": "erp.salesOrders.invalidMove",
+        "value": "Movimiento no válido"
+    },
+    {
+        "key": "erp.salesOrders.invalidMoveDesc",
+        "value": "No se puede mover de {{from}} a {{to}}."
+    },
+    {
+        "key": "erp.salesOrders.orderUpdated",
+        "value": "Pedido actualizado"
+    },
+    {
+        "key": "erp.salesOrders.lineItemAdded",
+        "value": "Línea de pedido agregada"
+    },
+    {
+        "key": "erp.salesOrders.updated",
+        "value": "Actualizado"
     }
 ]

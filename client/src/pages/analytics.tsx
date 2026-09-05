@@ -355,7 +355,7 @@ export default function Analytics() {
       if (!validation.isValid) {
         setDateRangeError(validation.error || 'Invalid date range');
         toast({
-          title: "Invalid Date Range",
+          title: t('analytics.date_range.invalid_title', 'Invalid Date Range'),
           description: validation.error,
           variant: "destructive",
         });
@@ -372,7 +372,7 @@ export default function Analytics() {
       if (!validation.isValid) {
         setDateRangeError(validation.error || 'Invalid date range');
         toast({
-          title: "Invalid Date Range",
+          title: t('analytics.date_range.invalid_title', 'Invalid Date Range'),
           description: validation.error,
           variant: "destructive",
         });

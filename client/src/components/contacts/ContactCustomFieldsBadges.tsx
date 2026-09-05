@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/hooks/use-translation';
 
 /** Helper to convert fieldName to label (e.g. "lead_source" -> "Lead Source") */
 function fieldNameToLabel(name: string): string {
@@ -25,6 +26,8 @@ export function ContactCustomFieldsBadges({
   maxVisible?: number;
   className?: string;
 }) {
+  const { t } = useTranslation();
+
   if (!customFields || typeof customFields !== 'object' || Object.keys(customFields).length === 0) {
     return null;
   }
@@ -44,8 +47,8 @@ export function ContactCustomFieldsBadges({
       ? val.map((v) => String(v)).join(', ')
       : typeof val === 'boolean'
       ? val
-        ? (boolOpts?.trueLabel ?? 'Yes')
-        : (boolOpts?.falseLabel ?? 'No')
+        ? (boolOpts?.trueLabel ?? t('erp.common.yes', 'Yes'))
+        : (boolOpts?.falseLabel ?? t('erp.common.no', 'No'))
       : String(val);
     if (Array.isArray(val)) {
       val.forEach((v) => items.push({ label: fieldLabel, value: String(v) }));

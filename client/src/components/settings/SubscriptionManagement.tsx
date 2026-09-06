@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { formatPlanDurationForDisplay } from '@/utils/plan-duration';
 import { useCurrency } from '@/contexts/currency-context';
@@ -83,6 +84,7 @@ interface DunningStatus {
 export function SubscriptionManagement() {
   const { toast } = useToast();
   const { formatCurrency } = useCurrency();
+  const { t } = useTranslation();
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [showDowngradeDialog, setShowDowngradeDialog] = useState(false);
   const [pauseDays, setPauseDays] = useState(30);
@@ -151,8 +153,8 @@ export function SubscriptionManagement() {
     },
     onSuccess: () => {
       toast({
-        title: "Subscription Paused",
-        description: "Your subscription has been paused successfully.",
+        title: t('subscription.paused_title', 'Subscription Paused'),
+        description: t('subscription.paused_desc', 'Your subscription has been paused successfully.'),
       });
       setShowPauseDialog(false);
       queryClient.invalidateQueries({ queryKey: ['/api/enhanced-subscription/pause/status'] });
@@ -160,8 +162,8 @@ export function SubscriptionManagement() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: `Failed to pause subscription: ${error.message}`,
+        title: t('subscription.error_title', 'Error'),
+        description: t('subscription.pause_failed', 'Failed to pause subscription: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     },
@@ -176,16 +178,16 @@ export function SubscriptionManagement() {
     },
     onSuccess: () => {
       toast({
-        title: "Subscription Resumed",
-        description: "Your subscription has been resumed successfully.",
+        title: t('subscription.resumed_title', 'Subscription Resumed'),
+        description: t('subscription.resumed_desc', 'Your subscription has been resumed successfully.'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/enhanced-subscription/pause/status'] });
       queryClient.invalidateQueries({ queryKey: ['/api/enhanced-subscription/status'] });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: `Failed to resume subscription: ${error.message}`,
+        title: t('subscription.error_title', 'Error'),
+        description: t('subscription.resume_failed', 'Failed to resume subscription: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     },
@@ -194,15 +196,15 @@ export function SubscriptionManagement() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-primary/10 text-primary border border-primary/20"><CheckCircle2 className="w-3 h-3 mr-1" />Active</Badge>;
+        return <Badge className="bg-primary/10 text-primary border border-primary/20"><CheckCircle2 className="w-3 h-3 mr-1" />{t('subscription.active_badge', 'Active')}</Badge>;
       case 'paused':
-        return <Badge className="bg-secondary/10 text-secondary border border-secondary/20"><Pause className="w-3 h-3 mr-1" />Paused</Badge>;
+        return <Badge className="bg-secondary/10 text-secondary border border-secondary/20"><Pause className="w-3 h-3 mr-1" />{t('subscription.paused_badge', 'Paused')}</Badge>;
       case 'grace_period':
-        return <Badge className="bg-secondary/10 text-secondary border border-secondary/20"><Clock className="w-3 h-3 mr-1" />Grace Period</Badge>;
+        return <Badge className="bg-secondary/10 text-secondary border border-secondary/20"><Clock className="w-3 h-3 mr-1" />{t('subscription.grace_period_badge', 'Grace Period')}</Badge>;
       case 'past_due':
-        return <Badge className="bg-destructive/10 text-destructive border border-destructive/20"><AlertTriangle className="w-3 h-3 mr-1" />Past Due</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive border border-destructive/20"><AlertTriangle className="w-3 h-3 mr-1" />{t('subscription.expired_badge', 'Expired')}</Badge>;
       case 'trial':
-        return <Badge className="bg-accent/10 text-accent border border-accent/20"><Zap className="w-3 h-3 mr-1" />Trial</Badge>;
+        return <Badge className="bg-accent/10 text-accent border border-accent/20"><Zap className="w-3 h-3 mr-1" />{t('subscription.renewal_badge', 'Renewing')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }

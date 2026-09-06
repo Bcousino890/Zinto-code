@@ -56934,5 +56934,65 @@
   {
     "key": "auth.impersonate_company_error",
     "value": "No se pudo suplantar la empresa"
+  },
+  {
+    "key": "subscription.paused_title",
+    "value": "Suscripción pausada"
+  },
+  {
+    "key": "subscription.paused_desc",
+    "value": "Tu suscripción ha sido pausada exitosamente."
+  },
+  {
+    "key": "subscription.resumed_title",
+    "value": "Suscripción reanudada"
+  },
+  {
+    "key": "subscription.resumed_desc",
+    "value": "Tu suscripción ha sido reanudada exitosamente."
+  },
+  {
+    "key": "subscription.error_title",
+    "value": "Error"
+  },
+  {
+    "key": "subscription.pause_failed",
+    "value": "No se pudo pausar la suscripción: {{error}}"
+  },
+  {
+    "key": "subscription.resume_failed",
+    "value": "No se pudo reanudar la suscripción: {{error}}"
+  },
+  {
+    "key": "subscription.current_subscription",
+    "value": "Suscripción actual"
+  },
+  {
+    "key": "subscription.no_active_subscription",
+    "value": "Sin suscripción activa"
+  },
+  {
+    "key": "subscription.status",
+    "value": "Estado de la suscripción"
+  },
+  {
+    "key": "subscription.paused_badge",
+    "value": "Pausada"
+  },
+  {
+    "key": "subscription.active_badge",
+    "value": "Activa"
+  },
+  {
+    "key": "subscription.grace_period_badge",
+    "value": "Período de gracia"
+  },
+  {
+    "key": "subscription.expired_badge",
+    "value": "Expirada"
+  },
+  {
+    "key": "subscription.renewal_badge",
+    "value": "Renovando"
   }
 ]

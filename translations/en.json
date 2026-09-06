@@ -53170,5 +53170,65 @@
   {
     "key": "auth.impersonate_company_error",
     "value": "Failed to impersonate company"
+  },
+  {
+    "key": "subscription.paused_title",
+    "value": "Subscription Paused"
+  },
+  {
+    "key": "subscription.paused_desc",
+    "value": "Your subscription has been paused successfully."
+  },
+  {
+    "key": "subscription.resumed_title",
+    "value": "Subscription Resumed"
+  },
+  {
+    "key": "subscription.resumed_desc",
+    "value": "Your subscription has been resumed successfully."
+  },
+  {
+    "key": "subscription.error_title",
+    "value": "Error"
+  },
+  {
+    "key": "subscription.pause_failed",
+    "value": "Failed to pause subscription: {{error}}"
+  },
+  {
+    "key": "subscription.resume_failed",
+    "value": "Failed to resume subscription: {{error}}"
+  },
+  {
+    "key": "subscription.current_subscription",
+    "value": "Current Subscription"
+  },
+  {
+    "key": "subscription.no_active_subscription",
+    "value": "No Active Subscription"
+  },
+  {
+    "key": "subscription.status",
+    "value": "Subscription Status"
+  },
+  {
+    "key": "subscription.paused_badge",
+    "value": "Paused"
+  },
+  {
+    "key": "subscription.active_badge",
+    "value": "Active"
+  },
+  {
+    "key": "subscription.grace_period_badge",
+    "value": "Grace Period"
+  },
+  {
+    "key": "subscription.expired_badge",
+    "value": "Expired"
+  },
+  {
+    "key": "subscription.renewal_badge",
+    "value": "Renewing"
   }
 ]

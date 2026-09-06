@@ -11,6 +11,7 @@ import { useMediaCache } from '@/hooks/useMediaCache';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useActiveChannel } from '@/contexts/ActiveChannelContext';
 import { showMessageNotification, registerNotificationClickHandler } from '@/utils/browser-notifications';
+import { shouldMarkConversationRead } from '@/utils/conversationPreview';
 import { useLocation } from 'wouter';
 import {
   getMediaUploadTimeoutMs,
@@ -40,6 +41,12 @@ interface InboxSettings {
 interface ConversationContextProps {
   activeConversationId: number | null;
   setActiveConversationId: (id: number | null) => void;
+  /** True while activeConversationId was opened via openConversationPreview() and hasn't been activated yet. */
+  isPreviewMode: boolean;
+  /** Open a conversation in the main panel without marking it as read. */
+  openConversationPreview: (id: number) => void;
+  /** Turn the current preview into a real, marked-as-read open. No-op outside preview mode. */
+  activatePreviewConversation: () => void;
   activeChannelId: number | null;
   setActiveChannelId: (id: number | null) => void;
   conversations: any[];
@@ -320,6 +327,11 @@ export interface SendMediaMessageOptions {
 
 export function ConversationProvider({ children }: ConversationProviderProps) {
   const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  // Set right before setActiveConversationId() by openConversationPreview(), and consumed by the
+  // very next run of the mark-read effect below -- this is how that effect tells a preview open
+  // (skip mark-read) apart from every other, ordinary way activeConversationId gets set.
+  const previewOpenIdRef = useRef<number | null>(null);
   const [activeChannelId, setActiveChannelId] = useState<number | null>(null);
   const [messages, setMessages] = useState<Record<number, any[]>>({});
   const [messagesPagination, setMessagesPagination] = useState<Record<number, { page: number; hasMore: boolean; loading: boolean }>>({});
@@ -1178,6 +1190,31 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
     void fetchMessages(activeConversationId, 1, false, true);
   }, [allConversations, allGroupConversations, activeConversationId, messages, user, authLoading]);
 
+  const markConversationAsReadRequest = useCallback(async (conversationId: number) => {
+    try {
+      await fetch(`/api/conversations/${conversationId}/mark-read`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+    }
+  }, []);
+
+  const openConversationPreview = useCallback((id: number) => {
+    previewOpenIdRef.current = id;
+    setIsPreviewMode(true);
+    setActiveConversationId(id);
+  }, []);
+
+  const activatePreviewConversation = useCallback(() => {
+    if (!activeConversationId || !isPreviewMode) return;
+    setIsPreviewMode(false);
+    void markConversationAsReadRequest(activeConversationId);
+  }, [activeConversationId, isPreviewMode, markConversationAsReadRequest]);
+
   useEffect(() => {
     if (activeConversationId && user && !authLoading) {
       setMessagesPagination(prev => ({
@@ -1185,27 +1222,22 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
         [activeConversationId]: { page: 1, hasMore: true, loading: false }
       }));
 
-      const markConversationAsRead = async () => {
-        try {
-          const response = await fetch(`/api/conversations/${activeConversationId}/mark-read`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (!response.ok) {
-          }
-        } catch (error) {
-        }
-      };
+      // openConversationPreview() sets this ref right before setActiveConversationId(), so it is
+      // only ever true for the one run of this effect that follows a preview open -- any other
+      // way activeConversationId gets set (a normal click, auto-select, a websocket redirect...)
+      // finds the ref empty and marks the conversation as read like before.
+      const isThisAPreviewOpen = previewOpenIdRef.current === activeConversationId;
+      previewOpenIdRef.current = null;
 
       // Force API fetch so IndexedDB cannot hide messages stored while the tab was closed.
       fetchMessages(activeConversationId);
-      markConversationAsRead();
+
+      setIsPreviewMode(isThisAPreviewOpen);
+      if (shouldMarkConversationRead(isThisAPreviewOpen)) {
+        void markConversationAsReadRequest(activeConversationId);
+      }
     }
-  }, [activeConversationId, user, authLoading, toast]);
+  }, [activeConversationId, user, authLoading, toast, markConversationAsReadRequest]);
 
   useEffect(() => {
     const unsubscribe = onMessage('messageDeleted', (data) => {
@@ -1900,6 +1932,9 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
   const contextValue: ConversationContextProps = {
     activeConversationId,
     setActiveConversationId,
+    isPreviewMode,
+    openConversationPreview,
+    activatePreviewConversation,
     activeChannelId,
     setActiveChannelId,
     conversations: conversations as any[],

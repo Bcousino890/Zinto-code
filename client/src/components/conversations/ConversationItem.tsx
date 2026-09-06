@@ -14,10 +14,6 @@ import BotIcon from '@/components/ui/bot-icon';
 import { TwilioIcon } from '@/components/icons/TwilioIcon';
 import { Pin, PinOff, Briefcase, Loader2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { apiRequest } from '@/lib/queryClient';
-import MessageBubble from './MessageBubble';
-import './ConversationStyles.css';
 
 interface ConversationItemProps {
   conversation: any;
@@ -30,6 +26,7 @@ interface ConversationItemProps {
   showDealAction?: boolean;
   dealActionLoading?: boolean;
   onDealActionClick?: (e: React.MouseEvent) => void;
+  onPreviewClick?: (e: React.MouseEvent) => void;
 }
 
 export default function ConversationItem({
@@ -42,7 +39,8 @@ export default function ConversationItem({
   showChannelBadge,
   showDealAction,
   dealActionLoading,
-  onDealActionClick
+  onDealActionClick,
+  onPreviewClick
 }: ConversationItemProps) {
   const { contact } = conversation;
   const [assignedUserId, setAssignedUserId] = useState(conversation.assignedToUserId);
@@ -52,32 +50,6 @@ export default function ConversationItem({
 
   const handleClick = () => {
     onClick();
-  };
-
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [previewMessages, setPreviewMessages] = useState<any[] | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [previewError, setPreviewError] = useState(false);
-
-  // Peek at recent messages without opening the conversation: opening it for real
-  // sets activeConversationId, which triggers /mark-read and clears the unread
-  // badge. This fetches the same messages endpoint directly instead, so looking
-  // has no side effect.
-  const loadPreview = async () => {
-    setPreviewLoading(true);
-    setPreviewError(false);
-    try {
-      const endpoint = conversation.isGroup
-        ? `/api/group-conversations/${conversation.id}/messages?page=1&limit=6`
-        : `/api/conversations/${conversation.id}/messages?page=1&limit=6`;
-      const res = await apiRequest('GET', endpoint);
-      const data = await res.json();
-      setPreviewMessages(data.messages || []);
-    } catch {
-      setPreviewError(true);
-    } finally {
-      setPreviewLoading(false);
-    }
   };
 
   const { data: connections } = useQuery<ChannelConnection[]>({
@@ -328,79 +300,21 @@ export default function ConversationItem({
                 {isPinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
               </Button>
             )}
-            <Dialog
-              open={isPreviewOpen}
-              onOpenChange={(open) => {
-                setIsPreviewOpen(open);
-                if (open && previewMessages === null) {
-                  loadPreview();
-                }
-              }}
-            >
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 flex items-center justify-center text-muted-foreground hover:text-foreground"
-                  onClick={(e) => e.stopPropagation()}
-                  title={t('conversations.item.preview_chat', 'Preview chat (does not mark as read)')}
-                  aria-label={t('conversations.item.preview_chat', 'Preview chat (does not mark as read)')}
-                >
-                  <Eye className="h-3 w-3" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent
-                className="max-w-2xl h-[80vh] flex flex-col"
-                contentNoScroll
-                closeOnOutsideClick
-                onClick={(e) => e.stopPropagation()}
+            {onPreviewClick && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 flex items-center justify-center text-muted-foreground hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPreviewClick(e);
+                }}
+                title={t('conversations.item.preview_chat', 'Preview chat (does not mark as read)')}
+                aria-label={t('conversations.item.preview_chat', 'Preview chat (does not mark as read)')}
               >
-                <DialogHeader>
-                  <DialogTitle>{t('conversations.item.preview_title', 'Preview — not marked as read')}</DialogTitle>
-                </DialogHeader>
-                <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden conversation-background rounded-md p-3 space-y-1">
-                  {previewLoading && (
-                    <div className="p-4 flex justify-center">
-                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                    </div>
-                  )}
-                  {!previewLoading && previewError && (
-                    <div className="p-4 text-sm text-muted-foreground">
-                      {t('conversations.item.preview_error', 'Could not load preview')}
-                    </div>
-                  )}
-                  {!previewLoading && !previewError && previewMessages?.length === 0 && (
-                    <div className="p-4 text-sm text-muted-foreground">
-                      {t('conversations.item.no_messages_yet', 'No messages yet')}
-                    </div>
-                  )}
-                  {!previewLoading && !previewError && previewMessages?.map((m: any) => (
-                    <MessageBubble
-                      key={m.id}
-                      message={m}
-                      contact={contact}
-                      channelType={conversation.channelType}
-                      conversation={conversation}
-                      reactions={[]}
-                    />
-                  ))}
-                </div>
-                <div className="pt-3">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsPreviewOpen(false);
-                      onClick();
-                    }}
-                  >
-                    {t('conversations.item.open_conversation', 'Open conversation')}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+                <Eye className="h-3 w-3" />
+              </Button>
+            )}
             <span className="text-xs text-muted-foreground">{formattedTime}</span>
           </div>
         </div>

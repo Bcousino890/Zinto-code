@@ -45,10 +45,13 @@ import {
 import { Loader2, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import './ConversationStyles.css';
+import { conversationSelectionMode } from '@/utils/conversationPreview';
 
 export default function ConversationView() {
   const {
     activeConversationId,
+    isPreviewMode,
+    activatePreviewConversation,
     messages,
     messagesPagination,
     loadMoreMessages,
@@ -56,6 +59,7 @@ export default function ConversationView() {
     conversations,
     groupConversations
   } = useConversations();
+  const selectionMode = conversationSelectionMode(isPreviewMode);
   const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -1060,11 +1064,22 @@ export default function ConversationView() {
             </button>
           )}
 
-          <MessageInput
-            conversationId={activeConversationId}
-            conversation={activeConversation}
-            contact={contact}
-          />
+          {selectionMode === 'preview' ? (
+            <div className="border-t border-border bg-muted/40 px-4 py-3 flex items-center justify-between gap-3 flex-shrink-0">
+              <span className="text-sm text-muted-foreground">
+                {t('conversations.view.preview_banner', 'Preview — not marked as read yet')}
+              </span>
+              <Button size="sm" onClick={activatePreviewConversation}>
+                {t('conversations.view.open_conversation', 'Open conversation')}
+              </Button>
+            </div>
+          ) : (
+            <MessageInput
+              conversationId={activeConversationId}
+              conversation={activeConversation}
+              contact={contact}
+            />
+          )}
         </div>
 
         {activeConversation?.isGroup ? (

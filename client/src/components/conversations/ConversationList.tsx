@@ -25,6 +25,9 @@ export default function ConversationList() {
     isLoadingConversations,
     activeConversationId,
     setActiveConversationId,
+    isPreviewMode,
+    openConversationPreview,
+    activatePreviewConversation,
     conversationsPagination,
     loadMoreConversations
   } = useConversations();
@@ -252,7 +255,14 @@ export default function ConversationList() {
   };
 
   const handleConversationClick = (conversationId: number) => {
-    setActiveConversationId(conversationId);
+    // Clicking the row that's already open as a preview should promote it to a real,
+    // marked-as-read open -- setActiveConversationId(conversationId) would be a no-op
+    // here since the id isn't actually changing.
+    if (activeConversationId === conversationId && isPreviewMode) {
+      activatePreviewConversation();
+    } else {
+      setActiveConversationId(conversationId);
+    }
     if (isMobile) {
       setConversationListOpen(false);
     }
@@ -503,6 +513,7 @@ export default function ConversationList() {
                 showDealAction={canAccessPipeline() && !conversation.isGroup && !!conversation.contact?.id}
                 dealActionLoading={smartDealLoadingContactId === conversation.contact?.id}
                 onDealActionClick={() => handleSmartDealClick(conversation.contact)}
+                onPreviewClick={() => openConversationPreview(conversation.id)}
               />
             ))}
 

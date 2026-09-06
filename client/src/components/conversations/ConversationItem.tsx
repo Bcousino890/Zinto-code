@@ -14,7 +14,7 @@ import BotIcon from '@/components/ui/bot-icon';
 import { TwilioIcon } from '@/components/icons/TwilioIcon';
 import { Pin, PinOff, Briefcase, Loader2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { apiRequest } from '@/lib/queryClient';
 import MessageBubble from './MessageBubble';
 import './ConversationStyles.css';
@@ -328,7 +328,7 @@ export default function ConversationItem({
                 {isPinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
               </Button>
             )}
-            <Popover
+            <Dialog
               open={isPreviewOpen}
               onOpenChange={(open) => {
                 setIsPreviewOpen(open);
@@ -337,7 +337,7 @@ export default function ConversationItem({
                 }
               }}
             >
-              <PopoverTrigger asChild>
+              <DialogTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -348,19 +348,20 @@ export default function ConversationItem({
                 >
                   <Eye className="h-3 w-3" />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-[340px] sm:w-[400px] p-0 overflow-hidden"
-                align="end"
+              </DialogTrigger>
+              <DialogContent
+                className="max-w-2xl h-[80vh] flex flex-col"
+                contentNoScroll
+                closeOnOutsideClick
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="px-3 py-2 border-b bg-card text-xs font-medium text-muted-foreground">
-                  {t('conversations.item.preview_title', 'Preview — not marked as read')}
-                </div>
-                <div className="max-h-96 overflow-y-auto overflow-x-hidden conversation-background p-3 space-y-1">
+                <DialogHeader>
+                  <DialogTitle>{t('conversations.item.preview_title', 'Preview — not marked as read')}</DialogTitle>
+                </DialogHeader>
+                <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden conversation-background rounded-md p-3 space-y-1">
                   {previewLoading && (
                     <div className="p-4 flex justify-center">
-                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                     </div>
                   )}
                   {!previewLoading && previewError && (
@@ -384,11 +385,11 @@ export default function ConversationItem({
                     />
                   ))}
                 </div>
-                <div className="p-2 border-t">
+                <div className="pt-3">
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="w-full h-7 text-xs"
+                    className="w-full"
                     onClick={(e) => {
                       e.stopPropagation();
                       setIsPreviewOpen(false);
@@ -398,8 +399,8 @@ export default function ConversationItem({
                     {t('conversations.item.open_conversation', 'Open conversation')}
                   </Button>
                 </div>
-              </PopoverContent>
-            </Popover>
+              </DialogContent>
+            </Dialog>
             <span className="text-xs text-muted-foreground">{formattedTime}</span>
           </div>
         </div>

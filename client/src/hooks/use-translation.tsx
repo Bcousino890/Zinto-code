@@ -288,10 +288,43 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Fallback used when useTranslation runs outside TranslationProvider.
+ *
+ * Some providers (AuthProvider, BrandingProvider) are mounted above
+ * TranslationProvider in the App tree, so throwing here unmounted the whole
+ * React tree and left the app on a blank screen. Since every call site passes
+ * an English fallback as the second argument, degrading to that fallback keeps
+ * those providers working instead of taking the app down over a missing
+ * translation.
+ */
+const FALLBACK_TRANSLATION_CONTEXT: TranslationContextType = {
+  currentLanguage: null,
+  languages: [],
+  translations: {},
+  isLoading: false,
+  t: (key: string, fallback?: string, variables?: Record<string, any>) => {
+    let result = fallback ?? key;
+    if (variables) {
+      for (const [name, value] of Object.entries(variables)) {
+        result = result.replace(new RegExp(`{{\\s*${name}\\s*}}`, 'g'), String(value));
+      }
+    }
+    return result;
+  },
+  changeLanguage: async () => {},
+  refreshTranslations: async () => {},
+};
+
 export function useTranslation(): TranslationContextType {
   const context = useContext(TranslationContext);
   if (!context) {
-    throw new Error('useTranslation must be used within a TranslationProvider');
+    if (typeof console !== 'undefined') {
+      console.warn(
+        'useTranslation used outside TranslationProvider; falling back to untranslated defaults.'
+      );
+    }
+    return FALLBACK_TRANSLATION_CONTEXT;
   }
   return context;
 }

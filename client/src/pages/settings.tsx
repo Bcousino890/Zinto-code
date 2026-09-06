@@ -1563,14 +1563,14 @@ export default function Settings() {
         setShowWebChatModal(true);
       } else {
         toast({
-          title: "Channel Connection Initiated",
-          description: `Starting connection flow for ${channelType}`,
+          title: t('settings.channel.connection_initiated_title', 'Channel Connection Initiated'),
+          description: t('settings.channel.connection_initiated_desc', 'Starting connection flow for {{channelType}}', { channelType }),
         });
       }
     } catch (error: any) {
       toast({
-        title: "Connection Error",
-        description: error.message || "Failed to connect to channel",
+        title: t('settings.connection_error', 'Connection Error'),
+        description: error.message || t('settings.channel.connect_failed_desc', 'Failed to connect to channel'),
         variant: "destructive"
       });
     }
@@ -1745,13 +1745,13 @@ export default function Settings() {
       queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
 
       toast({
-        title: "Channel Disconnected",
-        description: "The channel has been disconnected successfully",
+        title: t('settings.channel.disconnected_title', 'Channel Disconnected'),
+        description: t('settings.channel.disconnected_desc', 'The channel has been disconnected successfully'),
       });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to disconnect channel",
+        title: t('settings.error', 'Error'),
+        description: error.message || t('settings.channel.disconnect_failed_desc', 'Failed to disconnect channel'),
         variant: "destructive"
       });
     }
@@ -1775,16 +1775,16 @@ export default function Settings() {
       queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
 
       toast({
-        title: "WhatsApp Number Disconnected",
-        description: result.message || "WhatsApp number disconnected successfully",
+        title: t('settings.channel.whatsapp_disconnected_title', 'WhatsApp Number Disconnected'),
+        description: result.message || t('settings.channel.whatsapp_disconnected_desc', 'WhatsApp number disconnected successfully'),
       });
 
       setShowDisconnectWarning(false);
       setDisconnectConnectionId(null);
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to disconnect WhatsApp number",
+        title: t('settings.error', 'Error'),
+        description: error.message || t('settings.channel.whatsapp_disconnect_failed_desc', 'Failed to disconnect WhatsApp number'),
         variant: "destructive"
       });
     } finally {
@@ -1794,7 +1794,7 @@ export default function Settings() {
 
   const handleDeleteChannel = async (connectionId: number) => {
     try {
-      if (!window.confirm('Are you sure you want to delete this connection? This action cannot be undone.')) {
+      if (!window.confirm(t('settings.channel.delete_confirm', 'Are you sure you want to delete this connection? This action cannot be undone.'))) {
         return;
       }
 
@@ -1809,13 +1809,13 @@ export default function Settings() {
       queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
 
       toast({
-        title: "Channel Deleted",
-        description: "The channel connection has been permanently deleted",
+        title: t('settings.channel.deleted_title', 'Channel Deleted'),
+        description: t('settings.channel.deleted_desc', 'The channel connection has been permanently deleted'),
       });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete channel connection",
+        title: t('settings.error', 'Error'),
+        description: error.message || t('settings.channel.delete_failed_desc', 'Failed to delete channel connection'),
         variant: "destructive"
       });
     }
@@ -1858,8 +1858,8 @@ export default function Settings() {
       setQrGenerationInProgress(false);
       setConnectionStatus('error');
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : 'An error occurred',
+        title: t('settings.error', 'Error'),
+        description: error instanceof Error ? error.message : t('settings.channel.generic_error_desc', 'An error occurred'),
         variant: "destructive"
       });
     }
@@ -1891,22 +1891,22 @@ export default function Settings() {
 
       if (response.ok) {
         toast({
-          title: "Success",
-          description: "Email channel connected successfully!",
+          title: t('common.success', 'Success'),
+          description: t('settings.channel.email_connected_desc', 'Email channel connected successfully!'),
         });
         window.location.reload();
       } else {
         const errorData = await response.json();
         toast({
-          title: "Connection Failed",
-          description: errorData.message || "Failed to connect email channel",
+          title: t('settings.channel.connection_failed_title', 'Connection Failed'),
+          description: errorData.message || t('settings.channel.email_connect_failed_desc', 'Failed to connect email channel'),
           variant: "destructive"
         });
       }
     } catch (error: any) {
       toast({
-        title: "Connection Error",
-        description: error.message || "Failed to connect email channel",
+        title: t('settings.connection_error', 'Connection Error'),
+        description: error.message || t('settings.channel.email_connect_failed_desc', 'Failed to connect email channel'),
         variant: "destructive"
       });
     }
@@ -1921,13 +1921,13 @@ export default function Settings() {
         credentials: 'include'
       });
       if (response.ok) {
-        toast({ title: "Sync Started", description: "Email sync initiated successfully!" });
+        toast({ title: t('settings.channel.sync_started_title', 'Sync Started'), description: t('settings.channel.sync_started_desc', 'Email sync initiated successfully!') });
       } else {
         const errorData = await response.json();
-        toast({ title: "Sync Failed", description: errorData.message || "Failed to sync", variant: "destructive" });
+        toast({ title: t('settings.channel.sync_failed_title', 'Sync Failed'), description: errorData.message || t('settings.channel.sync_failed_desc', 'Failed to sync'), variant: "destructive" });
       }
     } catch (error: any) {
-      toast({ title: "Sync Error", description: error.message || "Failed to sync", variant: "destructive" });
+      toast({ title: t('settings.channel.sync_error_title', 'Sync Error'), description: error.message || t('settings.channel.sync_failed_desc', 'Failed to sync'), variant: "destructive" });
     } finally {
       setTimeout(() => setSyncingChannels(prev => { const newSet = new Set(prev); newSet.delete(connectionId); return newSet; }), 2000);
     }
@@ -1979,9 +1979,9 @@ export default function Settings() {
     if (token) {
       const embedCode = `<script src="${window.location.origin}/api/webchat/widget/${token}" async></script>`;
       await navigator.clipboard.writeText(embedCode);
-      toast({ title: 'Copied!', description: 'Embed code copied to clipboard' });
+      toast({ title: t('settings.channel.embed_copied_title', 'Copied!'), description: t('settings.channel.embed_copied_desc', 'Embed code copied to clipboard') });
     } else {
-      toast({ title: 'Token not found', description: 'This WebChat connection does not have a widget token yet', variant: 'destructive' });
+      toast({ title: t('settings.channel.token_not_found_title', 'Token not found'), description: t('settings.channel.token_not_found_desc', 'This WebChat connection does not have a widget token yet'), variant: 'destructive' });
     }
   };
 
@@ -1991,8 +1991,8 @@ export default function Settings() {
   const handleRenameChannel = async () => {
     if (!renameConnectionId || !newChannelName.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Channel name cannot be empty",
+        title: t('common.validation_error', 'Validation Error'),
+        description: t('settings.channel.name_required_desc', 'Channel name cannot be empty'),
         variant: "destructive"
       });
       return;
@@ -2020,13 +2020,13 @@ export default function Settings() {
       setNewChannelName('');
 
       toast({
-        title: "Channel Renamed",
-        description: "The channel has been renamed successfully",
+        title: t('settings.channel.renamed_title', 'Channel Renamed'),
+        description: t('settings.channel.renamed_desc', 'The channel has been renamed successfully'),
       });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to rename channel",
+        title: t('settings.error', 'Error'),
+        description: error.message || t('settings.channel.rename_failed_desc', 'Failed to rename channel'),
         variant: "destructive"
 });
     }
@@ -2094,8 +2094,8 @@ export default function Settings() {
           queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
 
           toast({
-            title: "Connection Cancelled",
-            description: "WhatsApp connection has been cancelled and removed.",
+            title: t('settings.channel.connection_cancelled_title', 'Connection Cancelled'),
+            description: t('settings.channel.connection_cancelled_desc', 'WhatsApp connection has been cancelled and removed.'),
           });
         } else {
           await fetch(`/api/whatsapp/disconnect/${activeConnectionId}`, {
@@ -2621,8 +2621,8 @@ export default function Settings() {
                 onClose={() => setShowTikTokPlatformConfigModal(false)}
                 onSuccess={() => {
                   toast({
-                    title: "Success",
-                    description: "TikTok platform configuration updated successfully",
+                    title: t('common.success', 'Success'),
+                    description: t('admin.settings.toast.tiktok_platform_saved_description', 'TikTok platform configuration updated successfully'),
                   });
                 }}
               />
@@ -2720,8 +2720,8 @@ export default function Settings() {
               onSuccess={() => {
                 queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
                 toast({
-                  title: "Email Channel Updated",
-                  description: "Your email channel has been updated successfully",
+                  title: t('settings.channel.email_updated_title', 'Email Channel Updated'),
+                  description: t('settings.channel.email_updated_desc', 'Your email channel has been updated successfully'),
                 });
               }}
               connectionId={editEmailConnectionId}
@@ -2739,8 +2739,8 @@ export default function Settings() {
               onSuccess={() => {
                 queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
                 toast({
-                  title: "WhatsApp Business API Updated",
-                  description: "Your WhatsApp Business API connection has been updated successfully",
+                  title: t('settings.channel.whatsapp_api_updated_title', 'WhatsApp Business API Updated'),
+                  description: t('settings.channel.whatsapp_api_updated_desc', 'Your WhatsApp Business API connection has been updated successfully'),
                 });
               }}
               connectionId={editWhatsAppConnectionId}

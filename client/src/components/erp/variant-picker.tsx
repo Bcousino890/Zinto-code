@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiRequest } from '@/lib/queryClient';
+import { useTranslation } from '@/hooks/use-translation';
 
 export type VariantOption = {
   id: number;
@@ -24,10 +25,12 @@ export function VariantPicker({
   productId,
   value,
   onChange,
-  placeholder = 'Select variant',
+  placeholder,
   includeBaseOption = false,
   disabled = false,
 }: VariantPickerProps) {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t('erp.variant_picker.select_variant', 'Select variant');
   const { data: variants = [] } = useQuery({
     queryKey: ['/api/erp/products', productId, 'variants', 'picker'],
     queryFn: async () => {
@@ -45,10 +48,12 @@ export function VariantPicker({
   return (
     <Select value={resolvedValue} onValueChange={(next) => onChange(next === 'none' ? '' : next)} disabled={isDisabled}>
       <SelectTrigger>
-        <SelectValue placeholder={placeholder} />
+        <SelectValue placeholder={resolvedPlaceholder} />
       </SelectTrigger>
       <SelectContent>
-        {includeBaseOption && <SelectItem value="none">Base product (no variant)</SelectItem>}
+        {includeBaseOption && (
+          <SelectItem value="none">{t('erp.variant_picker.base_product_no_variant', 'Base product (no variant)')}</SelectItem>
+        )}
         {variants.map((variant) => (
           <SelectItem key={variant.id} value={String(variant.id)}>
             {variant.name}

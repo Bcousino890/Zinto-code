@@ -3,6 +3,7 @@ import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/use-translation";
 
 export interface ThemeToggleProps {
   variant?: "default" | "compact";
@@ -12,6 +13,7 @@ export interface ThemeToggleProps {
 const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>(
   ({ variant = "default", className, ...props }, ref) => {
     const { theme, setTheme } = useTheme();
+    const { t } = useTranslation();
 
     const toggleTheme = () => {
       const currentTheme = theme || "light";
@@ -24,8 +26,8 @@ const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>(
 
     const isDark = theme === "dark";
     const ariaLabel = isDark
-      ? "Switch to light mode"
-      : "Switch to dark mode";
+      ? t("common.theme_toggle.switch_to_light", "Switch to light mode")
+      : t("common.theme_toggle.switch_to_dark", "Switch to dark mode");
 
     if (variant === "compact") {
       return (
@@ -63,12 +65,12 @@ const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>(
         {isDark ? (
           <>
             <Sun className="h-4 w-4 transition-all duration-200" />
-            <span>Light Mode</span>
+            <span>{t("common.theme_toggle.light_mode", "Light Mode")}</span>
           </>
         ) : (
           <>
             <Moon className="h-4 w-4 transition-all duration-200" />
-            <span>Dark Mode</span>
+            <span>{t("common.theme_toggle.dark_mode", "Dark Mode")}</span>
           </>
         )}
       </Button>

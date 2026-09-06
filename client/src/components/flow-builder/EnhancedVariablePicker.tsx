@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useFlowVariables, getCategoryLabel, getCategoryIcon, type FlowVariable } from '@/hooks/useFlowVariables';
 import type { FlowCustomVariable } from '@shared/types/flow-custom-variable';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface EnhancedVariablePickerProps {
   value: string;
@@ -63,6 +64,7 @@ export function EnhancedVariablePicker({
   pickerButtonClassName,
   multiline = false
 }: EnhancedVariablePickerProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
@@ -163,7 +165,7 @@ export function EnhancedVariablePicker({
               'h-8 px-2 flex items-center gap-1 shrink-0',
               pickerButtonClassName
             )}
-            title="Insert variable"
+            title={t('flow_builder.variable_picker.insert_variable_title', 'Insert variable')}
             disabled={disabled}
           >
             <Variable className="w-3 h-3" />
@@ -173,7 +175,7 @@ export function EnhancedVariablePicker({
           <Command>
             <div className="flex items-center gap-2 p-2 border-b">
               <CommandInput
-                placeholder="Search variables..."
+                placeholder={t('flow_builder.variable_browser_search_placeholder', 'Search variables...')}
                 value={searchValue}
                 onValueChange={setSearchValue}
                 className="flex-1"
@@ -196,7 +198,7 @@ export function EnhancedVariablePicker({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="top">
-                    <p className="text-xs">Refresh captured variables</p>
+                    <p className="text-xs">{t('flow_builder.variable_picker.refresh_tooltip', 'Refresh captured variables')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -206,12 +208,12 @@ export function EnhancedVariablePicker({
               <CommandEmpty>
                 {error ? (
                   <div className="text-center py-4">
-                    <p className="text-xs text-red-600">Error loading variables</p>
+                    <p className="text-xs text-red-600">{t('flow_builder.variable_browser_error_loading_variables', 'Error loading variables')}</p>
                     <p className="text-xs text-muted-foreground">{error}</p>
                   </div>
                 ) : (
                   <div className="text-center py-4">
-                    <p className="text-xs">No variables found.</p>
+                    <p className="text-xs">{t('flow_builder.google_sheets.no_variables_found', 'No variables found.')}</p>
                   </div>
                 )}
               </CommandEmpty>

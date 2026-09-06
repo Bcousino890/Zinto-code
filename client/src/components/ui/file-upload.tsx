@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Upload, X, FileIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface FileUploadProps {
   onFileSelected: (file: File) => void;
@@ -23,6 +24,7 @@ export function FileUpload({
 }: FileUploadProps) {
   const [fileInfo, setFileInfo] = useState<{ name: string; size: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
 
   const formatFileSize = (bytes: number) => {
@@ -45,8 +47,8 @@ export function FileUpload({
     const maxSizeBytes = maxSize * 1024 * 1024;
     if (file.size > maxSizeBytes) {
       toast({
-        title: 'File too large',
-        description: `Maximum file size is ${maxSize}MB`,
+        title: t('common.file_upload.too_large_title', 'File too large'),
+        description: t('common.file_upload.too_large_desc', 'Maximum file size is {{maxSize}}MB', { maxSize }),
         variant: 'destructive'
       });
       return;
@@ -77,7 +79,7 @@ export function FileUpload({
           size="sm"
         >
           <Upload className="h-4 w-4 mr-2" />
-          Upload File
+          {t('common.file_upload.upload_file', 'Upload File')}
         </Button>
       )}
 
@@ -87,13 +89,13 @@ export function FileUpload({
             <div className="flex min-w-0 flex-1 items-center">
               <FileIcon className="mr-2 h-4 w-4 shrink-0" />
               <span className="min-w-0 truncate text-sm">
-                {fileInfo?.name || 'Uploading file...'}
+                {fileInfo?.name || t('common.file_upload.uploading', 'Uploading file...')}
               </span>
             </div>
           </div>
           <Progress value={progress} className="h-2" />
           <div className="text-xs text-muted-foreground">
-            {fileInfo ? formatFileSize(fileInfo.size) : ''} • {progress}% uploaded
+            {fileInfo ? formatFileSize(fileInfo.size) : ''} • {t('common.file_upload.percent_uploaded', '{{progress}}% uploaded', { progress })}
           </div>
         </div>
       )}
@@ -131,7 +133,7 @@ export function FileUpload({
             size="sm"
           >
             <Upload className="h-3 w-3 mr-2" />
-            Change file
+            {t('common.file_upload.change_file', 'Change file')}
           </Button>
         </div>
       )}

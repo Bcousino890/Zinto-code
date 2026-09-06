@@ -252,8 +252,8 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Profile Updated",
-        description: "Your profile information has been updated successfully.",
+        title: t('profile.updated_title', 'Profile Updated'),
+        description: t('profile.updated_desc', 'Your profile information has been updated successfully.'),
       });
 
       queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
@@ -261,8 +261,8 @@ export default function ProfilePage() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to update profile: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.update_failed_desc', 'Failed to update profile: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     }
@@ -287,8 +287,8 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Avatar Updated",
-        description: "Your profile picture has been updated successfully.",
+        title: t('profile.avatar_updated_title', 'Avatar Updated'),
+        description: t('profile.avatar_updated_desc', 'Your profile picture has been updated successfully.'),
       });
 
       queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
@@ -297,8 +297,8 @@ export default function ProfilePage() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to upload avatar: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.avatar_upload_failed_desc', 'Failed to upload avatar: {{error}}', { error: error.message }),
         variant: "destructive",
       });
       setIsUploadingAvatar(false);
@@ -319,15 +319,15 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Password Changed",
-        description: "Your password has been changed successfully.",
+        title: t('profile.password_changed_title', 'Password Changed'),
+        description: t('profile.password_changed_desc', 'Your password has been changed successfully.'),
       });
       passwordForm.reset();
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to change password: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.password_change_failed_desc', 'Failed to change password: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     }
@@ -344,14 +344,14 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Notifications Updated",
-        description: "Your notification preferences have been updated successfully.",
+        title: t('profile.notifications_updated_title', 'Notifications Updated'),
+        description: t('profile.notifications_updated_desc', 'Your notification preferences have been updated successfully.'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to update notifications: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.notifications_update_failed_desc', 'Failed to update notifications: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     }
@@ -368,15 +368,15 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "Company Updated",
-        description: "Your company information has been updated successfully.",
+        title: t('profile.company_updated_title', 'Company Updated'),
+        description: t('profile.company_updated_desc', 'Your company information has been updated successfully.'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: `Failed to update company: ${error.message}`,
+        title: t('common.error', 'Error'),
+        description: t('profile.company_update_failed_desc', 'Failed to update company: {{error}}', { error: error.message }),
         variant: "destructive",
       });
     }
@@ -434,8 +434,8 @@ export default function ProfilePage() {
 
       if (!allowedTypes.includes(file.type)) {
         toast({
-          title: "Invalid File Type",
-          description: "Please select a valid image file (JPEG, PNG, GIF, or WebP).",
+          title: t('profile.invalid_file_type_title', 'Invalid File Type'),
+          description: t('profile.invalid_file_type_desc', 'Please select a valid image file (JPEG, PNG, GIF, or WebP).'),
           variant: "destructive",
         });
 
@@ -445,8 +445,8 @@ export default function ProfilePage() {
 
       if (file.size > maxSize) {
         toast({
-          title: "File Too Large",
-          description: "Please select an image smaller than 5MB.",
+          title: t('profile.file_too_large_title', 'File Too Large'),
+          description: t('profile.file_too_large_desc', 'Please select an image smaller than 5MB.'),
           variant: "destructive",
         });
 
@@ -500,10 +500,10 @@ export default function ProfilePage() {
           <main className="flex-1 p-6">
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
-                <h2 className="text-xl font-semibold mb-2">Error loading profile</h2>
+                <h2 className="text-xl font-semibold mb-2">{t('profile.error_loading', 'Error loading profile')}</h2>
                 <p className="text-muted-foreground mb-4">{(userError as Error).message}</p>
                 <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/users/me'] })}>
-                  Try Again
+                  {t('common.error_boundary.try_again', 'Try Again')}
                 </Button>
               </div>
             </div>
@@ -520,15 +520,15 @@ export default function ProfilePage() {
         <main className="flex-1 p-6">
           <div className="space-y-6">
             <div className="flex items-center">
-              <h1 className="text-2xl font-semibold">Account Settings</h1>
+              <h1 className="text-2xl font-semibold">{t('profile.account_settings', 'Account Settings')}</h1>
             </div>
-            
+
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-6">
-                <TabsTrigger value="account">Account</TabsTrigger>
-                <TabsTrigger value="company">Company</TabsTrigger>
-                <TabsTrigger value="security">Security</TabsTrigger>
-                <TabsTrigger value="notifications">Notifications</TabsTrigger>
+                <TabsTrigger value="account">{t('profile.tab_account', 'Account')}</TabsTrigger>
+                <TabsTrigger value="company">{t('nav.company', 'Company')}</TabsTrigger>
+                <TabsTrigger value="security">{t('admin.users.tab_security', 'Security')}</TabsTrigger>
+                <TabsTrigger value="notifications">{t('profile.tab_notifications', 'Notifications')}</TabsTrigger>
                 <TabsTrigger value="availability">
                   <Clock className="h-4 w-4 mr-1 inline" />
                   {t('inbox_availability.profile_tab', 'Availability')}
@@ -538,9 +538,9 @@ export default function ProfilePage() {
               <TabsContent value="account">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Profile Information</CardTitle>
+                    <CardTitle>{t('admin.users.tab_profile', 'Profile Information')}</CardTitle>
                     <CardDescription>
-                      Update your account details and public profile.
+                      {t('profile.update_details_desc', 'Update your account details and public profile.')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -572,12 +572,12 @@ export default function ProfilePage() {
                             {isUploadingAvatar ? (
                               <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Uploading...
+                                {t('ui.imageUpload.uploading', 'Uploading...')}
                               </>
                             ) : (
                               <>
                                 <Upload className="mr-2 h-4 w-4" />
-                                Change Avatar
+                                {t('profile.change_avatar', 'Change Avatar')}
                               </>
                             )}
                           </Button>
@@ -588,21 +588,21 @@ export default function ProfilePage() {
                     {/* Account Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-muted/30 rounded-lg">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Account Created</Label>
+                        <Label className="text-sm font-medium text-muted-foreground">{t('profile.account_created', 'Account Created')}</Label>
                         <p className="text-sm">{formatDate(user?.createdAt)}</p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Last Updated</Label>
+                        <Label className="text-sm font-medium text-muted-foreground">{t('contacts.table.last_updated', 'Last Updated')}</Label>
                         <p className="text-sm">{formatDate(user?.updatedAt)}</p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">User ID</Label>
+                        <Label className="text-sm font-medium text-muted-foreground">{t('profile.user_id', 'User ID')}</Label>
                         <p className="text-sm font-mono">{user?.id}</p>
                       </div>
                       {user?.isSuperAdmin && (
                         <div>
-                          <Label className="text-sm font-medium text-muted-foreground">Admin Status</Label>
-                          <p className="text-sm text-primary font-medium">Super Administrator</p>
+                          <Label className="text-sm font-medium text-muted-foreground">{t('profile.admin_status', 'Admin Status')}</Label>
+                          <p className="text-sm text-primary font-medium">{t('profile.super_administrator', 'Super Administrator')}</p>
                         </div>
                       )}
                     </div>
@@ -624,11 +624,11 @@ export default function ProfilePage() {
                           name="fullName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Full Name</FormLabel>
+                              <FormLabel>{t('auth.full_name', 'Full Name')}</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                  <Input className="pl-9" placeholder="Your full name" {...field} />
+                                  <Input className="pl-9" placeholder={t('profile.full_name_placeholder', 'Your full name')} {...field} />
                                 </div>
                               </FormControl>
                               <FormMessage />
@@ -640,11 +640,11 @@ export default function ProfilePage() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email Address</FormLabel>
+                              <FormLabel>{t('email.email_address', 'Email Address')}</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                  <Input className="pl-9" placeholder="your.email@example.com" {...field} />
+                                  <Input className="pl-9" placeholder={t('profile.email_placeholder', 'your.email@example.com')} {...field} />
                                 </div>
                               </FormControl>
                               <FormMessage />
@@ -656,12 +656,12 @@ export default function ProfilePage() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>{t('auth.username', 'Username')}</FormLabel>
                               <FormControl>
-                                <Input placeholder="username" {...field} />
+                                <Input placeholder={t('profile.username_placeholder', 'username')} {...field} />
                               </FormControl>
                               <FormDescription>
-                                This is your public display name. It can be your real name or a pseudonym.
+                                {t('profile.username_hint', 'This is your public display name. It can be your real name or a pseudonym.')}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -674,12 +674,12 @@ export default function ProfilePage() {
                             <FormItem>
                               <FormLabel>
                                 <Globe className="inline mr-2 h-4 w-4" />
-                                Language Preference
+                                {t('profile.language_preference', 'Language Preference')}
                               </FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Select a language" />
+                                    <SelectValue placeholder={t('profile.select_language', 'Select a language')} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
@@ -692,26 +692,26 @@ export default function ProfilePage() {
                                 </SelectContent>
                               </Select>
                               <FormDescription>
-                                Choose your preferred language for the interface.
+                                {t('profile.choose_preferred_language', 'Choose your preferred language for the interface.')}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        <Button 
-                          type="submit" 
+                        <Button
+                          type="submit"
                           className="w-full md:w-auto btn-brand-primary"
                           disabled={updateProfileMutation.isPending}
                         >
                           {updateProfileMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Saving Changes
+                              {t('profile.saving_changes', 'Saving Changes')}
                             </>
                           ) : (
                             <>
                               <Save className="mr-2 h-4 w-4" />
-                              Save Changes
+                              {t('common.save_changes', 'Save Changes')}
                             </>
                           )}
                         </Button>
@@ -724,24 +724,24 @@ export default function ProfilePage() {
               <TabsContent value="company">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Company Information</CardTitle>
+                    <CardTitle>{t('registration.company_info', 'Company Information')}</CardTitle>
                     <CardDescription>
-                      Manage your company details and settings.
+                      {t('profile.company_info_desc', 'Manage your company details and settings.')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     {/* Company Overview - Read Only Information */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-muted/30 rounded-lg">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Company Slug</Label>
+                        <Label className="text-sm font-medium text-muted-foreground">{t('registration.company_slug', 'Company Slug')}</Label>
                         <p className="text-sm font-mono">{user?.company?.slug}</p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Plan</Label>
-                        <p className="text-sm capitalize">{user?.company?.plan || 'Free'}</p>
+                        <Label className="text-sm font-medium text-muted-foreground">{t('nav.plan', 'Plan')}</Label>
+                        <p className="text-sm capitalize">{user?.company?.plan || t('plans.free', 'Free')}</p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Company Created</Label>
+                        <Label className="text-sm font-medium text-muted-foreground">{t('profile.company_created', 'Company Created')}</Label>
                         <p className="text-sm">{formatDate(user?.company?.createdAt)}</p>
                       </div>
                     </div>
@@ -754,12 +754,12 @@ export default function ProfilePage() {
                             name="name"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Company Name</FormLabel>
+                                <FormLabel>{t('registration.company_name', 'Company Name')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Your Company Name" {...field} />
+                                  <Input placeholder={t('registration.company_name_placeholder', 'Your Company Name')} {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                  The official name of your company.
+                                  {t('profile.company_name_hint', 'The official name of your company.')}
                                 </FormDescription>
                                 <FormMessage />
                               </FormItem>
@@ -792,7 +792,7 @@ export default function ProfilePage() {
                             name="primaryColor"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Primary Color</FormLabel>
+                                <FormLabel>{t('admin.settings.primary_color', 'Primary Color')}</FormLabel>
                                 <FormControl>
                                   <div className="flex items-center space-x-2">
                                     <Input
@@ -809,7 +809,7 @@ export default function ProfilePage() {
                                   </div>
                                 </FormControl>
                                 <FormDescription>
-                                  Primary brand color for your company.
+                                  {t('profile.primary_color_hint', 'Primary brand color for your company.')}
                                 </FormDescription>
                                 <FormMessage />
                               </FormItem>
@@ -955,9 +955,9 @@ export default function ProfilePage() {
               <TabsContent value="security">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Password</CardTitle>
+                    <CardTitle>{t('auth.password', 'Password')}</CardTitle>
                     <CardDescription>
-                      Change your password to keep your account secure.
+                      {t('profile.change_password_desc', 'Change your password to keep your account secure.')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -968,7 +968,7 @@ export default function ProfilePage() {
                           name="currentPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Current Password</FormLabel>
+                              <FormLabel>{t('profile.current_password', 'Current Password')}</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Key className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -990,7 +990,7 @@ export default function ProfilePage() {
                             name="newPassword"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>New Password</FormLabel>
+                                <FormLabel>{t('admin.users.new_password', 'New Password')}</FormLabel>
                                 <FormControl>
                                   <Input 
                                     type="password" 
@@ -1007,7 +1007,7 @@ export default function ProfilePage() {
                             name="confirmPassword"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Confirm New Password</FormLabel>
+                                <FormLabel>{t('admin.users.confirm_new_password', 'Confirm New Password')}</FormLabel>
                                 <FormControl>
                                   <Input 
                                     type="password" 
@@ -1028,12 +1028,12 @@ export default function ProfilePage() {
                           {changePasswordMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Changing Password
+                              {t('profile.changing_password', 'Changing Password')}
                             </>
                           ) : (
                             <>
                               <Check className="mr-2 h-4 w-4" />
-                              Change Password
+                              {t('profile.change_password_button', 'Change Password')}
                             </>
                           )}
                         </Button>
@@ -1046,9 +1046,9 @@ export default function ProfilePage() {
               <TabsContent value="notifications">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Notification Settings</CardTitle>
+                    <CardTitle>{t('profile.notification_settings', 'Notification Settings')}</CardTitle>
                     <CardDescription>
-                      Configure how you want to be notified about important events.
+                      {t('profile.notification_settings_desc', 'Configure how you want to be notified about important events.')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

@@ -85,6 +85,7 @@ function GatewayCard({
 
 function WebhookUrlField({ url }: { url: string }) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   return (
     <div className="space-y-2">
       <Label>Webhook URL</Label>
@@ -96,7 +97,7 @@ function WebhookUrlField({ url }: { url: string }) {
           size="icon"
           onClick={() => {
             void navigator.clipboard.writeText(url);
-            toast({ title: 'Copied webhook URL' });
+            toast({ title: t('erp.settings.paymentGateways.webhookUrlCopied', 'Copied webhook URL') });
           }}
         >
           <Copy className="h-4 w-4" />
@@ -167,7 +168,7 @@ export default function ErpPaymentGatewaysPanel() {
       return res.json();
     },
     onSuccess: (result) => {
-      toast({ title: result.message || 'Connection successful' });
+      toast({ title: result.message || t('erp.settings.paymentGateways.testConnectionSuccess', 'Connection successful') });
       setActiveGateway(null);
     },
     onError: (e: Error) => {

@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,7 @@ interface RenewalStatus {
 export function PlanExpirationChecker() {
   const { user, company } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
 
 
@@ -81,8 +83,8 @@ export function PlanExpirationChecker() {
     try {
       if (!renewalStatus?.plan?.id) {
         toast({
-          title: "Error",
-          description: "No plan found to activate",
+          title: t('common.error', 'Error'),
+          description: t('plan_expiration.plan_expiration_checker.no_plan_found', 'No plan found to activate'),
           variant: "destructive",
         });
         return;
@@ -100,8 +102,8 @@ export function PlanExpirationChecker() {
       const result = await res.json();
       
       toast({
-        title: "Success",
-        description: "Subscription activated successfully!",
+        title: t('common.success', 'Success'),
+        description: t('plan_expiration.plan_expiration_checker.activated_successfully', 'Subscription activated successfully!'),
       });
 
 
@@ -110,8 +112,8 @@ export function PlanExpirationChecker() {
 
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to activate subscription",
+        title: t('common.error', 'Error'),
+        description: error.message || t('plan_expiration.plan_expiration_checker.activation_failed', 'Failed to activate subscription'),
         variant: "destructive",
       });
     }
@@ -229,7 +231,7 @@ export function PlanExpirationChecker() {
               "border-blue-200 bg-blue-50"
             }`}>
               <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Action Required</AlertTitle>
+              <AlertTitle>{t('plan_expiration.plan_expiration_checker.action_required', 'Action Required')}</AlertTitle>
               <AlertDescription>
                 {getStatusMessage()}
               </AlertDescription>
@@ -239,7 +241,7 @@ export function PlanExpirationChecker() {
             {renewalStatus && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Current Subscription</CardTitle>
+                  <CardTitle className="text-lg">{t('plan_expiration.plan_expiration_checker.current_subscription', 'Current Subscription')}</CardTitle>
                   <CardDescription>
                     Your current subscription details
                   </CardDescription>

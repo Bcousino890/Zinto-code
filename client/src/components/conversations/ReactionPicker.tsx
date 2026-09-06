@@ -6,6 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface ReactionPickerProps {
   availableEmojis: string[];
@@ -71,6 +72,7 @@ export function QuickReactionBar({
   onSelect,
   className = ''
 }: QuickReactionBarProps) {
+  const { t } = useTranslation();
   return (
     <div className={cn('flex items-center gap-1 bg-popover rounded-full shadow-lg px-2 py-1', className)}>
       {quickReactions.map((emoji) => (
@@ -78,7 +80,7 @@ export function QuickReactionBar({
           key={emoji}
           onClick={() => onSelect(emoji)}
           className="w-8 h-8 flex items-center justify-center text-xl hover:bg-accent rounded-full transition-all hover:scale-110"
-          title={`React with ${emoji}`}
+          title={t('conversations.reaction_picker.react_with', 'React with {{emoji}}', { emoji })}
         >
           {emoji}
         </button>
@@ -106,6 +108,7 @@ export function ReactionDisplay({
   onAddReaction,
   className = ''
 }: ReactionDisplayProps) {
+  const { t } = useTranslation();
   if (reactions.length === 0 && !onAddReaction) return null;
 
   return (
@@ -127,7 +130,7 @@ export function ReactionDisplay({
                 ? 'bg-blue-100 border-2 border-blue-500 text-blue-700'
                 : 'bg-gray-100 border-2 border-transparent hover:bg-gray-200 text-gray-700'
             )}
-            title={`${count} ${count === 1 ? 'reaction' : 'reactions'}`}
+            title={count === 1 ? t('conversations.reaction_picker.reaction_count_one', '{{count}} reaction', { count }) : t('conversations.reaction_picker.reaction_count_other', '{{count}} reactions', { count })}
           >
             <span className="text-base">{emoji}</span>
             {count > 1 && (
@@ -145,7 +148,7 @@ export function ReactionDisplay({
           whileTap={{ scale: 0.95 }}
           onClick={onAddReaction}
           className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-all"
-          title="Add reaction"
+          title={t('conversations.reaction_picker.add_reaction', 'Add reaction')}
         >
           <span className="text-lg">+</span>
         </motion.button>
@@ -172,6 +175,7 @@ export function FloatingReactionPicker({
   onSelect,
   onShowAll
 }: FloatingReactionPickerProps) {
+  const { t } = useTranslation();
   const pickerRef = useRef<HTMLDivElement>(null);
 
 
@@ -210,7 +214,7 @@ export function FloatingReactionPicker({
               key={emoji}
               onClick={() => onSelect(emoji)}
               className="w-10 h-10 flex items-center justify-center text-2xl hover:bg-gray-100 rounded-full transition-all hover:scale-110"
-              title={`React with ${emoji}`}
+              title={t('conversations.reaction_picker.react_with', 'React with {{emoji}}', { emoji })}
             >
               {emoji}
             </button>
@@ -220,7 +224,7 @@ export function FloatingReactionPicker({
             <button
               onClick={onShowAll}
               className="w-10 h-10 flex items-center justify-center text-xl text-gray-500 hover:bg-gray-100 rounded-full transition-all"
-              title="Show all reactions"
+              title={t('conversations.reaction_picker.show_all_reactions', 'Show all reactions')}
             >
               <span className="font-bold">+</span>
             </button>

@@ -73,7 +73,7 @@ export default function GroupConversationItem({
   };
 
   const formattedTime = useMemo(() => {
-    return formatMessageDateTime(new Date(conversation.lastMessageAt));
+    return formatMessageDateTime(new Date(conversation.lastMessageAt), t);
   }, [conversation.lastMessageAt]);
 
   const formatMessagePreview = (message: any) => {

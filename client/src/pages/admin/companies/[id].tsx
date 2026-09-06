@@ -796,9 +796,9 @@ export default function CompanyDetailPage() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="disabled">Disabled</SelectItem>
-                                  <SelectItem value="contacts_only">Contacts only</SelectItem>
-                                  <SelectItem value="full_chat">Full chat + contacts (no limits)</SelectItem>
+                                  <SelectItem value="disabled">{t('admin.companies.detail.form.whatsapp_import_mode_disabled', 'Disabled')}</SelectItem>
+                                  <SelectItem value="contacts_only">{t('admin.companies.detail.form.whatsapp_import_mode_contacts_only', 'Contacts only')}</SelectItem>
+                                  <SelectItem value="full_chat">{t('admin.companies.detail.form.whatsapp_import_mode_full_chat', 'Full chat + contacts (no limits)')}</SelectItem>
                                 </SelectContent>
                               </Select>
                             </FormControl>

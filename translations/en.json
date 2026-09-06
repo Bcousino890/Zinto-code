@@ -2452,6 +2452,34 @@
     "value": "Used for URL and identification"
   },
   {
+    "key": "admin.companies.detail.form.whatsapp_groups",
+    "value": "Receive Group Messages"
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_groups_description",
+    "value": "When enabled, WhatsApp group chats appear in the inbox. Every group this number belongs to will start creating conversations."
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode",
+    "value": "WhatsApp History Import"
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode_contacts_only",
+    "value": "Contacts only"
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode_description",
+    "value": "Controls what this company imports from WhatsApp (Unofficial) history sync. \"Full chat\" also removes the time window on imported messages."
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode_disabled",
+    "value": "Disabled"
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode_full_chat",
+    "value": "Full chat + contacts (no limits)"
+  },
+  {
     "key": "admin.companies.detail.impersonate_button",
     "value": "Impersonate"
   },
@@ -47630,6 +47658,54 @@
   {
     "key": "settings.channel_connections.title",
     "value": "Channel Connections"
+  },
+  {
+    "key": "settings.channels.history_sync_complete",
+    "value": "History Sync Complete"
+  },
+  {
+    "key": "settings.channels.history_sync_complete_desc",
+    "value": "WhatsApp history sync finished for connection #{{id}}."
+  },
+  {
+    "key": "settings.channels.history_sync_failed",
+    "value": "Failed to start history sync"
+  },
+  {
+    "key": "settings.channels.history_sync_started",
+    "value": "History Sync Started"
+  },
+  {
+    "key": "settings.channels.history_sync_started_desc",
+    "value": "This can take a while depending on the date range and number of chats. You can keep using the app while it runs."
+  },
+  {
+    "key": "settings.channels.start_sync",
+    "value": "Start Sync"
+  },
+  {
+    "key": "settings.channels.sync_from_date",
+    "value": "From date"
+  },
+  {
+    "key": "settings.channels.sync_history",
+    "value": "Sync History"
+  },
+  {
+    "key": "settings.channels.sync_history_desc",
+    "value": "Fetches older messages for chats already in the CRM, back to the start date below (or as far back as WhatsApp still has). A new chat can only appear here if WhatsApp includes it the next time this number reconnects — it cannot be pulled in by date alone."
+  },
+  {
+    "key": "settings.channels.sync_to_date",
+    "value": "To date (optional)"
+  },
+  {
+    "key": "settings.channels.syncing",
+    "value": "Syncing... {{progress}}/{{total}}"
+  },
+  {
+    "key": "settings.channels.syncing_short",
+    "value": "Syncing..."
   },
   {
     "key": "settings.connection_error",

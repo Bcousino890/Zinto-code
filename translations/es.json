@@ -2452,6 +2452,34 @@
     "value": "Usado para URL e identificación"
   },
   {
+    "key": "admin.companies.detail.form.whatsapp_groups",
+    "value": "Recibir Mensajes de Grupos"
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_groups_description",
+    "value": "Al activarlo, los grupos de WhatsApp aparecen en la bandeja de entrada. Todos los grupos en los que esté este número empezarán a crear conversaciones."
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode",
+    "value": "Importación de Historial de WhatsApp"
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode_contacts_only",
+    "value": "Solo contactos"
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode_description",
+    "value": "Controla qué importa esta empresa de la sincronización de historial de WhatsApp (No Oficial). \"Chat completo\" además quita el límite de tiempo en los mensajes importados."
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode_disabled",
+    "value": "Deshabilitado"
+  },
+  {
+    "key": "admin.companies.detail.form.whatsapp_import_mode_full_chat",
+    "value": "Chat completo + contactos (sin límites)"
+  },
+  {
     "key": "admin.companies.detail.impersonate_button",
     "value": "Suplantar"
   },
@@ -47630,6 +47658,54 @@
   {
     "key": "settings.channel_connections.title",
     "value": "Conexiones de Canal"
+  },
+  {
+    "key": "settings.channels.history_sync_complete",
+    "value": "Sincronización de Historial Completa"
+  },
+  {
+    "key": "settings.channels.history_sync_complete_desc",
+    "value": "La sincronización de historial de WhatsApp terminó para la conexión #{{id}}."
+  },
+  {
+    "key": "settings.channels.history_sync_failed",
+    "value": "No se pudo iniciar la sincronización de historial"
+  },
+  {
+    "key": "settings.channels.history_sync_started",
+    "value": "Sincronización de Historial Iniciada"
+  },
+  {
+    "key": "settings.channels.history_sync_started_desc",
+    "value": "Esto puede tardar dependiendo del rango de fechas y la cantidad de chats. Podés seguir usando la app mientras se ejecuta."
+  },
+  {
+    "key": "settings.channels.start_sync",
+    "value": "Iniciar Sincronización"
+  },
+  {
+    "key": "settings.channels.sync_from_date",
+    "value": "Desde la fecha"
+  },
+  {
+    "key": "settings.channels.sync_history",
+    "value": "Sincronizar Historial"
+  },
+  {
+    "key": "settings.channels.sync_history_desc",
+    "value": "Trae mensajes más antiguos para chats que ya están en el CRM, hasta la fecha de inicio de abajo (o hasta donde WhatsApp aún tenga historial). Un chat nuevo solo puede aparecer acá si WhatsApp lo incluye la próxima vez que este número se reconecte — no se puede traer solo por fecha."
+  },
+  {
+    "key": "settings.channels.sync_to_date",
+    "value": "Hasta la fecha (opcional)"
+  },
+  {
+    "key": "settings.channels.syncing",
+    "value": "Sincronizando... {{progress}}/{{total}}"
+  },
+  {
+    "key": "settings.channels.syncing_short",
+    "value": "Sincronizando..."
   },
   {
     "key": "settings.connection_error",

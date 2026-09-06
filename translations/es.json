@@ -56842,5 +56842,97 @@
   {
     "key": "common.checkout.mpesa_phone_help",
     "value": "Ingresa tu número de teléfono de Kenia (formato: 254XXXXXXXXX)"
+  },
+  {
+    "key": "auth.login_successful_title",
+    "value": "Inicio de sesión exitoso"
+  },
+  {
+    "key": "auth.login_successful_desc",
+    "value": "¡Bienvenido de vuelta, {{name}}!"
+  },
+  {
+    "key": "auth.login_failed_title",
+    "value": "Error al iniciar sesión"
+  },
+  {
+    "key": "auth.login_failed_desc",
+    "value": "Credenciales inválidas"
+  },
+  {
+    "key": "auth.admin_login_successful_title",
+    "value": "Inicio de sesión de administrador exitoso"
+  },
+  {
+    "key": "auth.admin_login_successful_desc",
+    "value": "¡Bienvenido de vuelta, {{name}}!"
+  },
+  {
+    "key": "auth.admin_login_failed_title",
+    "value": "Error al iniciar sesión de administrador"
+  },
+  {
+    "key": "auth.admin_login_failed_desc",
+    "value": "Credenciales de administrador inválidas"
+  },
+  {
+    "key": "auth.registration_successful_title",
+    "value": "Registro exitoso"
+  },
+  {
+    "key": "auth.registration_successful_desc",
+    "value": "¡Bienvenido, {{name}}!"
+  },
+  {
+    "key": "auth.registration_failed_title",
+    "value": "Error al registrarse"
+  },
+  {
+    "key": "auth.registration_failed_desc",
+    "value": "No se pudo crear la cuenta"
+  },
+  {
+    "key": "auth.logout_successful_title",
+    "value": "Has cerrado sesión"
+  },
+  {
+    "key": "auth.logout_successful_desc",
+    "value": "Has cerrado sesión exitosamente"
+  },
+  {
+    "key": "auth.logout_failed_title",
+    "value": "Error al cerrar sesión"
+  },
+  {
+    "key": "auth.impersonation_active_title",
+    "value": "Suplantación de empresa activa"
+  },
+  {
+    "key": "auth.impersonation_active_desc",
+    "value": "Ahora has iniciado sesión como {{name}}"
+  },
+  {
+    "key": "auth.impersonation_failed_title",
+    "value": "Error en la suplantación"
+  },
+  {
+    "key": "auth.return_from_impersonation_title",
+    "value": "Volviste a tu cuenta de administrador"
+  },
+  {
+    "key": "auth.return_from_impersonation_desc",
+    "value": "Ahora has iniciado sesión como super administrador"
+  },
+  {
+    "key": "auth.return_from_impersonation_failed_title",
+    "value": "Error al volver a tu cuenta de administrador"
+  },
+  {
+    "key": "auth.return_from_impersonation_failed_desc",
+    "value": "Redirigiendo a inicio de sesión de administrador"
+  },
+  {
+    "key": "auth.impersonate_company_error",
+    "value": "No se pudo suplantar la empresa"
   }
 ]

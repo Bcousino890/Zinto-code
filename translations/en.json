@@ -53078,5 +53078,97 @@
   {
     "key": "common.checkout.mpesa_phone_help",
     "value": "Enter your Kenyan phone number (format: 254XXXXXXXXX)"
+  },
+  {
+    "key": "auth.login_successful_title",
+    "value": "Login successful"
+  },
+  {
+    "key": "auth.login_successful_desc",
+    "value": "Welcome back, {{name}}!"
+  },
+  {
+    "key": "auth.login_failed_title",
+    "value": "Login failed"
+  },
+  {
+    "key": "auth.login_failed_desc",
+    "value": "Invalid credentials"
+  },
+  {
+    "key": "auth.admin_login_successful_title",
+    "value": "Admin login successful"
+  },
+  {
+    "key": "auth.admin_login_successful_desc",
+    "value": "Welcome back, {{name}}!"
+  },
+  {
+    "key": "auth.admin_login_failed_title",
+    "value": "Admin login failed"
+  },
+  {
+    "key": "auth.admin_login_failed_desc",
+    "value": "Invalid admin credentials"
+  },
+  {
+    "key": "auth.registration_successful_title",
+    "value": "Registration successful"
+  },
+  {
+    "key": "auth.registration_successful_desc",
+    "value": "Welcome, {{name}}!"
+  },
+  {
+    "key": "auth.registration_failed_title",
+    "value": "Registration failed"
+  },
+  {
+    "key": "auth.registration_failed_desc",
+    "value": "Could not create account"
+  },
+  {
+    "key": "auth.logout_successful_title",
+    "value": "Logged out"
+  },
+  {
+    "key": "auth.logout_successful_desc",
+    "value": "You have been successfully logged out"
+  },
+  {
+    "key": "auth.logout_failed_title",
+    "value": "Logout failed"
+  },
+  {
+    "key": "auth.impersonation_active_title",
+    "value": "Company impersonation active"
+  },
+  {
+    "key": "auth.impersonation_active_desc",
+    "value": "You are now logged in as {{name}}"
+  },
+  {
+    "key": "auth.impersonation_failed_title",
+    "value": "Impersonation failed"
+  },
+  {
+    "key": "auth.return_from_impersonation_title",
+    "value": "Returned to admin account"
+  },
+  {
+    "key": "auth.return_from_impersonation_desc",
+    "value": "You are now logged in as super admin"
+  },
+  {
+    "key": "auth.return_from_impersonation_failed_title",
+    "value": "Failed to return to admin account"
+  },
+  {
+    "key": "auth.return_from_impersonation_failed_desc",
+    "value": "Redirecting to admin login"
+  },
+  {
+    "key": "auth.impersonate_company_error",
+    "value": "Failed to impersonate company"
   }
 ]

@@ -828,7 +828,7 @@ export default function ConversationView() {
                 <FollowUpIndicator conversationId={activeConversationId} />
               )}
             </div>
-            <div className="flex items-center text-xs sm:text-sm text-muted-foreground mt-1">
+            <div className="flex items-center flex-wrap gap-y-1 text-xs sm:text-sm text-muted-foreground mt-1">
               <span className="flex items-center">
                 {typeof channelInfo.icon === 'string' ? (
                   <i className={channelInfo.icon + " mr-1"} style={channelInfo.icon.includes('tiktok') ? undefined : { color: channelInfo.color }}></i>
@@ -879,7 +879,8 @@ export default function ConversationView() {
                         ) : (
                           <BotIcon className="mr-1.5" size={16} />
                         )}
-                        <span>{isBotDisabled ? t('conversations.bot_disabled', 'Bot disabled') : t('conversations.bot_enabled', 'Bot enabled')}</span>
+                        <span className="hidden sm:inline whitespace-nowrap">{isBotDisabled ? t('conversations.bot_disabled', 'Bot disabled') : t('conversations.bot_enabled', 'Bot enabled')}</span>
+                        <span className="sm:hidden whitespace-nowrap">{isBotDisabled ? t('conversations.item.bot_off', 'Bot off') : t('conversations.item.bot_on', 'Bot on')}</span>
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs text-xs">

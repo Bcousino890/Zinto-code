@@ -56426,5 +56426,285 @@
     {
         "key": "settings.smtp.sender_name_label",
         "value": "Nombre del remitente"
+    },
+    {
+        "key": "profile.error_loading",
+        "value": "Error al cargar el perfil"
+    },
+    {
+        "key": "profile.account_settings",
+        "value": "Configuración de la cuenta"
+    },
+    {
+        "key": "profile.tab_account",
+        "value": "Cuenta"
+    },
+    {
+        "key": "profile.tab_notifications",
+        "value": "Notificaciones"
+    },
+    {
+        "key": "profile.update_details_desc",
+        "value": "Actualice los datos de su cuenta y su perfil público."
+    },
+    {
+        "key": "profile.change_avatar",
+        "value": "Cambiar avatar"
+    },
+    {
+        "key": "profile.account_created",
+        "value": "Cuenta creada"
+    },
+    {
+        "key": "profile.user_id",
+        "value": "ID de usuario"
+    },
+    {
+        "key": "profile.admin_status",
+        "value": "Estado de administrador"
+    },
+    {
+        "key": "profile.super_administrator",
+        "value": "Superadministrador"
+    },
+    {
+        "key": "profile.full_name_placeholder",
+        "value": "Su nombre completo"
+    },
+    {
+        "key": "profile.email_placeholder",
+        "value": "su.correo@ejemplo.com"
+    },
+    {
+        "key": "profile.username_placeholder",
+        "value": "nombredeusuario"
+    },
+    {
+        "key": "profile.username_hint",
+        "value": "Este es su nombre público. Puede ser su nombre real o un seudónimo."
+    },
+    {
+        "key": "profile.language_preference",
+        "value": "Idioma preferido"
+    },
+    {
+        "key": "profile.select_language",
+        "value": "Seleccionar un idioma"
+    },
+    {
+        "key": "profile.choose_preferred_language",
+        "value": "Elija su idioma preferido para la interfaz."
+    },
+    {
+        "key": "profile.saving_changes",
+        "value": "Guardando cambios"
+    },
+    {
+        "key": "profile.company_info_desc",
+        "value": "Administre los datos y la configuración de su empresa."
+    },
+    {
+        "key": "profile.company_created",
+        "value": "Empresa creada"
+    },
+    {
+        "key": "profile.company_name_hint",
+        "value": "El nombre oficial de su empresa."
+    },
+    {
+        "key": "profile.primary_color_hint",
+        "value": "Color de marca principal de su empresa."
+    },
+    {
+        "key": "profile.change_password_desc",
+        "value": "Cambie su contraseña para mantener su cuenta segura."
+    },
+    {
+        "key": "profile.current_password",
+        "value": "Contraseña actual"
+    },
+    {
+        "key": "profile.changing_password",
+        "value": "Cambiando contraseña"
+    },
+    {
+        "key": "profile.change_password_button",
+        "value": "Cambiar contraseña"
+    },
+    {
+        "key": "profile.notification_settings",
+        "value": "Configuración de notificaciones"
+    },
+    {
+        "key": "profile.notification_settings_desc",
+        "value": "Configure cómo desea recibir notificaciones sobre eventos importantes."
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.manage_tags",
+        "value": "Gestionar etiquetas"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.pipeline_filter_help",
+        "value": "Seleccione un pipeline para filtrar las etapas disponibles. Los negocios solo se pueden mover a etapas dentro de su pipeline. Para movimientos entre pipelines, use el nodo \"Mover negocio a pipeline\"."
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.default_pipeline",
+        "value": "Pipeline predeterminado"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.stage_name_label",
+        "value": "Nombre de la etapa"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.stage_color_label",
+        "value": "Color de la etapa"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.deal_title_label",
+        "value": "Título del negocio"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.deal_update_options",
+        "value": "Opciones de actualización del negocio"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.new_title_label",
+        "value": "Nuevo título"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.new_value_label",
+        "value": "Nuevo valor"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.new_priority_label",
+        "value": "Nueva prioridad"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.new_stage_label",
+        "value": "Nueva etapa"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.tags_to_add",
+        "value": "Etiquetas a agregar"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.quick_add",
+        "value": "Agregar rápido:"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.tags_to_remove",
+        "value": "Etiquetas a eliminar"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.create_stage_if_not_exists",
+        "value": "Crear etapa si no existe"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.stage_revert_settings",
+        "value": "Configuración de reversión de etapa"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.enable_stage_revert",
+        "value": "Habilitar reversión de etapa"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.stage_revert_help",
+        "value": "Revertir automáticamente el negocio a una etapa anterior después de un tiempo especificado si no se realiza ninguna acción"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.time_amount",
+        "value": "Cantidad de tiempo"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.time_amount_range_error",
+        "value": "La cantidad de tiempo debe estar entre 1 y 999"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.time_unit",
+        "value": "Unidad de tiempo"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.revert_to_stage",
+        "value": "Revertir a la etapa"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.revert_to_stage_help",
+        "value": "Seleccione la etapa a la que revertir el negocio después del período de tiempo"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.select_stage_to_revert_error",
+        "value": "Seleccione una etapa a la que revertir"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.only_revert_if_no_activity",
+        "value": "Revertir solo si no hay actividad"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.only_revert_if_no_activity_help",
+        "value": "Revertir el negocio solo si no ocurrió actividad desde el cambio de etapa"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_contact_phone_label",
+        "value": "Teléfono del contacto"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_contact_name_label",
+        "value": "Nombre del contacto"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_contact_email_label",
+        "value": "Correo del contacto"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_contact_email_desc",
+        "value": "Dirección de correo electrónico del contacto"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_message_content_label",
+        "value": "Contenido del mensaje"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_message_content_desc",
+        "value": "Contenido del mensaje recibido"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_message_type_label",
+        "value": "Tipo de mensaje"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_message_type_desc",
+        "value": "Tipo de mensaje (texto, imagen, etc.)"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_current_date_label",
+        "value": "Fecha actual"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_current_date_desc",
+        "value": "Fecha de hoy"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_current_time_label",
+        "value": "Hora actual"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_current_time_desc",
+        "value": "Hora actual"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_previous_pipeline_id_label",
+        "value": "ID del pipeline anterior"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_previous_pipeline_id_desc",
+        "value": "ID del pipeline anterior (si se movió)"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_moved_between_pipelines_label",
+        "value": "Movido entre pipelines"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_moved_between_pipelines_desc",
+        "value": "Si el negocio se movió entre pipelines"
     }
 ]

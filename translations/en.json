@@ -52662,5 +52662,285 @@
     {
         "key": "settings.smtp.sender_name_label",
         "value": "Sender Name"
+    },
+    {
+        "key": "profile.error_loading",
+        "value": "Error loading profile"
+    },
+    {
+        "key": "profile.account_settings",
+        "value": "Account Settings"
+    },
+    {
+        "key": "profile.tab_account",
+        "value": "Account"
+    },
+    {
+        "key": "profile.tab_notifications",
+        "value": "Notifications"
+    },
+    {
+        "key": "profile.update_details_desc",
+        "value": "Update your account details and public profile."
+    },
+    {
+        "key": "profile.change_avatar",
+        "value": "Change Avatar"
+    },
+    {
+        "key": "profile.account_created",
+        "value": "Account Created"
+    },
+    {
+        "key": "profile.user_id",
+        "value": "User ID"
+    },
+    {
+        "key": "profile.admin_status",
+        "value": "Admin Status"
+    },
+    {
+        "key": "profile.super_administrator",
+        "value": "Super Administrator"
+    },
+    {
+        "key": "profile.full_name_placeholder",
+        "value": "Your full name"
+    },
+    {
+        "key": "profile.email_placeholder",
+        "value": "your.email@example.com"
+    },
+    {
+        "key": "profile.username_placeholder",
+        "value": "username"
+    },
+    {
+        "key": "profile.username_hint",
+        "value": "This is your public display name. It can be your real name or a pseudonym."
+    },
+    {
+        "key": "profile.language_preference",
+        "value": "Language Preference"
+    },
+    {
+        "key": "profile.select_language",
+        "value": "Select a language"
+    },
+    {
+        "key": "profile.choose_preferred_language",
+        "value": "Choose your preferred language for the interface."
+    },
+    {
+        "key": "profile.saving_changes",
+        "value": "Saving Changes"
+    },
+    {
+        "key": "profile.company_info_desc",
+        "value": "Manage your company details and settings."
+    },
+    {
+        "key": "profile.company_created",
+        "value": "Company Created"
+    },
+    {
+        "key": "profile.company_name_hint",
+        "value": "The official name of your company."
+    },
+    {
+        "key": "profile.primary_color_hint",
+        "value": "Primary brand color for your company."
+    },
+    {
+        "key": "profile.change_password_desc",
+        "value": "Change your password to keep your account secure."
+    },
+    {
+        "key": "profile.current_password",
+        "value": "Current Password"
+    },
+    {
+        "key": "profile.changing_password",
+        "value": "Changing Password"
+    },
+    {
+        "key": "profile.change_password_button",
+        "value": "Change Password"
+    },
+    {
+        "key": "profile.notification_settings",
+        "value": "Notification Settings"
+    },
+    {
+        "key": "profile.notification_settings_desc",
+        "value": "Configure how you want to be notified about important events."
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.manage_tags",
+        "value": "Manage Tags"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.pipeline_filter_help",
+        "value": "Select pipeline to filter available stages. Deals can only be moved to stages within their pipeline. For cross-pipeline moves, use the \"Move Deal to Pipeline\" node."
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.default_pipeline",
+        "value": "Default Pipeline"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.stage_name_label",
+        "value": "Stage Name"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.stage_color_label",
+        "value": "Stage Color"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.deal_title_label",
+        "value": "Deal Title"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.deal_update_options",
+        "value": "Deal Update Options"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.new_title_label",
+        "value": "New Title"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.new_value_label",
+        "value": "New Value"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.new_priority_label",
+        "value": "New Priority"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.new_stage_label",
+        "value": "New Stage"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.tags_to_add",
+        "value": "Tags to Add"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.quick_add",
+        "value": "Quick Add:"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.tags_to_remove",
+        "value": "Tags to Remove"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.create_stage_if_not_exists",
+        "value": "Create stage if not exists"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.stage_revert_settings",
+        "value": "Stage Revert Settings"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.enable_stage_revert",
+        "value": "Enable Stage Revert"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.stage_revert_help",
+        "value": "Automatically revert deal to a previous stage after a specified time if no action is taken"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.time_amount",
+        "value": "Time Amount"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.time_amount_range_error",
+        "value": "Time amount must be between 1 and 999"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.time_unit",
+        "value": "Time Unit"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.revert_to_stage",
+        "value": "Revert To Stage"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.revert_to_stage_help",
+        "value": "Select the stage to revert the deal to after the time period"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.select_stage_to_revert_error",
+        "value": "Please select a stage to revert to"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.only_revert_if_no_activity",
+        "value": "Only revert if no activity"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.only_revert_if_no_activity_help",
+        "value": "Only revert the deal if no activity occurred since the stage change"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_contact_phone_label",
+        "value": "Contact Phone"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_contact_name_label",
+        "value": "Contact Name"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_contact_email_label",
+        "value": "Contact Email"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_contact_email_desc",
+        "value": "Email address of the contact"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_message_content_label",
+        "value": "Message Content"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_message_content_desc",
+        "value": "Content of the received message"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_message_type_label",
+        "value": "Message Type"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_message_type_desc",
+        "value": "Type of the message (text, image, etc.)"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_current_date_label",
+        "value": "Current Date"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_current_date_desc",
+        "value": "Today's date"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_current_time_label",
+        "value": "Current Time"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_current_time_desc",
+        "value": "Current time"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_previous_pipeline_id_label",
+        "value": "Previous Pipeline ID"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_previous_pipeline_id_desc",
+        "value": "Previous pipeline ID (if moved)"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_moved_between_pipelines_label",
+        "value": "Moved Between Pipelines"
+    },
+    {
+        "key": "flow_builder.update_pipeline_stage_node.var_moved_between_pipelines_desc",
+        "value": "Whether deal moved between pipelines"
     }
 ]

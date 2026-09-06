@@ -892,6 +892,8 @@ export interface IStorage {
   getMessagesByConversationPaginated(conversationId: number, limit: number, offset: number): Promise<Message[]>;
   /** Latest message per conversation (one query per id); used for Telegram inbox previews. */
   getLatestMessageForConversations(conversationIds: number[]): Promise<Record<number, Message>>;
+  /** Oldest stored message for a conversation; used as the backward-pagination cursor for on-demand history sync. */
+  getOldestMessageForConversation(conversationId: number): Promise<Message | undefined>;
   getMessagesCountByConversation(conversationId: number): Promise<number>;
 
   getMessagesByConversationWithCompanyValidation(conversationId: number, companyId: number): Promise<Message[]>;
@@ -5881,6 +5883,16 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(messages.sentAt), desc(messages.createdAt), desc(messages.id))
       .limit(limit)
       .offset(offset);
+  }
+
+  async getOldestMessageForConversation(conversationId: number): Promise<Message | undefined> {
+    const rows = await db
+      .select()
+      .from(messages)
+      .where(eq(messages.conversationId, conversationId))
+      .orderBy(asc(messages.sentAt), asc(messages.createdAt), asc(messages.id))
+      .limit(1);
+    return rows[0];
   }
 
   async getLatestMessageForConversations(conversationIds: number[]): Promise<Record<number, Message>> {

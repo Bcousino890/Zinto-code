@@ -11538,11 +11538,51 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
     }
   });
 
-  app.post('/api/channel-connections/:id/sync-history', ensureAuthenticated, async (_req: any, res) => {
-    res.status(410).json({
-      error: 'History sync has been removed for WhatsApp (Baileys) connections',
-      code: 'HISTORY_SYNC_REMOVED'
-    });
+  app.post('/api/channel-connections/:id/sync-history', ensureAuthenticated, async (req: any, res) => {
+    try {
+      const connectionId = parseInt(req.params.id);
+      if (Number.isNaN(connectionId)) {
+        return res.status(400).json({ message: 'Invalid connection id' });
+      }
+
+      const owned = await isConnectionOwnedByCompany(connectionId, req.user?.companyId);
+      if (!owned) {
+        return res.status(404).json({ message: 'Connection not found' });
+      }
+
+      const connection = await storage.getChannelConnection(connectionId);
+      if (!connection || (connection.channelType !== 'whatsapp' && connection.channelType !== 'whatsapp_unofficial')) {
+        return res.status(400).json({ message: 'History sync is only available for WhatsApp (Unofficial) connections' });
+      }
+
+      if (connection.historySyncStatus === 'syncing') {
+        return res.status(409).json({ message: 'A history sync is already running for this connection' });
+      }
+
+      if (!whatsAppService.isConnectionActive(connectionId)) {
+        return res.status(400).json({ message: 'Connection is not active; reconnect (scan the QR code) before syncing history' });
+      }
+
+      const parseDate = (value: any): Date | undefined => {
+        if (!value) return undefined;
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? undefined : date;
+      };
+      const fromDate = parseDate(req.body?.fromDate);
+      const toDate = parseDate(req.body?.toDate);
+
+      // Runs in the background; progress/completion are broadcast over the WebSocket
+      // (whatsappHistorySyncProgress / whatsappHistorySyncComplete) and reflected on the
+      // connection's historySyncStatus/Progress/Total fields.
+      whatsAppService.runDateRangeHistorySync(connectionId, req.user.id, { fromDate, toDate }).catch((err) => {
+        console.error(`Error running date-range history sync for connection ${connectionId}:`, err);
+      });
+
+      res.status(202).json({ success: true, message: 'History sync started' });
+    } catch (error: any) {
+      console.error('Error starting history sync:', error);
+      res.status(500).json({ message: error?.message || 'Failed to start history sync' });
+    }
   });
 
 

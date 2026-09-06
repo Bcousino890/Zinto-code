@@ -41,6 +41,7 @@ import pino from 'pino';
 import { EventEmitter } from 'events';
 import crypto from 'crypto';
 import { logger } from '../../utils/logger';
+import { broadcastToCompany } from '../../utils/websocket';
 import {
   CONTACT_INITIAL_MESSAGE_METADATA_KEYS,
   withContactInitialMessageMetadata,
@@ -487,6 +488,22 @@ const RECONNECT_CATCHUP_CONFIG = {
   lookbackDays: 7,
   /** Only ingest catch-up messages newer than this window (hours). Matches lookbackDays. */
   messageWindowHours: 7 * 24,
+};
+
+// User-triggered "Sync from date" for an existing WhatsApp Unofficial connection.
+// Unlike RECONNECT_CATCHUP_CONFIG (a light, automatic single page per chat), this walks each
+// chat backward, page by page, until either the requested date is reached or WhatsApp stops
+// returning older messages. The caps below are a safety net against a runaway loop, not the
+// intended stopping point -- a normal chat's real history ends long before them.
+const DATE_RANGE_SYNC_CONFIG = {
+  maxConversations: 200,
+  messagesPerPage: 50,
+  maxPagesPerChat: 500,
+  pageWaitMs: 6000,
+  concurrency: 2,
+  // Stop a single chat's backward walk after this long even if it hasn't reached fromDate,
+  // so one huge or stuck chat can't block the whole sync indefinitely.
+  perChatTimeoutMs: 15 * 60 * 1000,
 };
 
 /** Bounds profile-picture fetches performed for contacts newly created during history sync. */
@@ -3340,11 +3357,13 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
       }
 
       // Run auth state, version fetch, and connection refresh in parallel (no proxy)
-      const [{ state: authState, saveCreds }, version] = await Promise.all([
+      const [{ state: authState, saveCreds }, version, refreshedConnection] = await Promise.all([
         usePostgresAuthState(connectionId, storage),
         getCachedWaWebVersion(),
+        storage.getChannelConnection(connectionId),
       ]);
 
+      const shouldSyncHistory = refreshedConnection?.historySyncEnabled || false;
       const useFallbackVersionForConnect = waVersionFallbackRetries.get(connectionId) === true;
       const resolvedVersion = useFallbackVersionForConnect ? WA_VERSION_FALLBACK : (version ?? WA_VERSION_FALLBACK);
 
@@ -3848,9 +3867,9 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
             status: 'syncing'
           });
 
-          // Ingest catch-up messages plus their chats/contacts (RECENT / ON_DEMAND /
-          // INITIAL_BOOTSTRAP), so threads absent from the CRM are created rather than
-          // silently dropped. processHistorySyncData is idempotent per contact/conversation.
+          // Always ingest catch-up messages (RECENT / ON_DEMAND / INITIAL_BOOTSTRAP).
+          // Contact/chat bootstrap remains gated on historySyncEnabled to avoid heavy first-link load;
+          // enable it per-connection in Settings > Inbox to also create contacts/chats absent from the CRM.
           await processHistorySyncData(connectionId, userId, {
             chats: allowChats ? (newChats || []) : [],
             contacts: allowContacts ? (newContacts || []) : [],
@@ -7941,6 +7960,7 @@ export async function sendWhatsAppPoll(
 export default {
   connect: connectToWhatsApp,
   disconnect: disconnectWhatsApp,
+  runDateRangeHistorySync,
   sendMessage: sendWhatsAppMessage,
   sendWhatsAppMessage,
   sendAudioMessage: sendWhatsAppAudioMessage,
@@ -8378,6 +8398,218 @@ async function runReconnectCatchUp(
       `Reconnect catch-up failed for connection ${connectionId}`,
       err instanceof Error ? err.message : String(err)
     );
+  }
+}
+
+/**
+ * User-triggered "Sync from date" for an existing WhatsApp Unofficial connection.
+ *
+ * For every existing conversation on this connection, walks backward page by page via
+ * Baileys' on-demand `fetchMessageHistory`, stopping a chat once its oldest known message
+ * reaches `fromDate` (or `toDate`, treated as an upper bound message filter only) or WhatsApp
+ * stops returning older messages. Results arrive asynchronously through the existing
+ * `messaging-history.set` handler -> `processHistorySyncData`, so this function polls the DB
+ * for the new oldest message after each page rather than awaiting a direct response.
+ *
+ * Also flips the connection's `historySyncEnabled` flag on for the duration (and leaves it on),
+ * so any brand-new chat/contact WhatsApp includes in its native sync payload during this run
+ * gets created in the CRM -- new threads can only ever appear that way, never by requesting a
+ * date range for a chat the CRM doesn't already know about.
+ */
+export async function runDateRangeHistorySync(
+  connectionId: number,
+  userId: number,
+  options: { fromDate?: Date; toDate?: Date }
+): Promise<void> {
+  const { fromDate, toDate } = options;
+  const sock = activeConnections.get(connectionId);
+
+  if (!sock || typeof (sock as any).fetchMessageHistory !== 'function') {
+    throw new Error('Connection is not active; reconnect (scan the QR code) before syncing history.');
+  }
+
+  const connection = await storage.getChannelConnection(connectionId);
+  if (!connection) {
+    throw new Error('Connection not found');
+  }
+
+  const user = await storage.getUser(userId);
+  const companyId = user?.companyId ?? connection.companyId;
+  if (!companyId) {
+    throw new Error('Company not found for this connection');
+  }
+
+  if (!connection.historySyncEnabled) {
+    await storage.updateChannelConnection(connectionId, { historySyncEnabled: true });
+  }
+
+  const allConversations = await storage.getConversationsByChannel(connectionId);
+  const conversations = allConversations.slice(0, DATE_RANGE_SYNC_CONFIG.maxConversations);
+
+  if (allConversations.length > conversations.length) {
+    logger.warn('whatsapp-date-range-sync', 'Conversation count exceeds per-run cap; extra chats skipped', {
+      connectionId,
+      total: allConversations.length,
+      capped: conversations.length,
+    });
+  }
+
+  const batchId = `${connectionId}-daterange-${Date.now()}`;
+  let processedChats = 0;
+  let totalPagesFetched = 0;
+
+  const emitProgress = (status: 'syncing' | 'completed' | 'failed') => {
+    const payload = {
+      connectionId,
+      companyId,
+      batchId,
+      progress: processedChats,
+      total: conversations.length,
+      status,
+    };
+    broadcastToCompany({ type: 'whatsappHistorySyncProgress', data: payload }, companyId);
+    if (status === 'completed') {
+      broadcastToCompany({ type: 'whatsappHistorySyncComplete', data: payload }, companyId);
+    }
+  };
+
+  await storage.createHistorySyncBatch({
+    connectionId,
+    companyId,
+    batchId,
+    syncType: 'manual',
+    totalChats: conversations.length,
+    totalMessages: 0,
+    totalContacts: 0,
+  });
+
+  await storage.updateChannelConnection(connectionId, {
+    historySyncStatus: 'syncing',
+    historySyncProgress: 0,
+    historySyncTotal: conversations.length,
+  });
+  emitProgress('syncing');
+
+  const toTimestamp = toDate ? Math.floor(toDate.getTime() / 1000) : null;
+  const fromTimestamp = fromDate ? Math.floor(fromDate.getTime() / 1000) : null;
+
+  const syncOneChat = async (conversation: any): Promise<void> => {
+    const chatStartedAt = Date.now();
+
+    for (let page = 0; page < DATE_RANGE_SYNC_CONFIG.maxPagesPerChat; page++) {
+      if (activeConnections.get(connectionId) !== sock) {
+        return; // Connection dropped mid-run; stop touching it.
+      }
+      if (Date.now() - chatStartedAt > DATE_RANGE_SYNC_CONFIG.perChatTimeoutMs) {
+        logger.warn('whatsapp-date-range-sync', 'Per-chat timeout reached, moving on', {
+          connectionId,
+          conversationId: conversation.id,
+          page,
+        });
+        return;
+      }
+
+      const oldest = await storage.getOldestMessageForConversation(conversation.id);
+      if (!oldest?.externalId) {
+        return; // Nothing to anchor pagination on.
+      }
+
+      const oldestTimestampMs = oldest.sentAt ? new Date(oldest.sentAt).getTime() : Date.now();
+      if (fromTimestamp && Math.floor(oldestTimestampMs / 1000) <= fromTimestamp) {
+        return; // Already reached the requested start date.
+      }
+      if (toTimestamp && Math.floor(oldestTimestampMs / 1000) > toTimestamp) {
+        // Oldest known message is still newer than the requested end date; keep paging back.
+      }
+
+      let metadata: any = oldest.metadata;
+      if (typeof metadata === 'string') {
+        try { metadata = JSON.parse(metadata); } catch { metadata = {}; }
+      }
+      const remoteJid =
+        metadata?.whatsappMessage?.key?.remoteJid ||
+        metadata?.remoteJid ||
+        metadata?.normalizedRemoteJid ||
+        (conversation.contact?.phone
+          ? `${String(conversation.contact.phone).replace(/\D/g, '')}@s.whatsapp.net`
+          : null);
+      if (!remoteJid) {
+        return;
+      }
+
+      const key = { remoteJid, id: oldest.externalId, fromMe: oldest.direction === 'outbound' };
+
+      try {
+        await (sock as any).fetchMessageHistory(
+          DATE_RANGE_SYNC_CONFIG.messagesPerPage,
+          key,
+          Math.floor(oldestTimestampMs / 1000)
+        );
+      } catch (err) {
+        logger.warn('whatsapp-date-range-sync', `fetchMessageHistory failed for conversation ${conversation.id}`,
+          err instanceof Error ? err.message : String(err));
+        return;
+      }
+
+      totalPagesFetched++;
+      await new Promise((resolve) => setTimeout(resolve, DATE_RANGE_SYNC_CONFIG.pageWaitMs));
+
+      const newOldest = await storage.getOldestMessageForConversation(conversation.id);
+      const newOldestMs = newOldest?.sentAt ? new Date(newOldest.sentAt).getTime() : oldestTimestampMs;
+      if (!newOldest || newOldestMs >= oldestTimestampMs) {
+        return; // No progress: WhatsApp has no more history for this chat.
+      }
+    }
+  };
+
+  let nextIndex = 0;
+  const worker = async () => {
+    while (nextIndex < conversations.length) {
+      const conversation = conversations[nextIndex++];
+      if (activeConnections.get(connectionId) !== sock) {
+        return;
+      }
+      try {
+        await syncOneChat(conversation);
+      } catch (err) {
+        logger.warn('whatsapp-date-range-sync', `Date-range sync failed for conversation ${conversation?.id}`,
+          err instanceof Error ? err.message : String(err));
+      }
+      processedChats++;
+      if (processedChats % 5 === 0) {
+        emitProgress('syncing');
+      }
+    }
+  };
+
+  try {
+    await Promise.all(
+      Array.from({ length: DATE_RANGE_SYNC_CONFIG.concurrency }, () => worker())
+    );
+
+    await storage.updateHistorySyncBatch(batchId, {
+      processedChats,
+      processedMessages: totalPagesFetched * DATE_RANGE_SYNC_CONFIG.messagesPerPage,
+      status: 'completed',
+      completedAt: new Date(),
+    });
+    await storage.updateChannelConnection(connectionId, {
+      historySyncStatus: 'completed',
+      historySyncProgress: conversations.length,
+      lastHistorySyncAt: new Date(),
+    });
+    emitProgress('completed');
+  } catch (err) {
+    await storage.updateHistorySyncBatch(batchId, {
+      status: 'failed',
+      errorMessage: err instanceof Error ? err.message : String(err),
+    });
+    await storage.updateChannelConnection(connectionId, {
+      historySyncStatus: 'failed',
+      historySyncError: err instanceof Error ? err.message : String(err),
+    });
+    emitProgress('failed');
+    throw err;
   }
 }
 

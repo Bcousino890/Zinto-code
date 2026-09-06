@@ -34,6 +34,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import useSocket from '@/hooks/useSocket';
 import { Switch } from '@/components/ui/switch';
 import { queryClient, apiRequest } from '@/lib/queryClient';
 import { TwilioIcon } from '@/components/icons/TwilioIcon';
@@ -1171,6 +1172,61 @@ export default function Settings() {
   const [renameConnectionId, setRenameConnectionId] = useState<number | null>(null);
   const [newChannelName, setNewChannelName] = useState('');
 
+  const [historySyncConnectionId, setHistorySyncConnectionId] = useState<number | null>(null);
+  const [historySyncFromDate, setHistorySyncFromDate] = useState('');
+  const [historySyncToDate, setHistorySyncToDate] = useState('');
+  const [isStartingHistorySync, setIsStartingHistorySync] = useState(false);
+
+  const { onMessage: onWhatsAppSocketMessage } = useSocket('/ws');
+
+  useEffect(() => {
+    const unsubscribeProgress = onWhatsAppSocketMessage('whatsappHistorySyncProgress', () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
+    });
+    const unsubscribeComplete = onWhatsAppSocketMessage('whatsappHistorySyncComplete', (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
+      toast({
+        title: t('settings.channels.history_sync_complete', 'History Sync Complete'),
+        description: t('settings.channels.history_sync_complete_desc', 'WhatsApp history sync finished for connection #{{id}}.', { id: data?.data?.connectionId }),
+      });
+    });
+    return () => {
+      unsubscribeProgress();
+      unsubscribeComplete();
+    };
+  }, [onWhatsAppSocketMessage]);
+
+  const handleOpenHistorySyncModal = (connectionId: number) => {
+    setHistorySyncConnectionId(connectionId);
+    setHistorySyncFromDate('');
+    setHistorySyncToDate('');
+  };
+
+  const handleStartHistorySync = async () => {
+    if (!historySyncConnectionId) return;
+    setIsStartingHistorySync(true);
+    try {
+      await apiRequest('POST', `/api/channel-connections/${historySyncConnectionId}/sync-history`, {
+        fromDate: historySyncFromDate || undefined,
+        toDate: historySyncToDate || undefined,
+      });
+      toast({
+        title: t('settings.channels.history_sync_started', 'History Sync Started'),
+        description: t('settings.channels.history_sync_started_desc', 'This can take a while depending on the date range and number of chats. You can keep using the app while it runs.'),
+      });
+      setHistorySyncConnectionId(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
+    } catch (error: any) {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error?.message || t('settings.channels.history_sync_failed', 'Failed to start history sync'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsStartingHistorySync(false);
+    }
+  };
+
   const [disconnectConnectionId, setDisconnectConnectionId] = useState<number | null>(null);
   const [isDisconnectingEmbedded, setIsDisconnectingEmbedded] = useState(false);
   const [showDisconnectWarning, setShowDisconnectWarning] = useState(false);
@@ -2258,6 +2314,69 @@ export default function Settings() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={historySyncConnectionId !== null} onOpenChange={(open) => { if (!open) setHistorySyncConnectionId(null); }}>
+        <DialogContent className="w-[95vw] max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg sm:text-xl">{t('settings.channels.sync_history', 'Sync History')}</DialogTitle>
+            <DialogDescription className="text-sm">
+              {t(
+                'settings.channels.sync_history_desc',
+                'Fetches older messages for chats already in the CRM, back to the start date below (or as far back as WhatsApp still has). A new chat can only appear here if WhatsApp includes it the next time this number reconnects — it cannot be pulled in by date alone.'
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <Label htmlFor="historySyncFromDate" className="mb-2 block text-sm">
+                {t('settings.channels.sync_from_date', 'From date')}
+              </Label>
+              <Input
+                id="historySyncFromDate"
+                type="date"
+                value={historySyncFromDate}
+                onChange={(e) => setHistorySyncFromDate(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="historySyncToDate" className="mb-2 block text-sm">
+                {t('settings.channels.sync_to_date', 'To date (optional)')}
+              </Label>
+              <Input
+                id="historySyncToDate"
+                type="date"
+                value={historySyncToDate}
+                onChange={(e) => setHistorySyncToDate(e.target.value)}
+                className="w-full"
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setHistorySyncConnectionId(null)}
+              className="w-full sm:w-auto"
+              disabled={isStartingHistorySync}
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              type="button"
+              variant="brand"
+              className="btn-brand-primary w-full sm:w-auto"
+              onClick={handleStartHistorySync}
+              disabled={!historySyncFromDate || isStartingHistorySync}
+            >
+              {isStartingHistorySync ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : null}
+              {t('settings.channels.start_sync', 'Start Sync')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showDisconnectWarning} onOpenChange={setShowDisconnectWarning}>
         <DialogContent className="w-[95vw] max-w-md mx-auto">
           <DialogHeader>
@@ -3026,6 +3145,35 @@ export default function Settings() {
                                         />
                                       );
                                     })()}
+
+                                    {/* Sync History button for WhatsApp (Unofficial) connections */}
+                                    {(connection.channelType === 'whatsapp' || connection.channelType === 'whatsapp_unofficial') && (
+                                      <Button
+                                        variant="brand"
+                                        size="sm"
+                                        className="btn-brand-primary text-purple-500 hover:text-purple-700 text-xs sm:text-sm"
+                                        onClick={() => handleOpenHistorySyncModal(connection.id)}
+                                        disabled={connection.historySyncStatus === 'syncing'}
+                                      >
+                                        {connection.historySyncStatus === 'syncing' ? (
+                                          <>
+                                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                            <span className="hidden sm:inline">
+                                              {t('settings.channels.syncing', 'Syncing... {{progress}}/{{total}}', {
+                                                progress: connection.historySyncProgress ?? 0,
+                                                total: connection.historySyncTotal ?? 0,
+                                              })}
+                                            </span>
+                                            <span className="sm:hidden">{t('settings.channels.syncing_short', 'Syncing...')}</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <span className="hidden sm:inline">{t('settings.channels.sync_history', 'Sync History')}</span>
+                                            <span className="sm:hidden">{t('settings.channels.sync_history', 'Sync History')}</span>
+                                          </>
+                                        )}
+                                      </Button>
+                                    )}
 
                                     {/* Edit button for email channels */}
                                     {connection.channelType === 'email' && (

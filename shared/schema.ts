@@ -56,6 +56,7 @@ export const companies = pgTable("companies", {
   whatsappImportMode: text("whatsapp_import_mode", {
     enum: ['disabled', 'contacts_only', 'full_chat']
   }).default('contacts_only'),
+  whatsappGroupsEnabled: boolean("whatsapp_groups_enabled").default(false),
 
 
   registerNumber: text("register_number"),
@@ -104,6 +105,7 @@ export const insertCompanySchema = createInsertSchema(companies).pick({
   isInTrial: true,
   maxUsers: true,
   whatsappImportMode: true,
+  whatsappGroupsEnabled: true,
   registerNumber: true,
   companyEmail: true,
   contactPerson: true,

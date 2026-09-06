@@ -3919,235 +3919,24 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
 }
 
 
-/**
- * Handle incoming WhatsApp messages
- */
-async function handleIncomingMessage(
+async function extractInboundMessageContent(
   waMsg: WAMessage,
   connectionId: number,
-  userId: number,
-  isHistorySync: boolean = false,
-  historySyncBatchId?: string
-): Promise<void> {
-  const messageId = waMsg.key?.id || 'unknown';
-  const rawRemoteJid = waMsg.key?.remoteJid || '';
-  
-  try {
-    if (!waMsg.key || !waMsg.key.remoteJid || !waMsg.key.id) {
-      return;
-    }
-
-    if (waMsg.key.remoteJid.includes('@broadcast') || waMsg.key.remoteJid === 'status@broadcast') {
-      return;
-    }
-
-    const user = await storage.getUser(userId);
-    if (!user) {
-      console.error(`User with ID ${userId} not found`);
-      return;
-    }
-
-    const connection = await storage.getChannelConnection(connectionId);
-    const connectionIdentifierType = getIdentifierTypeFromConnection(connection?.channelType);
-
-    const rawRemoteJidBeforeNormalization = waMsg.key.remoteJid;
-    const remoteJid = normalizeWhatsAppJid(waMsg.key.remoteJid);
-    const companyId = user.companyId;
-
-    const isFromMe = waMsg.key.fromMe === true;
-
-
-
-    const remoteJidAlt = (waMsg.key as any).remoteJidAlt || null;
-    const participantAlt = (waMsg.key as any).participantAlt || null;
-   
-    if (isFromMe && !isHistorySync) {
-
-
-      const trackingKey = `${remoteJid}:${waMsg.key.id}`;
-      const recentBotHiveMessage = recentBotHiveMessages.get(trackingKey);
-
-      if (recentBotHiveMessage) {
-        const messageAge = Date.now() - recentBotHiveMessage.timestamp;
-        if (messageAge < BOTHIVE_MESSAGE_TRACKING_DURATION) {
-          return;
-        } else {
-
-          recentBotHiveMessages.delete(trackingKey);
-        }
-      }
-    }
-
-
-
-
-    if (!isFromMe && !isHistorySync) {
-      const queueKey = getQueueKey(remoteJid, connectionId);
-      const existingQueue = messageQueues.get(queueKey);
-      if (existingQueue && existingQueue.length > 0) {
-        const totalPendingChunks = existingQueue.reduce((total, msg) => {
-          return total + (msg.chunks.length - msg.currentChunkIndex);
-        }, 0);
-
-        existingQueue.forEach(msg => {
-          const remainingChunks = msg.chunks.length - msg.currentChunkIndex;
-
-        });
-
-        cancelQueuedMessages(remoteJid, connectionId);
-
-      } else {
-
-      }
-    } else {
-
-    }
-
-
-    const isGroupChat = remoteJid.endsWith('@g.us');
-    
-    if (isGroupChat) {
-      return;
-    }
-
-    let messageType = 'text';
-    let messageContent = '';
-    let mediaUrl: string | null = null;
-    let pendingInboundMediaDownload = false;
-
-
-
-    let actualPhoneNumber: string | null = null;
-    let resolvedRemoteJid = remoteJid;
-    
-    if (rawRemoteJidBeforeNormalization.endsWith('@lid')) {
-      
-
-      if (remoteJidAlt && remoteJidAlt.includes('@s.whatsapp.net')) {
-        resolvedRemoteJid = remoteJidAlt;
-        actualPhoneNumber = remoteJidAlt.split('@')[0];
-      }
-      
-
-      if (!actualPhoneNumber) {
-        try {
-          const sock = activeConnections.get(connectionId);
-          if (sock) {
-
-
-            if ((sock as any).store && (sock as any).store.contacts) {
-              const contactInfo = (sock as any).store.contacts[rawRemoteJidBeforeNormalization];
-              if (contactInfo) {
-                
-
-                if (contactInfo.phoneNumber) {
-                  const phoneJid = `${contactInfo.phoneNumber}@s.whatsapp.net`;
-                  resolvedRemoteJid = phoneJid;
-                  actualPhoneNumber = contactInfo.phoneNumber.replace(/[^\d]/g, '');
-                } else if (contactInfo.jid && contactInfo.jid.includes('@s.whatsapp.net')) {
-                  resolvedRemoteJid = contactInfo.jid;
-                  actualPhoneNumber = contactInfo.jid.split('@')[0];
-                }
-              }
-            }
-            
-
-            if (!actualPhoneNumber) {
-              try {
-                const normalizedJid = jidNormalizedUser(rawRemoteJidBeforeNormalization);
-                if (normalizedJid && normalizedJid.includes('@s.whatsapp.net') && normalizedJid !== rawRemoteJidBeforeNormalization) {
-                  resolvedRemoteJid = normalizedJid;
-                  actualPhoneNumber = normalizedJid.split('@')[0];
-                 
-                }
-              } catch (normalizeError) {
-              }
-            }
-          } else {
-          }
-        } catch (error) {
-        }
-      }
-      
-
-
-      if (!actualPhoneNumber) {
-        try {
-          const lidIdentifier = rawRemoteJidBeforeNormalization.split('@')[0];
-          
-
-          let existingContact = await storage.getContactByIdentifier(lidIdentifier, 'whatsapp');
-          
-
-          if (!existingContact) {
-
-            const conversations = await storage.getConversationsByChannel(connectionId);
-            for (const conv of conversations) {
-              if (conv.contactId) {
-                const contact = await storage.getContact(conv.contactId);
-                if (contact && contact.phone && 
-                    !contact.phone.startsWith('LID-') && 
-                    contact.phone.replace(/[^\d]/g, '').length >= 10) {
-
-                  const recentMessages = await storage.getMessagesByConversationPaginated(conv.id, 10, 0);
-                  for (const msg of recentMessages) {
-                    if (msg.metadata) {
-                      const metadata = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata;
-                      if (metadata.originalRemoteJid === rawRemoteJidBeforeNormalization ||
-                          metadata.remoteJid === rawRemoteJidBeforeNormalization) {
-                        existingContact = contact;
-                        break;
-                      }
-                    }
-                  }
-                  if (existingContact) break;
-                }
-              }
-            }
-          }
-          
-
-          if (existingContact && existingContact.phone && 
-              !existingContact.phone.startsWith('LID-') && 
-              existingContact.phone.replace(/[^\d]/g, '').length >= 10) {
-            actualPhoneNumber = existingContact.phone.replace(/[^\d]/g, '');
-            resolvedRemoteJid = `${actualPhoneNumber}@s.whatsapp.net`;
-          }
-        } catch (dbError) {
-        }
-      }
-      
-
-      if (!actualPhoneNumber) {
-        resolvedRemoteJid = rawRemoteJidBeforeNormalization;
-      }
-    }
-
-
-    const phoneNumber = actualPhoneNumber || extractPhoneNumberFromJid(resolvedRemoteJid);
-    const cleanPhoneNumber = phoneNumber.replace(/[^\d]/g, '');
-    
-
-    if (isWhatsAppGroupChatId(cleanPhoneNumber)) {
-      return;
-    }
-
-    let contactDisplayName: string | null = null;
-    if (waMsg.pushName && waMsg.pushName.trim()) {
-      contactDisplayName = waMsg.pushName.trim();
-    } else if ((waMsg as any).notify && (waMsg as any).notify.trim()) {
-      contactDisplayName = (waMsg as any).notify.trim();
-    }
-
-
-
-    if (isFromMe) {
-      contactDisplayName = null;
-    }
+  isHistorySync: boolean
+): Promise<{
+  messageType: string;
+  messageContent: string;
+  mediaUrl: string | null;
+  pendingInboundMediaDownload: boolean;
+} | null> {
+  let messageType = 'text';
+  let messageContent = '';
+  let mediaUrl: string | null = null;
+  let pendingInboundMediaDownload = false;
 
     if (waMsg.message) {
       if (waMsg.message.protocolMessage) {
-        return;
+        return null;
       }
       if (waMsg.message.conversation) {
         messageContent = waMsg.message.conversation;
@@ -4577,8 +4366,589 @@ async function handleIncomingMessage(
       }
     } else {
 
+      return null;
+    }
+
+  return { messageType, messageContent, mediaUrl, pendingInboundMediaDownload };
+}
+
+/**
+ * Get-or-create the CRM conversation backing a WhatsApp group JID.
+ * Shared by every outbound send path and by inbound group message handling
+ * so group conversation creation (name/description/participant snapshot from
+ * groupMetadata) stays consistent in one place.
+ */
+async function resolveOrCreateGroupConversation(
+  sock: WASocket,
+  groupJid: string,
+  connectionId: number,
+  userId: number
+): Promise<{ conversation: Conversation; created: boolean }> {
+  let conversation = await storage.getConversationByGroupJid(groupJid);
+
+  if (!conversation) {
+    const user = await storage.getUser(userId);
+    const companyId = user?.companyId;
+
+    let groupName = groupJid.split('@')[0];
+    let groupMetadata: any = null;
+
+    try {
+      const metadata = await sock.groupMetadata(groupJid);
+      groupName = metadata.subject || groupName;
+      groupMetadata = {
+        subject: metadata.subject,
+        desc: metadata.desc,
+        participants: metadata.participants,
+        creation: metadata.creation,
+        owner: metadata.owner
+      };
+    } catch (error) {
+
+    }
+
+    const conversationData: InsertConversation = {
+      companyId: companyId,
+      contactId: null,
+      channelId: connectionId,
+      channelType: 'whatsapp_unofficial',
+      status: 'active',
+      lastMessageAt: new Date(),
+      isGroup: true,
+      groupJid: groupJid,
+      groupName: groupName,
+      groupDescription: groupMetadata?.desc || null,
+      groupParticipantCount: groupMetadata?.participants?.length || 0,
+      groupCreatedAt: groupMetadata?.creation ? new Date(groupMetadata.creation * 1000) : new Date(),
+      groupMetadata: groupMetadata
+    };
+
+    conversation = await storage.createConversation(conversationData);
+    return { conversation, created: true };
+  }
+
+  conversation = await storage.updateConversation(conversation.id, {
+    lastMessageAt: new Date()
+  });
+  return { conversation, created: false };
+}
+
+/**
+ * Best-effort resolution of the participant who authored an inbound group message.
+ * `key.participant` may be in `@lid` format; this mirrors (in lighter form) the
+ * `@lid` -> real-JID resolution handleIncomingMessage already does for 1:1 remoteJid,
+ * falling back to the `LID-<id>` synthetic identifier convention already used by
+ * storage.syncGroupParticipantsFromMetadata when no real phone number is recoverable.
+ */
+async function resolveGroupMessageParticipant(
+  sock: WASocket | undefined,
+  waMsg: WAMessage,
+  companyId: number
+): Promise<{ contact: Contact | null; participantJid: string; displayName: string | null }> {
+  const rawParticipantJid: string | undefined = (waMsg.key as any)?.participant || undefined;
+  const participantAlt: string | null = (waMsg.key as any)?.participantAlt || null;
+
+  if (!rawParticipantJid) {
+    return { contact: null, participantJid: waMsg.key?.remoteJid || 'unknown', displayName: null };
+  }
+
+  let resolvedJid = rawParticipantJid;
+  const isLidFormat = rawParticipantJid.includes('@lid');
+
+  if (isLidFormat) {
+    if (participantAlt && participantAlt.includes('@s.whatsapp.net')) {
+      resolvedJid = participantAlt;
+    } else if (sock) {
+      try {
+        const contactInfo = (sock as any).store?.contacts?.[rawParticipantJid];
+        if (contactInfo?.phoneNumber) {
+          resolvedJid = `${contactInfo.phoneNumber}@s.whatsapp.net`;
+        } else if (contactInfo?.jid?.includes('@s.whatsapp.net')) {
+          resolvedJid = contactInfo.jid;
+        } else {
+          const normalized = jidNormalizedUser(rawParticipantJid);
+          if (normalized && normalized.includes('@s.whatsapp.net') && normalized !== rawParticipantJid) {
+            resolvedJid = normalized;
+          }
+        }
+      } catch (error) {
+        // best effort only
+      }
+    }
+  }
+
+  let phoneNumber: string;
+  if (resolvedJid.includes('@s.whatsapp.net')) {
+    phoneNumber = resolvedJid.split('@')[0].replace(/[^\d]/g, '');
+  } else {
+    // Could not resolve the @lid to a real phone number; use the same synthetic
+    // identifier convention as storage.syncGroupParticipantsFromMetadata so both
+    // paths land on the same contact record.
+    phoneNumber = `LID-${rawParticipantJid.split('@')[0]}`;
+  }
+
+  const pushName = (waMsg.pushName && waMsg.pushName.trim())
+    || ((waMsg as any).notify && (waMsg as any).notify.trim())
+    || null;
+
+  let contact = await storage.getContactByIdentifier(phoneNumber, 'whatsapp');
+
+  if (!contact) {
+    const contactData: InsertContact = {
+      companyId,
+      name: pushName || phoneNumber,
+      phone: phoneNumber.startsWith('LID-') ? phoneNumber : `+${phoneNumber}`,
+      email: null,
+      avatarUrl: null,
+      identifier: phoneNumber,
+      identifierType: 'whatsapp',
+      source: 'whatsapp',
+      notes: null
+    };
+    contact = await storage.getOrCreateContact(contactData);
+  } else if (pushName && contact.name === contact.phone) {
+    try {
+      contact = await storage.updateContact(contact.id, { name: pushName });
+    } catch (error) {
+      // best effort only
+    }
+  }
+
+  return { contact, participantJid: resolvedJid, displayName: contact.name };
+}
+
+/**
+ * Handle an inbound WhatsApp group message. Only reached when the company has
+ * whatsappGroupsEnabled === true (checked by the caller). Stores the message
+ * against the group conversation (isGroup/groupJid), attributed to the actual
+ * participant (not the group JID) via groupParticipantJid/groupParticipantName
+ * plus a group_participants row, so existing group-aware UI components render it.
+ */
+async function handleIncomingGroupMessage(params: {
+  waMsg: WAMessage;
+  connectionId: number;
+  userId: number;
+  companyId: number;
+  connection: any;
+  groupJid: string;
+  isFromMe: boolean;
+  isHistorySync: boolean;
+  historySyncBatchId?: string;
+}): Promise<void> {
+  const { waMsg, connectionId, userId, companyId, connection, groupJid, isFromMe, isHistorySync, historySyncBatchId } = params;
+
+  // Force the synchronous media-download branch of extractInboundMessageContent
+  // (the flag there only chooses pending-vs-sync download, nothing else) — group
+  // support ships without the 1:1 path's deferred/async inbound media pipeline.
+  const extracted = await extractInboundMessageContent(waMsg, connectionId, true);
+  if (!extracted) {
+    return;
+  }
+  const { messageType, messageContent, mediaUrl } = extracted;
+
+  const sock = activeConnections.get(connectionId);
+
+  try {
+    if (waMsg.key?.id) {
+      const existingConversationForDedup = await storage.getConversationByGroupJid(groupJid);
+      if (existingConversationForDedup) {
+        const existingMessage = await storage.getMessageByWhatsAppId(existingConversationForDedup.id, waMsg.key.id);
+        if (existingMessage) {
+          return;
+        }
+      }
+    }
+  } catch (dedupError) {
+    console.error('Error checking for duplicate inbound group message:', dedupError);
+  }
+
+  if (!sock) {
+    console.error(`No active WhatsApp socket for connection ${connectionId}; cannot resolve group ${groupJid}`);
+    return;
+  }
+
+  let conversation: Conversation;
+  try {
+    const resolution = await resolveOrCreateGroupConversation(sock, groupJid, connectionId, userId);
+    conversation = resolution.conversation;
+    if (resolution.created) {
+      broadcastNewConversation({
+        ...conversation,
+        contact: null
+      });
+    }
+  } catch (conversationError) {
+    console.error('Error resolving group conversation for inbound message:', conversationError);
+    return;
+  }
+
+  let participantContact: Contact | null = null;
+  let participantJidResolved: string | null = null;
+  let participantDisplayName: string | null = null;
+
+  if (!isFromMe) {
+    try {
+      const resolved = await resolveGroupMessageParticipant(sock, waMsg, companyId);
+      participantContact = resolved.contact;
+      participantJidResolved = resolved.participantJid;
+      participantDisplayName = resolved.displayName;
+
+      if (participantContact) {
+        await storage.upsertGroupParticipant({
+          conversationId: conversation.id,
+          contactId: participantContact.id,
+          participantJid: participantJidResolved,
+          participantName: participantContact.name
+        });
+      }
+    } catch (participantError) {
+      console.error('Error resolving group message participant:', participantError);
+    }
+  }
+
+  const direction = isFromMe ? 'outbound' : 'inbound';
+  const senderType: 'user' | 'contact' | null = isFromMe ? 'user' : (participantContact ? 'contact' : null);
+  const senderId = isFromMe ? userId : (participantContact?.id ?? null);
+
+  const messageTimestamp = waMsg.messageTimestamp
+    ? new Date((typeof waMsg.messageTimestamp === 'object'
+      ? (waMsg.messageTimestamp as any).toNumber()
+      : Number(waMsg.messageTimestamp)) * 1000)
+    : new Date();
+
+  const messageData: InsertMessage = {
+    conversationId: conversation.id,
+    content: messageContent,
+    direction,
+    type: messageType,
+    sentAt: messageTimestamp,
+    ...(isHistorySync && { createdAt: messageTimestamp }),
+    senderId,
+    senderType,
+    status: 'delivered',
+    mediaUrl,
+    externalId: waMsg.key?.id,
+    groupParticipantJid: isFromMe ? null : participantJidResolved,
+    groupParticipantName: isFromMe ? null : (participantDisplayName || participantContact?.name || null),
+    metadata: JSON.stringify({
+      messageId: waMsg.key?.id,
+      groupJid,
+      isGroupChat: true,
+      fromMe: isFromMe,
+      channelType: connection?.channelType || 'whatsapp_unofficial',
+      whatsappMessage: {
+        key: waMsg.key,
+        message: waMsg.message,
+        messageTimestamp: waMsg.messageTimestamp
+      }
+    }),
+    isHistorySync,
+    historySyncBatchId
+  };
+
+  const message = await storage.createMessage(messageData);
+
+  try {
+    conversation = await storage.updateConversation(conversation.id, { lastMessageAt: new Date() });
+  } catch (updateError) {
+    console.error('Error updating group conversation lastMessageAt:', updateError);
+  }
+
+  try {
+    if (!isFromMe && !isHistorySync) {
+      const unreadCount = await storage.getUnreadCount(conversation.id);
+      broadcastWhatsAppEvent('unreadCountUpdated', {
+        conversationId: conversation.id,
+        unreadCount
+      }, {
+        conversationId: conversation.id,
+        priority: 'normal'
+      });
+    }
+  } catch (error) {
+    console.error('Error broadcasting unread count update for group message:', error);
+  }
+
+  if (isFromMe) {
+    emitWhatsAppEvent('messageSent', {
+      message,
+      conversation,
+      contact: null,
+      companyId: conversation?.companyId,
+    });
+  } else {
+    emitWhatsAppEvent('messageReceived', {
+      message,
+      conversation,
+      contact: participantContact,
+      companyId: conversation?.companyId,
+    });
+  }
+}
+
+/**
+ * Handle incoming WhatsApp messages
+ */
+async function handleIncomingMessage(
+  waMsg: WAMessage,
+  connectionId: number,
+  userId: number,
+  isHistorySync: boolean = false,
+  historySyncBatchId?: string
+): Promise<void> {
+  const messageId = waMsg.key?.id || 'unknown';
+  const rawRemoteJid = waMsg.key?.remoteJid || '';
+  
+  try {
+    if (!waMsg.key || !waMsg.key.remoteJid || !waMsg.key.id) {
       return;
     }
+
+    if (waMsg.key.remoteJid.includes('@broadcast') || waMsg.key.remoteJid === 'status@broadcast') {
+      return;
+    }
+
+    const user = await storage.getUser(userId);
+    if (!user) {
+      console.error(`User with ID ${userId} not found`);
+      return;
+    }
+
+    const connection = await storage.getChannelConnection(connectionId);
+    const connectionIdentifierType = getIdentifierTypeFromConnection(connection?.channelType);
+
+    const rawRemoteJidBeforeNormalization = waMsg.key.remoteJid;
+    const remoteJid = normalizeWhatsAppJid(waMsg.key.remoteJid);
+    const companyId = user.companyId;
+
+    const isFromMe = waMsg.key.fromMe === true;
+
+
+
+    const remoteJidAlt = (waMsg.key as any).remoteJidAlt || null;
+    const participantAlt = (waMsg.key as any).participantAlt || null;
+   
+    if (isFromMe && !isHistorySync) {
+
+
+      const trackingKey = `${remoteJid}:${waMsg.key.id}`;
+      const recentBotHiveMessage = recentBotHiveMessages.get(trackingKey);
+
+      if (recentBotHiveMessage) {
+        const messageAge = Date.now() - recentBotHiveMessage.timestamp;
+        if (messageAge < BOTHIVE_MESSAGE_TRACKING_DURATION) {
+          return;
+        } else {
+
+          recentBotHiveMessages.delete(trackingKey);
+        }
+      }
+    }
+
+
+
+
+    if (!isFromMe && !isHistorySync) {
+      const queueKey = getQueueKey(remoteJid, connectionId);
+      const existingQueue = messageQueues.get(queueKey);
+      if (existingQueue && existingQueue.length > 0) {
+        const totalPendingChunks = existingQueue.reduce((total, msg) => {
+          return total + (msg.chunks.length - msg.currentChunkIndex);
+        }, 0);
+
+        existingQueue.forEach(msg => {
+          const remainingChunks = msg.chunks.length - msg.currentChunkIndex;
+
+        });
+
+        cancelQueuedMessages(remoteJid, connectionId);
+
+      } else {
+
+      }
+    } else {
+
+    }
+
+
+    const isGroupChat = remoteJid.endsWith('@g.us');
+
+    if (isGroupChat) {
+      if (!companyId) {
+        return;
+      }
+
+      let groupsEnabled = false;
+      try {
+        const groupCompany = await storage.getCompany(companyId);
+        groupsEnabled = (groupCompany as any)?.whatsappGroupsEnabled === true;
+      } catch (companyLookupError) {
+        console.error('Error checking whatsappGroupsEnabled for company:', companyLookupError);
+      }
+
+      if (!groupsEnabled) {
+        return;
+      }
+
+      try {
+        await handleIncomingGroupMessage({
+          waMsg,
+          connectionId,
+          userId,
+          companyId,
+          connection,
+          groupJid: remoteJid,
+          isFromMe,
+          isHistorySync,
+          historySyncBatchId
+        });
+      } catch (groupMessageError) {
+        console.error('Error handling incoming WhatsApp group message:', groupMessageError);
+      }
+
+      return;
+    }
+
+    let messageType = 'text';
+    let messageContent = '';
+    let mediaUrl: string | null = null;
+    let pendingInboundMediaDownload = false;
+
+
+
+    let actualPhoneNumber: string | null = null;
+    let resolvedRemoteJid = remoteJid;
+    
+    if (rawRemoteJidBeforeNormalization.endsWith('@lid')) {
+      
+
+      if (remoteJidAlt && remoteJidAlt.includes('@s.whatsapp.net')) {
+        resolvedRemoteJid = remoteJidAlt;
+        actualPhoneNumber = remoteJidAlt.split('@')[0];
+      }
+      
+
+      if (!actualPhoneNumber) {
+        try {
+          const sock = activeConnections.get(connectionId);
+          if (sock) {
+
+
+            if ((sock as any).store && (sock as any).store.contacts) {
+              const contactInfo = (sock as any).store.contacts[rawRemoteJidBeforeNormalization];
+              if (contactInfo) {
+                
+
+                if (contactInfo.phoneNumber) {
+                  const phoneJid = `${contactInfo.phoneNumber}@s.whatsapp.net`;
+                  resolvedRemoteJid = phoneJid;
+                  actualPhoneNumber = contactInfo.phoneNumber.replace(/[^\d]/g, '');
+                } else if (contactInfo.jid && contactInfo.jid.includes('@s.whatsapp.net')) {
+                  resolvedRemoteJid = contactInfo.jid;
+                  actualPhoneNumber = contactInfo.jid.split('@')[0];
+                }
+              }
+            }
+            
+
+            if (!actualPhoneNumber) {
+              try {
+                const normalizedJid = jidNormalizedUser(rawRemoteJidBeforeNormalization);
+                if (normalizedJid && normalizedJid.includes('@s.whatsapp.net') && normalizedJid !== rawRemoteJidBeforeNormalization) {
+                  resolvedRemoteJid = normalizedJid;
+                  actualPhoneNumber = normalizedJid.split('@')[0];
+                 
+                }
+              } catch (normalizeError) {
+              }
+            }
+          } else {
+          }
+        } catch (error) {
+        }
+      }
+      
+
+
+      if (!actualPhoneNumber) {
+        try {
+          const lidIdentifier = rawRemoteJidBeforeNormalization.split('@')[0];
+          
+
+          let existingContact = await storage.getContactByIdentifier(lidIdentifier, 'whatsapp');
+          
+
+          if (!existingContact) {
+
+            const conversations = await storage.getConversationsByChannel(connectionId);
+            for (const conv of conversations) {
+              if (conv.contactId) {
+                const contact = await storage.getContact(conv.contactId);
+                if (contact && contact.phone && 
+                    !contact.phone.startsWith('LID-') && 
+                    contact.phone.replace(/[^\d]/g, '').length >= 10) {
+
+                  const recentMessages = await storage.getMessagesByConversationPaginated(conv.id, 10, 0);
+                  for (const msg of recentMessages) {
+                    if (msg.metadata) {
+                      const metadata = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata;
+                      if (metadata.originalRemoteJid === rawRemoteJidBeforeNormalization ||
+                          metadata.remoteJid === rawRemoteJidBeforeNormalization) {
+                        existingContact = contact;
+                        break;
+                      }
+                    }
+                  }
+                  if (existingContact) break;
+                }
+              }
+            }
+          }
+          
+
+          if (existingContact && existingContact.phone && 
+              !existingContact.phone.startsWith('LID-') && 
+              existingContact.phone.replace(/[^\d]/g, '').length >= 10) {
+            actualPhoneNumber = existingContact.phone.replace(/[^\d]/g, '');
+            resolvedRemoteJid = `${actualPhoneNumber}@s.whatsapp.net`;
+          }
+        } catch (dbError) {
+        }
+      }
+      
+
+      if (!actualPhoneNumber) {
+        resolvedRemoteJid = rawRemoteJidBeforeNormalization;
+      }
+    }
+
+
+    const phoneNumber = actualPhoneNumber || extractPhoneNumberFromJid(resolvedRemoteJid);
+    const cleanPhoneNumber = phoneNumber.replace(/[^\d]/g, '');
+    
+
+    if (isWhatsAppGroupChatId(cleanPhoneNumber)) {
+      return;
+    }
+
+    let contactDisplayName: string | null = null;
+    if (waMsg.pushName && waMsg.pushName.trim()) {
+      contactDisplayName = waMsg.pushName.trim();
+    } else if ((waMsg as any).notify && (waMsg as any).notify.trim()) {
+      contactDisplayName = (waMsg as any).notify.trim();
+    }
+
+
+
+    if (isFromMe) {
+      contactDisplayName = null;
+    }
+
+    const extractedContent = await extractInboundMessageContent(waMsg, connectionId, isHistorySync);
+    if (!extractedContent) {
+      return;
+    }
+    ({ messageType, messageContent, mediaUrl, pendingInboundMediaDownload } = extractedContent);
 
 
 
@@ -4848,8 +5218,8 @@ async function handleIncomingMessage(
         ...(metaReferral ? { metaReferral } : {}),
 
         ...(messageType === 'reaction' && (waMsg as any).reactionMetadata ? (waMsg as any).reactionMetadata : {}),
-        ...(messageType === 'poll' && (waMsg.message.pollCreationMessage || waMsg.message.pollCreationMessageV3) && (() => {
-          const pollCreation = waMsg.message.pollCreationMessage || waMsg.message.pollCreationMessageV3;
+        ...(messageType === 'poll' && (waMsg.message?.pollCreationMessage || waMsg.message?.pollCreationMessageV3) && (() => {
+          const pollCreation = waMsg.message?.pollCreationMessage || waMsg.message?.pollCreationMessageV3;
           return pollCreation ? {
             pollContext: {
               pollName: pollCreation.name || 'Poll',
@@ -4860,15 +5230,15 @@ async function handleIncomingMessage(
             }
           } : {};
         })()),
-        ...(messageType === 'poll_vote' && waMsg.message.pollUpdateMessage && {
+        ...(messageType === 'poll_vote' && waMsg.message?.pollUpdateMessage && {
           pollVote: {
-            pollCreationMessageKey: waMsg.message.pollUpdateMessage.pollCreationMessageKey,
-            encPayload: waMsg.message.pollUpdateMessage.vote?.encPayload,
-            encIv: waMsg.message.pollUpdateMessage.vote?.encIv,
-            senderTimestampMs: waMsg.message.pollUpdateMessage.senderTimestampMs,
+            pollCreationMessageKey: waMsg.message?.pollUpdateMessage.pollCreationMessageKey,
+            encPayload: waMsg.message?.pollUpdateMessage.vote?.encPayload,
+            encIv: waMsg.message?.pollUpdateMessage.vote?.encIv,
+            senderTimestampMs: waMsg.message?.pollUpdateMessage.senderTimestampMs,
 
-            ...(typeof (waMsg.message.pollUpdateMessage as any).decryptedSelectedIndex === 'number' && {
-              selectedIndex: (waMsg.message.pollUpdateMessage as any).decryptedSelectedIndex
+            ...(typeof (waMsg.message?.pollUpdateMessage as any).decryptedSelectedIndex === 'number' && {
+              selectedIndex: (waMsg.message?.pollUpdateMessage as any).decryptedSelectedIndex
             })
           }
         }),
@@ -5458,52 +5828,7 @@ export async function sendWhatsAppAudioMessage(
 
     if (isGroupChat) {
       const groupJid = phoneNumber;
-      conversation = await storage.getConversationByGroupJid(groupJid);
-
-      if (!conversation) {
-        const user = await storage.getUser(userId);
-        const companyId = user?.companyId;
-
-        let groupName = groupJid.split('@')[0];
-        let groupMetadata = null;
-
-        try {
-          const metadata = await sock.groupMetadata(groupJid);
-          groupName = metadata.subject || groupName;
-          groupMetadata = {
-            subject: metadata.subject,
-            desc: metadata.desc,
-            participants: metadata.participants,
-            creation: metadata.creation,
-            owner: metadata.owner
-          };
-        } catch (error) {
-
-        }
-
-        const conversationData: InsertConversation = {
-          companyId: companyId,
-          contactId: null,
-          channelId: connectionId,
-          channelType: 'whatsapp_unofficial',
-          status: 'active',
-          lastMessageAt: new Date(),
-          isGroup: true,
-          groupJid: groupJid,
-          groupName: groupName,
-          groupDescription: groupMetadata?.desc || null,
-          groupParticipantCount: groupMetadata?.participants?.length || 0,
-          groupCreatedAt: groupMetadata?.creation ? new Date(groupMetadata.creation * 1000) : new Date(),
-          groupMetadata: groupMetadata
-        };
-
-        conversation = await storage.createConversation(conversationData);
-
-      } else {
-        conversation = await storage.updateConversation(conversation.id, {
-          lastMessageAt: new Date()
-        });
-      }
+      ({ conversation } = await resolveOrCreateGroupConversation(sock, groupJid, connectionId, userId));
     } else {
       ({ contact, conversation } = await resolveOutboundContactAndConversation({
         to,
@@ -5743,57 +6068,12 @@ export async function sendWhatsAppMessage(
 
     if (isGroupChat) {
       const groupJid = phoneNumber;
-
-      conversation = await storage.getConversationByGroupJid(groupJid);
-
-      if (!conversation) {
-        const user = await storage.getUser(userId);
-        const companyId = user?.companyId;
-
-        let groupName = groupJid.split('@')[0];
-        let groupMetadata = null;
-
-        try {
-          const metadata = await sock.groupMetadata(groupJid);
-          groupName = metadata.subject || groupName;
-          groupMetadata = {
-            subject: metadata.subject,
-            desc: metadata.desc,
-            participants: metadata.participants,
-            creation: metadata.creation,
-            owner: metadata.owner
-          };
-        } catch (error) {
-
-        }
-
-        const conversationData: InsertConversation = {
-          companyId: companyId,
-          contactId: null,
-          channelId: connectionId,
-          channelType: 'whatsapp_unofficial',
-          status: 'active',
-          lastMessageAt: new Date(),
-          isGroup: true,
-          groupJid: groupJid,
-          groupName: groupName,
-          groupDescription: groupMetadata?.desc || null,
-          groupParticipantCount: groupMetadata?.participants?.length || 0,
-          groupCreatedAt: groupMetadata?.creation ? new Date(groupMetadata.creation * 1000) : new Date(),
-          groupMetadata: groupMetadata
-        };
-
-        conversation = await storage.createConversation(conversationData);
-
-
-
+      const groupResolution = await resolveOrCreateGroupConversation(sock, groupJid, connectionId, userId);
+      conversation = groupResolution.conversation;
+      if (groupResolution.created) {
         broadcastNewConversation({
           ...conversation,
           contact: null
-        });
-      } else {
-        conversation = await storage.updateConversation(conversation.id, {
-          lastMessageAt: new Date()
         });
       }
     } else {
@@ -6116,57 +6396,12 @@ export async function sendQuotedMessage(
 
     if (isGroupChat) {
       const groupJid = phoneNumber;
-
-      conversation = await storage.getConversationByGroupJid(groupJid);
-
-      if (!conversation) {
-        const user = await storage.getUser(userId);
-        const companyId = user?.companyId;
-
-        let groupName = groupJid.split('@')[0];
-        let groupMetadata = null;
-
-        try {
-          const metadata = await sock.groupMetadata(groupJid);
-          groupName = metadata.subject || groupName;
-          groupMetadata = {
-            subject: metadata.subject,
-            desc: metadata.desc,
-            participants: metadata.participants,
-            creation: metadata.creation,
-            owner: metadata.owner
-          };
-        } catch (error) {
-
-        }
-
-        const conversationData: InsertConversation = {
-          companyId: companyId,
-          contactId: null,
-          channelId: connectionId,
-          channelType: 'whatsapp_unofficial',
-          status: 'active',
-          lastMessageAt: new Date(),
-          isGroup: true,
-          groupJid: groupJid,
-          groupName: groupName,
-          groupDescription: groupMetadata?.desc || null,
-          groupParticipantCount: groupMetadata?.participants?.length || 0,
-          groupCreatedAt: groupMetadata?.creation ? new Date(groupMetadata.creation * 1000) : new Date(),
-          groupMetadata: groupMetadata
-        };
-
-        conversation = await storage.createConversation(conversationData);
-
-
-
+      const groupResolution = await resolveOrCreateGroupConversation(sock, groupJid, connectionId, userId);
+      conversation = groupResolution.conversation;
+      if (groupResolution.created) {
         broadcastNewConversation({
           ...conversation,
           contact: null
-        });
-      } else {
-        conversation = await storage.updateConversation(conversation.id, {
-          lastMessageAt: new Date()
         });
       }
     } else {
@@ -6481,57 +6716,12 @@ export async function sendWhatsAppMediaMessage(
 
     if (isGroupChat) {
       const groupJid = phoneNumber;
-
-      conversation = await storage.getConversationByGroupJid(groupJid);
-
-      if (!conversation) {
-        const user = await storage.getUser(userId);
-        const companyId = user?.companyId;
-
-        let groupName = groupJid.split('@')[0];
-        let groupMetadata = null;
-
-        try {
-          const metadata = await sock.groupMetadata(groupJid);
-          groupName = metadata.subject || groupName;
-          groupMetadata = {
-            subject: metadata.subject,
-            desc: metadata.desc,
-            participants: metadata.participants,
-            creation: metadata.creation,
-            owner: metadata.owner
-          };
-        } catch (error) {
-
-        }
-
-        const conversationData: InsertConversation = {
-          companyId: companyId,
-          contactId: null,
-          channelId: connectionId,
-          channelType: 'whatsapp_unofficial',
-          status: 'active',
-          lastMessageAt: new Date(),
-          isGroup: true,
-          groupJid: groupJid,
-          groupName: groupName,
-          groupDescription: groupMetadata?.desc || null,
-          groupParticipantCount: groupMetadata?.participants?.length || 0,
-          groupCreatedAt: groupMetadata?.creation ? new Date(groupMetadata.creation * 1000) : new Date(),
-          groupMetadata: groupMetadata
-        };
-
-        conversation = await storage.createConversation(conversationData);
-
-
-
+      const groupResolution = await resolveOrCreateGroupConversation(sock, groupJid, connectionId, userId);
+      conversation = groupResolution.conversation;
+      if (groupResolution.created) {
         broadcastNewConversation({
           ...conversation,
           contact: null
-        });
-      } else {
-        conversation = await storage.updateConversation(conversation.id, {
-          lastMessageAt: new Date()
         });
       }
     } else {
@@ -8266,7 +8456,11 @@ async function processHistorySyncData(
 
     for (const chat of chats) {
       try {
-        if (chat.id && !chat.id.includes('@broadcast')) {
+        // Group chats are handled by the live inbound path (handleIncomingGroupMessage),
+        // gated on whatsappGroupsEnabled. This loop only ever creates 1:1 contacts/
+        // conversations, so a group JID here would otherwise be misread as a phone
+        // number and produce a junk contact plus a fake 1:1 conversation.
+        if (chat.id && !chat.id.includes('@broadcast') && !chat.id.includes('@g.us')) {
           const phoneNumber = chat.id.split('@')[0];
           let contact = await storage.getContactByIdentifier(phoneNumber, 'whatsapp');
 

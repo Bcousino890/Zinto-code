@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { PipelineFilters } from '@shared/types/pipeline-filters';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface Pipeline {
   id: number;
@@ -42,6 +43,7 @@ interface PipelineProviderProps {
 export function PipelineProvider({ children, syncUrl = true }: PipelineProviderProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [activePipelineId, setActivePipelineIdState] = useState<number | null>(null);
   const [filters, setFiltersState] = useState<PipelineFilters>({});
   const urlUpdateTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -78,15 +80,15 @@ export function PipelineProvider({ children, syncUrl = true }: PipelineProviderP
         if (typeof parsedFilters === 'object' && parsedFilters !== null) {
           setFiltersState(parsedFilters);
           toast({
-            title: 'Filters loaded',
-            description: 'Filters loaded from URL',
+            title: t('common.filters_loaded', 'Filters loaded'),
+            description: t('common.filters_loaded_from_url', 'Filters loaded from URL'),
           });
         }
       } catch (error) {
         console.error('Error parsing filters from URL:', error);
         toast({
-          title: 'Invalid filters',
-          description: 'Could not load filters from URL. Using default filters.',
+          title: t('common.invalid_filters', 'Invalid filters'),
+          description: t('common.invalid_filters_description', 'Could not load filters from URL. Using default filters.'),
           variant: 'destructive',
         });
         // Clear the invalid filters param from URL
@@ -298,3 +300,4 @@ export function usePipeline(): PipelineContextType {
   }
   return context;
 }
+

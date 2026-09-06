@@ -3935,6 +3935,25 @@ async function extractInboundMessageContent(
   let pendingInboundMediaDownload = false;
 
     if (waMsg.message) {
+      // Unwrap ephemeral (disappearing messages) and view-once wrappers so the real
+      // message type is detected below instead of falling through to 'Unsupported
+      // message type' — these only wrap an ordinary image/video/text message inside
+      // `.message`, they carry no content of their own. Nesting (e.g. an ephemeral
+      // view-once photo) needs more than one unwrap pass.
+      const WRAPPER_KEYS = ['ephemeralMessage', 'viewOnceMessageV2Extension', 'viewOnceMessageV2', 'viewOnceMessage'] as const;
+      let innerMessage: any = waMsg.message;
+      for (let depth = 0; depth < 4; depth++) {
+        const wrapperKey = WRAPPER_KEYS.find((key) => innerMessage?.[key]?.message);
+        if (!wrapperKey) break;
+        innerMessage = innerMessage[wrapperKey].message;
+      }
+      if (innerMessage !== waMsg.message) {
+        waMsg = { ...waMsg, message: innerMessage };
+      }
+      if (!waMsg.message) {
+        return null;
+      }
+
       if (waMsg.message.protocolMessage) {
         return null;
       }

@@ -797,7 +797,6 @@ export default function MessageBubble({ message, contact, channelType, onReply, 
               alt={displayTitle}
               className="link-preview-image"
               loading="lazy"
-              crossOrigin="anonymous"
             />
           </div>
         )}

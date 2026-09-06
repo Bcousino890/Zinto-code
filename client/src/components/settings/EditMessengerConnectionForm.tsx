@@ -11,6 +11,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { TestTube, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
 
 interface MessengerFormData {
@@ -32,6 +33,7 @@ interface Props {
 
 export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connectionId }: Props) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [testingWebhook, setTestingWebhook] = useState(false);
   const [loadingConnection, setLoadingConnection] = useState(false);
@@ -57,7 +59,7 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
     try {
       const response = await fetch(`/api/channel-connections/${connectionId}`);
       if (!response.ok) {
-        throw new Error('Failed to load connection data');
+        throw new Error(t('settings.telegramConnectionForm.edit.toast.loadConnectionFailed', 'Failed to load connection data'));
       }
       
       const connection = await response.json();
@@ -75,8 +77,8 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
     } catch (error: any) {
       console.error('Error loading connection data:', error);
       toast({
-        title: "Error",
-        description: "Failed to load connection data. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('settings.instagram_connection.load_failed_description', 'Failed to load connection data. Please try again.'),
         variant: "destructive"
       });
     } finally {
@@ -104,8 +106,8 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
   const testWebhookConnection = async () => {
     if (!formData.webhookUrl || !formData.verifyToken) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in webhook URL and verify token first.",
+        title: t('common.validation_error', 'Validation Error'),
+        description: t('settings.instagram_connection.webhook_required_error', 'Please fill in webhook URL and verify token first.'),
         variant: "destructive"
       });
       return;
@@ -113,8 +115,8 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
 
     if (!validateWebhookUrl(formData.webhookUrl)) {
       toast({
-        title: "Invalid Webhook URL",
-        description: "Webhook URL must be HTTPS and point to /api/webhooks/messenger endpoint.",
+        title: t('settings.instagram_connection.invalid_webhook_url', 'Invalid Webhook URL'),
+        description: t('settings.messenger_connection.invalid_webhook_url_desc', 'Webhook URL must be HTTPS and point to /api/webhooks/messenger endpoint.'),
         variant: "destructive"
       });
       return;
@@ -135,17 +137,17 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
 
       if (response.ok) {
         toast({
-          title: "Webhook Test Successful",
-          description: "Your webhook configuration is valid and reachable.",
+          title: t('settings.instagram_connection.webhook_test_successful', 'Webhook Test Successful'),
+          description: t('settings.instagram_connection.webhook_test_successful_description', 'Your webhook configuration is valid and reachable.'),
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Webhook test failed');
+        throw new Error(errorData.message || t('settings.messenger_connection.webhook_test_failed_fallback', 'Webhook test failed'));
       }
     } catch (error: any) {
       toast({
-        title: "Webhook Test Failed",
-        description: error.message || "Could not validate webhook configuration.",
+        title: t('settings.instagram_connection.webhook_test_failed', 'Webhook Test Failed'),
+        description: error.message || t('settings.instagram_connection.webhook_test_failed_description', 'Could not validate webhook configuration.'),
         variant: "destructive"
       });
     } finally {
@@ -159,8 +161,8 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
 
     if (!formData.accountName || !formData.pageId || !formData.appId || !formData.webhookUrl || !formData.verifyToken) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields.",
+        title: t('common.validation_error', 'Validation Error'),
+        description: t('settings.instagram_connection.required_fields_error', 'Please fill in all required fields.'),
         variant: "destructive"
       });
       setLoading(false);
@@ -201,14 +203,14 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update Messenger connection');
+        throw new Error(errorData.message || t('settings.messenger_connection.update_failed', 'Failed to update Messenger connection'));
       }
 
       await response.json();
       
       toast({
-        title: "Messenger Updated",
-        description: "Your Facebook page connection has been updated successfully.",
+        title: t('settings.messenger_connection.updated_title', 'Messenger Updated'),
+        description: t('settings.messenger_connection.updated_desc', 'Your Facebook page connection has been updated successfully.'),
       });
 
       onSuccess();
@@ -216,8 +218,8 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
     } catch (error: any) {
       console.error('Error updating Messenger connection:', error);
       toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update Facebook page connection. Please check your credentials and try again.",
+        title: t('settings.instagram_connection.update_failed', 'Update Failed'),
+        description: error.message || t('settings.messenger_connection.update_failed_desc', 'Failed to update Facebook page connection. Please check your credentials and try again.'),
         variant: "destructive"
       });
     } finally {
@@ -235,38 +237,37 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit Facebook Messenger Connection</DialogTitle>
+          <DialogTitle>{t('settings.messenger_connection.edit_title', 'Edit Facebook Messenger Connection')}</DialogTitle>
           <DialogDescription>
-            Update your Facebook page connection settings.
-            You'll need your Meta for Developers credentials.
+            {t('settings.messenger_connection.edit_description', "Update your Facebook page connection settings. You'll need your Meta for Developers credentials.")}
           </DialogDescription>
         </DialogHeader>
         
         {loadingConnection ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin mr-2" />
-            Loading connection data...
+            {t('settings.instagram_connection.loading_connection_data', 'Loading connection data...')}
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="accountName">Account Name *</Label>
+                <Label htmlFor="accountName">{t('settings.instagram_connection.account_name_label', 'Account Name *')}</Label>
                 <Input
                   id="accountName"
                   name="accountName"
                   value={formData.accountName}
                   onChange={handleInputChange}
-                  placeholder="e.g. My Facebook Page"
+                  placeholder={t('settings.messenger_connection.account_name_placeholder', 'e.g. My Facebook Page')}
                   required
                 />
                 <p className="text-sm text-gray-500">
-                  A name to identify this connection
+                  {t('settings.instagram_connection.account_name_help', 'A name to identify this connection')}
                 </p>
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="pageId">Facebook Page ID *</Label>
+                <Label htmlFor="pageId">{t('settings.messenger_connection.page_id_label', 'Facebook Page ID *')}</Label>
                 <Input
                   id="pageId"
                   name="pageId"
@@ -276,60 +277,60 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
                   required
                 />
                 <p className="text-sm text-gray-500">
-                  Your Facebook Page ID from Meta for Developers
+                  {t('settings.messenger_connection.page_id_help', 'Your Facebook Page ID from Meta for Developers')}
                 </p>
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="accessToken">Page Access Token</Label>
+                <Label htmlFor="accessToken">{t('settings.messenger_connection.page_access_token_label', 'Page Access Token')}</Label>
                 <Input
                   id="accessToken"
                   name="accessToken"
                   type="password"
                   value={formData.accessToken}
                   onChange={handleInputChange}
-                  placeholder="Enter new access token (leave empty to keep current)"
+                  placeholder={t('settings.instagram_connection.access_token_update_placeholder', 'Enter new access token (leave empty to keep current)')}
                 />
                 <p className="text-sm text-gray-500">
-                  Long-lived page access token from Meta for Developers. Leave empty to keep current token.
+                  {t('settings.messenger_connection.page_access_token_help', 'Long-lived page access token from Meta for Developers. Leave empty to keep current token.')}
                 </p>
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="appId">App ID *</Label>
+                <Label htmlFor="appId">{t('settings.instagram_connection.app_id_label', 'App ID *')}</Label>
                 <Input
                   id="appId"
                   name="appId"
                   value={formData.appId}
                   onChange={handleInputChange}
-                  placeholder="Your app ID"
+                  placeholder={t('settings.instagram_connection.app_id_placeholder', 'Your app ID')}
                   required
                 />
                 <p className="text-sm text-gray-500">
-                  Your Meta app ID
+                  {t('settings.instagram_connection.app_id_help', 'Your Meta app ID')}
                 </p>
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="appSecret">App Secret</Label>
+                <Label htmlFor="appSecret">{t('whatsapp_business.app_secret', 'App Secret')}</Label>
                 <Input
                   id="appSecret"
                   name="appSecret"
                   type="password"
                   value={formData.appSecret}
                   onChange={handleInputChange}
-                  placeholder="Enter new app secret (leave empty to keep current)"
+                  placeholder={t('settings.instagram_connection.app_secret_update_placeholder', 'Enter new app secret (leave empty to keep current)')}
                 />
                 <p className="text-sm text-gray-500">
-                  Your Meta app secret (optional, for webhook verification). Leave empty to keep current secret.
+                  {t('settings.messenger_connection.app_secret_update_help', 'Your Meta app secret (optional, for webhook verification). Leave empty to keep current secret.')}
                 </p>
               </div>
 
               <div className="border-t pt-4">
-                <h4 className="font-medium mb-3">Webhook Configuration</h4>
+                <h4 className="font-medium mb-3">{t('settings.instagram_connection.webhook_configuration', 'Webhook Configuration')}</h4>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="webhookUrl">Webhook URL *</Label>
+                  <Label htmlFor="webhookUrl">{t('settings.instagram_connection.webhook_url_label', 'Webhook URL *')}</Label>
                   <Input
                     id="webhookUrl"
                     name="webhookUrl"
@@ -339,22 +340,22 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
                     required
                   />
                   <p className="text-sm text-gray-500">
-                    This URL will receive webhook events from Meta. Configure this in your Meta Developer Console.
+                    {t('settings.instagram_connection.webhook_url_help', 'This URL will receive webhook events from Meta. Configure this in your Meta Developer Console.')}
                   </p>
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="verifyToken">Webhook Verify Token *</Label>
+                  <Label htmlFor="verifyToken">{t('settings.instagram_connection.verify_token_label', 'Webhook Verify Token *')}</Label>
                   <Input
                     id="verifyToken"
                     name="verifyToken"
                     value={formData.verifyToken}
                     onChange={handleInputChange}
-                    placeholder="Enter a secure verify token"
+                    placeholder={t('settings.instagram_connection.verify_token_placeholder', 'Enter a secure verify token')}
                     required
                   />
                   <p className="text-sm text-gray-500">
-                    A secure token for webhook verification. Use the same token in your Meta Developer Console.
+                    {t('settings.instagram_connection.verify_token_help', 'A secure token for webhook verification. Use the same token in your Meta Developer Console.')}
                   </p>
                 </div>
 
@@ -368,7 +369,7 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
                     className="flex items-center gap-2"
                   >
                     <TestTube className="h-4 w-4" />
-                    {testingWebhook ? 'Testing...' : 'Test Webhook'}
+                    {testingWebhook ? t('settings.instagram_connection.testing_webhook', 'Testing...') : t('whatsapp_business.test_webhook', 'Test Webhook')}
                   </Button>
                   <Button
                     type="button"
@@ -378,7 +379,7 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
                     className="flex items-center gap-2"
                   >
                     <ExternalLink className="h-4 w-4" />
-                    Meta Docs
+                    {t('settings.instagram_connection.meta_docs', 'Meta Docs')}
                   </Button>
                 </div>
 
@@ -386,12 +387,12 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
                   <div className="flex items-start gap-2">
                     <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
-                      <p className="font-medium mb-1">Setup Instructions:</p>
+                      <p className="font-medium mb-1">{t('settings.instagram_connection.setup_instructions', 'Setup Instructions:')}</p>
                       <ol className="list-decimal list-inside space-y-1 text-xs">
-                        <li>Configure the webhook URL and verify token in your Meta Developer Console</li>
-                        <li>Subscribe to 'messages' and 'messaging_postbacks' webhook fields</li>
-                        <li>Test the webhook connection using the button above</li>
-                        <li>Ensure your page has the necessary permissions</li>
+                        <li>{t('settings.instagram_connection.setup_step_configure_webhook', 'Configure the webhook URL and verify token in your Meta Developer Console')}</li>
+                        <li>{t('settings.messenger_connection.setup_step_subscribe_fields', "Subscribe to 'messages' and 'messaging_postbacks' webhook fields")}</li>
+                        <li>{t('settings.instagram_connection.setup_step_test_webhook', 'Test the webhook connection using the button above')}</li>
+                        <li>{t('settings.messenger_connection.setup_step_permissions', 'Ensure your page has the necessary permissions')}</li>
                       </ol>
                     </div>
                   </div>
@@ -401,10 +402,10 @@ export function EditMessengerConnectionForm({ isOpen, onClose, onSuccess, connec
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={handleClose} disabled={loading || loadingConnection}>
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button type="submit" variant="outline" className="btn-brand-primary" disabled={loading || loadingConnection}>
-                {loading ? 'Updating...' : 'Update Connection'}
+                {loading ? t('common.updating', 'Updating...') : t('settings.instagram_connection.update_connection', 'Update Connection')}
               </Button>
             </DialogFooter>
           </form>

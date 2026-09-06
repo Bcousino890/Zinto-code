@@ -702,11 +702,11 @@ export default function ERPSalesOrdersPage() {
     onSuccess: (labels) => {
       setKanbanLabels(labels);
       queryClient.setQueryData(['/api/erp/sales-orders/kanban-labels', companyId], labels);
-      toast({ title: 'Kanban column name saved' });
+      toast({ title: t('erp.salesOrders.kanban.columnNameSaved', 'Kanban column name saved') });
     },
     onError: (e: Error) => {
       setKanbanLabels(savedKanbanLabels);
-      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+      toast({ title: t('erp.common.error', 'Error'), description: e.message, variant: 'destructive' });
     },
   });
 
@@ -886,13 +886,18 @@ export default function ERPSalesOrdersPage() {
       return json.data as SalesOrderRow;
     },
     onSuccess: () => {
-      toast({ title: createMode === 'quotation' ? 'Quotation created' : 'Order created' });
+      toast({
+        title:
+          createMode === 'quotation'
+            ? t('erp.salesOrders.quotationCreated', 'Quotation created')
+            : t('erp.salesOrders.orderCreated', 'Order created'),
+      });
       setCreateOpen(false);
       resetCreateForm();
       invalidateSalesOrders();
     },
     onError: (e: Error) => {
-      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+      toast({ title: t('erp.common.error', 'Error'), description: e.message, variant: 'destructive' });
     },
   });
 
@@ -904,16 +909,23 @@ export default function ERPSalesOrdersPage() {
     if (!order) return;
     if (order.status === destStatus) return;
     if (!isTransitionAllowed(order.status, destStatus)) {
-      toast({ title: 'Invalid move', description: `Cannot move from ${order.status} to ${destStatus}.`, variant: 'destructive' });
+      toast({
+        title: t('erp.salesOrders.invalidMove', 'Invalid move'),
+        description: t('erp.salesOrders.invalidMoveDesc', 'Cannot move from {{from}} to {{to}}.', {
+          from: order.status,
+          to: destStatus,
+        }),
+        variant: 'destructive',
+      });
       return;
     }
     try {
       await transitionOrderApi(orderId, order.status, destStatus);
-      toast({ title: 'Order updated' });
+      toast({ title: t('erp.salesOrders.orderUpdated', 'Order updated') });
       invalidateSalesOrders();
     } catch (e) {
       toast({
-        title: 'Error',
+        title: t('erp.common.error', 'Error'),
         description: e instanceof Error ? e.message : String(e),
         variant: 'destructive',
       });
@@ -935,12 +947,12 @@ export default function ERPSalesOrdersPage() {
       });
     },
     onSuccess: () => {
-      toast({ title: 'Line item added' });
+      toast({ title: t('erp.salesOrders.lineItemAdded', 'Line item added') });
       resetLineItemForm();
       invalidateDetail();
       invalidateSalesOrders();
     },
-    onError: (e: Error) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: Error) => toast({ title: t('erp.common.error', 'Error'), description: e.message, variant: 'destructive' }),
   });
 
   const deleteLineMutation = useMutation({
@@ -948,11 +960,11 @@ export default function ERPSalesOrdersPage() {
       await apiRequest('DELETE', `/api/erp/sales-orders/${orderId}/items/${itemId}`);
     },
     onSuccess: () => {
-      toast({ title: 'Line removed' });
+      toast({ title: t('erp.purchaseOrders.toast.lineRemoved', 'Line removed') });
       invalidateDetail();
       invalidateSalesOrders();
     },
-    onError: (e: Error) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: Error) => toast({ title: t('erp.common.error', 'Error'), description: e.message, variant: 'destructive' }),
   });
 
   const actionMutation = useMutation({
@@ -969,11 +981,11 @@ export default function ERPSalesOrdersPage() {
       await apiRequest('POST', `/api/erp/sales-orders/${orderId}/${p}`, {});
     },
     onSuccess: () => {
-      toast({ title: 'Updated' });
+      toast({ title: t('erp.salesOrders.updated', 'Updated') });
       invalidateDetail();
       invalidateSalesOrders();
     },
-    onError: (e: Error) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: Error) => toast({ title: t('erp.common.error', 'Error'), description: e.message, variant: 'destructive' }),
   });
 
   const generateInvoiceMutation = useMutation({
@@ -992,7 +1004,7 @@ export default function ERPSalesOrdersPage() {
       // Navigate to the invoice
       window.location.href = `/erp/invoices?detail=${invoice.id}`;
     },
-    onError: (e: Error) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: Error) => toast({ title: t('erp.common.error', 'Error'), description: e.message, variant: 'destructive' }),
   });
 
   const deleteOrderMutation = useMutation({
@@ -1004,7 +1016,7 @@ export default function ERPSalesOrdersPage() {
       invalidateSalesOrders();
       setDeleteConfirmId(null);
     },
-    onError: (e: Error) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: Error) => toast({ title: t('erp.common.error', 'Error'), description: e.message, variant: 'destructive' }),
   });
 
   const onPickProduct = (product: ProductPickerOption | null) => {

@@ -686,8 +686,8 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
           console.log('[CallScreenModal] Audio device change detected', lostActiveDevices.map(d => d.label));
           if (lostActiveDevices.length > 0) {
             toast({
-              title: 'Audio device disconnected',
-              description: 'Switching to default device.',
+              title: t('conversations.call_screen_modal.audio_device_disconnected_title', 'Audio device disconnected'),
+              description: t('conversations.call_screen_modal.audio_device_disconnected_description', 'Switching to default device.'),
               variant: 'default'
             });
             callMetricsLog.current.push({ type: 'audio_device_change', timestamp: Date.now(), data: { lost: lostActiveDevices.map(d => d.label) } });
@@ -833,9 +833,9 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
         const mos = warningData?.mos as number | undefined;
         const rtt = warningData?.rtt as number | undefined;
         if (mos != null && mos < 3.0) {
-          toast({ title: 'Poor call quality', description: `Quality score low (${mos.toFixed(1)}). Connection may be unstable.`, variant: 'destructive' });
+          toast({ title: t('conversations.call_screen_modal.poor_call_quality_title', 'Poor call quality'), description: t('conversations.call_screen_modal.poor_call_quality_description', 'Quality score low ({{score}}). Connection may be unstable.', { score: mos.toFixed(1) }), variant: 'destructive' });
         } else if (rtt != null && rtt > 600) {
-          toast({ title: 'High latency', description: `Latency is high (${Math.round(rtt)}ms). You may notice delay.`, variant: 'destructive' });
+          toast({ title: t('conversations.call_screen_modal.high_latency_title', 'High latency'), description: t('conversations.call_screen_modal.high_latency_description', 'Latency is high ({{ms}}ms). You may notice delay.', { ms: Math.round(rtt) }), variant: 'destructive' });
         }
       });
 
@@ -869,7 +869,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
           clearTimeout(reconnectionTimeoutRef.current);
           reconnectionTimeoutRef.current = null;
         }
-        toast({ title: 'Call reconnected', description: 'Call reconnected successfully.', variant: 'default' });
+        toast({ title: t('conversations.call_screen_modal.call_reconnected_title', 'Call reconnected'), description: t('conversations.call_screen_modal.call_reconnected_description', 'Call reconnected successfully.'), variant: 'default' });
         callMetricsLog.current.push({ type: 'call_reconnected', timestamp: Date.now() });
         setCallQualityWarnings([]);
       });
@@ -1295,7 +1295,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
     applyMediaFallback(true);
     setIsQualityDegraded(true);
     callMetricsLog.current.push({ type: 'quality_degraded', timestamp: Date.now() });
-    toast({ title: 'Call quality optimized', description: 'Call quality optimized for poor network.', variant: 'default' });
+    toast({ title: t('conversations.call_screen_modal.call_quality_optimized_title', 'Call quality optimized'), description: t('conversations.call_screen_modal.call_quality_optimized_description', 'Call quality optimized for poor network.'), variant: 'default' });
   }, [applyMediaFallback]);
 
   const restoreCallQuality = useCallback(() => {

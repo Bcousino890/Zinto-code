@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { apiRequest } from '@/lib/queryClient';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/use-translation';
 
 export type ProductPickerOption = {
   id: number;
@@ -33,11 +34,13 @@ export function ProductPicker({
   companyId,
   value,
   onChange,
-  placeholder = 'Select product',
+  placeholder,
   disabled = false,
   queryKeyScope,
   menuItemsOnly = false,
 }: ProductPickerProps) {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t('erp.products.structured.selectProduct', 'Select product');
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   useEffect(() => {
@@ -89,7 +92,7 @@ export function ProductPicker({
           disabled={disabled || !companyId}
         >
           <span className="truncate text-left">
-            {value ? `${value.name}${value.sku ? ` (${value.sku})` : ''}` : placeholder}
+            {value ? `${value.name}${value.sku ? ` (${value.sku})` : ''}` : resolvedPlaceholder}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -97,7 +100,7 @@ export function ProductPicker({
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="Search products or variant SKU..."
+            placeholder={t('erp.product_picker.search_placeholder', 'Search products or variant SKU...')}
             value={search}
             onValueChange={(nextValue) => {
               setSearch(nextValue);
@@ -111,16 +114,16 @@ export function ProductPicker({
                 setOpen(false);
               }}
             >
-              Clear selection
+              {t('erp.product_picker.clear_selection', 'Clear selection')}
             </CommandItem>
             {isLoading ? (
               <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading products...
+                {t('erp.product_picker.loading', 'Loading products...')}
               </div>
             ) : (
               <>
-                <CommandEmpty>No products found.</CommandEmpty>
+                <CommandEmpty>{t('erp.product_picker.no_products_found', 'No products found.')}</CommandEmpty>
                 {options.map((product) => (
                   <CommandItem
                     key={product.id}
@@ -136,7 +139,7 @@ export function ProductPicker({
                     <div className="min-w-0">
                       <div className="truncate">{product.name}</div>
                       <div className="truncate text-xs text-muted-foreground">
-                        {[product.sku, product.preparationTimeMinutes != null ? `~${product.preparationTimeMinutes} min` : null]
+                        {[product.sku, product.preparationTimeMinutes != null ? t('erp.product_picker.prep_time', '~{{minutes}} min', { minutes: product.preparationTimeMinutes }) : null]
                           .filter(Boolean)
                           .join(' · ') || ' '}
                       </div>
@@ -153,7 +156,7 @@ export function ProductPicker({
                       disabled={isFetchingNextPage}
                     >
                       {isFetchingNextPage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Load more
+                      {t('erp.product_picker.load_more', 'Load more')}
                     </Button>
                   </div>
                 ) : null}

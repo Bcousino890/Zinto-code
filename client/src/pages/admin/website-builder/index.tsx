@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { Link } from 'wouter';
 import AdminLayout from '@/components/admin/AdminLayout';
 
@@ -21,6 +22,7 @@ interface Website {
 
 export default function WebsiteBuilderIndex() {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
 
@@ -42,21 +44,21 @@ export default function WebsiteBuilderIndex() {
         method: 'DELETE'
       });
       if (!response.ok) {
-        throw new Error('Failed to delete website');
+        throw new Error(t('admin.website_builder.delete_failed', 'Failed to delete website'));
       }
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-websites'] });
       toast({
-        title: 'Success',
-        description: 'Website deleted successfully'
+        title: t('common.success', 'Success'),
+        description: t('admin.website_builder.delete_success', 'Website deleted successfully')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to delete website',
+        title: t('common.error', 'Error'),
+        description: error.message || t('admin.website_builder.delete_failed', 'Failed to delete website'),
         variant: 'destructive'
       });
     }
@@ -69,28 +71,33 @@ export default function WebsiteBuilderIndex() {
         method: 'POST'
       });
       if (!response.ok) {
-        throw new Error(`Failed to ${action} website`);
+        const actionLabel = action === 'publish'
+          ? t('admin.website_builder.publish_verb', 'publish')
+          : t('admin.website_builder.unpublish_verb', 'unpublish');
+        throw new Error(t('admin.website_builder.action_failed', 'Failed to {{action}} website', { action: actionLabel }));
       }
       return response.json();
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['admin-websites'] });
       toast({
-        title: 'Success',
-        description: `Website ${variables.action}ed successfully`
+        title: t('common.success', 'Success'),
+        description: variables.action === 'publish'
+          ? t('admin.website_builder.publish_success', 'Website published successfully')
+          : t('admin.website_builder.unpublish_success', 'Website unpublished successfully')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to update website status',
+        title: t('common.error', 'Error'),
+        description: error.message || t('admin.website_builder.update_status_failed', 'Failed to update website status'),
         variant: 'destructive'
       });
     }
   });
 
   const handleDelete = (websiteId: number, title: string) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
+    if (window.confirm(t('admin.website_builder.confirm_delete', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title }))) {
       deleteWebsiteMutation.mutate(websiteId);
     }
   };
@@ -103,11 +110,11 @@ export default function WebsiteBuilderIndex() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'published':
-        return <Badge className="bg-green-100 text-green-800">Published</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('pages.published', 'Published')}</Badge>;
       case 'draft':
-        return <Badge className="bg-yellow-100 text-yellow-800">Draft</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('pages.draft', 'Draft')}</Badge>;
       case 'archived':
-        return <Badge className="bg-gray-100 text-gray-800">Archived</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">{t('flows.archived', 'Archived')}</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -119,8 +126,8 @@ export default function WebsiteBuilderIndex() {
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold">Website Builder</h1>
-              <p className="text-gray-600">Manage your website pages and templates</p>
+              <h1 className="text-2xl font-bold">{t('admin.website_builder.title', 'Website Builder')}</h1>
+              <p className="text-gray-600">{t('admin.website_builder.subtitle_loading', 'Manage your website pages and templates')}</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -146,10 +153,10 @@ export default function WebsiteBuilderIndex() {
       <AdminLayout>
         <div className="p-6">
           <div className="text-center py-12">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Websites</h2>
-            <p className="text-gray-600 mb-4">Failed to load websites. Please try again.</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('admin.website_builder.error_title', 'Error Loading Websites')}</h2>
+            <p className="text-gray-600 mb-4">{t('admin.website_builder.error_desc', 'Failed to load websites. Please try again.')}</p>
             <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['admin-websites'] })}>
-              Retry
+              {t('common.retry', 'Retry')}
             </Button>
           </div>
         </div>
@@ -162,14 +169,14 @@ export default function WebsiteBuilderIndex() {
       <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Website Builder</h1>
-          <p className="text-gray-600">Manage your website pages</p>
+          <h1 className="text-2xl font-bold">{t('admin.website_builder.title', 'Website Builder')}</h1>
+          <p className="text-gray-600">{t('admin.website_builder.subtitle', 'Manage your website pages')}</p>
         </div>
         <div className="flex gap-2">
           <Link href="/admin/website-builder/new">
             <Button>
               <Plus className="w-4 h-4 mr-2" />
-              New Website
+              {t('admin.website_builder.new_website_button', 'New Website')}
             </Button>
           </Link>
         </div>
@@ -178,12 +185,12 @@ export default function WebsiteBuilderIndex() {
       {websites && websites.length === 0 ? (
         <div className="text-center py-12">
           <Globe className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">No Websites Yet</h2>
-          <p className="text-gray-600 mb-6">Create your first website to get started.</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('admin.website_builder.empty_title', 'No Websites Yet')}</h2>
+          <p className="text-gray-600 mb-6">{t('admin.website_builder.empty_desc', 'Create your first website to get started.')}</p>
           <Link href="/admin/website-builder/new">
             <Button>
               <Plus className="w-4 h-4 mr-2" />
-              Create Website
+              {t('admin.website_builder.create_website_button', 'Create Website')}
             </Button>
           </Link>
         </div>
@@ -204,13 +211,13 @@ export default function WebsiteBuilderIndex() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                  {website.description || 'No description provided'}
+                  {website.description || t('templates.no_description', 'No description provided')}
                 </p>
-                
+
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                  <span>Created: {new Date(website.createdAt).toLocaleDateString()}</span>
+                  <span>{t('pages.created', 'Created')}: {new Date(website.createdAt).toLocaleDateString()}</span>
                   {website.publishedAt && (
-                    <span>Published: {new Date(website.publishedAt).toLocaleDateString()}</span>
+                    <span>{t('pages.published', 'Published')}: {new Date(website.publishedAt).toLocaleDateString()}</span>
                   )}
                 </div>
 
@@ -218,7 +225,7 @@ export default function WebsiteBuilderIndex() {
                   <Link href={`/admin/website-builder/edit/${website.id}`}>
                     <Button size="sm" variant="outline" className="flex-1">
                       <Edit className="w-4 h-4 mr-1" />
-                      Edit
+                      {t('common.edit', 'Edit')}
                     </Button>
                   </Link>
                   
@@ -239,7 +246,7 @@ export default function WebsiteBuilderIndex() {
                     disabled={togglePublishMutation.isPending}
                     className={website.status === 'published' ? 'bg-green-100 text-green-800 hover:bg-green-200' : ''}
                   >
-                    {website.status === 'published' ? 'Unpublish' : 'Publish'}
+                    {website.status === 'published' ? t('pages.unpublish', 'Unpublish') : t('pages.publish', 'Publish')}
                   </Button>
                   
                   <Button

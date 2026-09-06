@@ -74,7 +74,9 @@ import { apiRequest } from '@/lib/queryClient';
 
 interface VariableOption {
   value: string;
+  labelKey: string;
   label: string;
+  descriptionKey: string;
   description: string;
   icon: React.ReactNode;
   category: 'contact' | 'message' | 'system' | 'deal' | 'pipeline';
@@ -83,21 +85,27 @@ interface VariableOption {
 const AVAILABLE_VARIABLES: VariableOption[] = [
   {
     value: 'contact.phone',
+    labelKey: 'flow_builder.update_pipeline_stage_node.var_contact_phone_label',
     label: 'Contact Phone',
+    descriptionKey: 'flow_builder.move_deal_node.var_contact_phone_desc',
     description: 'Phone number of the contact',
     icon: <Phone className="w-4 h-4" />,
     category: 'contact'
   },
   {
     value: 'contact.name',
+    labelKey: 'flow_builder.update_pipeline_stage_node.var_contact_name_label',
     label: 'Contact Name',
+    descriptionKey: 'flow_builder.move_deal_node.var_contact_name_desc',
     description: 'Full name of the contact',
     icon: <User className="w-4 h-4" />,
     category: 'contact'
   },
   {
     value: 'contact.email',
+    labelKey: 'flow_builder.update_pipeline_stage_node.var_contact_email_label',
     label: 'Contact Email',
+    descriptionKey: 'flow_builder.update_pipeline_stage_node.var_contact_email_desc',
     description: 'Email address of the contact',
     icon: <Mail className="w-4 h-4" />,
     category: 'contact'
@@ -105,14 +113,18 @@ const AVAILABLE_VARIABLES: VariableOption[] = [
 
   {
     value: 'message.content',
+    labelKey: 'flow_builder.update_pipeline_stage_node.var_message_content_label',
     label: 'Message Content',
+    descriptionKey: 'flow_builder.update_pipeline_stage_node.var_message_content_desc',
     description: 'Content of the received message',
     icon: <MessageSquare className="w-4 h-4" />,
     category: 'message'
   },
   {
     value: 'message.type',
+    labelKey: 'flow_builder.update_pipeline_stage_node.var_message_type_label',
     label: 'Message Type',
+    descriptionKey: 'flow_builder.update_pipeline_stage_node.var_message_type_desc',
     description: 'Type of the message (text, image, etc.)',
     icon: <Type className="w-4 h-4" />,
     category: 'message'
@@ -120,59 +132,48 @@ const AVAILABLE_VARIABLES: VariableOption[] = [
 
   {
     value: 'date.today',
+    labelKey: 'flow_builder.update_pipeline_stage_node.var_current_date_label',
     label: 'Current Date',
+    descriptionKey: 'flow_builder.update_pipeline_stage_node.var_current_date_desc',
     description: 'Today\'s date',
     icon: <Calendar className="w-4 h-4" />,
     category: 'system'
   },
   {
     value: 'time.now',
+    labelKey: 'flow_builder.update_pipeline_stage_node.var_current_time_label',
     label: 'Current Time',
+    descriptionKey: 'flow_builder.update_pipeline_stage_node.var_current_time_desc',
     description: 'Current time',
     icon: <Calendar className="w-4 h-4" />,
     category: 'system'
   },
-  { 
-    value: 'pipeline.currentPipelineId', 
-    label: 'Current Pipeline ID', 
-    description: 'Current pipeline ID', 
-    icon: <Layers className="w-4 h-4" />, 
-    category: 'deal' 
+  {
+    value: 'pipeline.currentPipelineId',
+    labelKey: 'flow_builder.move_deal_node.var_current_pipeline_id_label',
+    label: 'Current Pipeline ID',
+    descriptionKey: 'flow_builder.move_deal_node.var_current_pipeline_id_desc',
+    description: 'Current pipeline ID',
+    icon: <Layers className="w-4 h-4" />,
+    category: 'deal'
   },
-  { 
-    value: 'pipeline.previousPipelineId', 
-    label: 'Previous Pipeline ID', 
-    description: 'Previous pipeline ID (if moved)', 
-    icon: <Layers className="w-4 h-4" />, 
-    category: 'deal' 
+  {
+    value: 'pipeline.previousPipelineId',
+    labelKey: 'flow_builder.update_pipeline_stage_node.var_previous_pipeline_id_label',
+    label: 'Previous Pipeline ID',
+    descriptionKey: 'flow_builder.update_pipeline_stage_node.var_previous_pipeline_id_desc',
+    description: 'Previous pipeline ID (if moved)',
+    icon: <Layers className="w-4 h-4" />,
+    category: 'deal'
   },
-  { 
-    value: 'pipeline.movedBetweenPipelines', 
-    label: 'Moved Between Pipelines', 
-    description: 'Whether deal moved between pipelines', 
-    icon: <ArrowRightLeft className="w-4 h-4" />, 
-    category: 'deal' 
-  },
-  { 
-    value: 'pipeline.currentPipelineId', 
-    label: 'Current Pipeline ID', 
-    description: 'Current pipeline ID', 
-    icon: <Layers className="w-4 h-4" />, 
-    category: 'deal' 
-  },
-  { 
-    value: 'pipeline.previousPipelineId', 
-    label: 'Previous Pipeline ID', 
-    description: 'Previous pipeline ID (if moved)', 
-    icon: <Layers className="w-4 h-4" />, 
-    category: 'deal' 
-  },
-  { 
-    value: 'pipeline.movedBetweenPipelines', 
-    label: 'Moved Between Pipelines', 
-    description: 'Whether deal moved between pipelines', 
-    icon: <ArrowRightLeft className="w-4 h-4" />, 
-    category: 'deal' 
+  {
+    value: 'pipeline.movedBetweenPipelines',
+    labelKey: 'flow_builder.update_pipeline_stage_node.var_moved_between_pipelines_label',
+    label: 'Moved Between Pipelines',
+    descriptionKey: 'flow_builder.update_pipeline_stage_node.var_moved_between_pipelines_desc',
+    description: 'Whether deal moved between pipelines',
+    icon: <ArrowRightLeft className="w-4 h-4" />,
+    category: 'deal'
   }
 ];
 
@@ -185,12 +186,19 @@ interface VariablePickerProps {
 }
 
 function VariablePicker({ value, onChange, placeholder, className }: VariablePickerProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const filteredVariables = AVAILABLE_VARIABLES.filter(variable =>
+  const translatedVariables = useMemo(() => AVAILABLE_VARIABLES.map(variable => ({
+    ...variable,
+    label: t(variable.labelKey, variable.label),
+    description: t(variable.descriptionKey, variable.description),
+  })), [t]);
+
+  const filteredVariables = translatedVariables.filter(variable =>
     variable.label.toLowerCase().includes(searchValue.toLowerCase()) ||
     variable.value.toLowerCase().includes(searchValue.toLowerCase()) ||
     variable.description.toLowerCase().includes(searchValue.toLowerCase())
@@ -237,11 +245,11 @@ function VariablePicker({ value, onChange, placeholder, className }: VariablePic
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
-      case 'contact': return 'Contact';
-      case 'message': return 'Message';
-      case 'system': return 'System';
-      case 'deal': return 'Deal';
-      case 'pipeline': return 'Pipeline';
+      case 'contact': return t('flow_builder.condition_domains.contact', 'Contact');
+      case 'message': return t('flow_builder.condition_domains.message', 'Message');
+      case 'system': return t('flow_builder.move_deal_node.category_system', 'System');
+      case 'deal': return t('flow_builder.condition_domains.deal', 'Deal');
+      case 'pipeline': return t('flow_builder.node_types.pipeline', 'Pipeline');
       default: return category;
     }
   };
@@ -271,12 +279,12 @@ function VariablePicker({ value, onChange, placeholder, className }: VariablePic
         <PopoverContent className="w-80 p-0" align="start">
           <Command>
             <CommandInput
-              placeholder="Search variables..."
+              placeholder={t('flow_builder.variable_browser_search_placeholder', 'Search variables...')}
               value={searchValue}
               onValueChange={setSearchValue}
             />
             <CommandList>
-              <CommandEmpty>No variables found.</CommandEmpty>
+              <CommandEmpty>{t('flow_builder.google_sheets.no_variables_found', 'No variables found.')}</CommandEmpty>
 
               {Object.entries(groupedVariables).map(([category, variables]) => (
                 <CommandGroup
@@ -363,6 +371,7 @@ function UpdatePipelineStageNode({
   selected,
   isConnectable
 }: NodeProps<UpdatePipelineStageData>) {
+  const { t } = useTranslation();
   const { onDeleteNode, onDuplicateNode } = useFlowContext();
   const { getNodes, setNodes } = useReactFlow();
   const [showToolbar, setShowToolbar] = useState(false);
@@ -654,7 +663,7 @@ function UpdatePipelineStageNode({
                 onValueChange={handleOperationChange}
               >
                 <SelectTrigger className="h-8">
-                  <SelectValue placeholder="Select operation" />
+                  <SelectValue placeholder={t('flow_builder.select_operation', 'Select operation')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="update_stage">
@@ -678,13 +687,13 @@ function UpdatePipelineStageNode({
                   <SelectItem value="update_deal">
                     <div className="flex items-center gap-2">
                       <Target className="w-3 h-3" />
-                      Update Deal
+                      {t('pipeline.update_deal', 'Update Deal')}
                     </div>
                   </SelectItem>
                   <SelectItem value="manage_tags">
                     <div className="flex items-center gap-2">
                       <Tag className="w-3 h-3" />
-                      Manage Tags
+                      {t('flow_builder.update_pipeline_stage_node.manage_tags', 'Manage Tags')}
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -695,30 +704,30 @@ function UpdatePipelineStageNode({
               <div className="space-y-2">
                 <Label className="text-xs font-medium flex items-center gap-1">
                   <Layers className="w-3 h-3" />
-                  Pipeline
+                  {t('nav.pipeline', 'Pipeline')}
                   <Tooltip>
                     <TooltipTrigger>
                       <HelpCircle className="w-3 h-3 text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Select pipeline to filter available stages. Deals can only be moved to stages within their pipeline. For cross-pipeline moves, use the "Move Deal to Pipeline" node.</p>
+                      <p>{t('flow_builder.update_pipeline_stage_node.pipeline_filter_help', 'Select pipeline to filter available stages. Deals can only be moved to stages within their pipeline. For cross-pipeline moves, use the "Move Deal to Pipeline" node.')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </Label>
                 <Select
                   value={data.pipelineId?.toString() || 'default'}
-                  onValueChange={(value) => updateNodeData({ 
+                  onValueChange={(value) => updateNodeData({
                     pipelineId: value === 'default' ? null : parseInt(value),
                     stageId: null // Reset stage when pipeline changes
                   })}
                 >
                   <SelectTrigger className="h-8">
-                    <SelectValue placeholder="Select pipeline" />
+                    <SelectValue placeholder={t('flow_builder.select_pipeline', 'Select pipeline')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="default">Default Pipeline</SelectItem>
+                    <SelectItem value="default">{t('flow_builder.update_pipeline_stage_node.default_pipeline', 'Default Pipeline')}</SelectItem>
                     {pipelinesLoading ? (
-                      <SelectItem value="loading" disabled>Loading pipelines...</SelectItem>
+                      <SelectItem value="loading" disabled>{t('flow_builder.move_deal_node.loading_pipelines', 'Loading pipelines...')}</SelectItem>
                     ) : (
                       pipelines?.map(pipeline => (
                         <SelectItem key={pipeline.id} value={pipeline.id.toString()}>
@@ -735,18 +744,18 @@ function UpdatePipelineStageNode({
               <div className="space-y-2">
                 <Label className="text-xs font-medium flex items-center gap-1">
                   <ArrowRightCircle className="w-3 h-3" />
-                  Target Stage
+                  {t('flow_builder.move_deal_node.target_stage_label', 'Target Stage')}
                 </Label>
                 <Select
                   value={data.stageId || ''}
                   onValueChange={handleStageChange}
                 >
                   <SelectTrigger className="h-8">
-                    <SelectValue placeholder="Select a stage" />
+                    <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.select_a_stage', 'Select a stage')} />
                   </SelectTrigger>
                   <SelectContent>
                     {isLoading ? (
-                      <SelectItem value="loading">Loading stages...</SelectItem>
+                      <SelectItem value="loading">{t('flow_builder.move_deal_node.loading_stages', 'Loading stages...')}</SelectItem>
                     ) : (
                       pipelineStages && pipelineStages.length > 0 ? (
                         pipelineStages.map((stage) => (
@@ -764,7 +773,7 @@ function UpdatePipelineStageNode({
                           </SelectItem>
                         ))
                       ) : (
-                        <SelectItem value="no-stages" disabled>No stages available</SelectItem>
+                        <SelectItem value="no-stages" disabled>{t('flow_builder.move_deal_node.no_stages_available', 'No stages available')}</SelectItem>
                       )
                     )}
                   </SelectContent>
@@ -775,16 +784,16 @@ function UpdatePipelineStageNode({
             {data.operation === 'create_stage' && (
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Stage Name</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.stage_name_label', 'Stage Name')}</Label>
                   <Input
                     value={data.stageName || ''}
                     onChange={handleInputChange('stageName')}
-                    placeholder="Enter stage name"
+                    placeholder={t('flow_builder.update_pipeline_stage_node.enter_stage_name', 'Enter stage name')}
                     className="h-8"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Stage Color</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.stage_color_label', 'Stage Color')}</Label>
                   <Input
                     type="color"
                     value={data.stageColor || '#3a86ff'}
@@ -799,7 +808,7 @@ function UpdatePipelineStageNode({
               <div className="space-y-2">
                 <Label className="text-xs font-medium flex items-center gap-1">
                   <Phone className="w-3 h-3" />
-                  Contact Phone Variable
+                  {t('flow_builder.move_deal_node.contact_phone_variable_label', 'Contact Phone Variable')}
                 </Label>
                 <VariablePicker
                   value={data.dealIdVariable || ''}
@@ -808,7 +817,7 @@ function UpdatePipelineStageNode({
                   className="h-8"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Variable containing the contact phone number
+                  {t('flow_builder.move_deal_node.contact_phone_variable_help', 'Variable containing the contact phone number to identify the deal')}
                 </p>
               </div>
             )}
@@ -816,7 +825,7 @@ function UpdatePipelineStageNode({
             {data.operation === 'create_deal' && (
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Deal Title</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.deal_title_label', 'Deal Title')}</Label>
                   <VariablePicker
                     value={data.dealTitle || ''}
                     onChange={(value) => updateNodeData({ dealTitle: value })}
@@ -827,7 +836,7 @@ function UpdatePipelineStageNode({
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-xs font-medium">Value</Label>
+                    <Label className="text-xs font-medium">{t('flow_builder.value', 'Value')}</Label>
                     <VariablePicker
                       value={data.dealValue || ''}
                       onChange={(value) => updateNodeData({ dealValue: value })}
@@ -836,7 +845,7 @@ function UpdatePipelineStageNode({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-medium">Priority</Label>
+                    <Label className="text-xs font-medium">{t('pipeline.priority', 'Priority')}</Label>
                     <Select
                       value={data.dealPriority || 'medium'}
                       onValueChange={handleSelectChange('dealPriority')}
@@ -845,22 +854,22 @@ function UpdatePipelineStageNode({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="low">{t('pipeline.low', 'Low')}</SelectItem>
+                        <SelectItem value="medium">{t('pipeline.medium', 'Medium')}</SelectItem>
+                        <SelectItem value="high">{t('pipeline.high', 'High')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Target Stage</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.move_deal_node.target_stage_label', 'Target Stage')}</Label>
                   <Select
                     value={data.stageId || ''}
                     onValueChange={handleStageChange}
                   >
                     <SelectTrigger className="h-8">
-                      <SelectValue placeholder="Select initial stage" />
+                      <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.select_initial_stage', 'Select initial stage')} />
                     </SelectTrigger>
                     <SelectContent>
                       {pipelineStages && pipelineStages.length > 0 ? (
@@ -879,18 +888,18 @@ function UpdatePipelineStageNode({
                           </SelectItem>
                         ))
                       ) : (
-                        <SelectItem value="no-stages" disabled>No stages available</SelectItem>
+                        <SelectItem value="no-stages" disabled>{t('flow_builder.move_deal_node.no_stages_available', 'No stages available')}</SelectItem>
                       )}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Description</Label>
+                  <Label className="text-xs font-medium">{t('pipeline.description', 'Description')}</Label>
                   <VariablePicker
                     value={data.dealDescription || ''}
                     onChange={(value) => updateNodeData({ dealDescription: value })}
-                    placeholder="Deal description..."
+                    placeholder={t('flow_builder.update_pipeline_stage_node.deal_description_placeholder', 'Deal description...')}
                     className="h-16"
                   />
                 </div>
@@ -899,7 +908,7 @@ function UpdatePipelineStageNode({
                   <Collapsible open={showCreateDealCustomFields} onOpenChange={setShowCreateDealCustomFields}>
                     <CollapsibleTrigger asChild>
                       <Button variant="ghost" size="sm" className="w-full justify-between h-8">
-                        <span className="text-xs flex items-center gap-1">Custom Fields</span>
+                        <span className="text-xs flex items-center gap-1">{t('pipeline.custom_fields', 'Custom Fields')}</span>
                         {showCreateDealCustomFields ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                       </Button>
                     </CollapsibleTrigger>
@@ -908,7 +917,7 @@ function UpdatePipelineStageNode({
                         <div key={field.id} className="space-y-2">
                           <Label className="text-xs font-medium">
                             {field.fieldLabel}
-                            {field.fieldType === 'multi_select' && ' (select multiple)'}
+                            {field.fieldType === 'multi_select' && ` ${t('contacts.scraping.select_multiple_hint', '(select multiple)')}`}
                           </Label>
                           {field.fieldType === 'text' && (
                             <VariablePicker
@@ -916,7 +925,7 @@ function UpdatePipelineStageNode({
                               onChange={(value) => updateNodeData({
                                 customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                               })}
-                              placeholder="Enter value or {{variable}}"
+                              placeholder={t('flow_builder.update_pipeline_stage_node.enter_value_or_variable', 'Enter value or {{variable}}')}
                               className="h-8"
                             />
                           )}
@@ -926,7 +935,7 @@ function UpdatePipelineStageNode({
                               onChange={(value) => updateNodeData({
                                 customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                               })}
-                              placeholder="0 or {{variable}}"
+                              placeholder={t('flow_builder.placeholder_number_or_variable', '0 or {{variable}}')}
                               className="h-8"
                             />
                           )}
@@ -936,7 +945,7 @@ function UpdatePipelineStageNode({
                               onChange={(value) => updateNodeData({
                                 customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                               })}
-                              placeholder="YYYY-MM-DD or {{date.today}}"
+                              placeholder={t('flow_builder.placeholder_date_or_variable', 'YYYY-MM-DD or {{date.today}}')}
                               className="h-8"
                             />
                           )}
@@ -947,7 +956,7 @@ function UpdatePipelineStageNode({
                                 onChange={(value) => updateNodeData({
                                   customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                 })}
-                                placeholder="Value or {{variable}}"
+                                placeholder={t('flow_builder.update_pipeline_stage_node.value_or_variable', 'Value or {{variable}}')}
                                 className="h-8"
                               />
                               {(field.options && Array.isArray(field.options) && field.options.length > 0) && (
@@ -1007,8 +1016,8 @@ function UpdatePipelineStageNode({
                           )}
                           {field.fieldType === 'boolean' && (() => {
                             const boolOpts = field.options && !Array.isArray(field.options) ? (field.options as { trueLabel?: string; falseLabel?: string }) : null;
-                            const trueLabel = boolOpts?.trueLabel ?? 'Yes';
-                            const falseLabel = boolOpts?.falseLabel ?? 'No';
+                            const trueLabel = boolOpts?.trueLabel ?? t('erp.common.yes', 'Yes');
+                            const falseLabel = boolOpts?.falseLabel ?? t('erp.common.no', 'No');
                             const checked = !!data.customFieldsToSet?.[field.fieldName];
                             return (
                               <div className="flex items-center space-x-2">
@@ -1041,33 +1050,33 @@ function UpdatePipelineStageNode({
                 >
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm" className="w-full justify-between h-8">
-                      <span className="text-xs">Deal Update Options</span>
+                      <span className="text-xs">{t('flow_builder.update_pipeline_stage_node.deal_update_options', 'Deal Update Options')}</span>
                       {data.showDealCreation ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                     </Button>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="space-y-3 mt-2">
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium">New Title</Label>
+                      <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.new_title_label', 'New Title')}</Label>
                       <VariablePicker
                         value={data.dealTitle || ''}
                         onChange={(value) => updateNodeData({ dealTitle: value })}
-                        placeholder="Leave empty to keep current"
+                        placeholder={t('flow_builder.update_pipeline_stage_node.leave_empty_to_keep_current', 'Leave empty to keep current')}
                         className="h-8"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-2">
-                        <Label className="text-xs font-medium">New Value</Label>
+                        <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.new_value_label', 'New Value')}</Label>
                         <VariablePicker
                           value={data.dealValue || ''}
                           onChange={(value) => updateNodeData({ dealValue: value })}
-                          placeholder="Leave empty to keep current"
+                          placeholder={t('flow_builder.update_pipeline_stage_node.leave_empty_to_keep_current', 'Leave empty to keep current')}
                           className="h-8"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs font-medium">New Priority</Label>
+                        <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.new_priority_label', 'New Priority')}</Label>
                         <Select
                           value={data.dealPriority || 'keep_current'}
                           onValueChange={(value) => {
@@ -1076,20 +1085,20 @@ function UpdatePipelineStageNode({
                           }}
                         >
                           <SelectTrigger className="h-8">
-                            <SelectValue placeholder="Keep current" />
+                            <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.keep_current', 'Keep current')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="keep_current">Keep current</SelectItem>
-                            <SelectItem value="low">Low</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="keep_current">{t('flow_builder.update_pipeline_stage_node.keep_current', 'Keep current')}</SelectItem>
+                            <SelectItem value="low">{t('pipeline.low', 'Low')}</SelectItem>
+                            <SelectItem value="medium">{t('pipeline.medium', 'Medium')}</SelectItem>
+                            <SelectItem value="high">{t('pipeline.high', 'High')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium">New Stage</Label>
+                      <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.new_stage_label', 'New Stage')}</Label>
                       <Select
                         value={data.stageId || 'keep_current'}
                         onValueChange={(value) => {
@@ -1098,10 +1107,10 @@ function UpdatePipelineStageNode({
                         }}
                       >
                         <SelectTrigger className="h-8">
-                          <SelectValue placeholder="Keep current stage" />
+                          <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.keep_current_stage', 'Keep current stage')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="keep_current">Keep current</SelectItem>
+                          <SelectItem value="keep_current">{t('flow_builder.update_pipeline_stage_node.keep_current', 'Keep current')}</SelectItem>
                           {pipelineStages && pipelineStages.length > 0 ? (
                             pipelineStages.map((stage) => (
                               <SelectItem
@@ -1118,7 +1127,7 @@ function UpdatePipelineStageNode({
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem value="no-stages" disabled>No stages available</SelectItem>
+                            <SelectItem value="no-stages" disabled>{t('flow_builder.move_deal_node.no_stages_available', 'No stages available')}</SelectItem>
                           )}
                         </SelectContent>
                       </Select>
@@ -1126,7 +1135,7 @@ function UpdatePipelineStageNode({
 
                     {dealCustomFieldsSchema.length > 0 && (
                       <div className="space-y-3 pt-2 border-t">
-                        <Label className="text-xs font-medium">Custom Fields</Label>
+                        <Label className="text-xs font-medium">{t('pipeline.custom_fields', 'Custom Fields')}</Label>
                         {dealCustomFieldsSchema.map((field: { id: number; fieldName: string; fieldLabel: string; fieldType: string; options?: { value: string; label: string }[] | { trueLabel?: string; falseLabel?: string } }) => (
                           <div key={field.id} className="space-y-2">
                             <Label className="text-xs text-muted-foreground">
@@ -1139,7 +1148,7 @@ function UpdatePipelineStageNode({
                                 onChange={(value) => updateNodeData({
                                   customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                 })}
-                                placeholder="Leave empty to keep current"
+                                placeholder={t('flow_builder.update_pipeline_stage_node.leave_empty_to_keep_current', 'Leave empty to keep current')}
                                 className="h-8"
                               />
                             )}
@@ -1149,7 +1158,7 @@ function UpdatePipelineStageNode({
                                 onChange={(value) => updateNodeData({
                                   customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                 })}
-                                placeholder="Leave empty to keep current"
+                                placeholder={t('flow_builder.update_pipeline_stage_node.leave_empty_to_keep_current', 'Leave empty to keep current')}
                                 className="h-8"
                               />
                             )}
@@ -1159,7 +1168,7 @@ function UpdatePipelineStageNode({
                                 onChange={(value) => updateNodeData({
                                   customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                 })}
-                                placeholder="YYYY-MM-DD or {{date.today}}"
+                                placeholder={t('flow_builder.placeholder_date_or_variable', 'YYYY-MM-DD or {{date.today}}')}
                                 className="h-8"
                               />
                             )}
@@ -1170,7 +1179,7 @@ function UpdatePipelineStageNode({
                                   onChange={(value) => updateNodeData({
                                     customFieldsToSet: { ...(data.customFieldsToSet || {}), [field.fieldName]: value }
                                   })}
-                                  placeholder="Value or {{variable}}"
+                                  placeholder={t('flow_builder.update_pipeline_stage_node.value_or_variable', 'Value or {{variable}}')}
                                   className="h-8"
                                 />
                                 {(field.options && Array.isArray(field.options) && field.options.length > 0) && (
@@ -1274,12 +1283,12 @@ function UpdatePipelineStageNode({
                   </CollapsibleTrigger>
                   <CollapsibleContent className="space-y-3 mt-2">
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-green-600">Tags to Add</Label>
+                      <Label className="text-xs font-medium text-green-600">{t('flow_builder.update_pipeline_stage_node.tags_to_add', 'Tags to Add')}</Label>
                       <div className="flex gap-1">
                         <Input
                           value={data.tagInput || ''}
                           onChange={handleInputChange('tagInput')}
-                          placeholder="Enter tag name"
+                          placeholder={t('flow_builder.enter_tag_name', 'Enter tag name')}
                           className="h-8 text-xs"
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
@@ -1322,7 +1331,7 @@ function UpdatePipelineStageNode({
 
                       {dealTags && dealTags.length > 0 && (
                         <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Quick Add:</Label>
+                          <Label className="text-xs text-muted-foreground">{t('flow_builder.update_pipeline_stage_node.quick_add', 'Quick Add:')}</Label>
                           <div className="flex flex-wrap gap-1">
                             {dealTags.slice(0, 6).map((tag) => (
                               <Button
@@ -1342,11 +1351,11 @@ function UpdatePipelineStageNode({
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-red-600">Tags to Remove</Label>
+                      <Label className="text-xs font-medium text-red-600">{t('flow_builder.update_pipeline_stage_node.tags_to_remove', 'Tags to Remove')}</Label>
                       <div className="flex gap-1">
                         <Select onValueChange={handleAddRemoveTag}>
                           <SelectTrigger className="h-8">
-                            <SelectValue placeholder="Select tag to remove" />
+                            <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.select_tag_to_remove', 'Select tag to remove')} />
                           </SelectTrigger>
                           <SelectContent>
                             {dealTags?.map((tag) => (
@@ -1391,14 +1400,14 @@ function UpdatePipelineStageNode({
             >
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm" className="w-full justify-between h-8 text-muted-foreground">
-                  <span className="text-xs">Advanced Options</span>
+                  <span className="text-xs">{t('flow_builder.advanced_options', 'Advanced Options')}</span>
                   {data.showAdvanced ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-3 mt-2">
                 {(data.operation === 'update_stage' || data.operation === 'update_deal') && (
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-medium">Create deal if not exists</Label>
+                    <Label className="text-xs font-medium">{t('flow_builder.move_deal_node.create_if_not_exists', 'Create deal if not exists')}</Label>
                     <Switch
                       checked={data.createDealIfNotExists || false}
                       onCheckedChange={handleSwitchChange('createDealIfNotExists')}
@@ -1408,7 +1417,7 @@ function UpdatePipelineStageNode({
 
                 {data.operation === 'update_stage' && (
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-medium">Create stage if not exists</Label>
+                    <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.create_stage_if_not_exists', 'Create stage if not exists')}</Label>
                     <Switch
                       checked={data.createStageIfNotExists || false}
                       onCheckedChange={handleSwitchChange('createStageIfNotExists')}
@@ -1417,7 +1426,7 @@ function UpdatePipelineStageNode({
                 )}
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Error Handling</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.error_handling', 'Error Handling')}</Label>
                   <Select
                     value={data.errorHandling || 'continue'}
                     onValueChange={handleSelectChange('errorHandling')}
@@ -1429,13 +1438,13 @@ function UpdatePipelineStageNode({
                       <SelectItem value="continue">
                         <div className="flex items-center gap-2">
                           <CheckCircle className="w-3 h-3 text-green-500" />
-                          Continue on error
+                          {t('flow_builder.continue_on_error', 'Continue on error')}
                         </div>
                       </SelectItem>
                       <SelectItem value="stop">
                         <div className="flex items-center gap-2">
                           <AlertCircle className="w-3 h-3 text-red-500" />
-                          Stop on error
+                          {t('flow_builder.stop_on_error', 'Stop on error')}
                         </div>
                       </SelectItem>
                     </SelectContent>
@@ -1453,10 +1462,10 @@ function UpdatePipelineStageNode({
                   <Button variant="ghost" size="sm" className="w-full justify-between h-8 text-muted-foreground">
                     <span className="text-xs flex items-center gap-1">
                       <RotateCcw className="w-3 h-3" />
-                      Stage Revert Settings
+                      {t('flow_builder.update_pipeline_stage_node.stage_revert_settings', 'Stage Revert Settings')}
                       {data.enableStageRevert && (
                         <Badge variant="secondary" className="ml-1 text-xs bg-orange-100 text-orange-700 dark:bg-orange-900/20">
-                          Active
+                          {t('flow_builder.active', 'Active')}
                         </Badge>
                       )}
                     </span>
@@ -1466,13 +1475,13 @@ function UpdatePipelineStageNode({
                 <CollapsibleContent className="space-y-3 mt-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs font-medium">Enable Stage Revert</Label>
+                      <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.enable_stage_revert', 'Enable Stage Revert')}</Label>
                       <Tooltip>
                         <TooltipTrigger>
                           <HelpCircle className="w-3 h-3 text-muted-foreground" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Automatically revert deal to a previous stage after a specified time if no action is taken</p>
+                          <p>{t('flow_builder.update_pipeline_stage_node.stage_revert_help', 'Automatically revert deal to a previous stage after a specified time if no action is taken')}</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -1486,7 +1495,7 @@ function UpdatePipelineStageNode({
                     <>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-2">
-                          <Label className="text-xs font-medium">Time Amount</Label>
+                          <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.time_amount', 'Time Amount')}</Label>
                           <Input
                             type="number"
                             min="1"
@@ -1500,11 +1509,11 @@ function UpdatePipelineStageNode({
                             placeholder="24"
                           />
                           {((data.revertTimeAmount || 0) < 1 || (data.revertTimeAmount || 0) > 999) && (
-                            <p className="text-xs text-red-500">Time amount must be between 1 and 999</p>
+                            <p className="text-xs text-red-500">{t('flow_builder.update_pipeline_stage_node.time_amount_range_error', 'Time amount must be between 1 and 999')}</p>
                           )}
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-xs font-medium">Time Unit</Label>
+                          <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.time_unit', 'Time Unit')}</Label>
                           <Select
                             value={data.revertTimeUnit || 'hours'}
                             onValueChange={handleRevertTimeUnitChange}
@@ -1513,8 +1522,8 @@ function UpdatePipelineStageNode({
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="hours">Hours</SelectItem>
-                              <SelectItem value="days">Days</SelectItem>
+                              <SelectItem value="hours">{t('flow_builder.wait_hours', 'Hours')}</SelectItem>
+                              <SelectItem value="days">{t('flow_builder.wait_days', 'Days')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -1522,13 +1531,13 @@ function UpdatePipelineStageNode({
 
                       <div className="space-y-2">
                         <Label className="text-xs font-medium flex items-center gap-1">
-                          Revert To Stage
+                          {t('flow_builder.update_pipeline_stage_node.revert_to_stage', 'Revert To Stage')}
                           <Tooltip>
                             <TooltipTrigger>
                               <HelpCircle className="w-3 h-3 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Select the stage to revert the deal to after the time period</p>
+                              <p>{t('flow_builder.update_pipeline_stage_node.revert_to_stage_help', 'Select the stage to revert the deal to after the time period')}</p>
                             </TooltipContent>
                           </Tooltip>
                           {data.enableStageRevert && !data.revertToStageId && (
@@ -1543,10 +1552,10 @@ function UpdatePipelineStageNode({
                             "h-8",
                             data.enableStageRevert && !data.revertToStageId && "border-red-500"
                           )}>
-                            <SelectValue placeholder="Select stage to revert to" />
+                            <SelectValue placeholder={t('flow_builder.update_pipeline_stage_node.select_stage_to_revert_to', 'Select stage to revert to')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="none">{t('pipeline.none', 'None')}</SelectItem>
                             {pipelineStages && pipelineStages.length > 0 ? (
                               pipelineStages.map((stage) => (
                                 <SelectItem
@@ -1563,24 +1572,24 @@ function UpdatePipelineStageNode({
                                 </SelectItem>
                               ))
                             ) : (
-                              <SelectItem value="no-stages" disabled>No stages available</SelectItem>
+                              <SelectItem value="no-stages" disabled>{t('flow_builder.move_deal_node.no_stages_available', 'No stages available')}</SelectItem>
                             )}
                           </SelectContent>
                         </Select>
                         {data.enableStageRevert && !data.revertToStageId && (
-                          <p className="text-xs text-red-500">Please select a stage to revert to</p>
+                          <p className="text-xs text-red-500">{t('flow_builder.update_pipeline_stage_node.select_stage_to_revert_error', 'Please select a stage to revert to')}</p>
                         )}
                       </div>
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Label className="text-xs font-medium">Only revert if no activity</Label>
+                          <Label className="text-xs font-medium">{t('flow_builder.update_pipeline_stage_node.only_revert_if_no_activity', 'Only revert if no activity')}</Label>
                           <Tooltip>
                             <TooltipTrigger>
                               <HelpCircle className="w-3 h-3 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Only revert the deal if no activity occurred since the stage change</p>
+                              <p>{t('flow_builder.update_pipeline_stage_node.only_revert_if_no_activity_help', 'Only revert the deal if no activity occurred since the stage change')}</p>
                             </TooltipContent>
                           </Tooltip>
                         </div>

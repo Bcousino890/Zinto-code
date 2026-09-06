@@ -13815,7 +13815,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       // Populate new WhatsApp contacts consistently with contacts created by an
       // incoming message. Profile-photo lookup is best effort and must never make
       // contact creation fail.
-      if (contact.phone && !contact.avatarUrl && contact.identifierType === 'whatsapp_unofficial') {
+      if (contact.phone && !contact.avatarUrl && (contact.identifierType === 'whatsapp_unofficial' || contact.identifierType === 'whatsapp' || contact.source === 'whatsapp')) {
         try {
           const connections = await storage.getChannelConnectionsByCompany(req.user.companyId);
           const connection = connections.find((candidate) =>
@@ -16227,18 +16227,22 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         })
       );
 
-      const telegramIdsNeedingPreview = conversationsWithContacts
-        .filter((c: any) => c.channelType === 'telegram' && !(c as any).lastMessage)
+      // Preview for every channel, not just Telegram: getConversations() does not select
+      // lastMessage, so without this the inbox showed "No messages yet" on every WhatsApp
+      // row, and the empty-duplicate dedup in ConversationContext (which prefers whichever
+      // record has a lastMessage) had nothing to compare and could keep the empty one.
+      const idsNeedingPreview = conversationsWithContacts
+        .filter((c: any) => !(c as any).lastMessage)
         .map((c: any) => c.id);
-      const telegramLatest =
-        telegramIdsNeedingPreview.length > 0
-          ? await storage.getLatestMessageForConversations(telegramIdsNeedingPreview)
+      const latestByConversation =
+        idsNeedingPreview.length > 0
+          ? await storage.getLatestMessageForConversations(idsNeedingPreview)
           : {};
       const conversationsWithLastMessage = conversationsWithContacts.map((c: any) => {
-        if (c.channelType !== 'telegram' || c.lastMessage) {
+        if (c.lastMessage) {
           return c;
         }
-        const lm = telegramLatest[c.id];
+        const lm = latestByConversation[c.id];
         return lm ? { ...c, lastMessage: lm } : c;
       });
 
@@ -16637,18 +16641,18 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         );
       }
 
-      const telegramGroupIdsNeedingPreview = filteredConversations
-        .filter((c: any) => c.channelType === 'telegram' && !(c as any).lastMessage)
+      const groupIdsNeedingPreview = filteredConversations
+        .filter((c: any) => !(c as any).lastMessage)
         .map((c: any) => c.id);
-      const telegramGroupLatest =
-        telegramGroupIdsNeedingPreview.length > 0
-          ? await storage.getLatestMessageForConversations(telegramGroupIdsNeedingPreview)
+      const groupLatestByConversation =
+        groupIdsNeedingPreview.length > 0
+          ? await storage.getLatestMessageForConversations(groupIdsNeedingPreview)
           : {};
       const groupConversationsWithLastMessage = filteredConversations.map((c: any) => {
-        if (c.channelType !== 'telegram' || c.lastMessage) {
+        if (c.lastMessage) {
           return c;
         }
-        const lm = telegramGroupLatest[c.id];
+        const lm = groupLatestByConversation[c.id];
         return lm ? { ...c, lastMessage: lm } : c;
       });
 

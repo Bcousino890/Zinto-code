@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { Info, TestTube, ExternalLink, Loader2, Eye, EyeOff } from 'lucide-react';
 
 interface Props {
@@ -32,6 +33,7 @@ interface FormData {
 
 export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connectionId }: Props) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [showDocs, setShowDocs] = useState(false);
@@ -61,13 +63,13 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to load Twilio SMS configuration');
+        throw new Error(errorData.message || t('settings.twilio_sms.load_failed_desc', 'Failed to load Twilio SMS configuration'));
       }
 
       const connection = await response.json();
  
       if (connection.channelType !== 'twilio_sms') {
-        throw new Error('Invalid channel type');
+        throw new Error(t('settings.twilio_sms.invalid_channel_type', 'Invalid channel type'));
       }
 
 
@@ -93,8 +95,8 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
     } catch (error: any) {
       console.error('Error loading Twilio SMS configuration:', error);
       toast({
-        title: 'Load Failed',
-        description: error.message || 'Failed to load Twilio SMS configuration',
+        title: t('settings.voiceConnectionForm.toast.loadFailedTitle', 'Load Failed'),
+        description: error.message || t('settings.twilio_sms.load_failed_desc', 'Failed to load Twilio SMS configuration'),
         variant: 'destructive'
       });
     } finally {
@@ -109,17 +111,17 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
 
   const validate = (): string | null => {
     if (!form.accountName || !form.accountSid || !form.authToken || !form.fromNumber) {
-      return 'Please fill all required fields.';
+      return t('settings.twilio_sms.validation_required_fields', 'Please fill all required fields.');
     }
     if (!/^\+\d{6,15}$/.test(form.fromNumber.trim())) {
-      return 'From Number must be in E.164 format (e.g., +15551234567).';
+      return t('settings.twilio_sms.validation_from_number_format', 'From Number must be in E.164 format (e.g., +15551234567).');
     }
     try {
       const w = new URL(form.webhookUrl);
       const s = new URL(form.statusCallbackUrl);
      
     } catch {
-      return 'Webhook URLs are invalid.';
+      return t('settings.twilio_sms.validation_invalid_urls', 'Webhook URLs are invalid.');
     }
     return null;
   };
@@ -128,7 +130,7 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
     e.preventDefault();
     const err = validate();
     if (err) {
-      toast({ title: 'Validation Error', description: err, variant: 'destructive' });
+      toast({ title: t('common.validation_error', 'Validation Error'), description: err, variant: 'destructive' });
       return;
     }
     setLoading(true);
@@ -149,18 +151,18 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || 'Failed to update Twilio SMS connection');
+        throw new Error(data.message || t('settings.twilio_sms.update_failed', 'Failed to update Twilio SMS connection'));
       }
       toast({ 
-        title: 'Twilio SMS Updated', 
-        description: 'Your Twilio SMS channel has been updated successfully.' 
+        title: t('settings.twilio_sms.updated_title', 'Twilio SMS Updated'), 
+        description: t('settings.twilio_sms.updated_desc', 'Your Twilio SMS channel has been updated successfully.') 
       });
       onSuccess();
       onClose();
     } catch (error: any) {
       toast({ 
-        title: 'Update Failed', 
-        description: error.message || 'Failed to update Twilio SMS connection.', 
+        title: t('settings.instagram_connection.update_failed', 'Update Failed'), 
+        description: error.message || t('settings.twilio_sms.update_failed_desc', 'Failed to update Twilio SMS connection.'), 
         variant: 'destructive' 
       });
     } finally {
@@ -170,8 +172,8 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
 
   const testWebhookHint = () => {
     toast({
-      title: 'Webhook Test Tip',
-      description: 'Use Twilio Console "Try It Out" or send a real SMS to your From Number to test inbound webhooks.',
+      title: t('settings.twilio_sms.webhook_test_tip_title', 'Webhook Test Tip'),
+      description: t('settings.twilio_sms.webhook_test_tip_desc', 'Use Twilio Console “Try It Out” or send a real SMS to your From Number to test inbound webhooks.'),
     });
   };
 
@@ -179,9 +181,9 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[560px]">
         <DialogHeader>
-          <DialogTitle>Edit Twilio SMS Connection</DialogTitle>
+          <DialogTitle>{t('settings.twilio_sms.edit_dialog_title', 'Edit Twilio SMS Connection')}</DialogTitle>
           <DialogDescription>
-            Update your Twilio Programmable Messaging configuration.
+            {t('settings.twilio_sms.edit_dialog_description', 'Update your Twilio Programmable Messaging configuration.')}
           </DialogDescription>
         </DialogHeader>
 
@@ -192,19 +194,19 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-2">
-              <Label htmlFor="accountName">Account Name *</Label>
+              <Label htmlFor="accountName">{t('settings.twilio_sms.account_name', 'Account Name *')}</Label>
               <Input 
                 id="accountName" 
                 name="accountName" 
                 value={form.accountName} 
                 onChange={onChange} 
-                placeholder="e.g. Main Support Number" 
+                placeholder={t('settings.twilio_sms.account_name_placeholder', 'e.g. Main Support Number')} 
                 required 
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="accountSid">Twilio Account SID *</Label>
+              <Label htmlFor="accountSid">{t('settings.twilio_sms.account_sid', 'Twilio Account SID *')}</Label>
               <Input 
                 id="accountSid" 
                 name="accountSid" 
@@ -216,7 +218,7 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="authToken">Twilio Auth Token *</Label>
+              <Label htmlFor="authToken">{t('settings.twilio_sms.auth_token', 'Twilio Auth Token *')}</Label>
               <div className="relative">
                 <Input 
                   id="authToken" 
@@ -224,7 +226,7 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
                   type={showAuthToken ? "text" : "password"} 
                   value={form.authToken} 
                   onChange={onChange} 
-                  placeholder="Your Twilio Auth Token" 
+                  placeholder={t('settings.twilio_sms.auth_token_placeholder', 'Your Twilio Auth Token')} 
                   required 
                   className="pr-10"
                 />
@@ -245,7 +247,7 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="fromNumber">From Number (E.164) *</Label>
+              <Label htmlFor="fromNumber">{t('settings.twilio_sms.from_number', 'From Number (E.164) *')}</Label>
               <Input 
                 id="fromNumber" 
                 name="fromNumber" 
@@ -258,7 +260,7 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
 
             <div className="border-t pt-4 grid gap-3">
               <div className="flex items-center justify-between">
-                <Label>Webhook URLs</Label>
+                <Label>{t('settings.metaPartnerConfiguration.webhook_urls', 'Webhook URLs')}</Label>
                 <div className="flex gap-2">
                   <Button 
                     type="button" 
@@ -268,7 +270,7 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
                     className="flex items-center gap-2"
                   >
                     <Info className="h-4 w-4" />
-                    Setup Instructions
+                    {t('admin.backup.oauth.setup_instructions', 'Setup Instructions')}
                   </Button>
                   <Button 
                     type="button" 
@@ -278,13 +280,13 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
                     className="flex items-center gap-2"
                   >
                     <TestTube className="h-4 w-4" />
-                    Test Webhook
+                    {t('whatsapp_business.test_webhook', 'Test Webhook')}
                   </Button>
                 </div>
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="webhookUrl">Inbound Webhook URL</Label>
+                <Label htmlFor="webhookUrl">{t('settings.twilio_sms.inbound_webhook_url', 'Inbound Webhook URL')}</Label>
                 <Input 
                   id="webhookUrl" 
                   name="webhookUrl" 
@@ -296,7 +298,7 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="statusCallbackUrl">Status Callback URL</Label>
+                <Label htmlFor="statusCallbackUrl">{t('settings.twilio_sms.status_callback_url', 'Status Callback URL')}</Label>
                 <Input 
                   id="statusCallbackUrl" 
                   name="statusCallbackUrl" 
@@ -308,14 +310,14 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
 
               <Alert>
                 <AlertDescription>
-                  Ensure both URLs are publicly accessible via HTTPS. We verify Twilio requests with X-Twilio-Signature.
+                  {t('settings.twilio_sms.https_notice', 'Ensure both URLs are publicly accessible via HTTPS. We verify Twilio requests with X-Twilio-Signature.')}
                 </AlertDescription>
               </Alert>
             </div>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button 
                 type="submit" 
@@ -326,10 +328,10 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Updating...
+                    {t('common.updating', 'Updating...')}
                   </>
                 ) : (
-                  'Update Connection'
+                  t('settings.instagram_connection.update_connection', 'Update Connection')
                 )}
               </Button>
             </DialogFooter>
@@ -340,27 +342,27 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
         <Dialog open={showDocs} onOpenChange={setShowDocs}>
           <DialogContent className="sm:max-w-[720px]">
             <DialogHeader>
-              <DialogTitle>Twilio SMS Setup Instructions</DialogTitle>
+              <DialogTitle>{t('settings.twilio_sms.setup_dialog_title', 'Twilio SMS Setup Instructions')}</DialogTitle>
               <DialogDescription>
-                Follow these steps to complete the integration.
+                {t('settings.twilio_sms.setup_dialog_description', 'Follow these steps to complete the integration.')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 text-sm">
               <ol className="list-decimal list-inside space-y-2">
-                <li>Buy or select a Twilio phone number enabled for SMS.</li>
-                <li>In Twilio Console, set the Messaging webhook to:
+                <li>{t('settings.twilio_sms.setup_step_buy_number', 'Buy or select a Twilio phone number enabled for SMS.')}</li>
+                <li>{t('settings.twilio_sms.setup_step_messaging_webhook', 'In Twilio Console, set the Messaging webhook to:')}
                   <div className="mt-1 p-2 bg-muted rounded text-xs select-all break-all">
                     {form.webhookUrl}
                   </div>
                 </li>
-                <li>Set the Status Callback URL to:
+                <li>{t('settings.twilio_sms.setup_step_status_callback', 'Set the Status Callback URL to:')}
                   <div className="mt-1 p-2 bg-muted rounded text-xs select-all break-all">
                     {form.statusCallbackUrl}
                   </div>
                 </li>
-                <li>Paste your Account SID and Auth Token here, and the From Number in E.164 format (e.g., +15551234567).</li>
-                <li>Save. Inbound SMS will appear in Inbox under the Twilio SMS channel. Delivery updates will set message status to delivered/failed.</li>
-                <li>STOP/START/HELP: When customers send STOP, we opt them out automatically and block outbound sends until START/UNSTOP.</li>
+                <li>{t('settings.twilio_sms.setup_step_paste_credentials', 'Paste your Account SID and Auth Token here, and the From Number in E.164 format (e.g., +15551234567).')}</li>
+                <li>{t('settings.twilio_sms.setup_step_save', 'Save. Inbound SMS will appear in Inbox under the Twilio SMS channel. Delivery updates will set message status to delivered/failed.')}</li>
+                <li>{t('settings.twilio_sms.setup_step_stop_start_help', 'STOP/START/HELP: When customers send STOP, we opt them out automatically and block outbound sends until START/UNSTOP.')}</li>
               </ol>
               <div className="pt-2">
                 <a
@@ -369,7 +371,7 @@ export function EditTwilioSmsConnectionForm({ isOpen, onClose, onSuccess, connec
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 text-primary hover:underline"
                 >
-                  <ExternalLink className="h-4 w-4" /> Twilio SMS Docs (external)
+                  <ExternalLink className="h-4 w-4" /> {t('settings.twilio_sms.docs_link', 'Twilio SMS Docs (external)')}
                 </a>
               </div>
             </div>

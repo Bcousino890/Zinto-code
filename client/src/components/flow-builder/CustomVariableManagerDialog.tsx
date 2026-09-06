@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Bot, Loader2, Pencil, Trash2 } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 const NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 
@@ -58,6 +59,7 @@ export function CustomVariableManagerDialog({
   flowId,
   currentValues: currentValuesProp,
 }: CustomVariableManagerDialogProps) {
+  const { t } = useTranslation();
   const [formMode, setFormMode] = useState<'list' | 'create' | 'edit'>('list');
   const [editingVariable, setEditingVariable] = useState<FlowCustomVariable | null>(null);
   const [formValues, setFormValues] = useState({
@@ -117,7 +119,7 @@ export function CustomVariableManagerDialog({
             <code className={codeDefault}>{defaultTrimmed}</code>
           </span>
           <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-            Default
+            {t('flow_builder.custom_variables.default_badge', 'Default')}
           </span>
         </span>
       );
@@ -230,15 +232,15 @@ export function CustomVariableManagerDialog({
     const defaultValueTrimmed = formValues.defaultValue.trim();
 
     if (!label) {
-      setFormError('Label is required.');
+      setFormError(t('flow_builder.custom_variables.error_label_required', 'Label is required.'));
       return;
     }
     if (!NAME_PATTERN.test(name)) {
-      setFormError('Name must match snake_case: start with a letter, then letters, digits, or underscores.');
+      setFormError(t('flow_builder.custom_variables.error_name_pattern', 'Name must match snake_case: start with a letter, then letters, digits, or underscores.'));
       return;
     }
     if (otherNames.has(name)) {
-      setFormError('This name is already used by another variable.');
+      setFormError(t('flow_builder.custom_variables.error_name_duplicate', 'This name is already used by another variable.'));
       return;
     }
 
@@ -288,10 +290,10 @@ export function CustomVariableManagerDialog({
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="max-h-[90vh] w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] overflow-y-auto sm:max-w-4xl lg:max-w-5xl">
           <DialogHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0">
-            <DialogTitle>Custom Variables</DialogTitle>
+            <DialogTitle>{t('flow_builder.custom_variables.title', 'Custom Variables')}</DialogTitle>
             {formMode === 'list' && (
               <Button type="button" size="sm" onClick={startCreate}>
-                New Variable
+                {t('flow_builder.custom_variables.new_variable', 'New Variable')}
               </Button>
             )}
           </DialogHeader>
@@ -301,12 +303,16 @@ export function CustomVariableManagerDialog({
               {flowId != null && loadingCurrentValues && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                  <span>Loading current values…</span>
+                  <span>{t('flow_builder.custom_variables.loading_current_values', 'Loading current values…')}</span>
                 </div>
               )}
               {customVariables.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-8 text-center">
-                  No custom variables yet. Click &quot;New Variable&quot; to add one.
+                  {t(
+                    'flow_builder.custom_variables.empty_state',
+                    'No custom variables yet. Click "{{action}}" to add one.',
+                    { action: t('flow_builder.custom_variables.new_variable', 'New Variable') }
+                  )}
                 </p>
               ) : (
                 <>
@@ -321,7 +327,7 @@ export function CustomVariableManagerDialog({
                           <div className="min-w-0 flex-1 space-y-3">
                             <div>
                               <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                Name
+                                {t('flow_builder.name', 'Name')}
                               </p>
                               <Badge variant="secondary" className="font-mono text-xs">
                                 {`{{${v.name}}}`}
@@ -329,13 +335,13 @@ export function CustomVariableManagerDialog({
                             </div>
                             <div>
                               <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                Label
+                                {t('flow_builder.custom_variables.column_label', 'Label')}
                               </p>
                               <p className="font-medium leading-snug">{v.label}</p>
                             </div>
                             <div>
                               <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                Description
+                                {t('flow_builder.custom_variables.column_description', 'Description')}
                               </p>
                               <p className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
                                 {v.description?.trim() ? v.description : '—'}
@@ -343,15 +349,15 @@ export function CustomVariableManagerDialog({
                             </div>
                             <div>
                               <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                Current value
+                                {t('flow_builder.custom_variables.column_current_value', 'Current value')}
                               </p>
                               <div className="text-sm">{renderCurrentValueCell(v, 'block')}</div>
                             </div>
                             <div className="flex flex-wrap items-center gap-2">
                               <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                Type
+                                {t('flow_builder.custom_variables.column_type', 'Type')}
                               </span>
-                              <Badge variant="outline">{v.dataType}</Badge>
+                              <Badge variant="outline">{v.dataType === 'text' ? t('flow_builder.custom_variables.data_type_text', 'text') : v.dataType}</Badge>
                             </div>
                           </div>
                           <div className="flex shrink-0 flex-col gap-1 sm:flex-row">
@@ -361,7 +367,7 @@ export function CustomVariableManagerDialog({
                               size="icon"
                               className="h-8 w-8"
                               onClick={() => startEdit(v)}
-                              aria-label="Edit variable"
+                              aria-label={t('flow_builder.custom_variables.edit_variable_aria', 'Edit variable')}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
@@ -371,7 +377,7 @@ export function CustomVariableManagerDialog({
                               size="icon"
                               className="h-8 w-8 text-destructive hover:text-destructive"
                               onClick={() => setDeleteConfirmId(v.id)}
-                              aria-label="Delete variable"
+                              aria-label={t('flow_builder.custom_variables.delete_variable_aria', 'Delete variable')}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -386,12 +392,12 @@ export function CustomVariableManagerDialog({
                     <Table className="min-w-[720px] table-fixed">
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="w-[14%]">Name</TableHead>
-                          <TableHead className="w-[14%]">Label</TableHead>
-                          <TableHead className="w-[22%]">Description</TableHead>
-                          <TableHead className="w-[30%] min-w-[11rem]">Current Value</TableHead>
-                          <TableHead className="w-[8%]">Type</TableHead>
-                          <TableHead className="w-[12%] text-right">Actions</TableHead>
+                          <TableHead className="w-[14%]">{t('flow_builder.name', 'Name')}</TableHead>
+                          <TableHead className="w-[14%]">{t('flow_builder.custom_variables.column_label', 'Label')}</TableHead>
+                          <TableHead className="w-[22%]">{t('flow_builder.custom_variables.column_description', 'Description')}</TableHead>
+                          <TableHead className="w-[30%] min-w-[11rem]">{t('flow_builder.custom_variables.column_current_value_full', 'Current Value')}</TableHead>
+                          <TableHead className="w-[8%]">{t('flow_builder.custom_variables.column_type', 'Type')}</TableHead>
+                          <TableHead className="w-[12%] text-right">{t('common.actions', 'Actions')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -412,7 +418,7 @@ export function CustomVariableManagerDialog({
                             </TableCell>
                             <TableCell className="align-top">{renderCurrentValueCell(v)}</TableCell>
                             <TableCell className="align-top">
-                              <Badge variant="outline">{v.dataType}</Badge>
+                              <Badge variant="outline">{v.dataType === 'text' ? t('flow_builder.custom_variables.data_type_text', 'text') : v.dataType}</Badge>
                             </TableCell>
                             <TableCell className="align-top text-right">
                               <div className="flex justify-end gap-1">
@@ -422,7 +428,7 @@ export function CustomVariableManagerDialog({
                                   size="icon"
                                   className="h-8 w-8"
                                   onClick={() => startEdit(v)}
-                                  aria-label="Edit variable"
+                                  aria-label={t('flow_builder.custom_variables.edit_variable_aria', 'Edit variable')}
                                 >
                                   <Pencil className="h-4 w-4" />
                                 </Button>
@@ -432,7 +438,7 @@ export function CustomVariableManagerDialog({
                                   size="icon"
                                   className="h-8 w-8 text-destructive hover:text-destructive"
                                   onClick={() => setDeleteConfirmId(v.id)}
-                                  aria-label="Delete variable"
+                                  aria-label={t('flow_builder.custom_variables.delete_variable_aria', 'Delete variable')}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -451,58 +457,58 @@ export function CustomVariableManagerDialog({
           {(formMode === 'create' || formMode === 'edit') && (
             <div className="space-y-4 pt-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Label</label>
+                <label className="text-sm font-medium">{t('flow_builder.custom_variables.column_label', 'Label')}</label>
                 <Input
                   value={formValues.label}
                   onChange={(e) => onLabelChange(e.target.value)}
-                  placeholder="Human-readable label"
+                  placeholder={t('flow_builder.custom_variables.label_placeholder', 'Human-readable label')}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Name</label>
+                <label className="text-sm font-medium">{t('flow_builder.name', 'Name')}</label>
                 <Input
                   value={formValues.name}
                   onChange={(e) => {
                     setFormValues((prev) => ({ ...prev, name: e.target.value }));
                     setFormError(null);
                   }}
-                  placeholder="snake_case"
+                  placeholder={t('flow_builder.custom_variables.name_placeholder', 'snake_case')}
                   className="font-mono text-sm"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Description</label>
+                <label className="text-sm font-medium">{t('flow_builder.custom_variables.column_description', 'Description')}</label>
                 <Textarea
                   value={formValues.description}
                   onChange={(e) =>
                     setFormValues((prev) => ({ ...prev, description: e.target.value }))
                   }
-                  placeholder="Optional description"
+                  placeholder={t('flow_builder.custom_variables.description_placeholder', 'Optional description')}
                   rows={3}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Default Value</label>
+                <label className="text-sm font-medium">{t('flow_builder.data_capture_default_value', 'Default Value')}</label>
                 <Input
                   value={formValues.defaultValue}
                   onChange={(e) =>
                     setFormValues((prev) => ({ ...prev, defaultValue: e.target.value }))
                   }
-                  placeholder="Optional default when no session value exists"
+                  placeholder={t('flow_builder.custom_variables.default_value_placeholder', 'Optional default when no session value exists')}
                 />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Data Type</span>
-                <Badge variant="secondary">text</Badge>
+                <span className="text-sm font-medium">{t('flow_builder.data_capture_data_type', 'Data Type')}</span>
+                <Badge variant="secondary">{t('flow_builder.custom_variables.data_type_text', 'text')}</Badge>
               </div>
               {formError && <p className="text-sm text-destructive">{formError}</p>}
               <div className="flex justify-end gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={resetToList}>
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="button" onClick={validateAndSave}>
-                  Save
+                  {t('common.save', 'Save')}
                 </Button>
               </div>
             </div>
@@ -513,20 +519,24 @@ export function CustomVariableManagerDialog({
       <AlertDialog open={deleteConfirmId !== null} onOpenChange={(o) => !o && setDeleteConfirmId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete variable?</AlertDialogTitle>
+            <AlertDialogTitle>{t('flow_builder.custom_variables.delete_confirm_title', 'Delete variable?')}</AlertDialogTitle>
             <AlertDialogDescription>
               {deleteConfirmId
-                ? `Delete ${customVariables.find((v) => v.id === deleteConfirmId)?.name ?? 'this variable'}? This cannot be undone.`
+                ? t(
+                    'flow_builder.custom_variables.delete_confirm_desc',
+                    'Delete {{name}}? This cannot be undone.',
+                    { name: customVariables.find((v) => v.id === deleteConfirmId)?.name ?? t('flow_builder.custom_variables.this_variable', 'this variable') }
+                  )
                 : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={confirmDelete}
             >
-              Confirm Delete
+              {t('flow_builder.custom_variables.confirm_delete', 'Confirm Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

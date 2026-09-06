@@ -118,7 +118,7 @@ export function DocumentNode({ data, isConnectable, id }: any) {
       <div className="font-medium flex items-center gap-2 mb-2">
         <img 
           src="https://cdn-icons-png.flaticon.com/128/136/136522.png" 
-          alt="Document Message" 
+          alt={t('flow_builder.document_upload_node_title', 'Document Message')} 
           className="h-4 w-4"
         />
         <span>{t('flow_builder.send_document', 'Send Document')}</span>
@@ -226,12 +226,12 @@ export function DocumentNode({ data, isConnectable, id }: any) {
 
                         <div className="pl-8 space-y-2">
                           <div>
-                            <label className="text-xs text-muted-foreground block mb-1">Match Value:</label>
+                            <label className="text-xs text-muted-foreground block mb-1">{t('flow_builder.keyword_match_value_label', 'Match Value:')}</label>
                             <input
                               className="w-full p-1.5 text-xs border rounded"
                               value={keyword.value}
                               onChange={(e) => updateKeyword(keyword.id, 'value', e.target.value)}
-                              placeholder="Text to match"
+                              placeholder={t('flow_builder.keyword_match_value_placeholder', 'Text to match')}
                             />
                           </div>
 
@@ -244,7 +244,7 @@ export function DocumentNode({ data, isConnectable, id }: any) {
                               className="w-3 h-3"
                             />
                             <label htmlFor={`case-sensitive-${keyword.id}`} className="text-xs text-muted-foreground">
-                              Case sensitive
+                              {t('flow_builder.case_sensitive', 'Case sensitive')}
                             </label>
                           </div>
                         </div>
@@ -268,8 +268,8 @@ export function DocumentNode({ data, isConnectable, id }: any) {
 
                 {enableKeywordTriggers && (
                   <div className="text-[10px] text-muted-foreground space-y-1">
-                    <div>Each keyword will create its own output connection.</div>
-                    <div>A "no match" output will be available for unmatched responses.</div>
+                    <div>{t('flow_builder.keyword_trigger_each_output', 'Each keyword will create its own output connection.')}</div>
+                    <div>{t('flow_builder.keyword_trigger_no_match_output', 'A "no match" output will be available for unmatched responses.')}</div>
                   </div>
                 )}
               </div>
@@ -306,7 +306,7 @@ export function DocumentNode({ data, isConnectable, id }: any) {
                     <div className="flex-1">
                       <span className="font-medium">{keyword.text}</span>
                       <span className="text-muted-foreground/70"> → "{keyword.value}"</span>
-                      {keyword.caseSensitive && <span className="text-orange-600 ml-1">(case sensitive)</span>}
+                      {keyword.caseSensitive && <span className="text-orange-600 ml-1">{t('flow_builder.keyword_case_sensitive_suffix', '(case sensitive)')}</span>}
                     </div>
 
                     {/* Output handle for this keyword */}

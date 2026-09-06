@@ -1344,7 +1344,7 @@ export async function setupAuth(app: Express) {
   app.put("/api/admin/companies/:id", ensureSuperAdmin, async (req, res) => {
     try {
       const companyId = parseInt(req.params.id);
-      const { name, slug, logo, primaryColor, active, planId, maxUsers, companyEmail, contactPerson, registerNumber, iban } = req.body;
+      const { name, slug, logo, primaryColor, active, planId, maxUsers, companyEmail, contactPerson, registerNumber, iban, whatsappImportMode, whatsappGroupsEnabled } = req.body;
 
 
       const existingCompany = await storage.getCompany(companyId);
@@ -1393,7 +1393,9 @@ export async function setupAuth(app: Express) {
         companyEmail,
         contactPerson,
         registerNumber,
-        iban
+        iban,
+        whatsappImportMode: whatsappImportMode ?? existingCompany.whatsappImportMode,
+        whatsappGroupsEnabled: whatsappGroupsEnabled ?? existingCompany.whatsappGroupsEnabled
       };
 
 

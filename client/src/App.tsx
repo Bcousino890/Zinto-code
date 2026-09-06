@@ -578,6 +578,10 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* TranslationProvider must wrap every provider that calls useTranslation
+          (AuthProvider and BrandingProvider do). It only fetches /api/languages
+          and depends on no other context, so it is safe at the top. */}
+      <TranslationProvider>
       <CustomScriptsProvider>
         <SubdomainProvider>
           <AuthProvider>
@@ -585,7 +589,6 @@ function App() {
               <CompanyCustomJsProvider>
                 <BrandingProvider>
                   <CurrencyProvider>
-                    <TranslationProvider>
                       <ActiveChannelProvider>
                         <ConversationProvider>
                           <PlanUpdatesProvider>
@@ -603,7 +606,6 @@ function App() {
                           </PlanUpdatesProvider>
                         </ConversationProvider>
                       </ActiveChannelProvider>
-                    </TranslationProvider>
                   </CurrencyProvider>
                 </BrandingProvider>
               </CompanyCustomJsProvider>
@@ -611,6 +613,7 @@ function App() {
           </AuthProvider>
         </SubdomainProvider>
       </CustomScriptsProvider>
+      </TranslationProvider>
     </QueryClientProvider>
   );
 }

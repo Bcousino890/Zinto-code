@@ -152,6 +152,8 @@ export default function CompanyDetailPage() {
     active: z.boolean(),
     planId: z.number().int().min(1, t('admin.companies.detail.validation.plan_required', 'Plan is required')),
     maxUsers: z.number().int().min(1, t('admin.companies.detail.validation.max_users_required', 'Must have at least 1 user')),
+    whatsappImportMode: z.enum(['disabled', 'contacts_only', 'full_chat']),
+    whatsappGroupsEnabled: z.boolean(),
   });
 
   type CompanyFormValues = z.infer<typeof companySchema>;
@@ -204,11 +206,8 @@ export default function CompanyDetailPage() {
       active: true,
       planId: 0,
       maxUsers: 5,
-
-
-
-
-
+      whatsappImportMode: 'contacts_only',
+      whatsappGroupsEnabled: false,
     }
   });
 
@@ -224,10 +223,8 @@ export default function CompanyDetailPage() {
         active: company.active,
         planId: planId,
         maxUsers: company.maxUsers,
-
-
-
-
+        whatsappImportMode: (company as any).whatsappImportMode || 'contacts_only',
+        whatsappGroupsEnabled: (company as any).whatsappGroupsEnabled ?? false,
 
       });
     }
@@ -783,6 +780,53 @@ export default function CompanyDetailPage() {
                         />
                         */}
                       </div>
+
+                      <FormField
+                        control={form.control}
+                        name="whatsappImportMode"
+                        render={({ field }) => (
+                          <FormItem className="rounded-lg border p-4">
+                            <FormLabel className="text-base">{t('admin.companies.detail.form.whatsapp_import_mode', 'WhatsApp History Import')}</FormLabel>
+                            <FormDescription>
+                              {t('admin.companies.detail.form.whatsapp_import_mode_description', 'Controls what this company imports from WhatsApp (Unofficial) history sync. "Full chat" also removes the time window on imported messages.')}
+                            </FormDescription>
+                            <FormControl>
+                              <Select value={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="disabled">Disabled</SelectItem>
+                                  <SelectItem value="contacts_only">Contacts only</SelectItem>
+                                  <SelectItem value="full_chat">Full chat + contacts (no limits)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="whatsappGroupsEnabled"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-base">{t('admin.companies.detail.form.whatsapp_groups', 'Receive Group Messages')}</FormLabel>
+                              <FormDescription>
+                                {t('admin.companies.detail.form.whatsapp_groups_description', 'When enabled, WhatsApp group chats appear in the inbox. Every group this number belongs to will start creating conversations.')}
+                              </FormDescription>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
 
                       <FormField
                         control={form.control}

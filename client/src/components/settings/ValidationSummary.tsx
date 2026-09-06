@@ -9,6 +9,7 @@ import {
   CollapsibleTrigger
 } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/use-translation";
 
 export interface ValidationSection {
   key: string;
@@ -26,12 +27,6 @@ export interface ValidationSummaryProps {
   className?: string;
 }
 
-const statusConfig = {
-  valid: { icon: Check, color: "text-green-600", bg: "bg-green-500/10", label: "Valid" },
-  warning: { icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-500/10", label: "Warning" },
-  error: { icon: X, color: "text-destructive", bg: "bg-destructive/10", label: "Error" }
-};
-
 export function ValidationSummary({
   sections,
   onCopyDiagnostics,
@@ -39,6 +34,13 @@ export function ValidationSummary({
   className = ""
 }: ValidationSummaryProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
+
+  const statusConfig = {
+    valid: { icon: Check, color: "text-green-600", bg: "bg-green-500/10", label: t('common.valid', 'Valid') },
+    warning: { icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-500/10", label: t('common.warning', 'Warning') },
+    error: { icon: X, color: "text-destructive", bg: "bg-destructive/10", label: t('common.error', 'Error') }
+  };
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   const fullReport = sections
@@ -51,7 +53,7 @@ export function ValidationSummary({
   const handleCopy = () => {
     const text = onCopyDiagnostics ? onCopyDiagnostics() : fullReport;
     navigator.clipboard.writeText(text);
-    toast({ title: "Copied", description: "Diagnostics copied to clipboard" });
+    toast({ title: t('common.copied', 'Copied'), description: t('common.diagnostics_copied', 'Diagnostics copied to clipboard') });
   };
 
   const handleShare = () => {
@@ -59,22 +61,22 @@ export function ValidationSummary({
     if (onShareWithSupport) {
       onShareWithSupport(report);
     } else {
-      const subject = encodeURIComponent("Voice channel diagnostics");
+      const subject = encodeURIComponent(t('common.voice_channel_diagnostics', 'Voice channel diagnostics'));
       const body = encodeURIComponent(`Please find the diagnostics report below:\n\n${report}`);
       window.open(`mailto:support@example.com?subject=${subject}&body=${body}`, "_blank");
     }
-    toast({ title: "Share", description: "Opening support ticket option" });
+    toast({ title: t('common.share', 'Share'), description: t('common.opening_support_ticket', 'Opening support ticket option') });
   };
 
   return (
     <div className={`rounded-md border bg-muted/30 ${className}`}>
       <div className="p-3 flex items-center justify-between gap-2 border-b">
-        <span className="text-sm font-medium">Validation summary</span>
+        <span className="text-sm font-medium">{t('common.validation_summary', 'Validation summary')}</span>
         <div className="flex gap-2">
           {onCopyDiagnostics && (
             <Button type="button" variant="ghost" size="sm" onClick={handleCopy}>
               <Copy className="h-4 w-4 mr-1" />
-              Copy diagnostics
+              {t('common.copy_diagnostics', 'Copy diagnostics')}
             </Button>
           )}
         </div>
@@ -113,7 +115,7 @@ export function ValidationSummary({
                   {section.message && <p>{section.message}</p>}
                   {section.recommendedActions && section.recommendedActions.length > 0 && (
                     <div>
-                      <p className="font-medium text-foreground">Recommended actions:</p>
+                      <p className="font-medium text-foreground">{t('common.recommended_actions', 'Recommended actions')}:</p>
                       <ul className="list-disc list-inside mt-1">
                         {section.recommendedActions.map((action, i) => (
                           <li key={i}>{action}</li>

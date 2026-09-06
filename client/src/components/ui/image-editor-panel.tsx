@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Trash2, Lock, Unlock, RotateCcw } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface ImageProperties {
   width: number;
@@ -31,6 +32,7 @@ interface ImageEditorPanelProps {
 }
 
 export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete }: ImageEditorPanelProps) {
+  const { t } = useTranslation();
   const [properties, setProperties] = useState<ImageProperties>({
     width: 0,
     height: 0,
@@ -121,7 +123,7 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
     <Card className="image-editor-panel absolute top-4 right-4 w-80 z-[9999] shadow-lg border bg-white">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm">Image Properties</CardTitle>
+          <CardTitle className="text-sm">{t('common.image_editor.title', 'Image Properties')}</CardTitle>
           <div className="flex gap-1">
             <Button variant="ghost" size="sm" onClick={resetToOriginal}>
               <RotateCcw className="h-4 w-4" />
@@ -138,15 +140,15 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
       <CardContent className="space-y-4">
         <Tabs defaultValue="size" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="size">Size</TabsTrigger>
-            <TabsTrigger value="style">Style</TabsTrigger>
-            <TabsTrigger value="position">Position</TabsTrigger>
+            <TabsTrigger value="size">{t('common.image_editor.tab_size', 'Size')}</TabsTrigger>
+            <TabsTrigger value="style">{t('common.image_editor.tab_style', 'Style')}</TabsTrigger>
+            <TabsTrigger value="position">{t('common.image_editor.tab_position', 'Position')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="size" className="space-y-3">
             <div className="flex items-center gap-2">
               <div className="flex-1">
-                <Label htmlFor="width" className="text-xs">Width (px)</Label>
+                <Label htmlFor="width" className="text-xs">{t('common.image_editor.width_px', 'Width (px)')}</Label>
                 <Input
                   id="width"
                   type="number"
@@ -164,7 +166,7 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
                 {properties.aspectRatioLocked ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
               </Button>
               <div className="flex-1">
-                <Label htmlFor="height" className="text-xs">Height (px)</Label>
+                <Label htmlFor="height" className="text-xs">{t('common.image_editor.height_px', 'Height (px)')}</Label>
                 <Input
                   id="height"
                   type="number"
@@ -176,12 +178,12 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
             </div>
             
             <div>
-              <Label htmlFor="alt" className="text-xs">Alt Text</Label>
+              <Label htmlFor="alt" className="text-xs">{t('common.image_editor.alt_text', 'Alt Text')}</Label>
               <Input
                 id="alt"
                 value={properties.alt}
                 onChange={(e) => handlePropertyChange('alt', e.target.value)}
-                placeholder="Describe the image..."
+                placeholder={t('common.image_editor.alt_placeholder', 'Describe the image...')}
                 className="h-8"
               />
             </div>
@@ -189,7 +191,7 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
           
           <TabsContent value="style" className="space-y-3">
             <div>
-              <Label className="text-xs">Opacity: {properties.opacity}%</Label>
+              <Label className="text-xs">{t('common.image_editor.opacity_label', 'Opacity: {{value}}%', { value: properties.opacity })}</Label>
               <Slider
                 value={[properties.opacity]}
                 onValueChange={(value) => handlePropertyChange('opacity', value[0])}
@@ -201,7 +203,7 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
             </div>
             
             <div>
-              <Label htmlFor="border-width" className="text-xs">Border Width (px)</Label>
+              <Label htmlFor="border-width" className="text-xs">{t('common.image_editor.border_width_px', 'Border Width (px)')}</Label>
               <Input
                 id="border-width"
                 type="number"
@@ -212,7 +214,7 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
             </div>
             
             <div>
-              <Label htmlFor="border-color" className="text-xs">Border Color</Label>
+              <Label htmlFor="border-color" className="text-xs">{t('common.image_editor.border_color', 'Border Color')}</Label>
               <Input
                 id="border-color"
                 type="color"
@@ -225,7 +227,7 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
           
           <TabsContent value="position" className="space-y-3">
             <div>
-              <Label className="text-xs">Alignment</Label>
+              <Label className="text-xs">{t('common.image_editor.alignment', 'Alignment')}</Label>
               <Select
                 value={properties.alignment}
                 onValueChange={(value) => handlePropertyChange('alignment', value)}
@@ -234,17 +236,17 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="left">Left</SelectItem>
-                  <SelectItem value="center">Center</SelectItem>
-                  <SelectItem value="right">Right</SelectItem>
-                  <SelectItem value="float-left">Float Left</SelectItem>
-                  <SelectItem value="float-right">Float Right</SelectItem>
+                  <SelectItem value="left">{t('common.image_editor.align_left', 'Left')}</SelectItem>
+                  <SelectItem value="center">{t('common.image_editor.align_center', 'Center')}</SelectItem>
+                  <SelectItem value="right">{t('common.image_editor.align_right', 'Right')}</SelectItem>
+                  <SelectItem value="float-left">{t('common.image_editor.align_float_left', 'Float Left')}</SelectItem>
+                  <SelectItem value="float-right">{t('common.image_editor.align_float_right', 'Float Right')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
-              <Label htmlFor="margin" className="text-xs">Margin (px)</Label>
+              <Label htmlFor="margin" className="text-xs">{t('common.image_editor.margin_px', 'Margin (px)')}</Label>
               <Input
                 id="margin"
                 type="number"
@@ -257,7 +259,7 @@ export function ImageEditorPanel({ image, isVisible, onClose, onUpdate, onDelete
         </Tabs>
         
         <Button onClick={applyChanges} className="w-full h-8 text-xs">
-          Apply Changes
+          {t('common.image_editor.apply_changes', 'Apply Changes')}
         </Button>
       </CardContent>
     </Card>

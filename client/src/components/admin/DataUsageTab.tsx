@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { useCompanyUsage, useOverrideCompanyUsage, useResetBandwidthUsage, useRecalculateCompanyUsage } from '@/hooks/use-company-usage';
 import { 
   formatStorageSize, 
@@ -46,8 +47,10 @@ const emptyOverrideValues = {
   reason: ''
 };
 
-const formatLimitSize = (limit: number) => limit > 0 ? formatStorageSize(limit) : 'Unlimited';
-const formatLimitCount = (limit: number) => limit > 0 ? limit.toLocaleString() : 'Unlimited';
+type Translate = (key: string, fallback?: string, vars?: Record<string, any>) => string;
+
+const formatLimitSize = (limit: number, unlimitedLabel: string) => limit > 0 ? formatStorageSize(limit) : unlimitedLabel;
+const formatLimitCount = (limit: number, unlimitedLabel: string) => limit > 0 ? limit.toLocaleString() : unlimitedLabel;
 const formatPercentage = (percentage: number) => `${Math.round(percentage)}%`;
 
 const getStatusBadgeVariant = (
@@ -59,27 +62,27 @@ const getStatusBadgeVariant = (
   return 'success';
 };
 
-const parseUsageMbInput = (value: string, label: string) => {
+const parseUsageMbInput = (value: string, label: string, t: Translate) => {
   if (!value.trim()) {
     return undefined;
   }
 
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0) {
-    throw new Error(`${label} must be a non-negative number.`);
+    throw new Error(t('admin.data_usage.non_negative_number_error', '{{label}} must be a non-negative number.', { label }));
   }
 
   return parsed === 0 ? 0 : Math.ceil(parsed);
 };
 
-const parseFilesInput = (value: string) => {
+const parseFilesInput = (value: string, t: Translate) => {
   if (!value.trim()) {
     return undefined;
   }
 
   const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed < 0) {
-    throw new Error('Files count must be a non-negative whole number.');
+    throw new Error(t('admin.data_usage.files_count_error', 'Files count must be a non-negative whole number.'));
   }
 
   return parsed;
@@ -87,6 +90,7 @@ const parseFilesInput = (value: string) => {
 
 export function DataUsageTab({ companyId }: DataUsageTabProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { data: usage, isLoading, error, refetch } = useCompanyUsage(companyId);
   const overrideUsageMutation = useOverrideCompanyUsage(companyId);
   const resetBandwidthMutation = useResetBandwidthUsage(companyId);
@@ -105,23 +109,23 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
         reason: overrideValues.reason || 'Admin manual override'
       };
 
-      data.currentStorageUsed = parseUsageMbInput(overrideValues.currentStorageUsed, 'Storage used');
-      data.currentBandwidthUsed = parseUsageMbInput(overrideValues.currentBandwidthUsed, 'Bandwidth used');
-      data.filesCount = parseFilesInput(overrideValues.filesCount);
+      data.currentStorageUsed = parseUsageMbInput(overrideValues.currentStorageUsed, t('admin.data_usage.storage_used_label', 'Storage used'), t);
+      data.currentBandwidthUsed = parseUsageMbInput(overrideValues.currentBandwidthUsed, t('admin.data_usage.bandwidth_used_label', 'Bandwidth used'), t);
+      data.filesCount = parseFilesInput(overrideValues.filesCount, t);
 
       await overrideUsageMutation.mutateAsync(data);
-      
+
       toast({
-        title: "Usage Updated",
-        description: "Company usage has been manually overridden successfully.",
+        title: t('admin.data_usage.override_success_title', 'Usage Updated'),
+        description: t('admin.data_usage.override_success_desc', 'Company usage has been manually overridden successfully.'),
       });
-      
+
       setOverrideDialogOpen(false);
       resetOverrideValues();
     } catch (error: any) {
       toast({
-        title: "Override Failed",
-        description: error.message || "Failed to override usage",
+        title: t('admin.data_usage.override_failed_title', 'Override Failed'),
+        description: error.message || t('admin.data_usage.override_failed_desc', 'Failed to override usage'),
         variant: "destructive",
       });
     }
@@ -131,13 +135,13 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
     try {
       await resetBandwidthMutation.mutateAsync();
       toast({
-        title: "Bandwidth Reset",
-        description: "Monthly bandwidth usage has been reset to zero.",
+        title: t('admin.data_usage.bandwidth_reset_title', 'Bandwidth Reset'),
+        description: t('admin.data_usage.bandwidth_reset_desc', 'Monthly bandwidth usage has been reset to zero.'),
       });
     } catch (error: any) {
       toast({
-        title: "Reset Failed",
-        description: error.message || "Failed to reset bandwidth usage",
+        title: t('admin.data_usage.reset_failed_title', 'Reset Failed'),
+        description: error.message || t('admin.data_usage.reset_failed_desc', 'Failed to reset bandwidth usage'),
         variant: "destructive",
       });
     }
@@ -147,13 +151,13 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
     try {
       await recalculateUsageMutation.mutateAsync();
       toast({
-        title: "Storage Recalculated",
-        description: "Storage usage and file count were recalculated. Bandwidth is tracked monthly and was not recalculated.",
+        title: t('admin.data_usage.recalculate_success_title', 'Storage Recalculated'),
+        description: t('admin.data_usage.recalculate_success_desc', 'Storage usage and file count were recalculated. Bandwidth is tracked monthly and was not recalculated.'),
       });
     } catch (error: any) {
       toast({
-        title: "Storage Recalculation Failed",
-        description: error.message || "Failed to recalculate storage usage",
+        title: t('admin.data_usage.recalculate_failed_title', 'Storage Recalculation Failed'),
+        description: error.message || t('admin.data_usage.recalculate_failed_desc', 'Failed to recalculate storage usage'),
         variant: "destructive",
       });
     }
@@ -185,13 +189,13 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
         <CardContent className="p-6">
           <div className="text-center py-8">
             <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-red-600 mb-2">Failed to Load Usage Data</h3>
+            <h3 className="text-lg font-semibold text-red-600 mb-2">{t('admin.data_usage.load_error_title', 'Failed to Load Usage Data')}</h3>
             <p className="text-muted-foreground mb-4">
-              {error instanceof Error ? error.message : 'An error occurred while loading usage data'}
+              {error instanceof Error ? error.message : t('admin.data_usage.load_error_generic', 'An error occurred while loading usage data')}
             </p>
             <Button onClick={() => refetch()} variant="outline">
               <RefreshCw className="h-4 w-4 mr-2" />
-              Retry
+              {t('common.retry', 'Retry')}
             </Button>
           </div>
         </CardContent>
@@ -204,7 +208,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
       <Card>
         <CardContent className="p-6">
           <div className="text-center py-8 text-muted-foreground">
-            No usage data available for this company.
+            {t('admin.data_usage.no_usage_data', 'No usage data available for this company.')}
           </div>
         </CardContent>
       </Card>
@@ -220,7 +224,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
         {/* Storage Usage */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Storage Usage</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('admin.data_usage.storage_usage_title', 'Storage Usage')}</CardTitle>
             <HardDrive className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -228,7 +232,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
               {formatStorageSize(usage.currentUsage.storage ?? 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              of {formatLimitSize(usage.limits.storage)} limit
+              {t('admin.data_usage.of_limit', 'of {{limit}} limit', { limit: formatLimitSize(usage.limits.storage, t('admin.plans.unlimited', 'Unlimited')) })}
             </p>
             <div className="mt-4">
               <Progress 
@@ -245,7 +249,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
               </div>
               {usage.limits.storage === 0 && usage.currentUsage.storage > 0 && (
                 <p className="text-xs text-amber-600 mt-1">
-                  No plan limit configured
+                  {t('admin.data_usage.no_plan_limit', 'No plan limit configured')}
                 </p>
               )}
             </div>
@@ -255,7 +259,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
         {/* Bandwidth Usage */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bandwidth Usage</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('admin.data_usage.bandwidth_usage_title', 'Bandwidth Usage')}</CardTitle>
             <Wifi className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -263,7 +267,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
               {formatStorageSize(usage.currentUsage.bandwidth ?? 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              of {formatLimitSize(usage.limits.bandwidth)} monthly limit
+              {t('admin.data_usage.of_monthly_limit', 'of {{limit}} monthly limit', { limit: formatLimitSize(usage.limits.bandwidth, t('admin.plans.unlimited', 'Unlimited')) })}
             </p>
             <div className="mt-4">
               <Progress 
@@ -280,7 +284,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
               </div>
               {usage.limits.bandwidth === 0 && usage.currentUsage.bandwidth > 0 && (
                 <p className="text-xs text-amber-600 mt-1">
-                  No plan limit configured
+                  {t('admin.data_usage.no_plan_limit', 'No plan limit configured')}
                 </p>
               )}
             </div>
@@ -290,7 +294,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
         {/* Files Count */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Files Count</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('admin.data_usage.files_count_title', 'Files Count')}</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -298,7 +302,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
               {(usage.currentUsage.files ?? 0).toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              of {usage.limits.totalFiles > 0 ? usage.limits.totalFiles.toLocaleString() : 'Unlimited'} limit
+              {t('admin.data_usage.of_limit', 'of {{limit}} limit', { limit: usage.limits.totalFiles > 0 ? usage.limits.totalFiles.toLocaleString() : t('admin.plans.unlimited', 'Unlimited') })}
             </p>
             <div className="mt-4">
               <Progress 
@@ -315,7 +319,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
               </div>
               {usage.limits.totalFiles === 0 && usage.currentUsage.files > 0 && (
                 <p className="text-xs text-amber-600 mt-1">
-                  No plan limit configured
+                  {t('admin.data_usage.no_plan_limit', 'No plan limit configured')}
                 </p>
               )}
             </div>
@@ -326,26 +330,26 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
       {/* Plan Information */}
       <Card>
         <CardHeader>
-          <CardTitle>Plan Limits</CardTitle>
-          <CardDescription>Current plan: {usage.planName}</CardDescription>
+          <CardTitle>{t('admin.data_usage.plan_limits_title', 'Plan Limits')}</CardTitle>
+          <CardDescription>{t('admin.data_usage.current_plan', 'Current plan: {{plan}}', { plan: usage.planName })}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <Label className="text-sm font-medium">Storage Limit</Label>
-              <p className="text-lg font-semibold">{formatLimitSize(usage.limits.storage)}</p>
+              <Label className="text-sm font-medium">{t('admin.data_usage.storage_limit_label', 'Storage Limit')}</Label>
+              <p className="text-lg font-semibold">{formatLimitSize(usage.limits.storage, t('admin.plans.unlimited', 'Unlimited'))}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium">Bandwidth Limit</Label>
-              <p className="text-lg font-semibold">{formatLimitSize(usage.limits.bandwidth)}</p>
+              <Label className="text-sm font-medium">{t('admin.data_usage.bandwidth_limit_label', 'Bandwidth Limit')}</Label>
+              <p className="text-lg font-semibold">{formatLimitSize(usage.limits.bandwidth, t('admin.plans.unlimited', 'Unlimited'))}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium">File Upload Limit</Label>
-              <p className="text-lg font-semibold">{formatLimitSize(usage.limits.fileUpload)}</p>
+              <Label className="text-sm font-medium">{t('admin.data_usage.file_upload_limit_label', 'File Upload Limit')}</Label>
+              <p className="text-lg font-semibold">{formatLimitSize(usage.limits.fileUpload, t('admin.plans.unlimited', 'Unlimited'))}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium">Total Files Limit</Label>
-              <p className="text-lg font-semibold">{formatLimitCount(usage.limits.totalFiles)}</p>
+              <Label className="text-sm font-medium">{t('admin.data_usage.total_files_limit_label', 'Total Files Limit')}</Label>
+              <p className="text-lg font-semibold">{formatLimitCount(usage.limits.totalFiles, t('admin.plans.unlimited', 'Unlimited'))}</p>
             </div>
           </div>
         </CardContent>
@@ -357,7 +361,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
           <CardHeader>
             <CardTitle className="flex items-center">
               <TrendingUp className="h-5 w-5 mr-2" />
-              Recommendations
+              {t('admin.data_usage.recommendations_title', 'Recommendations')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -378,10 +382,10 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Settings className="h-5 w-5 mr-2" />
-            Admin Actions
+            {t('admin.data_usage.admin_actions_title', 'Admin Actions')}
           </CardTitle>
           <CardDescription>
-            Administrative tools for managing company usage
+            {t('admin.data_usage.admin_actions_desc', 'Administrative tools for managing company usage')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -398,58 +402,58 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
               <DialogTrigger asChild>
                 <Button variant="outline">
                   <Settings className="h-4 w-4 mr-2" />
-                  Override Usage
+                  {t('admin.data_usage.override_usage_button', 'Override Usage')}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Override Company Usage</DialogTitle>
+                  <DialogTitle>{t('admin.data_usage.override_dialog_title', 'Override Company Usage')}</DialogTitle>
                   <DialogDescription>
-                    Manually set usage values for this company. Leave fields empty to keep current values.
+                    {t('admin.data_usage.override_dialog_desc', 'Manually set usage values for this company. Leave fields empty to keep current values.')}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="storage">Storage Used (MB)</Label>
+                    <Label htmlFor="storage">{t('admin.data_usage.storage_used_mb_label', 'Storage Used (MB)')}</Label>
                     <Input
                       id="storage"
                       type="number"
                       min="0"
                       step="any"
-                      placeholder={`Current: ${formatStorageSize(usage.currentUsage.storage ?? 0)}`}
+                      placeholder={t('admin.data_usage.current_value_placeholder', 'Current: {{value}}', { value: formatStorageSize(usage.currentUsage.storage ?? 0) })}
                       value={overrideValues.currentStorageUsed}
                       onChange={(e) => setOverrideValues(prev => ({ ...prev, currentStorageUsed: e.target.value }))}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="bandwidth">Bandwidth Used (MB)</Label>
+                    <Label htmlFor="bandwidth">{t('admin.data_usage.bandwidth_used_mb_label', 'Bandwidth Used (MB)')}</Label>
                     <Input
                       id="bandwidth"
                       type="number"
                       min="0"
                       step="any"
-                      placeholder={`Current: ${formatStorageSize(usage.currentUsage.bandwidth ?? 0)}`}
+                      placeholder={t('admin.data_usage.current_value_placeholder', 'Current: {{value}}', { value: formatStorageSize(usage.currentUsage.bandwidth ?? 0) })}
                       value={overrideValues.currentBandwidthUsed}
                       onChange={(e) => setOverrideValues(prev => ({ ...prev, currentBandwidthUsed: e.target.value }))}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="files">Files Count</Label>
+                    <Label htmlFor="files">{t('admin.data_usage.files_count_title', 'Files Count')}</Label>
                     <Input
                       id="files"
                       type="number"
                       min="0"
                       step="1"
-                      placeholder={`Current: ${usage.currentUsage.files}`}
+                      placeholder={t('admin.data_usage.current_value_placeholder', 'Current: {{value}}', { value: usage.currentUsage.files })}
                       value={overrideValues.filesCount}
                       onChange={(e) => setOverrideValues(prev => ({ ...prev, filesCount: e.target.value }))}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="reason">Reason (Optional)</Label>
+                    <Label htmlFor="reason">{t('admin.data_usage.reason_label', 'Reason (Optional)')}</Label>
                     <Textarea
                       id="reason"
-                      placeholder="Reason for manual override..."
+                      placeholder={t('admin.data_usage.reason_placeholder', 'Reason for manual override...')}
                       value={overrideValues.reason}
                       onChange={(e) => setOverrideValues(prev => ({ ...prev, reason: e.target.value }))}
                     />
@@ -460,39 +464,39 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
                     setOverrideDialogOpen(false);
                     resetOverrideValues();
                   }}>
-                    Cancel
+                    {t('common.cancel', 'Cancel')}
                   </Button>
-                  <Button 
+                  <Button
                     onClick={handleOverrideUsage}
                     disabled={overrideUsageMutation.isPending}
                   >
-                    {overrideUsageMutation.isPending ? "Updating..." : "Update Usage"}
+                    {overrideUsageMutation.isPending ? t('common.updating', 'Updating...') : t('admin.data_usage.update_usage_button', 'Update Usage')}
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
 
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleResetBandwidth}
               disabled={resetBandwidthMutation.isPending}
             >
               <Calendar className="h-4 w-4 mr-2" />
-              {resetBandwidthMutation.isPending ? "Resetting..." : "Reset Monthly Bandwidth"}
+              {resetBandwidthMutation.isPending ? t('admin.data_usage.resetting', 'Resetting...') : t('admin.data_usage.reset_bandwidth_button', 'Reset Monthly Bandwidth')}
             </Button>
 
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleRecalculateUsage}
               disabled={recalculateUsageMutation.isPending}
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              {recalculateUsageMutation.isPending ? "Recalculating..." : "Recalculate Storage & Files"}
+              {recalculateUsageMutation.isPending ? t('admin.data_usage.recalculating', 'Recalculating...') : t('admin.data_usage.recalculate_button', 'Recalculate Storage & Files')}
             </Button>
 
             <Button variant="outline" onClick={() => refetch()}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh Data
+              {t('admin.data_usage.refresh_data_button', 'Refresh Data')}
             </Button>
           </div>
         </CardContent>
@@ -500,7 +504,7 @@ export function DataUsageTab({ companyId }: DataUsageTabProps) {
 
       {/* Last Updated */}
       <div className="text-sm text-muted-foreground text-center">
-        Last updated: {usage.lastUpdated ? new Date(usage.lastUpdated).toLocaleString() : 'Never'}
+        {t('admin.data_usage.last_updated', 'Last updated: {{date}}', { date: usage.lastUpdated ? new Date(usage.lastUpdated).toLocaleString() : t('api.access.key.never_used', 'Never') })}
       </div>
     </div>
   );

@@ -208,7 +208,6 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, isInbound }) => {
             alt={displayTitle}
             className="link-preview-image"
             loading="lazy"
-            crossOrigin="anonymous"
             onError={handleImageError}
           />
         </div>

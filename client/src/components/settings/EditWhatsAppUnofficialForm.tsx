@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { Loader2, Edit, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
 interface EditWhatsAppUnofficialFormProps {
@@ -24,6 +25,7 @@ interface ConnectionHealthData {
 
 export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connectionId }: EditWhatsAppUnofficialFormProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [accountName, setAccountName] = useState('');
@@ -87,8 +89,8 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
     } catch (error: any) {
       console.error('Error loading connection data:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to load connection data",
+        title: t('settings.tiktok_error', 'Error'),
+        description: error.message || t('settings.failed_load_connection', 'Failed to load connection data'),
         variant: "destructive"
       });
     } finally {
@@ -104,8 +106,8 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
 
     if (!accountName.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Account name is required.",
+        title: t('settings.validation_error', 'Validation Error'),
+        description: t('settings.whatsapp_account_required', 'Account name is required.'),
         variant: "destructive"
       });
       setIsSubmitting(false);
@@ -132,8 +134,8 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
       }
 
       toast({
-        title: "WhatsApp Connection Updated",
-        description: "Your WhatsApp connection settings have been updated successfully.",
+        title: t('settings.whatsapp_connection_updated', 'WhatsApp Connection Updated'),
+        description: t('settings.whatsapp_connection_updated_desc', 'Your WhatsApp connection settings have been updated successfully.'),
       });
 
       onSuccess();
@@ -141,8 +143,8 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
     } catch (error: any) {
       console.error('Error updating connection:', error);
       toast({
-        title: "Update Error",
-        description: error.message || "Failed to update WhatsApp connection",
+        title: t('settings.whatsapp_update_error', 'Update Error'),
+        description: error.message || t('settings.failed_load_connection', 'Failed to load connection data'),
         variant: "destructive"
       });
     } finally {

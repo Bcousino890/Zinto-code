@@ -1,6 +1,7 @@
 import React, { useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFlowExecution } from '../../hooks/useFlowExecution';
+import { useTranslation } from '@/hooks/use-translation';
 
 type NodeExecutionStatus = 'pending' | 'executing' | 'executed' | 'waiting' | 'failed' | 'skipped';
 
@@ -147,6 +148,7 @@ export const ExecutionStatusBadge: React.FC<ExecutionStatusBadgeProps> = ({
   status,
   className = ''
 }) => {
+  const { t } = useTranslation();
   const getStatusConfig = () => {
     switch (status) {
       case 'executing':
@@ -154,7 +156,7 @@ export const ExecutionStatusBadge: React.FC<ExecutionStatusBadgeProps> = ({
           badge: 'border-sky-200/80 bg-background/90 text-sky-900 shadow-[0_1px_2px_rgba(2,132,199,0.06),0_6px_18px_rgba(2,132,199,0.04)] dark:border-sky-400/60 dark:bg-sky-500/15 dark:text-sky-200 dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]',
           dot: 'bg-sky-500',
           showDot: false,
-          text: 'Running',
+          text: t('common.running', 'Running'),
           icon: (
             <img
               src="https://cdn-icons-png.flaticon.com/128/1709/1709973.png"
@@ -168,7 +170,7 @@ export const ExecutionStatusBadge: React.FC<ExecutionStatusBadgeProps> = ({
           badge: 'border-emerald-200/80 bg-background/90 text-emerald-900 shadow-[0_1px_2px_rgba(5,150,105,0.05),0_6px_18px_rgba(5,150,105,0.03)] dark:border-emerald-400/60 dark:bg-emerald-500/15 dark:text-emerald-200 dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]',
           dot: 'bg-emerald-500',
           showDot: false,
-          text: 'Done',
+          text: t('flow_builder.execution_overlay.done', 'Done'),
           icon: (
             <img
               src="https://cdn-icons-png.flaticon.com/128/9720/9720724.png"
@@ -182,7 +184,7 @@ export const ExecutionStatusBadge: React.FC<ExecutionStatusBadgeProps> = ({
           badge: 'border-amber-200/80 bg-background/90 text-amber-900 shadow-[0_1px_2px_rgba(217,119,6,0.05),0_6px_18px_rgba(217,119,6,0.03)] dark:border-amber-400/60 dark:bg-amber-500/15 dark:text-amber-200 dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]',
           dot: 'bg-amber-500',
           showDot: false,
-          text: 'Waiting',
+          text: t('common.waiting', 'Waiting'),
           icon: (
             <img
               src="https://cdn-icons-png.flaticon.com/128/717/717815.png"
@@ -196,7 +198,7 @@ export const ExecutionStatusBadge: React.FC<ExecutionStatusBadgeProps> = ({
           badge: 'border-rose-200/80 bg-background/90 text-rose-900 shadow-[0_1px_2px_rgba(225,29,72,0.05),0_6px_18px_rgba(225,29,72,0.03)] dark:border-rose-400/60 dark:bg-rose-500/15 dark:text-rose-200 dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]',
           dot: 'bg-rose-500',
           showDot: true,
-          text: 'Failed',
+          text: t('common.failed', 'Failed'),
           icon: (
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -243,6 +245,7 @@ export const ExecutionProgress: React.FC<ExecutionProgressProps> = ({
   flowId,
   className = ''
 }) => {
+  const { t } = useTranslation();
   const { getFlowExecutions, getExecutionStats } = useFlowExecution(flowId);
   
   const executions = getFlowExecutions(flowId);
@@ -254,32 +257,32 @@ export const ExecutionProgress: React.FC<ExecutionProgressProps> = ({
 
   return (
     <div className={`bg-card border border-border rounded-lg p-4 shadow-sm ${className}`}>
-      <h3 className="text-sm font-medium text-gray-900 mb-3">Flow Execution Status</h3>
-      
+      <h3 className="text-sm font-medium text-gray-900 mb-3">{t('flow_builder.execution_overlay.status_title', 'Flow Execution Status')}</h3>
+
       <div className="space-y-2">
         {executions.map((execution) => (
           <div key={execution.executionId} className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <ExecutionStatusBadge status={execution.status === 'running' ? 'executing' : execution.status === 'completed' ? 'executed' : execution.status} />
               <span className="text-sm text-gray-600">
-                Execution {execution.executionId.slice(-8)}
+                {t('flow_builder.execution_overlay.execution_id', 'Execution {{id}}', { id: execution.executionId.slice(-8) })}
               </span>
             </div>
             <div className="text-xs text-gray-500">
-              {execution.executionPath.length} nodes executed
+              {t('flow_builder.execution_overlay.nodes_executed', '{{count}} nodes executed', { count: execution.executionPath.length })}
             </div>
           </div>
         ))}
       </div>
-      
+
       {stats.total > 0 && (
         <div className="mt-3 pt-3 border-t border-gray-100">
           <div className="flex justify-between text-xs text-gray-500">
-            <span>Total: {stats.total}</span>
-            <span>Running: {stats.running}</span>
-            <span>Waiting: {stats.waiting}</span>
-            <span>Completed: {stats.completed}</span>
-            {stats.failed > 0 && <span className="text-red-500">Failed: {stats.failed}</span>}
+            <span>{t('flow_builder.execution_overlay.stat_line', '{{label}}: {{count}}', { label: t('flow_builder.execution_overlay.stats_total_label', 'Total'), count: stats.total })}</span>
+            <span>{t('flow_builder.execution_overlay.stat_line', '{{label}}: {{count}}', { label: t('common.running', 'Running'), count: stats.running })}</span>
+            <span>{t('flow_builder.execution_overlay.stat_line', '{{label}}: {{count}}', { label: t('common.waiting', 'Waiting'), count: stats.waiting })}</span>
+            <span>{t('flow_builder.execution_overlay.stat_line', '{{label}}: {{count}}', { label: t('common.completed', 'Completed'), count: stats.completed })}</span>
+            {stats.failed > 0 && <span className="text-red-500">{t('flow_builder.execution_overlay.stat_line', '{{label}}: {{count}}', { label: t('common.failed', 'Failed'), count: stats.failed })}</span>}
           </div>
         </div>
       )}

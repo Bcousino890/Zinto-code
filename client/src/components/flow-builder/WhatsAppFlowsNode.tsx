@@ -94,7 +94,7 @@ export function WhatsAppFlowsNode({ id, data, isConnectable }: WhatsAppFlowsNode
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Duplicate node</p>
+              <p className="text-xs">{t('flow_builder.duplicate_node', 'Duplicate node')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -112,17 +112,17 @@ export function WhatsAppFlowsNode({ id, data, isConnectable }: WhatsAppFlowsNode
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Delete node</p>
+              <p className="text-xs">{t('flow_builder.delete_node', 'Delete node')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>
 
       <div className="font-medium flex items-center gap-2 mb-2">
-        <img src="https://cdn-icons-png.flaticon.com/128/1587/1587495.png" alt="WhatsApp Flows" className="h-4 w-4" />
-        <span>WhatsApp Flows</span>
+        <img src="https://cdn-icons-png.flaticon.com/128/1587/1587495.png" alt={t('flow_builder.node_types.whatsapp_flows', 'WhatsApp Flows')} className="h-4 w-4" />
+        <span>{t('flow_builder.node_types.whatsapp_flows', 'WhatsApp Flows')}</span>
         <span className="px-1.5 py-0.5 text-[9px] font-medium bg-primary/10 text-primary rounded border border-primary/20">
-          Official API
+          {t('flow_builder.whatsapp_flows.official_api', 'Official API')}
         </span>
         <button
           className="ml-auto text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
@@ -131,12 +131,12 @@ export function WhatsAppFlowsNode({ id, data, isConnectable }: WhatsAppFlowsNode
           {isEditing ? (
             <>
               <EyeOff className="h-3 w-3" />
-              Hide
+              {t('flow_builder.hide', 'Hide')}
             </>
           ) : (
             <>
               <Eye className="h-3 w-3" />
-              Edit
+              {t('flow_builder.edit', 'Edit')}
             </>
           )}
         </button>
@@ -148,12 +148,12 @@ export function WhatsAppFlowsNode({ id, data, isConnectable }: WhatsAppFlowsNode
           <span className="font-medium text-primary">FLOW</span>
           <span className="text-muted-foreground">•</span>
           <span className="text-xs text-muted-foreground truncate">
-            {flowId || 'No Flow ID'}
+            {flowId || t('flow_builder.whatsapp_flows.no_flow_id', 'No Flow ID')}
           </span>
         </div>
         
         <div className="text-xs text-muted-foreground">
-          Flow content managed in Facebook Business Manager
+          {t('flow_builder.whatsapp_flows.managed_in_business_manager', 'Flow content managed in Facebook Business Manager')}
         </div>
       </div>
 
@@ -163,7 +163,7 @@ export function WhatsAppFlowsNode({ id, data, isConnectable }: WhatsAppFlowsNode
           <div className="space-y-2">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <Label className="text-xs">Flow ID</Label>
+                <Label className="text-xs">{t('flow_builder.whatsapp_flows.flow_id', 'Flow ID')}</Label>
                 <Button
                   variant="outline"
                   size="sm"
@@ -171,17 +171,17 @@ export function WhatsAppFlowsNode({ id, data, isConnectable }: WhatsAppFlowsNode
                   onClick={() => window.open('https://business.facebook.com/latest/whatsapp_manager/flow_create/', '_blank')}
                 >
                   <ExternalLink className="h-3 w-3 mr-1" />
-                  Create Flow
+                  {t('flow_builder.whatsapp_flows.create_flow', 'Create Flow')}
                 </Button>
               </div>
               <Input
                 value={flowId}
                 onChange={(e) => handleFlowIdChange(e.target.value)}
-                placeholder="Paste Flow URL or enter Flow ID (e.g., 1501195611215264)"
+                placeholder={t('flow_builder.whatsapp_flows.flow_id_placeholder', 'Paste Flow URL or enter Flow ID (e.g., 1501195611215264)')}
                 className="text-xs"
               />
               <p className="text-[10px] text-muted-foreground mt-1">
-                Paste the full Facebook Flow URL or just the Flow ID. The ID will be extracted automatically.
+                {t('flow_builder.whatsapp_flows.flow_id_help', 'Paste the full Facebook Flow URL or just the Flow ID. The ID will be extracted automatically.')}
               </p>
             </div>
 

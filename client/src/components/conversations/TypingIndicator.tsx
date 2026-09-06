@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface TypingIndicatorProps {
   isTyping: boolean;
@@ -18,6 +19,7 @@ export function TypingIndicator({
   variant = 'bubble',
   className = ''
 }: TypingIndicatorProps) {
+  const { t } = useTranslation();
   if (!isTyping) return null;
 
   if (variant === 'inline') {
@@ -46,7 +48,7 @@ export function TypingIndicator({
               transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
             />
           </div>
-          <span>{userName ? `${userName} is typing...` : 'Typing...'}</span>
+          <span>{userName ? t('conversations.typing_indicator.user_is_typing', '{{userName}} is typing...', { userName }) : t('conversations.typing_indicator.typing', 'Typing...')}</span>
         </motion.div>
       </AnimatePresence>
     );
@@ -105,15 +107,16 @@ export function MultipleTypingIndicator({
   variant = 'bubble',
   className = ''
 }: MultipleTypingIndicatorProps) {
+  const { t } = useTranslation();
   if (typingUserNames.length === 0) return null;
 
   let displayText = '';
   if (typingUserNames.length === 1) {
-    displayText = `${typingUserNames[0]} is typing...`;
+    displayText = t('conversations.typing_indicator.user_is_typing', '{{userName}} is typing...', { userName: typingUserNames[0] });
   } else if (typingUserNames.length === 2) {
-    displayText = `${typingUserNames[0]} and ${typingUserNames[1]} are typing...`;
+    displayText = t('conversations.typing_indicator.two_users_are_typing', '{{userName1}} and {{userName2}} are typing...', { userName1: typingUserNames[0], userName2: typingUserNames[1] });
   } else {
-    displayText = `${typingUserNames[0]} and ${typingUserNames.length - 1} others are typing...`;
+    displayText = t('conversations.typing_indicator.multiple_users_are_typing', '{{userName}} and {{count}} others are typing...', { userName: typingUserNames[0], count: typingUserNames.length - 1 });
   }
 
   if (variant === 'inline') {
@@ -206,6 +209,7 @@ export function PresenceBadge({
   showLabel = false,
   className = ''
 }: PresenceBadgeProps) {
+  const { t } = useTranslation();
   const sizeClasses = {
     sm: 'w-2 h-2',
     md: 'w-3 h-3',
@@ -219,9 +223,9 @@ export function PresenceBadge({
   };
 
   const labelText = {
-    online: 'Online',
-    away: 'Away',
-    offline: 'Offline'
+    online: t('conversations.typing_indicator.online', 'Online'),
+    away: t('conversations.typing_indicator.away', 'Away'),
+    offline: t('conversations.typing_indicator.offline', 'Offline')
   };
 
   return (

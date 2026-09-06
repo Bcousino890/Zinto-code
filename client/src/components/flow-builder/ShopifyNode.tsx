@@ -514,12 +514,14 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
           )}
           {variableMappings.length > 0 && (
             <span className="text-[10px] bg-purple-100 text-purple-800 px-1 py-0.5 rounded">
-              {variableMappings.length} mapping{variableMappings.length !== 1 ? 's' : ''}
+              {variableMappings.length === 1
+                ? t('flow_builder.http_summary_one_mapping', '1 mapping')
+                : t('flow_builder.http_summary_n_mappings', '{{count}} mappings', { count: variableMappings.length })}
             </span>
           )}
           {apiKey && (
             <span className="text-[10px] bg-orange-100 text-orange-800 px-1 py-0.5 rounded">
-              API Connected
+              {t('flow_builder.shopify_api_connected', 'API Connected')}
             </span>
           )}
         </div>
@@ -528,13 +530,13 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
       {isEditing && (
         <div className="mt-3 text-xs space-y-3 border rounded p-2 ">
           <div>
-            <Label className="block mb-1 font-medium">Quick Templates</Label>
+            <Label className="block mb-1 font-medium">{t('flow_builder.shopify_quick_templates', 'Quick Templates')}</Label>
             <Select
               value=""
               onValueChange={applyTemplate}
             >
               <SelectTrigger className="text-xs h-7">
-                <SelectValue placeholder="Choose a Shopify operation..." />
+                <SelectValue placeholder={t('flow_builder.shopify_choose_operation', 'Choose a Shopify operation...')} />
               </SelectTrigger>
               <SelectContent>
                 {SHOPIFY_TEMPLATES.map((template) => (
@@ -547,30 +549,30 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
           </div>
 
           <div className="space-y-2 pt-2 border-t">
-            <Label className="block font-medium">Shop Configuration</Label>
+            <Label className="block font-medium">{t('flow_builder.shopify_shop_configuration', 'Shop Configuration')}</Label>
             <div>
-              <Label className="block mb-1 text-xs">Shop Domain</Label>
+              <Label className="block mb-1 text-xs">{t('flow_builder.shopify_shop_domain', 'Shop Domain')}</Label>
               <Input
-                placeholder="mystore.myshopify.com"
+                placeholder={t('flow_builder.shopify_shop_domain_placeholder', 'mystore.myshopify.com')}
                 value={shopDomain}
                 onChange={(e) => setShopDomain(e.target.value)}
                 className="text-xs h-7"
               />
             </div>
             <div>
-              <Label className="block mb-1 text-xs">API Key</Label>
+              <Label className="block mb-1 text-xs">{t('flow_builder.shopify_api_key', 'API Key')}</Label>
               <Input
-                placeholder="Your Shopify API key"
+                placeholder={t('flow_builder.shopify_api_key_placeholder', 'Your Shopify API key')}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="text-xs h-7"
               />
             </div>
             <div>
-              <Label className="block mb-1 text-xs">API Password</Label>
+              <Label className="block mb-1 text-xs">{t('flow_builder.shopify_api_password', 'API Password')}</Label>
               <Input
                 type="password"
-                placeholder="Your Shopify API password"
+                placeholder={t('flow_builder.shopify_api_password_placeholder', 'Your Shopify API password')}
                 value={apiPassword}
                 onChange={(e) => setApiPassword(e.target.value)}
                 className="text-xs h-7"
@@ -583,27 +585,27 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
                 className="h-7 px-2 flex-1"
                 onClick={testConnection}
                 disabled={isTesting || !shopDomain.trim() || !apiKey.trim() || !apiPassword.trim()}
-                title="Test connection to your Shopify store"
+                title={t('flow_builder.shopify_test_connection_tooltip', 'Test connection to your Shopify store')}
               >
                 {isTesting ? (
                   <Loader2 className="h-3 w-3 animate-spin mr-1" />
                 ) : (
                   <Play className="h-3 w-3 mr-1" />
                 )}
-                Test Connection
+                {t('flow_builder.shopify_test_connection', 'Test Connection')}
               </Button>
             </div>
           </div>
 
           <div className="space-y-2 pt-2 border-t">
             <div>
-              <Label className="block mb-1 font-medium">Shopify Resource</Label>
+              <Label className="block mb-1 font-medium">{t('flow_builder.shopify_resource', 'Shopify Resource')}</Label>
               <Select
                 value={resource}
                 onValueChange={setResource}
               >
                 <SelectTrigger className="text-xs h-7">
-                  <SelectValue placeholder="Select resource" />
+                  <SelectValue placeholder={t('flow_builder.shopify_select_resource', 'Select resource')} />
                 </SelectTrigger>
                 <SelectContent>
                   {SHOPIFY_RESOURCES.map((res) => (
@@ -616,13 +618,13 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
             </div>
 
             <div>
-              <Label className="block mb-1 font-medium">Action Type</Label>
+              <Label className="block mb-1 font-medium">{t('flow_builder.shopify_action_type', 'Action Type')}</Label>
               <Select
                 value={action}
                 onValueChange={setAction}
               >
                 <SelectTrigger className="text-xs h-7">
-                  <SelectValue placeholder="Select action" />
+                  <SelectValue placeholder={t('flow_builder.shopify_select_action', 'Select action')} />
                 </SelectTrigger>
                 <SelectContent>
                   {ACTION_TYPES.map((actionType) => (
@@ -637,13 +639,13 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
 
           {RESOURCE_FILTERS[resource as keyof typeof RESOURCE_FILTERS] && (
             <div className="pt-2 border-t">
-              <Label className="block mb-2 font-medium">Filters & Parameters</Label>
+              <Label className="block mb-2 font-medium">{t('flow_builder.shopify_filters_parameters', 'Filters & Parameters')}</Label>
               <div className="space-y-2">
                 {RESOURCE_FILTERS[resource as keyof typeof RESOURCE_FILTERS].map((filter) => (
                   <div key={filter.key} className="flex gap-2 items-center">
                     <div className="flex-1">
                       <Label className="block mb-1 text-[10px] text-muted-foreground">
-                        {filter.label}
+                        {t(`flow_builder.shopify_filter_${resource}_${filter.key}` as const, filter.label)}
                         {filter.required && <span className="text-red-500 ml-1">*</span>}
                       </Label>
                       {filter.type === 'select' ? (
@@ -652,7 +654,7 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
                           onValueChange={(value) => updateFilter(filter.key, value)}
                         >
                           <SelectTrigger className="text-xs h-6">
-                            <SelectValue placeholder={`Select ${filter.label.toLowerCase()}`} />
+                            <SelectValue placeholder={t('flow_builder.shopify_select_filter_placeholder', 'Select {{label}}', { label: t(`flow_builder.shopify_filter_${resource}_${filter.key}` as const, filter.label).toLowerCase() })} />
                           </SelectTrigger>
                           <SelectContent>
                             {filter.type === 'select' && 'options' in filter && Array.isArray(filter.options) && filter.options.map((option: string) => (
@@ -665,7 +667,9 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
                       ) : (
                         <Input
                           type={filter.type}
-                          placeholder={filter.placeholder || `Enter ${filter.label.toLowerCase()}`}
+                          placeholder={filter.placeholder
+                            ? t(`flow_builder.shopify_filter_${resource}_${filter.key}_placeholder` as const, filter.placeholder)
+                            : t('flow_builder.shopify_enter_filter_placeholder', 'Enter {{label}}', { label: t(`flow_builder.shopify_filter_${resource}_${filter.key}` as const, filter.label).toLowerCase() })}
                           value={filters[filter.key] || filter.default || ''}
                           onChange={(e) => updateFilter(filter.key, e.target.value)}
                           className="text-xs h-6"
@@ -686,14 +690,14 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
                 ))}
               </div>
               <div className="text-[10px] text-muted-foreground mt-2">
-                Use &#123;&#123;variable&#125;&#125; syntax for dynamic values
+                {t('flow_builder.variable_syntax_help', 'Use {{variable}} syntax for dynamic values')}
               </div>
             </div>
           )}
 
           <div className="pt-2 border-t">
             <div className="flex items-center justify-between mb-2">
-              <Label className="font-medium">Response Variable Mapping</Label>
+              <Label className="font-medium">{t('flow_builder.http_response_variable_mapping', 'Response Variable Mapping')}</Label>
               <Button
                 variant="outline"
                 size="sm"
@@ -701,20 +705,20 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
                 onClick={addVariableMapping}
               >
                 <Plus className="h-3 w-3 mr-1" />
-                Add
+                {t('common.add', 'Add')}
               </Button>
             </div>
             {variableMappings.map((mapping, index) => (
               <div key={index} className="flex gap-2 mb-2">
                 <Input
-                  placeholder="orders.0.id"
+                  placeholder={t('flow_builder.shopify_response_field_placeholder', 'orders.0.id')}
                   value={mapping.responseField}
                   onChange={(e) => updateVariableMapping(index, 'responseField', e.target.value)}
                   className="text-xs h-7 flex-1"
                 />
                 <span className="text-xs text-muted-foreground self-center">→</span>
                 <Input
-                  placeholder="shopify.order_id"
+                  placeholder={t('flow_builder.shopify_variable_name_placeholder', 'shopify.order_id')}
                   value={mapping.variableName}
                   onChange={(e) => updateVariableMapping(index, 'variableName', e.target.value)}
                   className="text-xs h-7 flex-1"
@@ -730,13 +734,13 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
               </div>
             ))}
             <div className="text-[10px] text-muted-foreground">
-              Map Shopify response fields to flow variables for use in subsequent nodes
+              {t('flow_builder.shopify_mapping_help', 'Map Shopify response fields to flow variables for use in subsequent nodes')}
             </div>
           </div>
 
           <div className="pt-2 border-t">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium">Rate Limit Delay (ms)</Label>
+              <Label className="text-xs font-medium">{t('flow_builder.shopify_rate_limit_delay', 'Rate Limit Delay (ms)')}</Label>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -756,7 +760,7 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
               </div>
             </div>
             <div className="text-[10px] text-muted-foreground mt-1">
-              Delay between requests to respect Shopify's rate limits
+              {t('flow_builder.shopify_rate_limit_help', 'Delay between requests to respect Shopify\'s rate limits')}
             </div>
           </div>
 
@@ -766,7 +770,7 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
               className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 w-full"
               onClick={() => setShowVariablePreview(!showVariablePreview)}
             >
-              Available Output Variables
+              {t('flow_builder.http_available_output_variables', 'Available Output Variables')}
               {showVariablePreview ? (
                 <ChevronUp className="h-3 w-3" />
               ) : (
@@ -775,35 +779,35 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
             </button>
             {showVariablePreview && (
               <div className="mt-2 text-[10px] bg-gray-50 p-2 rounded space-y-1">
-                <div><code>&#123;&#123;shopify.{resource}.data&#125;&#125;</code> - {SHOPIFY_RESOURCES.find(r => r.id === resource)?.name} data</div>
-                <div><code>&#123;&#123;shopify.response.count&#125;&#125;</code> - Number of results returned</div>
-                <div><code>&#123;&#123;shopify.api.rate_limit_remaining&#125;&#125;</code> - API calls remaining</div>
-                <div><code>&#123;&#123;shopify.success&#125;&#125;</code> - Request success status</div>
+                <div><code>&#123;&#123;shopify.{resource}.data&#125;&#125;</code> - {t('flow_builder.shopify_var_resource_data', '{{resource}} data', { resource: SHOPIFY_RESOURCES.find(r => r.id === resource)?.name ?? '' })}</div>
+                <div><code>&#123;&#123;shopify.response.count&#125;&#125;</code> - {t('flow_builder.shopify_var_response_count', 'Number of results returned')}</div>
+                <div><code>&#123;&#123;shopify.api.rate_limit_remaining&#125;&#125;</code> - {t('flow_builder.shopify_var_rate_limit_remaining', 'API calls remaining')}</div>
+                <div><code>&#123;&#123;shopify.success&#125;&#125;</code> - {t('flow_builder.shopify_var_success', 'Request success status')}</div>
                 {resource === 'orders' && (
                   <>
-                    <div><code>&#123;&#123;shopify.order.id&#125;&#125;</code> - Order ID</div>
-                    <div><code>&#123;&#123;shopify.order.total_price&#125;&#125;</code> - Order total</div>
-                    <div><code>&#123;&#123;shopify.order.customer.email&#125;&#125;</code> - Customer email</div>
+                    <div><code>&#123;&#123;shopify.order.id&#125;&#125;</code> - {t('flow_builder.shopify_var_order_id', 'Order ID')}</div>
+                    <div><code>&#123;&#123;shopify.order.total_price&#125;&#125;</code> - {t('flow_builder.shopify_var_order_total', 'Order total')}</div>
+                    <div><code>&#123;&#123;shopify.order.customer.email&#125;&#125;</code> - {t('flow_builder.shopify_var_customer_email', 'Customer email')}</div>
                   </>
                 )}
                 {resource === 'products' && (
                   <>
-                    <div><code>&#123;&#123;shopify.product.id&#125;&#125;</code> - Product ID</div>
-                    <div><code>&#123;&#123;shopify.product.title&#125;&#125;</code> - Product title</div>
-                    <div><code>&#123;&#123;shopify.product.vendor&#125;&#125;</code> - Product vendor</div>
+                    <div><code>&#123;&#123;shopify.product.id&#125;&#125;</code> - {t('flow_builder.shopify_var_product_id', 'Product ID')}</div>
+                    <div><code>&#123;&#123;shopify.product.title&#125;&#125;</code> - {t('flow_builder.shopify_var_product_title', 'Product title')}</div>
+                    <div><code>&#123;&#123;shopify.product.vendor&#125;&#125;</code> - {t('flow_builder.shopify_var_product_vendor', 'Product vendor')}</div>
                   </>
                 )}
                 {resource === 'customers' && (
                   <>
-                    <div><code>&#123;&#123;shopify.customer.id&#125;&#125;</code> - Customer ID</div>
-                    <div><code>&#123;&#123;shopify.customer.email&#125;&#125;</code> - Customer email</div>
-                    <div><code>&#123;&#123;shopify.customer.first_name&#125;&#125;</code> - First name</div>
+                    <div><code>&#123;&#123;shopify.customer.id&#125;&#125;</code> - {t('flow_builder.shopify_var_customer_id', 'Customer ID')}</div>
+                    <div><code>&#123;&#123;shopify.customer.email&#125;&#125;</code> - {t('flow_builder.shopify_var_customer_email', 'Customer email')}</div>
+                    <div><code>&#123;&#123;shopify.customer.first_name&#125;&#125;</code> - {t('flow_builder.shopify_var_customer_first_name', 'First name')}</div>
                   </>
                 )}
                 {variableMappings.map((mapping, index) => (
                   mapping.variableName && (
                     <div key={index}>
-                      <code>&#123;&#123;{mapping.variableName}&#125;&#125;</code> - {mapping.responseField || 'Custom mapping'}
+                      <code>&#123;&#123;{mapping.variableName}&#125;&#125;</code> - {mapping.responseField || t('flow_builder.http_custom_mapping_fallback', 'Custom mapping')}
                     </div>
                   )
                 ))}
@@ -813,8 +817,7 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
 
           <div className="text-[10px] text-muted-foreground mt-2">
             <p>
-              The Shopify Integration node connects to your Shopify store's Admin API.
-              Response data will be available as variables in subsequent nodes.
+              {t('flow_builder.shopify_node_footer', 'The Shopify Integration node connects to your Shopify store\'s Admin API. Response data will be available as variables in subsequent nodes.')}
             </p>
           </div>
 
@@ -828,16 +831,20 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
                     <XCircle className="h-4 w-4 text-red-600" />
                   )}
                   <span className="text-xs font-medium">
-                    {testResult.success ? 'Connection Successful' : 'Connection Failed'}
+                    {testResult.success
+                      ? t('flow_builder.shopify_connection_successful', 'Connection Successful')
+                      : t('flow_builder.shopify_connection_failed_title', 'Connection Failed')}
                   </span>
                   {testResult.responseCount !== undefined && (
                     <span className="text-[10px] text-muted-foreground">
-                      ({testResult.responseCount} result{testResult.responseCount !== 1 ? 's' : ''})
+                      ({testResult.responseCount === 1
+                        ? t('flow_builder.shopify_one_result', '1 result')
+                        : t('flow_builder.shopify_n_results', '{{count}} results', { count: testResult.responseCount })})
                     </span>
                   )}
                   {testResult.rateLimitRemaining !== undefined && (
                     <span className="text-[10px] text-orange-600">
-                      {testResult.rateLimitRemaining} API calls remaining
+                      {t('flow_builder.shopify_api_calls_remaining', '{{count}} API calls remaining', { count: testResult.rateLimitRemaining })}
                     </span>
                   )}
                 </div>
@@ -858,13 +865,13 @@ export function ShopifyNode({ id, data, isConnectable }: ShopifyNodeProps) {
               ) : (
                 <div className="space-y-2">
                   <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
-                    Successfully connected to Shopify store and retrieved {SHOPIFY_RESOURCES.find(r => r.id === resource)?.name.toLowerCase()} data.
+                    {t('flow_builder.shopify_connection_success_detail', 'Successfully connected to Shopify store and retrieved {{resource}} data.', { resource: SHOPIFY_RESOURCES.find(r => r.id === resource)?.name.toLowerCase() ?? '' })}
                   </div>
 
                   {testResult.data && (
                     <div>
                       <div className="text-xs font-medium text-muted-foreground mb-1">
-                        Sample Response Data:
+                        {t('flow_builder.shopify_sample_response_data', 'Sample Response Data:')}
                       </div>
                       <div className="text-[10px] bg-gray-50 p-2 rounded font-mono max-h-32 overflow-y-auto">
                         {JSON.stringify(testResult.data, null, 2)}

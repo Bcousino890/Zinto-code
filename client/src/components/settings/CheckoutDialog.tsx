@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { getPlanBillingPeriod } from "@/utils/plan-duration";
 import { useCurrency } from "@/contexts/currency-context";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 declare global {
@@ -65,6 +66,7 @@ export function CheckoutDialog({
   const [mpesaKesAmount, setMpesaKesAmount] = useState<number | null>(null);
   const { toast } = useToast();
   const { formatCurrency, currency } = useCurrency();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!isOpen || selectedMethod !== 'mpesa' || currency.toUpperCase() !== 'USD' || !plan) {
@@ -88,7 +90,7 @@ export function CheckoutDialog({
   const checkoutMutation = useMutation({
     mutationFn: async () => {
       if (!plan || !selectedMethod) {
-        throw new Error("Please select a plan and payment method");
+        throw new Error(t('common.checkout.select_plan_payment_method', 'Please select a plan and payment method'));
       }
 
 
@@ -105,7 +107,7 @@ export function CheckoutDialog({
 
       if (selectedMethod === 'mpesa') {
         if (!phoneNumber) {
-          throw new Error("Phone number is required for MPESA payment");
+          throw new Error(t('common.checkout.mpesa_phone_required', 'Phone number is required for MPESA payment'));
         }
         payload.phoneNumber = phoneNumber;
       }
@@ -138,8 +140,8 @@ export function CheckoutDialog({
           window.location.href = data.checkoutUrl;
         } else {
           toast({
-            title: "Checkout Error",
-            description: "No checkout URL received from server",
+            title: t('common.checkout.error_title', 'Checkout Error'),
+            description: t('common.checkout.no_checkout_url', 'No checkout URL received from server'),
             variant: "destructive"
           });
         }
@@ -157,8 +159,8 @@ export function CheckoutDialog({
   const handleCheckout = () => {
     if (!selectedMethod) {
       toast({
-        title: "Payment Method Required",
-        description: "Please select a payment method to continue",
+        title: t('common.checkout.payment_method_required', 'Payment Method Required'),
+        description: t('common.checkout.select_payment_method', 'Please select a payment method to continue'),
         variant: "destructive"
       });
       return;
@@ -168,16 +170,16 @@ export function CheckoutDialog({
     if (selectedMethod === 'mpesa') {
       if (currency !== 'KES') {
         toast({
-          title: "Currency Mismatch",
-          description: `MPESA only supports KES (Kenyan Shillings). Current configured currency is ${currency}. Please change the default currency to KES in General Settings.`,
+          title: t('common.checkout.currency_mismatch', 'Currency Mismatch'),
+          description: t('common.checkout.mpesa_only_kes', 'MPESA only supports KES (Kenyan Shillings). Current configured currency is {{currency}}. Please change the default currency to KES in General Settings.', { currency }),
           variant: "destructive"
         });
         return;
       }
       if (!phoneNumber) {
         toast({
-          title: "Phone Number Required",
-          description: "Please enter your phone number for MPESA payment",
+          title: t('common.checkout.phone_number_required', 'Phone Number Required'),
+          description: t('common.checkout.enter_mpesa_phone', 'Please enter your phone number for MPESA payment'),
           variant: "destructive"
         });
         return;
@@ -186,8 +188,8 @@ export function CheckoutDialog({
       const phoneRegex = /^254[0-9]{9}$/;
       if (!phoneRegex.test(phoneNumber)) {
         toast({
-          title: "Invalid Phone Number",
-          description: "Please enter a valid Kenyan phone number (format: 254XXXXXXXXX)",
+          title: t('common.checkout.invalid_phone', 'Invalid Phone Number'),
+          description: t('common.checkout.kenyan_phone_format', 'Please enter a valid Kenyan phone number (format: 254XXXXXXXXX)'),
           variant: "destructive"
         });
         return;
@@ -197,8 +199,8 @@ export function CheckoutDialog({
     if (selectedMethod === 'moyasar') {
       if (currency !== 'SAR') {
         toast({
-          title: "Currency Mismatch",
-          description: `Moyasar only supports SAR (Saudi Riyal). Current configured currency is ${currency}. Please change the default currency to SAR in General Settings.`,
+          title: t('common.checkout.currency_mismatch', 'Currency Mismatch'),
+          description: t('common.checkout.moyasar_only_sar', 'Moyasar only supports SAR (Saudi Riyal). Current configured currency is {{currency}}. Please change the default currency to SAR in General Settings.', { currency }),
           variant: "destructive"
         });
         return;
@@ -209,8 +211,8 @@ export function CheckoutDialog({
       const supported = ['NGN', 'GHS', 'ZAR', 'USD'];
       if (!supported.includes(currency.toUpperCase())) {
         toast({
-          title: "Currency Not Supported",
-          description: `Paystack supports NGN, GHS, ZAR, and USD. Current currency is ${currency}.`,
+          title: t('common.checkout.currency_not_supported', 'Currency Not Supported'),
+          description: t('common.checkout.paystack_supported', 'Paystack supports NGN, GHS, ZAR, and USD. Current currency is {{currency}}.', { currency }),
           variant: "destructive"
         });
         return;
@@ -222,8 +224,8 @@ export function CheckoutDialog({
       const supportedCurrencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF', 'NZD', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'RON', 'BGN', 'HRK', 'RUB', 'TRY', 'BRL', 'MXN', 'ARS', 'CLP', 'COP', 'PEN', 'INR', 'SGD', 'HKD', 'KRW', 'TWD', 'THB', 'MYR', 'PHP', 'IDR', 'VND', 'AED', 'SAR', 'ILS', 'ZAR', 'NGN', 'EGP', 'KES'];
       if (!supportedCurrencies.includes(currency.toUpperCase())) {
         toast({
-          title: "Currency Not Supported",
-          description: `Currency ${currency} is not supported by Stripe. Please configure a supported currency in General Settings.`,
+          title: t('common.checkout.currency_not_supported', 'Currency Not Supported'),
+          description: t('common.checkout.stripe_unsupported', 'Currency {{currency}} is not supported by Stripe. Please configure a supported currency in General Settings.', { currency }),
           variant: "destructive"
         });
         return;
@@ -234,8 +236,8 @@ export function CheckoutDialog({
       const supportedCurrencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF', 'NZD', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'RON', 'BGN', 'HRK', 'RUB', 'TRY', 'BRL', 'MXN', 'ARS', 'CLP', 'COP', 'PEN', 'INR', 'SGD', 'HKD', 'KRW', 'TWD', 'THB', 'MYR', 'PHP', 'IDR', 'VND', 'AED', 'SAR', 'ILS', 'ZAR', 'NGN', 'EGP', 'KES'];
       if (!supportedCurrencies.includes(currency.toUpperCase())) {
         toast({
-          title: "Currency Not Supported",
-          description: `Currency ${currency} may not be supported by PayPal. Please verify your PayPal account configuration supports this currency.`,
+          title: t('common.checkout.currency_not_supported', 'Currency Not Supported'),
+          description: t('common.checkout.paypal_unsupported', 'Currency {{currency}} may not be supported by PayPal. Please verify your PayPal account configuration supports this currency.', { currency }),
           variant: "destructive"
         });
         return;
@@ -246,8 +248,8 @@ export function CheckoutDialog({
       const supportedCurrencies = ['USD', 'ARS', 'BRL', 'CLP', 'COP', 'MXN', 'PEN', 'UYU', 'VEF'];
       if (!supportedCurrencies.includes(currency.toUpperCase())) {
         toast({
-          title: "Currency Not Supported",
-          description: `Currency ${currency} may not be supported by Mercado Pago. Supported currencies: ${supportedCurrencies.join(', ')}. Please verify your Mercado Pago account configuration.`,
+          title: t('common.checkout.currency_not_supported', 'Currency Not Supported'),
+          description: t('common.checkout.mercadopago_unsupported', 'Currency {{currency}} may not be supported by Mercado Pago. Supported currencies: {{currencies}}. Please verify your Mercado Pago account configuration.', { currency, currencies: supportedCurrencies.join(', ') }),
           variant: "destructive"
         });
         return;

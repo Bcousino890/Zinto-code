@@ -2,6 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/use-translation";
 import { useEffect } from "react";
 import { buildAuthRedirectForLocation, getRelativeUrl } from "@/utils/auth-redirect";
 import { preserveEmbedParam } from "@/utils/embed-context";
@@ -14,15 +15,16 @@ type ProtectedRouteProps = {
 export function ProtectedRoute({ path, component: Component }: ProtectedRouteProps) {
   const { user, company, isLoading, isMaintenanceMode, isLoadingMaintenance } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (user && user.isSuperAdmin && path !== "/admin/dashboard") {
       toast({
-        title: "Admin Access",
-        description: "You are logged in as a super admin. Redirecting to admin dashboard.",
+        title: t('auth.admin_access', 'Admin Access'),
+        description: t('auth.super_admin_redirect', 'You are logged in as a super admin. Redirecting to admin dashboard.'),
       });
     }
-  }, [user, path, toast]);
+  }, [user, path, toast, t]);
 
   return (
     <Route path={path}>
@@ -51,10 +53,9 @@ export function ProtectedRoute({ path, component: Component }: ProtectedRoutePro
         if (!user.isSuperAdmin && !company) {
           return (
             <div className="flex flex-col items-center justify-center min-h-screen p-4">
-              <h1 className="text-2xl mb-2">Company Not Found</h1>
+              <h1 className="text-2xl mb-2">{t('auth.company_not_found', 'Company Not Found')}</h1>
               <p className="text-muted-foreground mb-4 text-center">
-                Your account is not associated with an active company.
-                Please contact your administrator.
+                {t('auth.company_not_associated', 'Your account is not associated with an active company. Please contact your administrator.')}
               </p>
               <button
                 onClick={() => {
@@ -63,7 +64,7 @@ export function ProtectedRoute({ path, component: Component }: ProtectedRoutePro
                 }}
                 className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
               >
-                Return to Login
+                {t('auth.return_to_login', 'Return to Login')}
               </button>
             </div>
           );

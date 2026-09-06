@@ -5,6 +5,7 @@ import { useSubscriptionStatus } from '../../hooks/useSubscriptionStatus.ts';
 import { useGeneralSettings } from '../../hooks/use-general-settings';
 import { useManualRenewal } from '../../contexts/manual-renewal-context';
 import { apiRequest } from '../../lib/queryClient';
+import { useTranslation } from '../../hooks/use-translation';
 import SubscriptionRenewalDialog from './SubscriptionRenewalDialog';
 
 interface SubscriptionGuardProps {
@@ -13,6 +14,7 @@ interface SubscriptionGuardProps {
 
 export default function SubscriptionGuard({ children }: SubscriptionGuardProps) {
   const { user, company } = useAuth();
+  const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
 
 
@@ -29,7 +31,7 @@ export default function SubscriptionGuard({ children }: SubscriptionGuardProps) 
     queryKey: ['/api/plan-renewal/status'],
     queryFn: async () => {
       const res = await apiRequest("GET", "/api/plan-renewal/status");
-      if (!res.ok) throw new Error("Failed to fetch renewal status");
+      if (!res.ok) throw new Error(t('subscription.failed_fetch_renewal_status', 'Failed to fetch renewal status'));
       return res.json();
     },
     enabled: !!user && !!company, // Only run when user and company are authenticated
@@ -39,7 +41,7 @@ export default function SubscriptionGuard({ children }: SubscriptionGuardProps) 
     queryKey: ['/api/plans'],
     queryFn: async () => {
       const res = await apiRequest("GET", "/api/plans");
-      if (!res.ok) throw new Error("Failed to fetch plans");
+      if (!res.ok) throw new Error(t('subscription.failed_fetch_plans', 'Failed to fetch plans'));
       return res.json();
     },
     enabled: !!user && !!company, // Only run when user and company are authenticated
@@ -186,7 +188,7 @@ export default function SubscriptionGuard({ children }: SubscriptionGuardProps) 
         isOpen={showModal}
         onClose={handleCloseModal}
         companyName={company?.name}
-        planName={currentPlan?.name || company?.plan || "Current Plan"}
+        planName={currentPlan?.name || company?.plan || t('subscription.current_plan', 'Current Plan')}
         planPrice={currentPlan?.price || 29.99}
         currentPlanId={company?.planId || undefined}
         {...getExpirationInfo()}

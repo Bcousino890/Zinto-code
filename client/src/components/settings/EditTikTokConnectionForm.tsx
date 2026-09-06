@@ -10,6 +10,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { AlertCircle, CheckCircle, Loader2, RefreshCw } from 'lucide-react';
 
 interface TikTokConnectionData {
@@ -34,6 +35,7 @@ interface Props {
 
 export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectionId }: Props) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [loadingConnection, setLoadingConnection] = useState(false);
   const [connectionData, setConnectionData] = useState<TikTokConnectionData | null>(null);
@@ -59,8 +61,8 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
     } catch (error: any) {
       console.error('Error loading connection data:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to load connection data. Please try again.',
+        title: t('settings.tiktok_error', 'Error'),
+        description: t('settings.tiktok_failed_load', 'Failed to load connection data'),
         variant: 'destructive'
       });
     } finally {
@@ -81,7 +83,7 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
       }
 
       toast({
-        title: 'Success',
+        title: t('settings.tiktok_success', 'Success'),
         description: 'TikTok connection refreshed successfully!'
       });
 
@@ -90,7 +92,7 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
     } catch (error: any) {
       console.error('Error refreshing connection:', error);
       toast({
-        title: 'Error',
+        title: t('settings.tiktok_error', 'Error'),
         description: error.message || 'Failed to refresh connection. Please try again.',
         variant: 'destructive'
       });

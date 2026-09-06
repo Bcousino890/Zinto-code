@@ -2,6 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useState, useCallback,
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import useSocket from "@/hooks/useSocket";
 import { useAuth } from "@/hooks/use-auth";
+import { useTranslation } from "@/hooks/use-translation";
 import type { GradientConfig, SimpleGradientConfig, AdvancedGradientConfig } from '@shared/schema';
 
 export type BrandingSettings = {
@@ -62,6 +63,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const { user, isLoading: authLoading } = useAuth();
+  const { t } = useTranslation();
   const { onMessage } = useSocket('/ws');
 
   const hexToRgb = (hex: string) => {
@@ -201,7 +203,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       setBranding(DEFAULT_BRANDING);
       applyBrandingToDOM(DEFAULT_BRANDING);
-      setError(err instanceof Error ? err : new Error("Failed to fetch branding settings"));
+      setError(err instanceof Error ? err : new Error(t('common.failed_fetch_branding', 'Failed to fetch branding settings')));
     } finally {
       setIsLoading(false);
     }

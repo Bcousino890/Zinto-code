@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { User as SelectUser, Company, insertUserSchema } from "@shared/schema";
 import { queryClient, getQueryFn, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/use-translation";
 import { z } from "zod";
 
 
@@ -41,6 +42,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
 
   const isOnAuthPage = window.location.pathname === '/auth' || 
@@ -98,14 +100,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(['/api/user'], user);
       queryClient.invalidateQueries({ queryKey: ['/api/user/with-company'] });
       toast({
-        title: "Login successful",
-        description: `Welcome back, ${user.fullName}!`,
+        title: t('auth.login_successful_title', 'Login successful'),
+        description: t('auth.login_successful_desc', 'Welcome back, {{name}}!', { name: user.fullName }),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Login failed",
-        description: error.message || "Invalid credentials",
+        title: t('auth.login_failed_title', 'Login failed'),
+        description: error.message || t('auth.login_failed_desc', 'Invalid credentials'),
         variant: "destructive",
       });
     },
@@ -125,8 +127,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
 
       toast({
-        title: "Admin login successful",
-        description: `Welcome back, ${user.fullName}!`,
+        title: t('auth.admin_login_successful_title', 'Admin login successful'),
+        description: t('auth.admin_login_successful_desc', 'Welcome back, {{name}}!', { name: user.fullName }),
       });
 
       setTimeout(() => {
@@ -135,8 +137,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onError: (error: Error) => {
       toast({
-        title: "Admin login failed",
-        description: error.message || "Invalid admin credentials",
+        title: t('auth.admin_login_failed_title', 'Admin login failed'),
+        description: error.message || t('auth.admin_login_failed_desc', 'Invalid admin credentials'),
         variant: "destructive",
       });
     },
@@ -151,14 +153,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(['/api/user'], user);
       toast({
-        title: "Registration successful",
-        description: `Welcome, ${user.fullName}!`,
+        title: t('auth.registration_successful_title', 'Registration successful'),
+        description: t('auth.registration_successful_desc', 'Welcome, {{name}}!', { name: user.fullName }),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Registration failed",
-        description: error.message || "Could not create account",
+        title: t('auth.registration_failed_title', 'Registration failed'),
+        description: error.message || t('auth.registration_failed_desc', 'Could not create account'),
         variant: "destructive",
       });
     },
@@ -173,8 +175,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.clear();
       queryClient.setQueryData(['/api/user'], null);
       toast({
-        title: "Logged out",
-        description: "You have been successfully logged out",
+        title: t('auth.logout_successful_title', 'Logged out'),
+        description: t('auth.logout_successful_desc', 'You have been successfully logged out'),
       });
 
       setTimeout(() => {
@@ -183,7 +185,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onError: (error: Error) => {
       toast({
-        title: "Logout failed",
+        title: t('auth.logout_failed_title', 'Logout failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -210,8 +212,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(['/api/user/with-company'], { company: data.company });
 
       toast({
-        title: "Company impersonation active",
-        description: `You are now logged in as ${data.user.fullName}`,
+        title: t('auth.impersonation_active_title', 'Company impersonation active'),
+        description: t('auth.impersonation_active_desc', 'You are now logged in as {{name}}', { name: data.user.fullName }),
       });
 
       setTimeout(() => {
@@ -220,7 +222,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onError: (error: Error) => {
       toast({
-        title: "Impersonation failed",
+        title: t('auth.impersonation_failed_title', 'Impersonation failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -277,8 +279,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       toast({
-        title: "Returned to admin account",
-        description: data.message || "You are now logged in as super admin",
+        title: t('auth.return_from_impersonation_title', 'Returned to admin account'),
+        description: data.message || t('auth.return_from_impersonation_desc', 'You are now logged in as super admin'),
       });
 
       setTimeout(() => {
@@ -291,8 +293,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('originalSuperAdminId');
 
       toast({
-        title: "Failed to return to admin account",
-        description: error.message + " - Redirecting to admin login",
+        title: t('auth.return_from_impersonation_failed_title', 'Failed to return to admin account'),
+        description: error.message + " - " + t('auth.return_from_impersonation_failed_desc', 'Redirecting to admin login'),
         variant: "destructive",
       });
 

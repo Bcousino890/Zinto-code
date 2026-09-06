@@ -5,6 +5,7 @@ import { PaymentMethod } from "@/hooks/use-payment-methods";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCurrency } from "@/contexts/currency-context";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface PaymentMethodSelectorProps {
   paymentMethods: PaymentMethod[];
@@ -18,6 +19,7 @@ export function PaymentMethodSelector({
   onSelectMethod
 }: PaymentMethodSelectorProps) {
   const { currency } = useCurrency();
+  const { t } = useTranslation();
 
   const isMethodAvailable = (methodId: string): boolean => {
     if (methodId === 'mpesa') {
@@ -47,22 +49,22 @@ export function PaymentMethodSelector({
 
   const getUnavailableReason = (methodId: string): string | null => {
     if (methodId === 'mpesa' && currency !== 'KES' && currency !== 'USD') {
-      return `MPESA supports USD (converted to KES) or KES. Current currency: ${currency}`;
+      return t('common.payment_method.mpesa_currency_warning', 'MPESA supports USD (converted to KES) or KES. Current currency: {{currency}}', { currency });
     }
     if (methodId === 'moyasar' && currency !== 'SAR') {
-      return `Moyasar only supports SAR. Current currency: ${currency}`;
+      return t('common.payment_method.moyasar_currency_warning', 'Moyasar only supports SAR. Current currency: {{currency}}', { currency });
     }
     if (methodId === 'paystack' && !isMethodAvailable('paystack')) {
-      return `Paystack supports NGN, GHS, ZAR, USD. Current currency: ${currency}`;
+      return t('common.payment_method.paystack_currency_warning', 'Paystack supports NGN, GHS, ZAR, USD. Current currency: {{currency}}', { currency });
     }
     if (methodId === 'stripe' && !isMethodAvailable('stripe')) {
-      return `Currency ${currency} is not supported by Stripe`;
+      return t('common.payment_method.stripe_currency_unsupported', 'Currency {{currency}} is not supported by Stripe', { currency });
     }
     if (methodId === 'paypal' && !isMethodAvailable('paypal')) {
-      return `Currency ${currency} may not be supported by PayPal`;
+      return t('common.payment_method.paypal_currency_unsupported', 'Currency {{currency}} may not be supported by PayPal', { currency });
     }
     if (methodId === 'mercadopago' && !isMethodAvailable('mercadopago')) {
-      return `Currency ${currency} may not be supported by Mercado Pago`;
+      return t('common.payment_method.mercadopago_currency_unsupported', 'Currency {{currency}} may not be supported by Mercado Pago', { currency });
     }
     return null;
   };
@@ -135,10 +137,10 @@ export function PaymentMethodSelector({
                         <div className="font-medium">{method.name}</div>
                         <div className="text-sm text-muted-foreground">{method.description}</div>
                         {method.testMode && (
-                          <div className="text-xs text-amber-600 mt-1">Test Mode Enabled</div>
+                          <div className="text-xs text-amber-600 mt-1">{t('common.payment_method.test_mode_enabled', 'Test Mode Enabled')}</div>
                         )}
                         {!isAvailable && (
-                          <div className="text-xs text-red-600 mt-1">Unavailable for {currency}</div>
+                          <div className="text-xs text-red-600 mt-1">{t('common.payment_method.unavailable_for_currency', 'Unavailable for {{currency}}', { currency })}</div>
                         )}
                       </div>
                     </div>

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Check, ChevronsUpDown, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/use-translation';
 import {
   Command,
   CommandEmpty,
@@ -28,12 +29,14 @@ interface TimezoneSelectorProps {
 export function TimezoneSelector({
   value,
   onValueChange,
-  placeholder = "Select timezone...",
+  placeholder,
   className,
   disabled = false
 }: TimezoneSelectorProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const defaultPlaceholder = t('common.timezone.label', 'Select timezone...');
 
 
   const selectedTimezone = useMemo(() => {
@@ -110,7 +113,7 @@ export function TimezoneSelector({
               </span>
             </div>
           ) : (
-            <span className="text-muted-foreground">{placeholder}</span>
+            <span className="text-muted-foreground">{placeholder || defaultPlaceholder}</span>
           )}
           <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
         </Button>
@@ -119,7 +122,7 @@ export function TimezoneSelector({
         <div className="flex items-center border-b px-3 py-2">
           <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
           <input
-            placeholder="Search timezones..."
+            placeholder={t('common.timezone.search', 'Search timezones...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"

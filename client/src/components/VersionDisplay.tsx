@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface VersionDisplayProps {
   className?: string;
@@ -10,17 +11,19 @@ interface VersionDisplayProps {
   variant?: 'default' | 'secondary' | 'outline';
 }
 
-export function VersionDisplay({ 
-  className = '', 
+export function VersionDisplay({
+  className = '',
   showIcon = false,
-  variant = 'default' 
+  variant = 'default'
 }: VersionDisplayProps) {
+  const { t } = useTranslation();
+
   const { data: versionData, isLoading } = useQuery({
     queryKey: ['app-version'],
     queryFn: async () => {
       const response = await fetch('/api/auto-update/version');
       if (!response.ok) {
-        throw new Error('Failed to fetch version');
+        throw new Error(t('common.failed_fetch_version', 'Failed to fetch version'));
       }
       return response.json();
     },
@@ -31,7 +34,7 @@ export function VersionDisplay({
   if (isLoading) {
     return (
       <div className={`text-xs text-muted-foreground ${className}`}>
-        Loading version...
+        {t('common.loading_version', 'Loading version...')}
       </div>
     );
   }
@@ -49,7 +52,7 @@ export function VersionDisplay({
             <Info className="h-3 w-3 text-muted-foreground" />
           </TooltipTrigger>
           <TooltipContent>
-            <p>Application Version: {version}</p>
+            <p>{t('common.application_version', 'Application Version')}: {version}</p>
           </TooltipContent>
         </Tooltip>
       )}

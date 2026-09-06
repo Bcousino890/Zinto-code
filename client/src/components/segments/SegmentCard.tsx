@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Users, MoreVertical, Edit, Trash2, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface SegmentCardProps {
   segment: {
@@ -33,6 +34,8 @@ export function SegmentCard({
   onDelete,
   className,
 }: SegmentCardProps) {
+  const { t } = useTranslation();
+
   return (
     <Card
       className={cn(
@@ -54,7 +57,7 @@ export function SegmentCard({
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
               <Users className="w-4 h-4" />
               <span className="font-medium">{segment.contactCount}</span>
-              <span>contacts</span>
+              <span>{t('common.contacts', 'contacts')}</span>
             </div>
             {segment.description && (
               <p className="text-sm text-muted-foreground line-clamp-2">
@@ -69,7 +72,7 @@ export function SegmentCard({
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 p-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
-                  aria-label="Segment actions"
+                  aria-label={t('common.segment_actions', 'Segment actions')}
                 >
                   <MoreVertical className="w-4 h-4" />
                 </Button>
@@ -78,7 +81,7 @@ export function SegmentCard({
                 {onEdit && (
                   <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(); }}>
                     <Edit className="w-4 h-4 mr-2" />
-                    Edit
+                    {t('common.edit', 'Edit')}
                   </DropdownMenuItem>
                 )}
                 {onDelete && (
@@ -87,7 +90,7 @@ export function SegmentCard({
                     className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
+                    {t('common.delete', 'Delete')}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>

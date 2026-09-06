@@ -16,6 +16,8 @@ import { Pin, PinOff, Briefcase, Loader2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { apiRequest } from '@/lib/queryClient';
+import MessageBubble from './MessageBubble';
+import './ConversationStyles.css';
 
 interface ConversationItemProps {
   conversation: any;
@@ -348,14 +350,14 @@ export default function ConversationItem({
                 </Button>
               </PopoverTrigger>
               <PopoverContent
-                className="w-80 p-0"
+                className="w-[340px] sm:w-[400px] p-0 overflow-hidden"
                 align="end"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="px-3 py-2 border-b text-xs font-medium text-muted-foreground">
+                <div className="px-3 py-2 border-b bg-card text-xs font-medium text-muted-foreground">
                   {t('conversations.item.preview_title', 'Preview — not marked as read')}
                 </div>
-                <div className="max-h-72 overflow-y-auto divide-y">
+                <div className="max-h-96 overflow-y-auto overflow-x-hidden conversation-background p-3 space-y-1">
                   {previewLoading && (
                     <div className="p-4 flex justify-center">
                       <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -372,12 +374,14 @@ export default function ConversationItem({
                     </div>
                   )}
                   {!previewLoading && !previewError && previewMessages?.map((m: any) => (
-                    <div key={m.id} className="px-3 py-2 text-sm flex items-start justify-between gap-2">
-                      <p className="text-muted-foreground truncate flex-1">{formatMessagePreview(m)}</p>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
-                        {formatMessageDateTime(m.sentAt || m.createdAt, t)}
-                      </span>
-                    </div>
+                    <MessageBubble
+                      key={m.id}
+                      message={m}
+                      contact={contact}
+                      channelType={conversation.channelType}
+                      conversation={conversation}
+                      reactions={[]}
+                    />
                   ))}
                 </div>
                 <div className="p-2 border-t">

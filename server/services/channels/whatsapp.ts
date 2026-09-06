@@ -4938,15 +4938,23 @@ async function handleIncomingMessage(
 
       if (!actualPhoneNumber) {
         resolvedRemoteJid = rawRemoteJidBeforeNormalization;
+        // Could not resolve the @lid to a real phone number through any lookup above.
+        // extractPhoneNumberFromJid() would otherwise strip the "@lid" suffix and treat
+        // the raw LID digits as if they were a phone number, inventing a contact with a
+        // fake number that doesn't exist. Use the same LID-<id> synthetic identifier
+        // convention resolveGroupMessageParticipant() falls back to for the same reason,
+        // so both paths land on the same (clearly-marked, non-phone) contact record.
+        actualPhoneNumber = `LID-${rawRemoteJidBeforeNormalization.split('@')[0]}`;
       }
     }
 
 
     const phoneNumber = actualPhoneNumber || extractPhoneNumberFromJid(resolvedRemoteJid);
-    const cleanPhoneNumber = phoneNumber.replace(/[^\d]/g, '');
-    
+    const isUnresolvedLid = phoneNumber.startsWith('LID-');
+    const cleanPhoneNumber = isUnresolvedLid ? phoneNumber : phoneNumber.replace(/[^\d]/g, '');
 
-    if (isWhatsAppGroupChatId(cleanPhoneNumber)) {
+
+    if (!isUnresolvedLid && isWhatsAppGroupChatId(cleanPhoneNumber)) {
       return;
     }
 
@@ -4993,7 +5001,9 @@ async function handleIncomingMessage(
       const contactData: InsertContact = {
         companyId: companyId,
         name,
-        phone: `+${cleanPhoneNumber}`, // Store with + prefix for consistency - this is the ACTUAL sender's phone
+        // Store with + prefix for consistency - this is the ACTUAL sender's phone.
+        // An unresolved LID has no real phone number to prefix.
+        phone: isUnresolvedLid ? cleanPhoneNumber : `+${cleanPhoneNumber}`,
         email: null,
         avatarUrl: null,
         identifier: cleanPhoneNumber, // Store clean phone number as identifier - this is the ACTUAL sender's phone

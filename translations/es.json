@@ -56994,5 +56994,145 @@
   {
     "key": "subscription.renewal_badge",
     "value": "Renovando"
+  },
+  {
+    "key": "settings.whatsapp_connection_updated",
+    "value": "Conexión de WhatsApp actualizada"
+  },
+  {
+    "key": "settings.whatsapp_connection_updated_desc",
+    "value": "Tu configuración de conexión de WhatsApp ha sido actualizada exitosamente."
+  },
+  {
+    "key": "settings.whatsapp_update_error",
+    "value": "Error de actualización"
+  },
+  {
+    "key": "settings.whatsapp_account_required",
+    "value": "El nombre de la cuenta es requerido."
+  },
+  {
+    "key": "settings.validation_error",
+    "value": "Error de validación"
+  },
+  {
+    "key": "settings.failed_load_connection",
+    "value": "No se pudieron cargar los datos de conexión"
+  },
+  {
+    "key": "settings.tiktok_error",
+    "value": "Error"
+  },
+  {
+    "key": "settings.tiktok_success",
+    "value": "Éxito"
+  },
+  {
+    "key": "settings.tiktok_failed_load",
+    "value": "No se pudieron cargar los datos de conexión"
+  },
+  {
+    "key": "error.context_required",
+    "value": "{{context}} debe ser usado dentro de {{provider}}"
+  },
+  {
+    "key": "common.timezone.label",
+    "value": "Selecciona zona horaria..."
+  },
+  {
+    "key": "common.timezone.search",
+    "value": "Buscar zonas horarias..."
+  },
+  {
+    "key": "common.date_picker.placeholder",
+    "value": "Elige una fecha"
+  },
+  {
+    "key": "common.breadcrumb",
+    "value": "migajas de pan"
+  },
+  {
+    "key": "common.form.field_error",
+    "value": "useFormField debe ser usado dentro de..."
+  },
+  {
+    "key": "common.chart.error",
+    "value": "useChart debe ser usado dentro de..."
+  },
+  {
+    "key": "common.version_fetch_error",
+    "value": "No se pudo obtener la versión"
+  },
+  {
+    "key": "common.segment_actions",
+    "value": "Acciones de segmento"
+  },
+  {
+    "key": "common.admin_access",
+    "value": "Acceso de administrador"
+  },
+  {
+    "key": "common.copy_success",
+    "value": "Copiado"
+  },
+  {
+    "key": "common.share",
+    "value": "Compartir"
+  },
+  {
+    "key": "common.flow_context_error",
+    "value": "useFlowContext debe ser usado dentro de..."
+  },
+  {
+    "key": "common.pipeline_context_error",
+    "value": "usePipeline debe ser usado dentro de un PipelineProvider"
+  },
+  {
+    "key": "common.validation_summary_copy",
+    "value": "Copiado"
+  },
+  {
+    "key": "common.validation_summary_share",
+    "value": "Compartir"
+  },
+  {
+    "key": "common.subscription_guard_renewal_error",
+    "value": "No se pudo obtener el estado de renovación"
+  },
+  {
+    "key": "common.subscription_guard_plans_error",
+    "value": "No se pudieron obtener los planes"
+  },
+  {
+    "key": "common.branding_context_error",
+    "value": "useBranding debe ser usado dentro de un BrandingProvider"
+  },
+  {
+    "key": "common.branding_fetch_error",
+    "value": "No se pudieron obtener las configuraciones de marca"
+  },
+  {
+    "key": "common.protected_route_admin",
+    "value": "Acceso de administrador"
+  },
+  {
+    "key": "common.form_field_error",
+    "value": "useFormField debe ser usado dentro del componente FormField"
+  },
+  {
+    "key": "common.chart_error",
+    "value": "useChart debe ser usado dentro de ChartContainer"
+  },
+  {
+    "key": "common.sidebar_chrome_error",
+    "value": "useAppSidebarChrome debe ser usado dentro de AppSidebarChromeProvider"
+  },
+  {
+    "key": "common.mobile_layout_error",
+    "value": "useMobileLayout debe ser usado dentro de MobileLayoutProvider"
+  },
+  {
+    "key": "common.manual_renewal_error",
+    "value": "useManualRenewal debe ser usado dentro de ManualRenewalProvider"
   }
 ]

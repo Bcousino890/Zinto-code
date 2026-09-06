@@ -53230,5 +53230,145 @@
   {
     "key": "subscription.renewal_badge",
     "value": "Renewing"
+  },
+  {
+    "key": "settings.whatsapp_connection_updated",
+    "value": "WhatsApp Connection Updated"
+  },
+  {
+    "key": "settings.whatsapp_connection_updated_desc",
+    "value": "Your WhatsApp connection settings have been updated successfully."
+  },
+  {
+    "key": "settings.whatsapp_update_error",
+    "value": "Update Error"
+  },
+  {
+    "key": "settings.whatsapp_account_required",
+    "value": "Account name is required."
+  },
+  {
+    "key": "settings.validation_error",
+    "value": "Validation Error"
+  },
+  {
+    "key": "settings.failed_load_connection",
+    "value": "Failed to load connection data"
+  },
+  {
+    "key": "settings.tiktok_error",
+    "value": "Error"
+  },
+  {
+    "key": "settings.tiktok_success",
+    "value": "Success"
+  },
+  {
+    "key": "settings.tiktok_failed_load",
+    "value": "Failed to load connection data"
+  },
+  {
+    "key": "error.context_required",
+    "value": "{{context}} must be used within {{provider}}"
+  },
+  {
+    "key": "common.timezone.label",
+    "value": "Select timezone..."
+  },
+  {
+    "key": "common.timezone.search",
+    "value": "Search timezones..."
+  },
+  {
+    "key": "common.date_picker.placeholder",
+    "value": "Pick a date"
+  },
+  {
+    "key": "common.breadcrumb",
+    "value": "breadcrumb"
+  },
+  {
+    "key": "common.form.field_error",
+    "value": "useFormField should be used within..."
+  },
+  {
+    "key": "common.chart.error",
+    "value": "useChart must be used within..."
+  },
+  {
+    "key": "common.version_fetch_error",
+    "value": "Failed to fetch version"
+  },
+  {
+    "key": "common.segment_actions",
+    "value": "Segment actions"
+  },
+  {
+    "key": "common.admin_access",
+    "value": "Admin Access"
+  },
+  {
+    "key": "common.copy_success",
+    "value": "Copied"
+  },
+  {
+    "key": "common.share",
+    "value": "Share"
+  },
+  {
+    "key": "common.flow_context_error",
+    "value": "useFlowContext must be used within..."
+  },
+  {
+    "key": "common.pipeline_context_error",
+    "value": "usePipeline must be used within a PipelineProvider"
+  },
+  {
+    "key": "common.validation_summary_copy",
+    "value": "Copied"
+  },
+  {
+    "key": "common.validation_summary_share",
+    "value": "Share"
+  },
+  {
+    "key": "common.subscription_guard_renewal_error",
+    "value": "Failed to fetch renewal status"
+  },
+  {
+    "key": "common.subscription_guard_plans_error",
+    "value": "Failed to fetch plans"
+  },
+  {
+    "key": "common.branding_context_error",
+    "value": "useBranding must be used within a BrandingProvider"
+  },
+  {
+    "key": "common.branding_fetch_error",
+    "value": "Failed to fetch branding settings"
+  },
+  {
+    "key": "common.protected_route_admin",
+    "value": "Admin Access"
+  },
+  {
+    "key": "common.form_field_error",
+    "value": "useFormField should be used within FormField component"
+  },
+  {
+    "key": "common.chart_error",
+    "value": "useChart must be used within ChartContainer"
+  },
+  {
+    "key": "common.sidebar_chrome_error",
+    "value": "useAppSidebarChrome must be used within AppSidebarChromeProvider"
+  },
+  {
+    "key": "common.mobile_layout_error",
+    "value": "useMobileLayout must be used within MobileLayoutProvider"
+  },
+  {
+    "key": "common.manual_renewal_error",
+    "value": "useManualRenewal must be used within ManualRenewalProvider"
   }
 ]

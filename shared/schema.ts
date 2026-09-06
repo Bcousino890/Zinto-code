@@ -53,6 +53,9 @@ export const companies = pgTable("companies", {
   trialEndDate: timestamp("trial_end_date"),
   isInTrial: boolean("is_in_trial").default(false),
   maxUsers: integer("max_users").default(5),
+  whatsappImportMode: text("whatsapp_import_mode", {
+    enum: ['disabled', 'contacts_only', 'full_chat']
+  }).default('contacts_only'),
 
 
   registerNumber: text("register_number"),
@@ -100,6 +103,7 @@ export const insertCompanySchema = createInsertSchema(companies).pick({
   trialEndDate: true,
   isInTrial: true,
   maxUsers: true,
+  whatsappImportMode: true,
   registerNumber: true,
   companyEmail: true,
   contactPerson: true,

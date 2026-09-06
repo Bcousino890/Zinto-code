@@ -13775,7 +13775,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       // Populate new WhatsApp contacts consistently with contacts created by an
       // incoming message. Profile-photo lookup is best effort and must never make
       // contact creation fail.
-      if (contact.phone && !contact.avatarUrl && contact.identifierType === 'whatsapp_unofficial') {
+      if (contact.phone && !contact.avatarUrl && (contact.identifierType === 'whatsapp_unofficial' || contact.identifierType === 'whatsapp' || contact.source === 'whatsapp')) {
         try {
           const connections = await storage.getChannelConnectionsByCompany(req.user.companyId);
           const connection = connections.find((candidate) =>

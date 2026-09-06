@@ -152,6 +152,7 @@ export default function CompanyDetailPage() {
     active: z.boolean(),
     planId: z.number().int().min(1, t('admin.companies.detail.validation.plan_required', 'Plan is required')),
     maxUsers: z.number().int().min(1, t('admin.companies.detail.validation.max_users_required', 'Must have at least 1 user')),
+    whatsappImportMode: z.enum(['disabled', 'contacts_only', 'full_chat']),
   });
 
   type CompanyFormValues = z.infer<typeof companySchema>;
@@ -204,11 +205,7 @@ export default function CompanyDetailPage() {
       active: true,
       planId: 0,
       maxUsers: 5,
-
-
-
-
-
+      whatsappImportMode: 'contacts_only',
     }
   });
 
@@ -224,10 +221,7 @@ export default function CompanyDetailPage() {
         active: company.active,
         planId: planId,
         maxUsers: company.maxUsers,
-
-
-
-
+        whatsappImportMode: (company as any).whatsappImportMode || 'contacts_only',
 
       });
     }
@@ -783,6 +777,32 @@ export default function CompanyDetailPage() {
                         />
                         */}
                       </div>
+
+                      <FormField
+                        control={form.control}
+                        name="whatsappImportMode"
+                        render={({ field }) => (
+                          <FormItem className="rounded-lg border p-4">
+                            <FormLabel className="text-base">{t('admin.companies.detail.form.whatsapp_import_mode', 'WhatsApp History Import')}</FormLabel>
+                            <FormDescription>
+                              {t('admin.companies.detail.form.whatsapp_import_mode_description', 'Controls what this company imports from WhatsApp (Unofficial) history sync. "Full chat" also removes the time window on imported messages.')}
+                            </FormDescription>
+                            <FormControl>
+                              <Select value={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="disabled">Disabled</SelectItem>
+                                  <SelectItem value="contacts_only">Contacts only</SelectItem>
+                                  <SelectItem value="full_chat">Full chat + contacts (no limits)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                       <FormField
                         control={form.control}

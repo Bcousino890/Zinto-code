@@ -489,6 +489,12 @@ const RECONNECT_CATCHUP_CONFIG = {
   messageWindowHours: 7 * 24,
 };
 
+/** Bounds profile-picture fetches performed for contacts newly created during history sync. */
+const HISTORY_SYNC_AVATAR_CONFIG = {
+  maxPerBatch: 300,
+  delayMs: 400,
+};
+
 const WA_VERSION_FILE_PATH = '/app/data/wa-version.json';
 // Fallback WhatsApp Web version so makeWASocket always receives a defined value
 const WA_VERSION_FALLBACK: any = [2, 3000, 1037654574];
@@ -3783,23 +3789,34 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
             return;
           }
 
-          const windowStart = new Date();
-          windowStart.setHours(windowStart.getHours() - RECONNECT_CATCHUP_CONFIG.messageWindowHours);
-          const windowStartTimestamp = Math.floor(windowStart.getTime() / 1000);
-
-          const filteredMessages = (newMessages || []).filter((message: any) => {
-            if (!message.messageTimestamp) return true; // keep if no timestamp (ON_DEMAND edge cases)
-
-            const messageTimestamp = typeof message.messageTimestamp === 'object'
-              ? message.messageTimestamp.toNumber()
-              : Number(message.messageTimestamp);
-
-            return messageTimestamp >= windowStartTimestamp;
-          });
-
           const batchId = `${connectionId}-${Date.now()}-${syncType ?? 'catchup'}`;
 
           const syncUser = await storage.getUser(userId);
+          const importCompany = syncUser?.companyId ? await storage.getCompany(syncUser.companyId) : null;
+          const importMode = (importCompany as any)?.whatsappImportMode || 'contacts_only';
+          const allowChats = importMode === 'full_chat';
+          const allowContacts = importMode === 'full_chat' || importMode === 'contacts_only';
+          const unlimitedMessages = importMode === 'full_chat';
+
+          let filteredMessages: any[];
+          if (unlimitedMessages) {
+            filteredMessages = newMessages || [];
+          } else {
+            const windowStart = new Date();
+            windowStart.setHours(windowStart.getHours() - RECONNECT_CATCHUP_CONFIG.messageWindowHours);
+            const windowStartTimestamp = Math.floor(windowStart.getTime() / 1000);
+
+            filteredMessages = (newMessages || []).filter((message: any) => {
+              if (!message.messageTimestamp) return true; // keep if no timestamp (ON_DEMAND edge cases)
+
+              const messageTimestamp = typeof message.messageTimestamp === 'object'
+                ? message.messageTimestamp.toNumber()
+                : Number(message.messageTimestamp);
+
+              return messageTimestamp >= windowStartTimestamp;
+            });
+          }
+
           if (syncUser?.companyId) {
             await storage.createHistorySyncBatch({
               connectionId,
@@ -3811,16 +3828,16 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
                     syncType === proto.HistorySync.HistorySyncType.ON_DEMAND
                   ? 'incremental'
                   : 'manual',
-              totalChats: newChats?.length || 0,
+              totalChats: allowChats ? (newChats?.length || 0) : 0,
               totalMessages: filteredMessages.length,
-              totalContacts: newContacts?.length || 0
+              totalContacts: allowContacts ? (newContacts?.length || 0) : 0
             });
           }
 
           await storage.updateChannelConnection(connectionId, {
             historySyncStatus: 'syncing',
             historySyncProgress: 0,
-            historySyncTotal: filteredMessages.length + (newChats?.length || 0) + (newContacts?.length || 0)
+            historySyncTotal: filteredMessages.length + (allowChats ? (newChats?.length || 0) : 0) + (allowContacts ? (newContacts?.length || 0) : 0)
           });
 
           emitWhatsAppEvent('historySyncProgress', {
@@ -3835,10 +3852,11 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
           // INITIAL_BOOTSTRAP), so threads absent from the CRM are created rather than
           // silently dropped. processHistorySyncData is idempotent per contact/conversation.
           await processHistorySyncData(connectionId, userId, {
-            chats: newChats || [],
-            contacts: newContacts || [],
+            chats: allowChats ? (newChats || []) : [],
+            contacts: allowContacts ? (newContacts || []) : [],
             messages: filteredMessages,
-            batchId
+            batchId,
+            unlimitedMessages
           });
 
           await storage.updateChannelConnection(connectionId, {
@@ -3851,9 +3869,9 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
             connectionId,
             companyId: syncUser?.companyId,
             batchId,
-            totalChats: newChats?.length || 0,
+            totalChats: allowChats ? (newChats?.length || 0) : 0,
             totalMessages: filteredMessages.length,
-            totalContacts: newContacts?.length || 0
+            totalContacts: allowContacts ? (newContacts?.length || 0) : 0
           });
         } catch (error) {
           console.error('Error processing history sync:', error);
@@ -8155,10 +8173,11 @@ async function processHistorySyncData(
     contacts: any[];
     messages: any[];
     batchId: string;
+    unlimitedMessages?: boolean;
   }
 ): Promise<void> {
   try {
-    const { chats, contacts, messages, batchId } = data;
+    const { chats, contacts, messages, batchId, unlimitedMessages } = data;
     const user = await storage.getUser(userId);
     const companyId = user?.companyId;
 
@@ -8171,6 +8190,31 @@ async function processHistorySyncData(
     let processedMessages = 0;
     const totalItems = contacts.length + chats.length + messages.length;
     let totalProcessed = 0;
+    let avatarFetchCount = 0;
+    let avatarLimitWarned = false;
+
+    const maybeFetchAvatar = async (contactRecord: any, phoneNumber: string) => {
+      try {
+        if (contactRecord?.avatarUrl || !isConnectionActive(connectionId)) {
+          return;
+        }
+        if (avatarFetchCount >= HISTORY_SYNC_AVATAR_CONFIG.maxPerBatch) {
+          if (!avatarLimitWarned) {
+            avatarLimitWarned = true;
+            console.warn(`History sync avatar fetch limit (${HISTORY_SYNC_AVATAR_CONFIG.maxPerBatch}) reached for batch ${batchId}`);
+          }
+          return;
+        }
+        avatarFetchCount++;
+        const avatarUrl = await fetchProfilePicture(connectionId, phoneNumber, true);
+        if (avatarUrl) {
+          await storage.updateContact(contactRecord.id, { avatarUrl });
+        }
+        await new Promise((resolve) => setTimeout(resolve, HISTORY_SYNC_AVATAR_CONFIG.delayMs));
+      } catch (avatarError) {
+        console.error('Error fetching profile picture during history sync:', avatarError);
+      }
+    };
 
     const emitProgress = () => {
       emitWhatsAppEvent('historySyncProgress', {
@@ -8192,7 +8236,7 @@ async function processHistorySyncData(
           if (!existingContact) {
             const contactData = {
               companyId,
-              name: contact.name || contact.notify || phoneNumber,
+              name: contact.name || contact.notify || (contact as any).verifiedName || phoneNumber,
               phone: phoneNumber,
               email: null,
               avatarUrl: null,
@@ -8206,6 +8250,8 @@ async function processHistorySyncData(
 
             existingContact = await storage.getOrCreateContact(contactData);
             processedContacts++;
+
+            await maybeFetchAvatar(existingContact, phoneNumber);
           }
         }
         totalProcessed++;
@@ -8227,7 +8273,7 @@ async function processHistorySyncData(
           if (!contact) {
             const contactData = {
               companyId,
-              name: chat.name || phoneNumber,
+              name: chat.name || (chat as any).notify || (chat as any).pushName || phoneNumber,
               phone: phoneNumber,
               email: null,
               avatarUrl: null,
@@ -8240,6 +8286,8 @@ async function processHistorySyncData(
             };
 
             contact = await storage.getOrCreateContact(contactData);
+
+            await maybeFetchAvatar(contact, phoneNumber);
           }
 
           const existingConversation = await storage.getConversationByContactAndChannel(
@@ -8287,7 +8335,7 @@ async function processHistorySyncData(
     for (const message of messages) {
       try {
 
-        if (message.messageTimestamp) {
+        if (!unlimitedMessages && message.messageTimestamp) {
           const messageTimestamp = typeof message.messageTimestamp === 'object'
             ? message.messageTimestamp.toNumber()
             : Number(message.messageTimestamp);

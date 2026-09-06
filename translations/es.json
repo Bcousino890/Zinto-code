@@ -15516,6 +15516,10 @@
     "value": "📊 Encuesta"
   },
   {
+    "key": "conversations.item.preview_chat",
+    "value": "Vista previa del chat (no marca como leído)"
+  },
+  {
     "key": "conversations.item.sent_audio",
     "value": "🎵 Enviado un audio"
   },
@@ -15738,6 +15742,14 @@
   {
     "key": "conversations.view.no_results",
     "value": "No se encontraron resultados"
+  },
+  {
+    "key": "conversations.view.open_conversation",
+    "value": "Abrir conversación"
+  },
+  {
+    "key": "conversations.view.preview_banner",
+    "value": "Vista previa — aún no marcada como leída"
   },
   {
     "key": "conversations.view.previous_result",

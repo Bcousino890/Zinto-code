@@ -15516,6 +15516,10 @@
     "value": "📊 Poll"
   },
   {
+    "key": "conversations.item.preview_chat",
+    "value": "Preview chat (does not mark as read)"
+  },
+  {
     "key": "conversations.item.sent_audio",
     "value": "🎵 Sent an audio"
   },
@@ -15738,6 +15742,14 @@
   {
     "key": "conversations.view.no_results",
     "value": "No results found"
+  },
+  {
+    "key": "conversations.view.open_conversation",
+    "value": "Open conversation"
+  },
+  {
+    "key": "conversations.view.preview_banner",
+    "value": "Preview — not marked as read yet"
   },
   {
     "key": "conversations.view.previous_result",

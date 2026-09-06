@@ -151,6 +151,13 @@ Ahora coinciden. **Commit:** `c3cb220`
   subida de 10 MB → 100 MB (PR #1, hecho en otra sesión)
 - El bucle de sincronización leía un ID de grupo como si fuera un teléfono y creaba contactos
   basura — ya se excluyen los `@g.us`
+- Mensajes que llegaban marcados "Unsupported message type": los mensajes de "ver una vez" y
+  los de "mensajes temporales" (ephemeral) nunca se desenvolvían, así que caían siempre al caso
+  desconocido en vez de mostrarse como imagen/video/texto. **Commit:** `a0328d7`
+- Vista previa de enlaces (ej. links de portales inmobiliarios) rota con error CORS en consola:
+  la miniatura tenía `crossOrigin="anonymous"` sin necesitarlo (no se lee el pixel de la imagen
+  en ningún lado), lo que exigía que el sitio externo mandara cabeceras CORS que la mayoría no
+  manda. Se sacó el atributo. **Commit:** `488c788`
 
 ---
 

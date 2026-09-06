@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useTranslation } from '@/hooks/use-translation';
 
 export type DatePickerProps = {
   date?: Date;
@@ -19,8 +20,10 @@ export type DatePickerProps = {
  * Single-day picker used on ERP accounting report filters.
  * Wraps the shared Calendar + Popover pattern used elsewhere in the app.
  */
-export function DatePicker({ date, onSelect, placeholder = 'Pick a date', disabled, className }: DatePickerProps) {
+export function DatePicker({ date, onSelect, placeholder, disabled, className }: DatePickerProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const defaultPlaceholder = t('common.date_picker.placeholder', 'Pick a date');
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -30,7 +33,7 @@ export function DatePicker({ date, onSelect, placeholder = 'Pick a date', disabl
           disabled={disabled}
           className={cn('w-[240px] justify-start text-left font-normal', !date && 'text-muted-foreground', className)}
         >
-          {date ? format(date, 'PPP') : <span>{placeholder}</span>}
+          {date ? format(date, 'PPP') : <span>{placeholder || defaultPlaceholder}</span>}
           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
         </Button>
       </PopoverTrigger>

@@ -1602,7 +1602,7 @@ function registerAdminRoutes(app: Express) {
       const appName =
         typeof brandingValue?.appName === 'string' && brandingValue.appName.trim()
           ? brandingValue.appName.trim()
-          : 'BotHive';
+          : 'Zinto';
       const defaultLocale = (defaultLanguage?.code || 'en').toLowerCase();
 
       const activeLanguageCodes = languages

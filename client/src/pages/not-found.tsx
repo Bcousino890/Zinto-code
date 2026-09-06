@@ -204,7 +204,7 @@ export default function NotFound() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.open('mailto:support@bothiveapp.net', '_blank')}
+                  onClick={() => window.open('mailto:support@zinto.app', '_blank')}
                   className="w-full sm:w-auto"
                 >
                   <Mail className="h-4 w-4 mr-2" />

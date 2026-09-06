@@ -655,7 +655,7 @@ export function createDefaultFrontendWebsiteFooter(): FrontendWebsiteFooter {
 }
 
 export function createDefaultFrontendWebsiteLocaleContent(
-  appName = 'BotHive'
+  appName = 'Zinto'
 ): FrontendWebsiteLocaleContent {
   return {
     homepage: normalizeLandingPageContent(undefined, { appName }),
@@ -663,7 +663,7 @@ export function createDefaultFrontendWebsiteLocaleContent(
 }
 
 export function createDefaultFrontendWebsiteSettings(
-  appName = 'BotHive',
+  appName = 'Zinto',
   defaultLocale = 'en'
 ): FrontendWebsiteSettings {
   const now = new Date().toISOString();
@@ -699,7 +699,7 @@ export function normalizeFrontendWebsiteSettings(
     mediaLibrary?: FrontendWebsiteMediaLibrary;
   } = {}
 ): FrontendWebsiteSettings {
-  const appName = options.appName ?? 'BotHive';
+  const appName = options.appName ?? 'Zinto';
   const defaultLocale = options.defaultLocale ?? 'en';
   const defaults = createDefaultFrontendWebsiteSettings(appName, defaultLocale);
   const source = isRecord(value) ? value : {};
@@ -819,7 +819,7 @@ export function buildFrontendWebsiteSettingsFromLegacyKeys(
   legacy: LegacyLandingAppSettings,
   options: { appName?: string; defaultLocale?: string } = {}
 ): FrontendWebsiteSettings {
-  const appName = options.appName ?? 'BotHive';
+  const appName = options.appName ?? 'Zinto';
   const defaultLocale = options.defaultLocale ?? 'en';
   const settings = createDefaultFrontendWebsiteSettings(appName, defaultLocale);
   const homepage = settings.localizedContent[defaultLocale].homepage;

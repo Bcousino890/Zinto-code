@@ -180,8 +180,8 @@ export async function sendEmailWithSendGrid(
     
     const config = await getSmtpConfig();
     
-    const fromEmail = config?.senderEmail || 'noreply@bothive.app';
-    const fromName = config?.senderName || 'BotHive';
+    const fromEmail = config?.senderEmail || 'noreply@zinto.app';
+    const fromName = config?.senderName || 'Zinto';
     
     const msg = {
       to: Array.isArray(to) ? to : to,
@@ -212,10 +212,10 @@ export async function sendTeamInvitation(
   role: string,
   invitationLink: string
 ): Promise<boolean> {
-  const subject = `You've been invited to join ${companyName} on BotHive`;
+  const subject = `You've been invited to join ${companyName} on Zinto`;
   
   const textContent = `
-    ${invitedByName} has invited you to join ${companyName} on BotHive as a ${role}.
+    ${invitedByName} has invited you to join ${companyName} on Zinto as a ${role}.
     
     Click the link below to accept the invitation:
     ${invitationLink}
@@ -226,7 +226,7 @@ export async function sendTeamInvitation(
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #4f46e5;">You've Been Invited</h2>
-      <p><strong>${invitedByName}</strong> has invited you to join <strong>${companyName}</strong> on BotHive as a <strong>${role}</strong>.</p>
+      <p><strong>${invitedByName}</strong> has invited you to join <strong>${companyName}</strong> on Zinto as a <strong>${role}</strong>.</p>
       
       <div style="margin: 30px 0; text-align: center;">
         <a href="${invitationLink}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Accept Invitation</a>

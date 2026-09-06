@@ -482,7 +482,7 @@ async function analyzeWithProvider(
           baseURL: 'https://openrouter.ai/api/v1',
           defaultHeaders: {
             'HTTP-Referer': 'https://bothive.pro',
-            'X-Title': 'BotHive'
+            'X-Title': 'Zinto'
           }
         }
       : {})

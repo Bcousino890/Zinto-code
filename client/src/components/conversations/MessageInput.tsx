@@ -703,10 +703,10 @@ export default function MessageInput({ conversationId, conversation, contact }: 
     
     const file = files[0];
     
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > 100 * 1024 * 1024) {
       toast({
         title: t('messages.input.file_too_large', 'File Too Large'),
-        description: t('messages.input.max_file_size', 'Maximum file size is 10MB'),
+        description: t('messages.input.max_file_size', 'Maximum file size is 100MB'),
         variant: "destructive"
       });
       return;

@@ -39,7 +39,7 @@ export function serveStatic(app: Express) {
         }
         res.status(503).send(`
           <html>
-            <head><title>BotHivePlus - Build Required</title></head>
+            <head><title>Zinto - Build Required</title></head>
             <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
               <h1>🔧 Build Required</h1>
               <p>The client hasn't been built yet.</p>

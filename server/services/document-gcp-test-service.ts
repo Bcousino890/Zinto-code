@@ -27,7 +27,7 @@ export async function testDocumentGeneratorGcpCredentials(
 
     const created = await slides.presentations.create({
       requestBody: {
-        title: 'BotHive Document Generator Connection Test',
+        title: 'Zinto Document Generator Connection Test',
       },
     });
 

@@ -199,7 +199,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<{ succes
     const brandingValue = brandingSetting?.value as { appName?: string } | undefined;
     const appName = typeof brandingValue?.appName === 'string' && brandingValue.appName.trim()
       ? brandingValue.appName.trim()
-      : 'BotHive';
+      : 'Zinto';
 
     // Replace variables in template
     const variables = {

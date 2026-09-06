@@ -196,7 +196,7 @@ function coerceSocialUrl(value: unknown): string {
   return parsed.success ? parsed.data : '';
 }
 
-export function createDefaultLandingPageContent(appName = 'BotHive'): LandingPageContent {
+export function createDefaultLandingPageContent(appName = 'Zinto'): LandingPageContent {
   return {
     heroTitle: 'Ready to transform your customer communication?',
     heroSubtitle: `Join thousands of businesses using ${appName} to streamline their customer interactions and boost satisfaction rates.`,
@@ -509,7 +509,7 @@ export function normalizeLandingPageContent(
     mediaLibrary?: LandingPageMediaLibraryLookup;
   } = {}
 ): LandingPageContent {
-  const appName = options.appName ?? 'BotHive';
+  const appName = options.appName ?? 'Zinto';
   const defaults = createDefaultLandingPageContent(appName);
   const source = isRecord(value) ? value : {};
   const overrides = options.overrides ?? {};

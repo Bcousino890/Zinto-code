@@ -3133,7 +3133,7 @@ async function getOpenRouterImageCapabilityIds(): Promise<Set<string>> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'HTTP-Referer': 'https://bothive.pro',
-      'X-Title': 'BotHive'
+      'X-Title': 'Zinto'
     };
     const openRouterApiKey = process.env.OPENROUTER_API_KEY;
     if (openRouterApiKey) {
@@ -4351,7 +4351,7 @@ class OpenRouterProvider implements AIProviderInterface {
       baseURL: 'https://openrouter.ai/api/v1',
       headers: {
         'HTTP-Referer': 'https://bothive.pro',
-        'X-Title': 'BotHive'
+        'X-Title': 'Zinto'
       }
     });
     if (voiceFallbackApiKey) {

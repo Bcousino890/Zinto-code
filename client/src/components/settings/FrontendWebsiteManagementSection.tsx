@@ -72,7 +72,7 @@ export default function FrontendWebsiteManagementSection({
   const { plans: publicPlans } = usePublicPlans();
   const { toast } = useToast();
 
-  const appName = branding.appName || 'BotHive';
+  const appName = branding.appName || 'Zinto';
   const activeLanguages = useMemo(
     () => languages.filter((language) => language.isActive !== false),
     [languages]

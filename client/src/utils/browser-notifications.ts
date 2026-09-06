@@ -273,7 +273,7 @@ class BrowserNotificationManager {
     if (this.isSupported && this.getPermissionStatus() === 'granted') {
       try {
 
-        const directNotification = new Notification('BotHive Test', {
+        const directNotification = new Notification('Zinto Test', {
           body: 'Direct notification test',
           icon: '/favicon.ico'
         });
@@ -291,7 +291,7 @@ class BrowserNotificationManager {
 
 
     return this.showNotification({
-      title: 'BotHive Notifications',
+      title: 'Zinto Notifications',
       body: 'Notifications are working! You\'ll receive alerts for new messages.',
       tag: 'test-notification',
       requireInteraction: false,

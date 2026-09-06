@@ -542,12 +542,12 @@ export default function Sidebar() {
           <i className={`ri-${isCollapsed ? 'menu-unfold' : 'menu-fold'}-line text-lg`} />
         </button>
         {!isCollapsed && (
-          <div className="flex min-w-0 flex-1 items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             {company?.logo || branding.logoUrl ? (
               <img
                 src={company?.logo || branding.logoUrl}
                 alt={company?.name || branding.appName}
-                className="h-8 max-w-[150px] object-contain object-left"
+                className="h-8 min-w-0 max-w-full object-contain object-left"
               />
             ) : (
               <>

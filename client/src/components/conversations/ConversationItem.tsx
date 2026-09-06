@@ -12,8 +12,10 @@ import { stripFormatting } from '@/utils/textFormatter';
 import { formatMessageDateTime } from '@/utils/dateUtils';
 import BotIcon from '@/components/ui/bot-icon';
 import { TwilioIcon } from '@/components/icons/TwilioIcon';
-import { Pin, PinOff, Briefcase, Loader2 } from 'lucide-react';
+import { Pin, PinOff, Briefcase, Loader2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { apiRequest } from '@/lib/queryClient';
 
 interface ConversationItemProps {
   conversation: any;
@@ -48,6 +50,32 @@ export default function ConversationItem({
 
   const handleClick = () => {
     onClick();
+  };
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewMessages, setPreviewMessages] = useState<any[] | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState(false);
+
+  // Peek at recent messages without opening the conversation: opening it for real
+  // sets activeConversationId, which triggers /mark-read and clears the unread
+  // badge. This fetches the same messages endpoint directly instead, so looking
+  // has no side effect.
+  const loadPreview = async () => {
+    setPreviewLoading(true);
+    setPreviewError(false);
+    try {
+      const endpoint = conversation.isGroup
+        ? `/api/group-conversations/${conversation.id}/messages?page=1&limit=6`
+        : `/api/conversations/${conversation.id}/messages?page=1&limit=6`;
+      const res = await apiRequest('GET', endpoint);
+      const data = await res.json();
+      setPreviewMessages(data.messages || []);
+    } catch {
+      setPreviewError(true);
+    } finally {
+      setPreviewLoading(false);
+    }
   };
 
   const { data: connections } = useQuery<ChannelConnection[]>({
@@ -298,6 +326,76 @@ export default function ConversationItem({
                 {isPinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
               </Button>
             )}
+            <Popover
+              open={isPreviewOpen}
+              onOpenChange={(open) => {
+                setIsPreviewOpen(open);
+                if (open && previewMessages === null) {
+                  loadPreview();
+                }
+              }}
+            >
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 flex items-center justify-center text-muted-foreground hover:text-foreground"
+                  onClick={(e) => e.stopPropagation()}
+                  title={t('conversations.item.preview_chat', 'Preview chat (does not mark as read)')}
+                  aria-label={t('conversations.item.preview_chat', 'Preview chat (does not mark as read)')}
+                >
+                  <Eye className="h-3 w-3" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-80 p-0"
+                align="end"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="px-3 py-2 border-b text-xs font-medium text-muted-foreground">
+                  {t('conversations.item.preview_title', 'Preview — not marked as read')}
+                </div>
+                <div className="max-h-72 overflow-y-auto divide-y">
+                  {previewLoading && (
+                    <div className="p-4 flex justify-center">
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+                  {!previewLoading && previewError && (
+                    <div className="p-4 text-sm text-muted-foreground">
+                      {t('conversations.item.preview_error', 'Could not load preview')}
+                    </div>
+                  )}
+                  {!previewLoading && !previewError && previewMessages?.length === 0 && (
+                    <div className="p-4 text-sm text-muted-foreground">
+                      {t('conversations.item.no_messages_yet', 'No messages yet')}
+                    </div>
+                  )}
+                  {!previewLoading && !previewError && previewMessages?.map((m: any) => (
+                    <div key={m.id} className="px-3 py-2 text-sm flex items-start justify-between gap-2">
+                      <p className="text-muted-foreground truncate flex-1">{formatMessagePreview(m)}</p>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
+                        {formatMessageDateTime(m.sentAt || m.createdAt, t)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="p-2 border-t">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full h-7 text-xs"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsPreviewOpen(false);
+                      onClick();
+                    }}
+                  >
+                    {t('conversations.item.open_conversation', 'Open conversation')}
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             <span className="text-xs text-muted-foreground">{formattedTime}</span>
           </div>
         </div>

@@ -350,8 +350,6 @@ export async function launchMessengerSignup(
       }, useBusinessLogin
         ? {
             config_id: trimmedConfigId,
-            response_type: 'code',
-            override_default_response_type: true,
             extras: {
               setup: {},
               sessionInfoVersion: '3',
@@ -419,8 +417,6 @@ export async function launchInstagramSignup(
       }, useBusinessLogin
         ? {
             config_id: trimmedConfigId,
-            response_type: 'code',
-            override_default_response_type: true,
             extras: {
               setup: {},
               sessionInfoVersion: '3',

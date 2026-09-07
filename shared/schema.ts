@@ -888,6 +888,89 @@ export const apiWebhooks = pgTable("api_webhooks", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
+// CRM integration v2: durable state for bidirectional synchronization.
+// These records are company-scoped so a credential can never synchronize
+// data across tenants.
+export const crmIntegrations = pgTable("crm_integrations", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
+  name: text("name").notNull(),
+  provider: text("provider").notNull().default('custom'),
+  status: text("status").notNull().default('draft'),
+  webhookUrl: text("webhook_url"),
+  webhookSecretEncrypted: text("webhook_secret_encrypted"),
+  scopes: jsonb("scopes").notNull().default('[]'),
+  conflictRules: jsonb("conflict_rules").notNull().default('{}'),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  index("crm_integrations_company_status_idx").on(table.companyId, table.status),
+]);
+
+export const crmExternalMappings = pgTable("crm_external_mappings", {
+  id: bigserial("id", { mode: 'number' }).primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
+  integrationId: integer("integration_id").notNull().references(() => crmIntegrations.id, { onDelete: 'cascade' }),
+  entityType: text("entity_type").notNull(),
+  zintoId: text("zinto_id").notNull(),
+  externalId: text("external_id").notNull(),
+  version: integer("version").notNull().default(1),
+  lastSyncedAt: timestamp("last_synced_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("crm_external_mappings_external_unique").on(table.companyId, table.integrationId, table.entityType, table.externalId),
+  uniqueIndex("crm_external_mappings_zinto_unique").on(table.companyId, table.integrationId, table.entityType, table.zintoId),
+]);
+
+export const crmIdempotencyKeys = pgTable("crm_idempotency_keys", {
+  id: bigserial("id", { mode: 'number' }).primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
+  integrationId: integer("integration_id").references(() => crmIntegrations.id, { onDelete: 'cascade' }),
+  key: text("key").notNull(),
+  method: text("method").notNull(),
+  path: text("path").notNull(),
+  requestHash: text("request_hash").notNull(),
+  responseStatus: integer("response_status"),
+  responseBody: jsonb("response_body"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(),
+}, (table) => [
+  uniqueIndex("crm_idempotency_keys_unique").on(table.companyId, table.key),
+]);
+
+export const crmWebhookEvents = pgTable("crm_webhook_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
+  integrationId: integer("integration_id").notNull().references(() => crmIntegrations.id, { onDelete: 'cascade' }),
+  type: text("type").notNull(),
+  origin: text("origin").notNull(),
+  payload: jsonb("payload").notNull(),
+  status: text("status").notNull().default('pending'),
+  attemptCount: integer("attempt_count").notNull().default(0),
+  nextAttemptAt: timestamp("next_attempt_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  index("crm_webhook_events_pending_idx").on(table.status, table.nextAttemptAt),
+  index("crm_webhook_events_company_created_idx").on(table.companyId, table.createdAt),
+]);
+
+export const crmSyncConflicts = pgTable("crm_sync_conflicts", {
+  id: bigserial("id", { mode: 'number' }).primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
+  integrationId: integer("integration_id").notNull().references(() => crmIntegrations.id, { onDelete: 'cascade' }),
+  entityType: text("entity_type").notNull(),
+  zintoId: text("zinto_id").notNull(),
+  externalId: text("external_id").notNull(),
+  fields: jsonb("fields").notNull(),
+  status: text("status").notNull().default('pending'),
+  resolution: jsonb("resolution"),
+  resolvedBy: integer("resolved_by").references(() => users.id, { onDelete: 'set null' }),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertChannelConnectionSchema = createInsertSchema(channelConnections).pick({
   userId: true,
   companyId: true,

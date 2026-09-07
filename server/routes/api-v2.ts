@@ -1,6 +1,7 @@
 import { Router, type NextFunction, type Request, type Response } from 'express';
 import { integrationCapabilities, requireIntegrationScope } from '../middleware/integration-scope';
 import { getApiV2OpenApiDocument } from './api-v2-openapi';
+import { validateCampaignBatch, type CampaignBatchItem } from '../services/campaign-batch-validation';
 import type { CrmContactSyncService } from '../services/crm-contact-sync-service';
 import { normalizeOutboundCrmMessageRequest } from '../services/crm-message-sync-service';
 
@@ -16,15 +17,24 @@ type MessageSync = {
     origin: 'crm';
   }): Promise<{ id: string | number }>;
 };
+type CampaignSync = {
+  syncBatch(input: {
+    companyId: number;
+    integrationId: number;
+    campaigns: CampaignBatchItem[];
+  }): Promise<void>;
+};
 
 export function createApiV2Router({
   authenticate,
   contactSync,
   messageSync,
+  campaignSync,
 }: {
   authenticate: AuthenticationMiddleware;
   contactSync?: Pick<CrmContactSyncService, 'upsert'>;
   messageSync?: MessageSync;
+  campaignSync?: CampaignSync;
 }) {
   const router = Router();
 
@@ -111,6 +121,37 @@ export function createApiV2Router({
         });
       } catch (error) {
         return res.status(500).json({ error: 'MESSAGE_SYNC_FAILED', message: error instanceof Error ? error.message : 'Message synchronization failed' });
+      }
+    });
+  }
+
+  if (campaignSync) {
+    router.post('/campaigns/batch', requireIntegrationScope('campaigns:write'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const campaigns = req.body?.campaigns;
+
+      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !Array.isArray(campaigns) || campaigns.some((campaign) => !campaign || typeof campaign.externalId !== 'string' || !campaign.externalId.trim())) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and campaigns with external IDs are required' });
+      }
+
+      try {
+        validateCampaignBatch(campaigns);
+      } catch (error) {
+        return res.status(400).json({
+          error: 'VALIDATION_ERROR',
+          message: error instanceof Error ? error.message : 'Campaign batch validation failed',
+        });
+      }
+
+      try {
+        await campaignSync.syncBatch({ companyId, integrationId, campaigns });
+        return res.status(202).json({ count: campaigns.length });
+      } catch (error) {
+        return res.status(500).json({
+          error: 'CAMPAIGN_SYNC_FAILED',
+          message: error instanceof Error ? error.message : 'Campaign synchronization failed',
+        });
       }
     });
   }

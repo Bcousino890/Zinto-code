@@ -4,6 +4,7 @@ import test from 'node:test';
 
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { createApiV2Router } from '../../server/routes/api-v2';
+import type { CampaignBatchItem } from '../../server/services/campaign-batch-validation';
 import type { CrmContactSyncService } from '../../server/services/crm-contact-sync-service';
 
 type MessageSync = {
@@ -18,15 +19,24 @@ type MessageSync = {
   }): Promise<{ id: string | number }>;
 };
 
+type CampaignSync = {
+  syncBatch(input: {
+    companyId: number;
+    integrationId: number;
+    campaigns: CampaignBatchItem[];
+  }): Promise<void>;
+};
+
 async function withServer(
   middleware: (req: Request, res: Response, next: NextFunction) => void,
   run: (baseUrl: string) => Promise<void>,
   contactSync?: Pick<CrmContactSyncService, 'upsert'>,
   messageSync?: MessageSync,
+  campaignSync?: CampaignSync,
 ) {
   const app = express();
   app.use(express.json());
-  app.use('/api/v2', createApiV2Router({ authenticate: middleware, contactSync, messageSync }));
+  app.use('/api/v2', createApiV2Router({ authenticate: middleware, contactSync, messageSync, campaignSync }));
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
@@ -225,4 +235,99 @@ test('queues a CRM message without an external message ID', async () => {
     content: 'Appointment confirmed',
     origin: 'crm',
   }]);
+});
+
+test('accepts a validated campaign batch from a permitted integration', async () => {
+  const received: unknown[] = [];
+  const campaignSync: CampaignSync = {
+    syncBatch: async (input) => {
+      received.push(input);
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['campaigns:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441' }, { externalId: 'crm-campaign-442' }] }),
+    });
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await response.json(), { count: 2 });
+  }, undefined, undefined, campaignSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12,
+    integrationId: 3,
+    campaigns: [{ externalId: 'crm-campaign-441' }, { externalId: 'crm-campaign-442' }],
+  }]);
+});
+
+test('does not expose campaign batch synchronization when no campaign sync dependency is supplied', async () => {
+  await withServer((_req, _res, next) => next(), async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, { method: 'POST' });
+    assert.equal(response.status, 404);
+  });
+});
+
+test('does not synchronize campaigns without campaigns:write permission', async () => {
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['contacts:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441' }] }),
+    });
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).error, 'INSUFFICIENT_PERMISSIONS');
+  }, undefined, undefined, { syncBatch: async () => undefined });
+});
+
+test('rejects campaign batches that violate the batch validation contract', async () => {
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['campaigns:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441' }, { externalId: 'crm-campaign-441' }] }),
+    });
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), {
+      error: 'VALIDATION_ERROR',
+      message: 'Campaign sync batch contains duplicate external ID: crm-campaign-441',
+    });
+  }, undefined, undefined, { syncBatch: async () => undefined });
+});
+
+test('reports a campaign sync failure separately from an invalid batch', async () => {
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['campaigns:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441' }] }),
+    });
+    assert.equal(response.status, 500);
+    assert.deepEqual(await response.json(), {
+      error: 'CAMPAIGN_SYNC_FAILED',
+      message: 'Campaign queue unavailable',
+    });
+  }, undefined, undefined, {
+    syncBatch: async () => {
+      throw new Error('Campaign queue unavailable');
+    },
+  });
 });

@@ -2432,11 +2432,10 @@ export default function Settings() {
         <DialogContent className="w-[95vw] max-w-lg mx-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-xl">
-              {googleCalendarCredentials?.configured ? 'Update' : 'Configure'} Google Calendar API Credentials
+              {googleCalendarCredentials?.configured ? t('settings.google_calendar_update_credentials', 'Update') : t('settings.google_calendar_configure_credentials', 'Configure')} Google Calendar API Credentials
             </DialogTitle>
             <DialogDescription className="text-sm">
-              Enter your company's Google Cloud OAuth credentials to enable Google Calendar integration.
-              These credentials will be used for all users in your company.
+              {t('settings.google_calendar_description', 'Enter your company\'s Google Cloud OAuth credentials to enable Google Calendar integration. These credentials will be used for all users in your company.')}
             </DialogDescription>
           </DialogHeader>
 
@@ -2448,17 +2447,17 @@ export default function Settings() {
                   name="clientId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Client ID</FormLabel>
+                      <FormLabel>{t('settings.google_calendar_client_id', 'Client ID')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Your Google OAuth Client ID"
+                          placeholder={t('settings.google_calendar_client_id_placeholder', 'Your Google OAuth Client ID')}
                           required
                         />
                       </FormControl>
                       <FormMessage />
                       <p className="text-xs text-muted-foreground mt-1">
-                        Client ID from Google Cloud Console OAuth credentials
+                        {t('settings.google_calendar_client_id_help', 'Client ID from Google Cloud Console OAuth credentials')}
                       </p>
                     </FormItem>
                   )}
@@ -2469,18 +2468,18 @@ export default function Settings() {
                   name="clientSecret"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Client Secret</FormLabel>
+                      <FormLabel>{t('settings.google_calendar_client_secret', 'Client Secret')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="password"
-                          placeholder="Your Google OAuth Client Secret"
+                          placeholder={t('settings.google_calendar_client_secret_placeholder', 'Your Google OAuth Client Secret')}
                           required
                         />
                       </FormControl>
                       <FormMessage />
                       <p className="text-xs text-muted-foreground mt-1">
-                        Client Secret from Google Cloud Console OAuth credentials
+                        {t('settings.google_calendar_client_secret_help', 'Client Secret from Google Cloud Console OAuth credentials')}
                       </p>
                     </FormItem>
                   )}
@@ -2491,7 +2490,7 @@ export default function Settings() {
                   name="redirectUri"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Redirect URI</FormLabel>
+                      <FormLabel>{t('settings.google_calendar_redirect_uri', 'Redirect URI')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -2501,7 +2500,7 @@ export default function Settings() {
                       </FormControl>
                       <FormMessage />
                       <p className="text-xs text-muted-foreground mt-1">
-                        This should match the authorized redirect URI in your Google Cloud Console
+                        {t('settings.google_calendar_redirect_uri_help', 'This should match the authorized redirect URI in your Google Cloud Console')}
                       </p>
                     </FormItem>
                   )}
@@ -2510,10 +2509,9 @@ export default function Settings() {
                 <div className="pt-2 border-t border-border">
                   <Alert className="mb-4 bg-amber-50 border-amber-200">
                     <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Important</AlertTitle>
+                    <AlertTitle>{t('settings.google_calendar_important', 'Important')}</AlertTitle>
                     <AlertDescription className="text-xs">
-                      After updating these credentials, you will need to reconnect your Google account.
-                      All previous Google Calendar connections will be invalidated.
+                      {t('settings.google_calendar_credentials_warning', 'After updating these credentials, you will need to reconnect your Google account. All previous Google Calendar connections will be invalidated.')}
                     </AlertDescription>
                   </Alert>
 
@@ -2527,7 +2525,7 @@ export default function Settings() {
                       }}
                       className="w-full sm:w-auto"
                     >
-                      Cancel
+                      {t('common.cancel', 'Cancel')}
                     </Button>
 
                     <Button
@@ -2538,10 +2536,10 @@ export default function Settings() {
                     >
                       {isUpdatingCredentials && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       {isUpdatingCredentials
-                        ? 'Saving...'
+                        ? t('settings.google_calendar_saving', 'Saving...')
                         : googleCalendarCredentials?.configured
-                          ? 'Update Credentials'
-                          : 'Save Credentials'
+                          ? t('settings.google_calendar_update_button', 'Update Credentials')
+                          : t('settings.google_calendar_save_button', 'Save Credentials')
                       }
                     </Button>
                   </DialogFooter>

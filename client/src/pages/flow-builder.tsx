@@ -497,7 +497,7 @@ function MessageNode({ data, isConnectable, id }: any) {
                           <div className="flex-shrink-0 w-6 h-6 rounded-md bg-primary text-white flex items-center justify-center text-xs font-medium">
                             {index + 1}
                           </div>
-                          <div className="flex-1 text-xs font-medium">Keyword {index + 1}</div>
+                          <div className="flex-1 text-xs font-medium">{t('flow_builder.keyword_item', 'Keyword {{index}}', { index: index + 1 })}</div>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -2455,7 +2455,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                     <div className="flex-shrink-0 w-6 h-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
                       {index + 1}
                     </div>
-                    <div className="flex-1 font-medium text-xs">Option {index + 1}</div>
+                    <div className="flex-1 font-medium text-xs">{t('flow_builder.option_item', 'Option {{index}}', { index: index + 1 })}</div>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -2635,13 +2635,13 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
           {/* 🔧 ENHANCED: Message display with validation and preview */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-medium text-muted-foreground">Message</div>
+              <div className="text-xs font-medium text-muted-foreground">{t('flow_builder.message_label', 'Message')}</div>
               <button
                 className="text-xs px-2 py-1 rounded  hover: transition-colors"
                 onClick={() => setShowPreview(!showPreview)}
-                title={showPreview ? "Show variables" : "Show preview values"}
+                title={showPreview ? t('flow_builder.show_variables', 'Show variables') : t('flow_builder.show_preview_values', 'Show preview values')}
               >
-                {showPreview ? "Variables" : "Preview"}
+                {showPreview ? t('flow_builder.variables_button', 'Variables') : t('flow_builder.preview_button', 'Preview')}
               </button>
             </div>
             <div className="text-sm p-2  rounded border border-border">
@@ -2652,7 +2652,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
               const issues = validateVariables(message);
               return issues.length > 0 && (
                 <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">
-                  <div className="font-medium mb-1">Variable Issues:</div>
+                  <div className="font-medium mb-1">{t('flow_builder.variable_issues', 'Variable Issues:')}</div>
                   <ul className="list-disc list-inside space-y-0.5">
                     {issues.map((issue, index) => (
                       <li key={index}>{issue}</li>
@@ -2672,7 +2672,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                 <div className="text-sm flex-1 pr-6">
                   <div>{option.text}</div>
                   <div className="text-xs text-muted-foreground">
-                    Responds to: "{option.value}"
+                    {t('flow_builder.responds_to', 'Responds to:')} "{option.value}"
                   </div>
                 </div>
                 <Handle

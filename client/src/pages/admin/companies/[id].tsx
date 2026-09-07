@@ -734,11 +734,11 @@ export default function CompanyDetailPage() {
 
                             return (
                               <FormItem>
-                                <FormLabel>Company IBAN Number (KSA)</FormLabel>
+                                <FormLabel>{t('admin.companies.iban_label', 'Company IBAN Number (KSA)')}</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input
-                                      placeholder="SA03 8000 0000 6080 1016 7519"
+                                      placeholder={t('admin.companies.iban_placeholder', 'SA03 8000 0000 6080 1016 7519')}
                                       className={`font-mono pr-10 ${
                                         field.value && !isValidIban
                                           ? 'border-red-500 focus:border-red-500'
@@ -766,10 +766,10 @@ export default function CompanyDetailPage() {
                                   </div>
                                 </FormControl>
                                 <FormDescription>
-                                  Company's official KSA IBAN (24 characters: SA + 22 digits).
+                                  {t('admin.companies.iban_description', "Company's official KSA IBAN (24 characters: SA + 22 digits).")}
                                   {field.value && !isValidIban && (
                                     <span className="text-red-500 block mt-1">
-                                      Please enter a valid KSA IBAN (e.g., SA0380000000608010167519)
+                                      {t('admin.companies.iban_invalid_error', 'Please enter a valid KSA IBAN (e.g., SA0380000000608010167519)')}
                                     </span>
                                   )}
                                 </FormDescription>

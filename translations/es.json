@@ -3044,6 +3044,22 @@
     "value": "El slug es obligatorio"
   },
   {
+    "key": "admin.companies.iban_description",
+    "value": "IBAN oficial KSA de la empresa (24 caracteres: SA + 22 dígitos)."
+  },
+  {
+    "key": "admin.companies.iban_invalid_error",
+    "value": "Por favor, introduce un IBAN KSA válido (p. ej., SA0380000000608010167519)"
+  },
+  {
+    "key": "admin.companies.iban_label",
+    "value": "Número de IBAN de la empresa (KSA)"
+  },
+  {
+    "key": "admin.companies.iban_placeholder",
+    "value": "SA03 8000 0000 6080 1016 7519"
+  },
+  {
     "key": "admin.companies.impersonate_description",
     "value": "Está a punto de iniciar sesión como usuario administrador para {{name}}. Esto le permitirá acceder al panel de la empresa y realizar acciones como administrador de la empresa."
   },
@@ -4562,6 +4578,10 @@
   {
     "key": "admin.payments.export.title",
     "value": "Exportar Datos de Pago"
+  },
+  {
+    "key": "admin.payments.methods.bank_transfer",
+    "value": "Transferencia Bancaria"
   },
   {
     "key": "admin.payments.metrics.active_subscriptions",
@@ -11740,6 +11760,14 @@
     "value": "Asistentes"
   },
   {
+    "key": "calendar.available_time_slots_description",
+    "value": "Selecciona un horario para crear una nueva cita."
+  },
+  {
+    "key": "calendar.available_time_slots_title",
+    "value": "Horarios disponibles"
+  },
+  {
     "key": "calendar.bot_appointment_cancelled",
     "value": "¡Listo! He cancelado su cita."
   },
@@ -12184,6 +12212,14 @@
     "value": "Día"
   },
   {
+    "key": "calendar.delete_schedule_description",
+    "value": "¿Estás seguro de que deseas eliminar esta agenda? No se puede deshacer esta acción."
+  },
+  {
+    "key": "calendar.delete_schedule_title",
+    "value": "Eliminar agenda"
+  },
+  {
     "key": "calendar.description",
     "value": "Descripción"
   },
@@ -12218,6 +12254,14 @@
   {
     "key": "calendar.edit_appointment",
     "value": "Editar cita"
+  },
+  {
+    "key": "calendar.edit_schedule_description",
+    "value": "Actualiza los detalles de tu agenda."
+  },
+  {
+    "key": "calendar.edit_schedule_title",
+    "value": "Editar agenda"
   },
   {
     "key": "calendar.enable_calendar",
@@ -19284,12 +19328,36 @@
     "value": "Llamada iniciada"
   },
   {
+    "key": "conversations.call_screen_modal.action_connection_retry",
+    "value": "La conexión se reintentará automáticamente; espera o actualiza"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_device_refresh",
+    "value": "Actualiza la página e intenta de nuevo"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_generic_retry",
+    "value": "Intenta de nuevo o termina la llamada e intenta más tarde"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_mic_access",
+    "value": "Habilita el micrófono en los ajustes del navegador y recarga"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_network_check",
+    "value": "Verifica tu conexión y firewall, luego intenta de nuevo"
+  },
+  {
     "key": "conversations.call_screen_modal.audio_device_disconnected_description",
     "value": "Cambiando al dispositivo predeterminado."
   },
   {
     "key": "conversations.call_screen_modal.audio_device_disconnected_title",
     "value": "Dispositivo de audio desconectado"
+  },
+  {
+    "key": "conversations.call_screen_modal.call_duration_label",
+    "value": "Duración de la llamada"
   },
   {
     "key": "conversations.call_screen_modal.call_ended",
@@ -19316,12 +19384,20 @@
     "value": "Llamada reconectada"
   },
   {
+    "key": "conversations.call_screen_modal.continue",
+    "value": "Continuar"
+  },
+  {
     "key": "conversations.call_screen_modal.duration_label",
     "value": "Duración"
   },
   {
     "key": "conversations.call_screen_modal.end_call",
     "value": "Finalizar llamada"
+  },
+  {
+    "key": "conversations.call_screen_modal.end_call_button",
+    "value": "Terminar llamada"
   },
   {
     "key": "conversations.call_screen_modal.ending",
@@ -19364,8 +19440,20 @@
     "value": "La calidad de llamada es muy pobre"
   },
   {
+    "key": "conversations.call_screen_modal.quality_optimized_banner",
+    "value": "Calidad de llamada optimizada para red lenta"
+  },
+  {
     "key": "conversations.call_screen_modal.reconnecting_call",
     "value": "Reconectando llamada..."
+  },
+  {
+    "key": "conversations.call_screen_modal.reconnecting_ellipsis",
+    "value": "Reconectando..."
+  },
+  {
+    "key": "conversations.call_screen_modal.reconnecting_to_call",
+    "value": "Reconectando a la llamada..."
   },
   {
     "key": "conversations.call_screen_modal.speaker",
@@ -19378,6 +19466,10 @@
   {
     "key": "conversations.call_screen_modal.unmute",
     "value": "Desmutar"
+  },
+  {
+    "key": "conversations.call_screen_modal.what_you_can_do",
+    "value": "Lo que puedes hacer:"
   },
   {
     "key": "conversations.call_type_selection_modal.description",
@@ -21416,6 +21508,10 @@
     "value": "El asunto del correo es obligatorio."
   },
   {
+    "key": "emailCampaign.template",
+    "value": "Plantilla"
+  },
+  {
     "key": "emailCampaign.timezone_label",
     "value": "Zona horaria"
   },
@@ -22358,6 +22454,10 @@
   {
     "key": "erp.common.view",
     "value": "Ver"
+  },
+  {
+    "key": "erp.common.warehouse",
+    "value": "Almacén"
   },
   {
     "key": "erp.common.yes",
@@ -26868,6 +26968,10 @@
     "value": "Buscar productos o SKU de variante..."
   },
   {
+    "key": "erp.products.adjust",
+    "value": "Ajustar"
+  },
+  {
     "key": "erp.products.allCategories",
     "value": "Todas las categorías"
   },
@@ -26878,6 +26982,14 @@
   {
     "key": "erp.products.allTypes",
     "value": "Todos los tipos"
+  },
+  {
+    "key": "erp.products.attribute_key_placeholder",
+    "value": "p. ej. Talla"
+  },
+  {
+    "key": "erp.products.attribute_value_placeholder",
+    "value": "p. ej. M"
   },
   {
     "key": "erp.products.category.editTitle",
@@ -26918,6 +27030,10 @@
   {
     "key": "erp.products.copyId",
     "value": "Copiar Product ID"
+  },
+  {
+    "key": "erp.products.create_stock_row",
+    "value": "Crear fila de stock"
   },
   {
     "key": "erp.products.customFields.requiredError",
@@ -27200,6 +27316,10 @@
     "value": "Importar Productos"
   },
   {
+    "key": "erp.products.initialize_first_warehouse_stock_row",
+    "value": "Inicializar la primera fila de stock del almacén"
+  },
+  {
     "key": "erp.products.kitchenStation",
     "value": "Estación de cocina"
   },
@@ -27236,6 +27356,14 @@
     "value": "Nuevo producto"
   },
   {
+    "key": "erp.products.on_hand",
+    "value": "En existencia"
+  },
+  {
+    "key": "erp.products.opening_qty",
+    "value": "Cantidad inicial"
+  },
+  {
     "key": "erp.products.prepTime",
     "value": "Tiempo de preparación (minutos)"
   },
@@ -27244,8 +27372,20 @@
     "value": "Producto #{{id}}"
   },
   {
+    "key": "erp.products.qty_adjustment_placeholder",
+    "value": "+/- cant."
+  },
+  {
     "key": "erp.products.recipeIngredients",
     "value": "Ingredientes de receta"
+  },
+  {
+    "key": "erp.products.reorder_pt",
+    "value": "Punto de reorden"
+  },
+  {
+    "key": "erp.products.reorder_qty",
+    "value": "Cantidad de reorden"
   },
   {
     "key": "erp.products.restaurantSettings",
@@ -27254,6 +27394,10 @@
   {
     "key": "erp.products.searchPlaceholder",
     "value": "Buscar nombre, SKU o campos personalizados…"
+  },
+  {
+    "key": "erp.products.select_warehouse",
+    "value": "Selecciona un almacén"
   },
   {
     "key": "erp.products.sort",
@@ -27420,6 +27564,10 @@
     "value": "Tipo"
   },
   {
+    "key": "erp.products.tags_placeholder",
+    "value": "estacional, importado"
+  },
+  {
     "key": "erp.products.title",
     "value": "Productos"
   },
@@ -27448,12 +27596,20 @@
     "value": "Producto actualizado"
   },
   {
+    "key": "erp.products.variant",
+    "value": "Variante"
+  },
+  {
     "key": "erp.products.variant.deleted",
     "value": "Variante eliminada"
   },
   {
     "key": "erp.products.variant.saved",
     "value": "Variante guardada"
+  },
+  {
+    "key": "erp.products.variant_stock_by_warehouse",
+    "value": "Stock de variantes por almacén"
   },
   {
     "key": "erp.products.variants.add_attribute",
@@ -35432,8 +35588,16 @@
     "value": "Regla de captura:"
   },
   {
+    "key": "flow_builder.data_capture_help_capture_rules_form_mode_label",
+    "value": "Reglas de captura (modo formulario):"
+  },
+  {
     "key": "flow_builder.data_capture_help_capture_rules_label",
     "value": "Reglas de captura:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_captured_label",
+    "value": "Capturado:"
   },
   {
     "key": "flow_builder.data_capture_help_common_patterns",
@@ -35462,6 +35626,14 @@
   {
     "key": "flow_builder.data_capture_help_description",
     "value": "Aprende a capturar y usar datos efectivamente en tus flujos"
+  },
+  {
+    "key": "flow_builder.data_capture_help_example_hello_result",
+    "value": "Hola John, ¿en qué puedo ayudarte hoy?"
+  },
+  {
+    "key": "flow_builder.data_capture_help_example_hello_usage",
+    "value": "Hola {{user_name}}, ¿en qué puedo ayudarte hoy?"
   },
   {
     "key": "flow_builder.data_capture_help_examples",
@@ -35594,6 +35766,14 @@
   {
     "key": "flow_builder.data_capture_help_variables_work",
     "value": "Cómo Funcionan las Variables"
+  },
+  {
+    "key": "flow_builder.data_capture_help_variables_work_desc_post",
+    "value": "tokens que se pueden usar en cualquier nodo posterior de tu flujo."
+  },
+  {
+    "key": "flow_builder.data_capture_help_variables_work_desc_pre",
+    "value": "Una vez capturado, el dato queda disponible como"
   },
   {
     "key": "flow_builder.data_capture_media_kind",
@@ -36644,12 +36824,24 @@
     "value": "Analiza todos los documentos de la carpeta y proporciona información"
   },
   {
+    "key": "flow_builder.documind_api_key",
+    "value": "Clave API"
+  },
+  {
+    "key": "flow_builder.documind_api_key_placeholder",
+    "value": "Introduce tu clave API de Documind"
+  },
+  {
     "key": "flow_builder.documind_ask_question",
     "value": "Hacer Pregunta"
   },
   {
     "key": "flow_builder.documind_ask_question_description",
     "value": "Haz una pregunta sobre los documentos de la carpeta seleccionada"
+  },
+  {
+    "key": "flow_builder.documind_choose_folder",
+    "value": "Elige una carpeta"
   },
   {
     "key": "flow_builder.documind_complete_config",
@@ -36684,6 +36876,18 @@
     "value": "Historial de Conversación"
   },
   {
+    "key": "flow_builder.documind_create_folder",
+    "value": "Crear Carpeta"
+  },
+  {
+    "key": "flow_builder.documind_delete_file",
+    "value": "Eliminar archivo"
+  },
+  {
+    "key": "flow_builder.documind_delete_folder",
+    "value": "Eliminar carpeta"
+  },
+  {
     "key": "flow_builder.documind_delete_node",
     "value": "Eliminar nodo"
   },
@@ -36696,12 +36900,28 @@
     "value": "Incluir historial de conversación"
   },
   {
+    "key": "flow_builder.documind_enter_folder_name",
+    "value": "Introduce el nombre de la carpeta:"
+  },
+  {
+    "key": "flow_builder.documind_files",
+    "value": "Archivos"
+  },
+  {
     "key": "flow_builder.documind_files_label",
     "value": "Archivos:"
   },
   {
+    "key": "flow_builder.documind_folder",
+    "value": "Carpeta"
+  },
+  {
     "key": "flow_builder.documind_folder_label",
     "value": "Carpeta:"
+  },
+  {
+    "key": "flow_builder.documind_get_api_key",
+    "value": "Obtener Clave API"
   },
   {
     "key": "flow_builder.documind_hide_config",
@@ -36728,6 +36948,10 @@
     "value": "No conectado"
   },
   {
+    "key": "flow_builder.documind_operation",
+    "value": "Operación"
+  },
+  {
     "key": "flow_builder.documind_operation_label",
     "value": "Operación:"
   },
@@ -36744,8 +36968,36 @@
     "value": "Busca contenido específico en todos los documentos"
   },
   {
+    "key": "flow_builder.documind_select_operation",
+    "value": "Selecciona operación"
+  },
+  {
     "key": "flow_builder.documind_show_config",
     "value": "Mostrar panel de configuración"
+  },
+  {
+    "key": "flow_builder.documind_system_prompt",
+    "value": "Prompt del Sistema"
+  },
+  {
+    "key": "flow_builder.documind_system_prompt_placeholder",
+    "value": "Introduce instrucciones del sistema para guiar la respuesta de la IA (p.ej., 'Responde en tono profesional', 'Proporciona puntos', 'Enfócate en detalles técnicos')"
+  },
+  {
+    "key": "flow_builder.documind_test_connection",
+    "value": "Probar Conexión"
+  },
+  {
+    "key": "flow_builder.documind_upload_pdf",
+    "value": "Cargar PDF"
+  },
+  {
+    "key": "flow_builder.documind_uploading",
+    "value": "Cargando..."
+  },
+  {
+    "key": "flow_builder.documind_variables_support",
+    "value": "Soporta variables como {{contact.name}}, {{message.content}}. Estas se reemplazarán en tiempo de ejecución."
   },
   {
     "key": "flow_builder.draft",
@@ -39612,6 +39864,10 @@
     "value": "(distingue mayúsculas y minúsculas)"
   },
   {
+    "key": "flow_builder.keyword_item",
+    "value": "Palabra clave {{index}}"
+  },
+  {
     "key": "flow_builder.keyword_match_placeholder",
     "value": "Texto para buscar"
   },
@@ -42424,6 +42680,10 @@
     "value": "Redacta tu mensaje de seguimiento. Usa la sintaxis {{variable}} para insertar contenido dinámico"
   },
   {
+    "key": "flow_builder.message_label",
+    "value": "Mensaje"
+  },
+  {
     "key": "flow_builder.message_lowercase",
     "value": "mensaje"
   },
@@ -43392,6 +43652,10 @@
     "value": "Operador"
   },
   {
+    "key": "flow_builder.option_item",
+    "value": "Opción {{index}}"
+  },
+  {
     "key": "flow_builder.or_enter_image_url",
     "value": "O introduce URL de imagen:"
   },
@@ -43716,6 +43980,10 @@
     "value": "Previsualizar Audio"
   },
   {
+    "key": "flow_builder.preview_button",
+    "value": "Vista previa"
+  },
+  {
     "key": "flow_builder.preview_document",
     "value": "Previsualizar Documento"
   },
@@ -43886,6 +44154,10 @@
   {
     "key": "flow_builder.reset_scope",
     "value": "Alcance del reinicio"
+  },
+  {
+    "key": "flow_builder.responds_to",
+    "value": "Responde a:"
   },
   {
     "key": "flow_builder.result",
@@ -44318,6 +44590,14 @@
   {
     "key": "flow_builder.show_configuration_options",
     "value": "Mostrar opciones de configuración"
+  },
+  {
+    "key": "flow_builder.show_preview_values",
+    "value": "Mostrar valores de vista previa"
+  },
+  {
+    "key": "flow_builder.show_variables",
+    "value": "Mostrar variables"
   },
   {
     "key": "flow_builder.simple_mode",
@@ -46044,6 +46324,10 @@
     "value": "Resultado del Flujo"
   },
   {
+    "key": "flow_builder.variable_issues",
+    "value": "Problemas de variables:"
+  },
+  {
     "key": "flow_builder.variable_message_content_desc",
     "value": "Contenido de texto del mensaje"
   },
@@ -46085,6 +46369,10 @@
   },
   {
     "key": "flow_builder.variables",
+    "value": "Variables"
+  },
+  {
+    "key": "flow_builder.variables_button",
     "value": "Variables"
   },
   {
@@ -46330,6 +46618,10 @@
   {
     "key": "flow_builder.webhook_config_progress",
     "value": "Progreso de configuración"
+  },
+  {
+    "key": "flow_builder.webhook_connected",
+    "value": "Webhook Conectado"
   },
   {
     "key": "flow_builder.webhook_contact_association_tooltip",
@@ -47102,6 +47394,10 @@
   {
     "key": "flow_builder.webhook_url",
     "value": "URL de Webhook"
+  },
+  {
+    "key": "flow_builder.webhook_url_configured",
+    "value": "URL del Webhook configurada"
   },
   {
     "key": "flow_builder.webhook_url_copied",
@@ -49090,6 +49386,10 @@
   {
     "key": "knowledge_base.processor.processors",
     "value": "Procesadores de Documentos"
+  },
+  {
+    "key": "knowledge_base.processor.restart_message",
+    "value": "Reinicia el servidor después de instalar los paquetes"
   },
   {
     "key": "knowledge_base.processor.supported_formats",
@@ -53856,8 +54156,20 @@
     "value": "Color de marca principal de su empresa."
   },
   {
+    "key": "profile.save_company_info",
+    "value": "Guardar información de la empresa"
+  },
+  {
+    "key": "profile.save_notification_settings",
+    "value": "Guardar configuración de notificaciones"
+  },
+  {
     "key": "profile.saving_changes",
     "value": "Guardando cambios"
+  },
+  {
+    "key": "profile.saving_settings",
+    "value": "Guardando configuración"
   },
   {
     "key": "profile.select_language",
@@ -58848,6 +59160,10 @@
     "value": "Todos los mensajes"
   },
   {
+    "key": "settings.email_channel.folder_inbox",
+    "value": "BANDEJA DE ENTRADA"
+  },
+  {
     "key": "settings.email_channel.folder_sent",
     "value": "Enviados"
   },
@@ -59020,6 +59336,34 @@
     "value": "Solicitando QR desde WhatsApp… normalmente 1–2 segundos"
   },
   {
+    "key": "settings.google_calendar_client_id",
+    "value": "ID de Cliente"
+  },
+  {
+    "key": "settings.google_calendar_client_id_help",
+    "value": "ID de Cliente desde las credenciales OAuth de Google Cloud Console"
+  },
+  {
+    "key": "settings.google_calendar_client_id_placeholder",
+    "value": "Tu ID de Cliente OAuth de Google"
+  },
+  {
+    "key": "settings.google_calendar_client_secret",
+    "value": "Secreto de Cliente"
+  },
+  {
+    "key": "settings.google_calendar_client_secret_help",
+    "value": "Secreto de Cliente desde las credenciales OAuth de Google Cloud Console"
+  },
+  {
+    "key": "settings.google_calendar_client_secret_placeholder",
+    "value": "Tu Secreto de Cliente OAuth de Google"
+  },
+  {
+    "key": "settings.google_calendar_configure_credentials",
+    "value": "Configurar"
+  },
+  {
     "key": "settings.google_calendar_credentials_error",
     "value": "Error al actualizar las credenciales de Google Calendar: {{error}}"
   },
@@ -59032,6 +59376,14 @@
     "value": "Credenciales de Google Calendar Actualizadas"
   },
   {
+    "key": "settings.google_calendar_credentials_warning",
+    "value": "Después de actualizar estas credenciales, necesitarás reconectar tu cuenta de Google. Todas las conexiones anteriores a Google Calendar se invalidarán."
+  },
+  {
+    "key": "settings.google_calendar_description",
+    "value": "Introduce las credenciales de OAuth de Google Cloud de tu empresa para habilitar la integración con Google Calendar. Estas credenciales se usarán para todos los usuarios de tu empresa."
+  },
+  {
     "key": "settings.google_calendar_disconnect_error",
     "value": "Error al desconectar Google Calendar: {{error}}"
   },
@@ -59042,6 +59394,34 @@
   {
     "key": "settings.google_calendar_disconnected",
     "value": "Google Calendar Desconectado"
+  },
+  {
+    "key": "settings.google_calendar_important",
+    "value": "Importante"
+  },
+  {
+    "key": "settings.google_calendar_redirect_uri",
+    "value": "URI de Redirección"
+  },
+  {
+    "key": "settings.google_calendar_redirect_uri_help",
+    "value": "Debe coincidir con el URI de redirección autorizado en Google Cloud Console"
+  },
+  {
+    "key": "settings.google_calendar_save_button",
+    "value": "Guardar Credenciales"
+  },
+  {
+    "key": "settings.google_calendar_saving",
+    "value": "Guardando..."
+  },
+  {
+    "key": "settings.google_calendar_update_button",
+    "value": "Actualizar Credenciales"
+  },
+  {
+    "key": "settings.google_calendar_update_credentials",
+    "value": "Actualizar"
   },
   {
     "key": "settings.group_chats_disabled",
@@ -64472,6 +64852,10 @@
     "value": "Actual"
   },
   {
+    "key": "settings.whatsapp.custom_delimiter",
+    "value": "Delimitador Personalizado"
+  },
+  {
     "key": "settings.whatsapp.debounce_delay",
     "value": "Tiempo de espera de agrupación (segundos)"
   },
@@ -64490,6 +64874,10 @@
   {
     "key": "settings.whatsapp.delay_between_chunks_desc",
     "value": "Tiempo entre fragmentos de mensajes divididos (0.5-10 segundos)"
+  },
+  {
+    "key": "settings.whatsapp.delimiter_help",
+    "value": "Delimitador para dividir mensajes (p.ej., || para conversaciones en mandarín)"
   },
   {
     "key": "settings.whatsapp.disconnected",
@@ -64530,6 +64918,14 @@
   {
     "key": "settings.whatsapp.error",
     "value": "Error"
+  },
+  {
+    "key": "settings.whatsapp.fallback_to_character_splitting",
+    "value": "Recurrir a División por Caracteres"
+  },
+  {
+    "key": "settings.whatsapp.fallback_to_character_splitting_desc",
+    "value": "Usa división basada en caracteres cuando no se encuentren delimitadores"
   },
   {
     "key": "settings.whatsapp.healthMetrics",
@@ -64574,6 +64970,14 @@
   {
     "key": "settings.whatsapp.loadingConnection",
     "value": "Cargando datos de conexión..."
+  },
+  {
+    "key": "settings.whatsapp.logical_message_splitting",
+    "value": "División Lógica de Mensajes"
+  },
+  {
+    "key": "settings.whatsapp.logical_message_splitting_desc",
+    "value": "Divide mensajes usando delimitadores personalizados (p.ej., || para conversaciones en mandarín)"
   },
   {
     "key": "settings.whatsapp.max_debounce_delay",
@@ -64844,6 +65248,10 @@
     "value": "Cómo funciona:"
   },
   {
+    "key": "settings.whatsappEmbeddedSignup.meta_privacy_link",
+    "value": "Política de privacidad de Meta"
+  },
+  {
     "key": "settings.whatsappEmbeddedSignup.mode_existing_app",
     "value": "Aplicación de WhatsApp Business existente"
   },
@@ -65054,6 +65462,10 @@
   {
     "key": "settings.whatsappEmbeddedSignup.toast_terms_required_desc",
     "value": "Acepte los términos y la política de privacidad para continuar."
+  },
+  {
+    "key": "settings.whatsappEmbeddedSignup.whatsapp_terms_link",
+    "value": "Términos de servicio de WhatsApp Business API"
   },
   {
     "key": "settings.whatsappOnboarding.cancel",
@@ -65464,6 +65876,22 @@
     "value": "Monto del reembolso (opcional)"
   },
   {
+    "key": "stripe.resource_balance",
+    "value": "Saldo"
+  },
+  {
+    "key": "stripe.resource_customer",
+    "value": "Cliente"
+  },
+  {
+    "key": "stripe.resource_payment",
+    "value": "Pago"
+  },
+  {
+    "key": "stripe.resource_subscription",
+    "value": "Suscripción"
+  },
+  {
     "key": "stripe.resource_type",
     "value": "Tipo de recurso"
   },
@@ -65502,6 +65930,10 @@
   {
     "key": "stripe.terminal_node_info",
     "value": "Este es un nodo terminal. La ejecución del flujo se detiene después de que se completa la operación de Stripe. Todos los datos de respuesta se almacenan en variables para referencia."
+  },
+  {
+    "key": "stripe.test_configuration",
+    "value": "Probar Configuración"
   },
   {
     "key": "stripe.transaction_id",
@@ -65596,12 +66028,40 @@
     "value": "Activa"
   },
   {
+    "key": "subscription.cancel",
+    "value": "Cancelar"
+  },
+  {
     "key": "subscription.current_plan",
     "value": "Plan Actual"
   },
   {
     "key": "subscription.current_subscription",
     "value": "Suscripción actual"
+  },
+  {
+    "key": "subscription.days_14",
+    "value": "14 días"
+  },
+  {
+    "key": "subscription.days_30",
+    "value": "30 días"
+  },
+  {
+    "key": "subscription.days_60",
+    "value": "60 días"
+  },
+  {
+    "key": "subscription.days_7",
+    "value": "7 días"
+  },
+  {
+    "key": "subscription.days_90",
+    "value": "90 días"
+  },
+  {
+    "key": "subscription.days_remaining",
+    "value": "días restantes."
   },
   {
     "key": "subscription.error_title",
@@ -65628,8 +66088,24 @@
     "value": "Sin suscripción activa"
   },
   {
+    "key": "subscription.pause_dialog_desc",
+    "value": "Pausa temporalmente tu suscripción. Tus datos se conservarán y podrás reanudarla cuando quieras."
+  },
+  {
+    "key": "subscription.pause_duration",
+    "value": "Duración de la pausa"
+  },
+  {
     "key": "subscription.pause_failed",
     "value": "No se pudo pausar la suscripción: {{error}}"
+  },
+  {
+    "key": "subscription.pause_subscription",
+    "value": "Pausar suscripción"
+  },
+  {
+    "key": "subscription.pause_warning",
+    "value": "Durante la pausa no se te cobrará, pero el acceso a las funciones premium estará limitado. Tu suscripción se reanudará automáticamente después del período seleccionado."
   },
   {
     "key": "subscription.paused_badge",
@@ -65644,12 +66120,20 @@
     "value": "Suscripción pausada"
   },
   {
+    "key": "subscription.paused_until",
+    "value": "Tu suscripción está pausada hasta"
+  },
+  {
     "key": "subscription.renewal_badge",
     "value": "Renovando"
   },
   {
     "key": "subscription.resume_failed",
     "value": "No se pudo reanudar la suscripción: {{error}}"
+  },
+  {
+    "key": "subscription.resume_subscription",
+    "value": "Reanudar suscripción"
   },
   {
     "key": "subscription.resumed_desc",
@@ -67206,6 +67690,10 @@
   {
     "key": "ui.imageUpload.uploading",
     "value": "Subiendo..."
+  },
+  {
+    "key": "ui.openai_icon",
+    "value": "Ícono de OpenAI"
   },
   {
     "key": "variables.category.contact",

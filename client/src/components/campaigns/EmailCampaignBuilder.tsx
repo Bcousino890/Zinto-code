@@ -574,7 +574,7 @@ export function EmailCampaignBuilder() {
         return (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2">
-              <Label className="sr-only">Template</Label>
+              <Label className="sr-only">{t('emailCampaign.template', 'Template')}</Label>
               <Select
                 value={campaignData.templateId?.toString() ?? ''}
                 onValueChange={handleTemplateSelect}

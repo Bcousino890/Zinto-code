@@ -233,7 +233,7 @@ export function WebhookInspectorModal({ isOpen, onClose, requestId }: WebhookIns
                   <CardContent>
                     {data.executionPath ? (
                       <div className="space-y-2 text-sm">
-                        <p><span className="text-muted-foreground">Status:</span> <Badge variant={statusVariant(data.executionPath.status)}>{data.executionPath.status}</Badge></p>
+                        <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_status', 'Status:')}</span> <Badge variant={statusVariant(data.executionPath.status)}>{data.executionPath.status}</Badge></p>
                         {data.executionPath.errorMessage && (
                           <p className="text-destructive text-xs">{data.executionPath.errorMessage}</p>
                         )}

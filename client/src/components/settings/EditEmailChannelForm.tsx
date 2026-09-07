@@ -547,7 +547,7 @@ export function EditEmailChannelForm({ isOpen, onClose, onSuccess, connectionId 
                     <SelectValue placeholder={t('settings.email_channel.select_folder_placeholder', 'Select folder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="INBOX">INBOX</SelectItem>
+                    <SelectItem value="INBOX">{t('settings.email_channel.folder_inbox', 'INBOX')}</SelectItem>
                     <SelectItem value="All">{t('settings.email_channel.folder_all_mail', 'All Mail')}</SelectItem>
                     <SelectItem value="Sent">{t('settings.email_channel.folder_sent', 'Sent')}</SelectItem>
                   </SelectContent>

@@ -1150,13 +1150,14 @@ function DataCaptureHelpContent() {
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
               <h4 className="font-medium text-sm mb-2">{t('flow_builder.data_capture_help_variables_work', 'How Variables Work')}</h4>
               <p className="text-xs text-foreground mb-2">
-                Once captured, data becomes available as <code className="bg-muted px-1 rounded">&#123;&#123;variable_name&#125;&#125;</code> tokens
-                that can be used in any subsequent node in your flow.
+                {t('flow_builder.data_capture_help_variables_work_desc_pre', 'Once captured, data becomes available as')}{' '}
+                <code className="bg-muted px-1 rounded">&#123;&#123;variable_name&#125;&#125;</code>{' '}
+                {t('flow_builder.data_capture_help_variables_work_desc_post', 'tokens that can be used in any subsequent node in your flow.')}
               </p>
               <div className="bg-card rounded p-2 text-xs font-mono">
-                Captured: user_name = "John"<br/>
-                Usage: "Hello &#123;&#123;user_name&#125;&#125;, how can I help you today?"<br/>
-                Result: "Hello John, how can I help you today?"
+                {t('flow_builder.data_capture_help_captured_label', 'Captured:')} user_name = "John"<br/>
+                {t('flow_builder.data_capture_help_usage_label', 'Usage:')} "{t('flow_builder.data_capture_help_example_hello_usage', 'Hello {{user_name}}, how can I help you today?')}"<br/>
+                {t('flow_builder.data_capture_help_result_label', 'Result:')} "{t('flow_builder.data_capture_help_example_hello_result', 'Hello John, how can I help you today?')}"
               </div>
             </div>
 
@@ -1275,7 +1276,7 @@ function DataCaptureHelpContent() {
               <h4 className="font-medium text-sm mb-2">{t('flow_builder.data_capture_example3', 'Example 3: Guided questions (Custom Prompt)')}</h4>
               <div className="space-y-2 text-xs">
                 <div className="bg-muted rounded p-2 font-mono">
-                  <strong>Capture Rules (form mode):</strong><br/>
+                  <strong>{t('flow_builder.data_capture_help_capture_rules_form_mode_label', 'Capture Rules (form mode):')}</strong><br/>
                   visit_reason | Custom Prompt | “What brings you in today?”<br/>
                   preferred_contact | Custom Prompt | “Email or phone?”
                 </div>

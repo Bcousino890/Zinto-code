@@ -3044,6 +3044,22 @@
     "value": "Slug is required"
   },
   {
+    "key": "admin.companies.iban_description",
+    "value": "Company's official KSA IBAN (24 characters: SA + 22 digits)."
+  },
+  {
+    "key": "admin.companies.iban_invalid_error",
+    "value": "Please enter a valid KSA IBAN (e.g., SA0380000000608010167519)"
+  },
+  {
+    "key": "admin.companies.iban_label",
+    "value": "Company IBAN Number (KSA)"
+  },
+  {
+    "key": "admin.companies.iban_placeholder",
+    "value": "SA03 8000 0000 6080 1016 7519"
+  },
+  {
     "key": "admin.companies.impersonate_description",
     "value": "You are about to log in as an admin user for {{name}}. This will allow you to access the company dashboard and perform actions as a company admin."
   },
@@ -4562,6 +4578,10 @@
   {
     "key": "admin.payments.export.title",
     "value": "Export Payment Data"
+  },
+  {
+    "key": "admin.payments.methods.bank_transfer",
+    "value": "Bank Transfer"
   },
   {
     "key": "admin.payments.metrics.active_subscriptions",
@@ -11740,6 +11760,14 @@
     "value": "Attendees"
   },
   {
+    "key": "calendar.available_time_slots_description",
+    "value": "Select a time slot to create a new appointment."
+  },
+  {
+    "key": "calendar.available_time_slots_title",
+    "value": "Available Time Slots"
+  },
+  {
     "key": "calendar.bot_appointment_cancelled",
     "value": "Done! I've cancelled your appointment."
   },
@@ -12184,6 +12212,14 @@
     "value": "Day"
   },
   {
+    "key": "calendar.delete_schedule_description",
+    "value": "Are you sure you want to delete this schedule? This action cannot be undone."
+  },
+  {
+    "key": "calendar.delete_schedule_title",
+    "value": "Delete Schedule"
+  },
+  {
     "key": "calendar.description",
     "value": "Description"
   },
@@ -12218,6 +12254,14 @@
   {
     "key": "calendar.edit_appointment",
     "value": "Edit Appointment"
+  },
+  {
+    "key": "calendar.edit_schedule_description",
+    "value": "Update your schedule details."
+  },
+  {
+    "key": "calendar.edit_schedule_title",
+    "value": "Edit Schedule"
   },
   {
     "key": "calendar.enable_calendar",
@@ -19284,12 +19328,36 @@
     "value": "Call Initiated"
   },
   {
+    "key": "conversations.call_screen_modal.action_connection_retry",
+    "value": "Connection will retry automatically; wait or refresh"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_device_refresh",
+    "value": "Refresh the page and try again"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_generic_retry",
+    "value": "Try again or end the call and retry later"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_mic_access",
+    "value": "Enable microphone in browser settings and reload"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_network_check",
+    "value": "Check your network and firewall, then retry"
+  },
+  {
     "key": "conversations.call_screen_modal.audio_device_disconnected_description",
     "value": "Switching to default device."
   },
   {
     "key": "conversations.call_screen_modal.audio_device_disconnected_title",
     "value": "Audio device disconnected"
+  },
+  {
+    "key": "conversations.call_screen_modal.call_duration_label",
+    "value": "Call duration"
   },
   {
     "key": "conversations.call_screen_modal.call_ended",
@@ -19316,11 +19384,19 @@
     "value": "Call reconnected"
   },
   {
+    "key": "conversations.call_screen_modal.continue",
+    "value": "Continue"
+  },
+  {
     "key": "conversations.call_screen_modal.duration_label",
     "value": "Duration"
   },
   {
     "key": "conversations.call_screen_modal.end_call",
+    "value": "End Call"
+  },
+  {
+    "key": "conversations.call_screen_modal.end_call_button",
     "value": "End Call"
   },
   {
@@ -19364,8 +19440,20 @@
     "value": "Call quality is very poor"
   },
   {
+    "key": "conversations.call_screen_modal.quality_optimized_banner",
+    "value": "Call quality optimized for poor network"
+  },
+  {
     "key": "conversations.call_screen_modal.reconnecting_call",
     "value": "Reconnecting call..."
+  },
+  {
+    "key": "conversations.call_screen_modal.reconnecting_ellipsis",
+    "value": "Reconnecting..."
+  },
+  {
+    "key": "conversations.call_screen_modal.reconnecting_to_call",
+    "value": "Reconnecting to call..."
   },
   {
     "key": "conversations.call_screen_modal.speaker",
@@ -19378,6 +19466,10 @@
   {
     "key": "conversations.call_screen_modal.unmute",
     "value": "Unmute"
+  },
+  {
+    "key": "conversations.call_screen_modal.what_you_can_do",
+    "value": "What you can do:"
   },
   {
     "key": "conversations.call_type_selection_modal.description",
@@ -21416,6 +21508,10 @@
     "value": "Email subject is required."
   },
   {
+    "key": "emailCampaign.template",
+    "value": "Template"
+  },
+  {
     "key": "emailCampaign.timezone_label",
     "value": "Timezone"
   },
@@ -22358,6 +22454,10 @@
   {
     "key": "erp.common.view",
     "value": "View"
+  },
+  {
+    "key": "erp.common.warehouse",
+    "value": "Warehouse"
   },
   {
     "key": "erp.common.yes",
@@ -26868,6 +26968,10 @@
     "value": "Search products or variant SKU..."
   },
   {
+    "key": "erp.products.adjust",
+    "value": "Adjust"
+  },
+  {
     "key": "erp.products.allCategories",
     "value": "All categories"
   },
@@ -26878,6 +26982,14 @@
   {
     "key": "erp.products.allTypes",
     "value": "All types"
+  },
+  {
+    "key": "erp.products.attribute_key_placeholder",
+    "value": "e.g. Size"
+  },
+  {
+    "key": "erp.products.attribute_value_placeholder",
+    "value": "e.g. M"
   },
   {
     "key": "erp.products.category.editTitle",
@@ -26918,6 +27030,10 @@
   {
     "key": "erp.products.copyId",
     "value": "Copy Product ID"
+  },
+  {
+    "key": "erp.products.create_stock_row",
+    "value": "Create stock row"
   },
   {
     "key": "erp.products.customFields.requiredError",
@@ -27200,6 +27316,10 @@
     "value": "Importar Productos"
   },
   {
+    "key": "erp.products.initialize_first_warehouse_stock_row",
+    "value": "Initialize first warehouse stock row"
+  },
+  {
     "key": "erp.products.kitchenStation",
     "value": "Estación de cocina"
   },
@@ -27236,6 +27356,14 @@
     "value": "New product"
   },
   {
+    "key": "erp.products.on_hand",
+    "value": "On hand"
+  },
+  {
+    "key": "erp.products.opening_qty",
+    "value": "Opening qty"
+  },
+  {
     "key": "erp.products.prepTime",
     "value": "Tiempo de preparación (minutos)"
   },
@@ -27244,8 +27372,20 @@
     "value": "Product #{{id}}"
   },
   {
+    "key": "erp.products.qty_adjustment_placeholder",
+    "value": "+/- qty"
+  },
+  {
     "key": "erp.products.recipeIngredients",
     "value": "Ingredientes de receta"
+  },
+  {
+    "key": "erp.products.reorder_pt",
+    "value": "Reorder pt."
+  },
+  {
+    "key": "erp.products.reorder_qty",
+    "value": "Reorder qty"
   },
   {
     "key": "erp.products.restaurantSettings",
@@ -27254,6 +27394,10 @@
   {
     "key": "erp.products.searchPlaceholder",
     "value": "Search name, SKU or custom fields…"
+  },
+  {
+    "key": "erp.products.select_warehouse",
+    "value": "Select warehouse"
   },
   {
     "key": "erp.products.sort",
@@ -27420,6 +27564,10 @@
     "value": "Type"
   },
   {
+    "key": "erp.products.tags_placeholder",
+    "value": "seasonal, imported"
+  },
+  {
     "key": "erp.products.title",
     "value": "Products"
   },
@@ -27448,12 +27596,20 @@
     "value": "Product updated"
   },
   {
+    "key": "erp.products.variant",
+    "value": "Variant"
+  },
+  {
     "key": "erp.products.variant.deleted",
     "value": "Variant deleted"
   },
   {
     "key": "erp.products.variant.saved",
     "value": "Variant saved"
+  },
+  {
+    "key": "erp.products.variant_stock_by_warehouse",
+    "value": "Variant stock by warehouse"
   },
   {
     "key": "erp.products.variants.add_attribute",
@@ -35432,8 +35588,16 @@
     "value": "Capture Rule:"
   },
   {
+    "key": "flow_builder.data_capture_help_capture_rules_form_mode_label",
+    "value": "Capture Rules (form mode):"
+  },
+  {
     "key": "flow_builder.data_capture_help_capture_rules_label",
     "value": "Capture Rules:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_captured_label",
+    "value": "Captured:"
   },
   {
     "key": "flow_builder.data_capture_help_common_patterns",
@@ -35462,6 +35626,14 @@
   {
     "key": "flow_builder.data_capture_help_description",
     "value": "Learn how to effectively capture and use data in your flows"
+  },
+  {
+    "key": "flow_builder.data_capture_help_example_hello_result",
+    "value": "Hello John, how can I help you today?"
+  },
+  {
+    "key": "flow_builder.data_capture_help_example_hello_usage",
+    "value": "Hello {{user_name}}, how can I help you today?"
   },
   {
     "key": "flow_builder.data_capture_help_examples",
@@ -35594,6 +35766,14 @@
   {
     "key": "flow_builder.data_capture_help_variables_work",
     "value": "How Variables Work"
+  },
+  {
+    "key": "flow_builder.data_capture_help_variables_work_desc_post",
+    "value": "tokens that can be used in any subsequent node in your flow."
+  },
+  {
+    "key": "flow_builder.data_capture_help_variables_work_desc_pre",
+    "value": "Once captured, data becomes available as"
   },
   {
     "key": "flow_builder.data_capture_media_kind",
@@ -36644,12 +36824,24 @@
     "value": "Analyze all documents in the folder and provide insights"
   },
   {
+    "key": "flow_builder.documind_api_key",
+    "value": "API Key"
+  },
+  {
+    "key": "flow_builder.documind_api_key_placeholder",
+    "value": "Enter your Documind API key"
+  },
+  {
     "key": "flow_builder.documind_ask_question",
     "value": "Ask Question"
   },
   {
     "key": "flow_builder.documind_ask_question_description",
     "value": "Ask a question about documents in the selected folder"
+  },
+  {
+    "key": "flow_builder.documind_choose_folder",
+    "value": "Choose a folder"
   },
   {
     "key": "flow_builder.documind_complete_config",
@@ -36684,6 +36876,18 @@
     "value": "Conversation History"
   },
   {
+    "key": "flow_builder.documind_create_folder",
+    "value": "Create Folder"
+  },
+  {
+    "key": "flow_builder.documind_delete_file",
+    "value": "Delete file"
+  },
+  {
+    "key": "flow_builder.documind_delete_folder",
+    "value": "Delete folder"
+  },
+  {
     "key": "flow_builder.documind_delete_node",
     "value": "Delete node"
   },
@@ -36696,12 +36900,28 @@
     "value": "Include conversation history"
   },
   {
+    "key": "flow_builder.documind_enter_folder_name",
+    "value": "Enter folder name:"
+  },
+  {
+    "key": "flow_builder.documind_files",
+    "value": "Files"
+  },
+  {
     "key": "flow_builder.documind_files_label",
     "value": "Files:"
   },
   {
+    "key": "flow_builder.documind_folder",
+    "value": "Folder"
+  },
+  {
     "key": "flow_builder.documind_folder_label",
     "value": "Folder:"
+  },
+  {
+    "key": "flow_builder.documind_get_api_key",
+    "value": "Get API Key"
   },
   {
     "key": "flow_builder.documind_hide_config",
@@ -36728,6 +36948,10 @@
     "value": "Not Connected"
   },
   {
+    "key": "flow_builder.documind_operation",
+    "value": "Operation"
+  },
+  {
     "key": "flow_builder.documind_operation_label",
     "value": "Operation:"
   },
@@ -36744,8 +36968,36 @@
     "value": "Search for specific content across documents"
   },
   {
+    "key": "flow_builder.documind_select_operation",
+    "value": "Select operation"
+  },
+  {
     "key": "flow_builder.documind_show_config",
     "value": "Show configuration panel"
+  },
+  {
+    "key": "flow_builder.documind_system_prompt",
+    "value": "System Prompt"
+  },
+  {
+    "key": "flow_builder.documind_system_prompt_placeholder",
+    "value": "Enter system instructions to guide the AI\\"
+  },
+  {
+    "key": "flow_builder.documind_test_connection",
+    "value": "Test Connection"
+  },
+  {
+    "key": "flow_builder.documind_upload_pdf",
+    "value": "Upload PDF"
+  },
+  {
+    "key": "flow_builder.documind_uploading",
+    "value": "Uploading..."
+  },
+  {
+    "key": "flow_builder.documind_variables_support",
+    "value": "Supports variables like {{contact.name}}, {{message.content}}. These will be replaced at runtime."
   },
   {
     "key": "flow_builder.draft",
@@ -39612,6 +39864,10 @@
     "value": "(case sensitive)"
   },
   {
+    "key": "flow_builder.keyword_item",
+    "value": "Keyword {{index}}"
+  },
+  {
     "key": "flow_builder.keyword_match_placeholder",
     "value": "Text to match"
   },
@@ -42424,6 +42680,10 @@
     "value": "Compose your follow-up message. Use {{variable}} syntax to insert dynamic content"
   },
   {
+    "key": "flow_builder.message_label",
+    "value": "Message"
+  },
+  {
     "key": "flow_builder.message_lowercase",
     "value": "message"
   },
@@ -43392,6 +43652,10 @@
     "value": "Operator"
   },
   {
+    "key": "flow_builder.option_item",
+    "value": "Option {{index}}"
+  },
+  {
     "key": "flow_builder.or_enter_image_url",
     "value": "Or enter image URL:"
   },
@@ -43716,6 +43980,10 @@
     "value": "Preview Audio"
   },
   {
+    "key": "flow_builder.preview_button",
+    "value": "Preview"
+  },
+  {
     "key": "flow_builder.preview_document",
     "value": "Preview Document"
   },
@@ -43886,6 +44154,10 @@
   {
     "key": "flow_builder.reset_scope",
     "value": "Reset Scope"
+  },
+  {
+    "key": "flow_builder.responds_to",
+    "value": "Responds to:"
   },
   {
     "key": "flow_builder.result",
@@ -44318,6 +44590,14 @@
   {
     "key": "flow_builder.show_configuration_options",
     "value": "Show configuration options"
+  },
+  {
+    "key": "flow_builder.show_preview_values",
+    "value": "Show preview values"
+  },
+  {
+    "key": "flow_builder.show_variables",
+    "value": "Show variables"
   },
   {
     "key": "flow_builder.simple_mode",
@@ -46044,6 +46324,10 @@
     "value": "Flow Result"
   },
   {
+    "key": "flow_builder.variable_issues",
+    "value": "Variable Issues:"
+  },
+  {
     "key": "flow_builder.variable_message_content_desc",
     "value": "Text content of the message"
   },
@@ -46085,6 +46369,10 @@
   },
   {
     "key": "flow_builder.variables",
+    "value": "Variables"
+  },
+  {
+    "key": "flow_builder.variables_button",
     "value": "Variables"
   },
   {
@@ -46330,6 +46618,10 @@
   {
     "key": "flow_builder.webhook_config_progress",
     "value": "Configuration progress"
+  },
+  {
+    "key": "flow_builder.webhook_connected",
+    "value": "Webhook Connected"
   },
   {
     "key": "flow_builder.webhook_contact_association_tooltip",
@@ -47102,6 +47394,10 @@
   {
     "key": "flow_builder.webhook_url",
     "value": "Webhook URL"
+  },
+  {
+    "key": "flow_builder.webhook_url_configured",
+    "value": "Webhook URL configured"
   },
   {
     "key": "flow_builder.webhook_url_copied",
@@ -49090,6 +49386,10 @@
   {
     "key": "knowledge_base.processor.processors",
     "value": "Document Processors"
+  },
+  {
+    "key": "knowledge_base.processor.restart_message",
+    "value": "Restart server after installing packages"
   },
   {
     "key": "knowledge_base.processor.supported_formats",
@@ -53856,8 +54156,20 @@
     "value": "Primary brand color for your company."
   },
   {
+    "key": "profile.save_company_info",
+    "value": "Save Company Information"
+  },
+  {
+    "key": "profile.save_notification_settings",
+    "value": "Save Notification Settings"
+  },
+  {
     "key": "profile.saving_changes",
     "value": "Saving Changes"
+  },
+  {
+    "key": "profile.saving_settings",
+    "value": "Saving Settings"
   },
   {
     "key": "profile.select_language",
@@ -58848,6 +59160,10 @@
     "value": "All Mail"
   },
   {
+    "key": "settings.email_channel.folder_inbox",
+    "value": "INBOX"
+  },
+  {
     "key": "settings.email_channel.folder_sent",
     "value": "Sent"
   },
@@ -59020,6 +59336,34 @@
     "value": "Requesting QR from WhatsApp… usually 1–2 seconds"
   },
   {
+    "key": "settings.google_calendar_client_id",
+    "value": "Client ID"
+  },
+  {
+    "key": "settings.google_calendar_client_id_help",
+    "value": "Client ID from Google Cloud Console OAuth credentials"
+  },
+  {
+    "key": "settings.google_calendar_client_id_placeholder",
+    "value": "Your Google OAuth Client ID"
+  },
+  {
+    "key": "settings.google_calendar_client_secret",
+    "value": "Client Secret"
+  },
+  {
+    "key": "settings.google_calendar_client_secret_help",
+    "value": "Client Secret from Google Cloud Console OAuth credentials"
+  },
+  {
+    "key": "settings.google_calendar_client_secret_placeholder",
+    "value": "Your Google OAuth Client Secret"
+  },
+  {
+    "key": "settings.google_calendar_configure_credentials",
+    "value": "Configure"
+  },
+  {
     "key": "settings.google_calendar_credentials_error",
     "value": "Failed to update Google Calendar credentials: {{error}}"
   },
@@ -59032,6 +59376,14 @@
     "value": "Google Calendar Credentials Updated"
   },
   {
+    "key": "settings.google_calendar_credentials_warning",
+    "value": "After updating these credentials, you will need to reconnect your Google account. All previous Google Calendar connections will be invalidated."
+  },
+  {
+    "key": "settings.google_calendar_description",
+    "value": "Enter your company\\"
+  },
+  {
     "key": "settings.google_calendar_disconnect_error",
     "value": "Failed to disconnect Google Calendar: {{error}}"
   },
@@ -59042,6 +59394,34 @@
   {
     "key": "settings.google_calendar_disconnected",
     "value": "Google Calendar Disconnected"
+  },
+  {
+    "key": "settings.google_calendar_important",
+    "value": "Important"
+  },
+  {
+    "key": "settings.google_calendar_redirect_uri",
+    "value": "Redirect URI"
+  },
+  {
+    "key": "settings.google_calendar_redirect_uri_help",
+    "value": "This should match the authorized redirect URI in your Google Cloud Console"
+  },
+  {
+    "key": "settings.google_calendar_save_button",
+    "value": "Save Credentials"
+  },
+  {
+    "key": "settings.google_calendar_saving",
+    "value": "Saving..."
+  },
+  {
+    "key": "settings.google_calendar_update_button",
+    "value": "Update Credentials"
+  },
+  {
+    "key": "settings.google_calendar_update_credentials",
+    "value": "Update"
   },
   {
     "key": "settings.group_chats_disabled",
@@ -64472,6 +64852,10 @@
     "value": "Current"
   },
   {
+    "key": "settings.whatsapp.custom_delimiter",
+    "value": "Custom Delimiter"
+  },
+  {
     "key": "settings.whatsapp.debounce_delay",
     "value": "Tiempo de espera de agrupación (segundos)"
   },
@@ -64490,6 +64874,10 @@
   {
     "key": "settings.whatsapp.delay_between_chunks_desc",
     "value": "Time between split message chunks (0.5-10 seconds)"
+  },
+  {
+    "key": "settings.whatsapp.delimiter_help",
+    "value": "Delimiter to split messages (e.g., || for Mandarin conversations)"
   },
   {
     "key": "settings.whatsapp.disconnected",
@@ -64530,6 +64918,14 @@
   {
     "key": "settings.whatsapp.error",
     "value": "Error"
+  },
+  {
+    "key": "settings.whatsapp.fallback_to_character_splitting",
+    "value": "Fallback to Character Splitting"
+  },
+  {
+    "key": "settings.whatsapp.fallback_to_character_splitting_desc",
+    "value": "Use character-based splitting when no delimiters are found"
   },
   {
     "key": "settings.whatsapp.healthMetrics",
@@ -64574,6 +64970,14 @@
   {
     "key": "settings.whatsapp.loadingConnection",
     "value": "Loading connection data..."
+  },
+  {
+    "key": "settings.whatsapp.logical_message_splitting",
+    "value": "Logical Message Splitting"
+  },
+  {
+    "key": "settings.whatsapp.logical_message_splitting_desc",
+    "value": "Split messages using custom delimiters (e.g., || for Mandarin conversations)"
   },
   {
     "key": "settings.whatsapp.max_debounce_delay",
@@ -64844,6 +65248,10 @@
     "value": "How it works:"
   },
   {
+    "key": "settings.whatsappEmbeddedSignup.meta_privacy_link",
+    "value": "Meta Privacy Policy"
+  },
+  {
     "key": "settings.whatsappEmbeddedSignup.mode_existing_app",
     "value": "Existing WhatsApp Business App"
   },
@@ -65054,6 +65462,10 @@
   {
     "key": "settings.whatsappEmbeddedSignup.toast_terms_required_desc",
     "value": "Please accept both the terms and privacy policy to continue."
+  },
+  {
+    "key": "settings.whatsappEmbeddedSignup.whatsapp_terms_link",
+    "value": "WhatsApp Business API Terms of Service"
   },
   {
     "key": "settings.whatsappOnboarding.cancel",
@@ -65464,6 +65876,22 @@
     "value": "Refund Amount (optional)"
   },
   {
+    "key": "stripe.resource_balance",
+    "value": "Balance"
+  },
+  {
+    "key": "stripe.resource_customer",
+    "value": "Customer"
+  },
+  {
+    "key": "stripe.resource_payment",
+    "value": "Payment"
+  },
+  {
+    "key": "stripe.resource_subscription",
+    "value": "Subscription"
+  },
+  {
     "key": "stripe.resource_type",
     "value": "Resource Type"
   },
@@ -65502,6 +65930,10 @@
   {
     "key": "stripe.terminal_node_info",
     "value": "This is a terminal node. Flow execution stops after Stripe operation completes. All response data is stored in variables for reference."
+  },
+  {
+    "key": "stripe.test_configuration",
+    "value": "Test Configuration"
   },
   {
     "key": "stripe.transaction_id",
@@ -65596,12 +66028,40 @@
     "value": "Active"
   },
   {
+    "key": "subscription.cancel",
+    "value": "Cancel"
+  },
+  {
     "key": "subscription.current_plan",
     "value": "Current Plan"
   },
   {
     "key": "subscription.current_subscription",
     "value": "Current Subscription"
+  },
+  {
+    "key": "subscription.days_14",
+    "value": "14 days"
+  },
+  {
+    "key": "subscription.days_30",
+    "value": "30 days"
+  },
+  {
+    "key": "subscription.days_60",
+    "value": "60 days"
+  },
+  {
+    "key": "subscription.days_7",
+    "value": "7 days"
+  },
+  {
+    "key": "subscription.days_90",
+    "value": "90 days"
+  },
+  {
+    "key": "subscription.days_remaining",
+    "value": "days remaining."
   },
   {
     "key": "subscription.error_title",
@@ -65628,8 +66088,24 @@
     "value": "No Active Subscription"
   },
   {
+    "key": "subscription.pause_dialog_desc",
+    "value": "Temporarily pause your subscription. Your data will be preserved and you can resume anytime."
+  },
+  {
+    "key": "subscription.pause_duration",
+    "value": "Pause Duration"
+  },
+  {
     "key": "subscription.pause_failed",
     "value": "Failed to pause subscription: {{error}}"
+  },
+  {
+    "key": "subscription.pause_subscription",
+    "value": "Pause Subscription"
+  },
+  {
+    "key": "subscription.pause_warning",
+    "value": "During the pause, you won't be charged, but access to premium features will be limited. Your subscription will automatically resume after the selected period."
   },
   {
     "key": "subscription.paused_badge",
@@ -65644,12 +66120,20 @@
     "value": "Subscription Paused"
   },
   {
+    "key": "subscription.paused_until",
+    "value": "Your subscription is paused until"
+  },
+  {
     "key": "subscription.renewal_badge",
     "value": "Renewing"
   },
   {
     "key": "subscription.resume_failed",
     "value": "Failed to resume subscription: {{error}}"
+  },
+  {
+    "key": "subscription.resume_subscription",
+    "value": "Resume Subscription"
   },
   {
     "key": "subscription.resumed_desc",
@@ -67206,6 +67690,10 @@
   {
     "key": "ui.imageUpload.uploading",
     "value": "Uploading..."
+  },
+  {
+    "key": "ui.openai_icon",
+    "value": "OpenAI icon"
   },
   {
     "key": "variables.category.contact",

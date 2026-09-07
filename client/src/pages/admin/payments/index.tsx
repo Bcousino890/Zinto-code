@@ -727,7 +727,7 @@ export default function PaymentsPage() {
                           <SelectItem value="paystack">Paystack</SelectItem>
                           <SelectItem value="mercadopago">Mercado Pago</SelectItem>
                           <SelectItem value="moyasar">Moyasar</SelectItem>
-                          <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                          <SelectItem value="bank_transfer">{t('admin.payments.methods.bank_transfer', 'Bank Transfer')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1320,7 +1320,7 @@ export default function PaymentsPage() {
                     <SelectItem value="paystack">Paystack</SelectItem>
                       <SelectItem value="mercado_pago">Mercado Pago</SelectItem>
                       <SelectItem value="moyasar">Moyasar</SelectItem>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="bank_transfer">{t('admin.payments.methods.bank_transfer', 'Bank Transfer')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

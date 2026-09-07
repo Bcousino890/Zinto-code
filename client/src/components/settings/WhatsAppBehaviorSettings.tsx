@@ -855,7 +855,7 @@ export function WhatsAppBehaviorSettings() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="logicalDelimiter">Custom Delimiter</Label>
+                        <Label htmlFor="logicalDelimiter">{t('settings.whatsapp.custom_delimiter', 'Custom Delimiter')}</Label>
                         <Input
                           id="logicalDelimiter"
                           type="text"
@@ -875,16 +875,16 @@ export function WhatsAppBehaviorSettings() {
                           placeholder="e.g., ||"
                         />
                         <p className="text-xs text-muted-foreground">
-                          Delimiter to split messages (e.g., || for Mandarin conversations)
+                          {t('settings.whatsapp.delimiter_help', 'Delimiter to split messages (e.g., || for Mandarin conversations)')}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label className="text-base">Fallback to Character Splitting</Label>
+                        <Label className="text-base">{t('settings.whatsapp.fallback_to_character_splitting', 'Fallback to Character Splitting')}</Label>
                         <div className="text-sm text-muted-foreground">
-                          Use character-based splitting when no delimiters are found
+                          {t('settings.whatsapp.fallback_to_character_splitting_desc', 'Use character-based splitting when no delimiters are found')}
                         </div>
                       </div>
                       <Switch
@@ -911,9 +911,9 @@ export function WhatsAppBehaviorSettings() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Logical Message Splitting</Label>
+                    <Label className="text-base">{t('settings.whatsapp.logical_message_splitting', 'Logical Message Splitting')}</Label>
                     <div className="text-sm text-muted-foreground">
-                      Split messages using custom delimiters (e.g., || for Mandarin conversations)
+                      {t('settings.whatsapp.logical_message_splitting_desc', 'Split messages using custom delimiters (e.g., || for Mandarin conversations)')}
                     </div>
                   </div>
                   <Switch
@@ -937,7 +937,7 @@ export function WhatsAppBehaviorSettings() {
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="logicalDelimiter">Custom Delimiter</Label>
+                        <Label htmlFor="logicalDelimiter">{t('settings.whatsapp.custom_delimiter', 'Custom Delimiter')}</Label>
                         <Input
                           id="logicalDelimiter"
                           type="text"
@@ -957,16 +957,16 @@ export function WhatsAppBehaviorSettings() {
                           placeholder="e.g., ||"
                         />
                         <p className="text-xs text-muted-foreground">
-                          Delimiter to split messages (e.g., || for Mandarin conversations)
+                          {t('settings.whatsapp.delimiter_help', 'Delimiter to split messages (e.g., || for Mandarin conversations)')}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label className="text-base">Fallback to Character Splitting</Label>
+                        <Label className="text-base">{t('settings.whatsapp.fallback_to_character_splitting', 'Fallback to Character Splitting')}</Label>
                         <div className="text-sm text-muted-foreground">
-                          Use character-based splitting when no delimiters are found
+                          {t('settings.whatsapp.fallback_to_character_splitting_desc', 'Use character-based splitting when no delimiters are found')}
                         </div>
                       </div>
                       <Switch

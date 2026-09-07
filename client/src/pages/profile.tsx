@@ -937,12 +937,12 @@ export default function ProfilePage() {
                           {updateCompanyMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Saving Changes
+                              {t('profile.saving_changes', 'Saving Changes')}
                             </>
                           ) : (
                             <>
                               <Save className="mr-2 h-4 w-4" />
-                              Save Company Information
+                              {t('profile.save_company_info', 'Save Company Information')}
                             </>
                           )}
                         </Button>
@@ -1152,12 +1152,12 @@ export default function ProfilePage() {
                           {updateNotificationsMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Saving Settings
+                              {t('profile.saving_settings', 'Saving Settings')}
                             </>
                           ) : (
                             <>
                               <Save className="mr-2 h-4 w-4" />
-                              Save Notification Settings
+                              {t('profile.save_notification_settings', 'Save Notification Settings')}
                             </>
                           )}
                         </Button>

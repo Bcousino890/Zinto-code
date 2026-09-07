@@ -2849,9 +2849,9 @@ export default function Calendar() {
       <Dialog open={isEditScheduleModalOpen} onOpenChange={setIsEditScheduleModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit Schedule</DialogTitle>
+            <DialogTitle>{t('calendar.edit_schedule_title', 'Edit Schedule')}</DialogTitle>
             <DialogDescription>
-              Update your schedule details.
+              {t('calendar.edit_schedule_description', 'Update your schedule details.')}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -2917,9 +2917,9 @@ export default function Calendar() {
       <AlertDialog open={isDeleteScheduleAlertOpen} onOpenChange={setIsDeleteScheduleAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Schedule</AlertDialogTitle>
+            <AlertDialogTitle>{t('calendar.delete_schedule_title', 'Delete Schedule')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this schedule? This action cannot be undone.
+              {t('calendar.delete_schedule_description', 'Are you sure you want to delete this schedule? This action cannot be undone.')}
               {selectedSchedule && (
                 <div className="mt-2 font-medium flex items-center">
                   <div className={`w-3 h-3 rounded-full ${SCHEDULE_COLORS[selectedSchedule.color || 'blue']} mr-2`}></div>
@@ -2929,7 +2929,7 @@ export default function Calendar() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               className="bg-red-600 hover:bg-red-700"
               onClick={handleDeleteSchedule}
@@ -2943,9 +2943,9 @@ export default function Calendar() {
       <Dialog open={isAvailabilityModalOpen} onOpenChange={setIsAvailabilityModalOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Available Time Slots</DialogTitle>
+            <DialogTitle>{t('calendar.available_time_slots_title', 'Available Time Slots')}</DialogTitle>
             <DialogDescription>
-              Select a time slot to create a new appointment.
+              {t('calendar.available_time_slots_description', 'Select a time slot to create a new appointment.')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">

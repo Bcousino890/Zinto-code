@@ -400,8 +400,8 @@ export function ManagedPagesEditor({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="legal">Legal</SelectItem>
-                        <SelectItem value="custom">Custom</SelectItem>
+                        <SelectItem value="legal">{t('admin.settings.frontend_website.page_type_legal', 'Legal')}</SelectItem>
+                        <SelectItem value="custom">{t('admin.settings.frontend_website.page_type_custom', 'Custom')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

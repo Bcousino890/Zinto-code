@@ -566,11 +566,11 @@ export function N8nNode({ id, data, isConnectable }: N8nNodeProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Badge className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-1 py-0.5 rounded cursor-help">
-                    Webhook Connected
+                    {t('flow_builder.webhook_connected', 'Webhook Connected')}
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p className="text-xs">Webhook URL configured</p>
+                  <p className="text-xs">{t('flow_builder.webhook_url_configured', 'Webhook URL configured')}</p>
                   <p className="text-xs text-muted-foreground">{webhookUrl}</p>
                 </TooltipContent>
               </Tooltip>

@@ -1023,10 +1023,10 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                 <SelectValue placeholder={t('stripe.select_resource', 'Select resource')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="customer">Customer</SelectItem>
-                <SelectItem value="payment">Payment</SelectItem>
-                <SelectItem value="subscription">Subscription</SelectItem>
-                <SelectItem value="balance">Balance</SelectItem>
+                <SelectItem value="customer">{t('stripe.resource_customer', 'Customer')}</SelectItem>
+                <SelectItem value="payment">{t('stripe.resource_payment', 'Payment')}</SelectItem>
+                <SelectItem value="subscription">{t('stripe.resource_subscription', 'Subscription')}</SelectItem>
+                <SelectItem value="balance">{t('stripe.resource_balance', 'Balance')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -1077,7 +1077,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
             ) : (
               <Play className="h-3 w-3 mr-1" />
             )}
-            Test Configuration
+            {t('stripe.test_configuration', 'Test Configuration')}
           </Button>
 
           {showTestResult && testResult && renderTestResults()}

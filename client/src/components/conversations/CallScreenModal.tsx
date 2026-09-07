@@ -1391,7 +1391,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
           {/* Reconnecting to call banner (state restore) */}
           {isRestoringState && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-sm font-medium">
-              Reconnecting to call...
+              {t('conversations.call_screen_modal.reconnecting_to_call', 'Reconnecting to call...')}
             </div>
           )}
 
@@ -1405,7 +1405,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
           {/* Quality degraded banner */}
           {isBrowserDirectCall && callStatus === 'in-progress' && isQualityDegraded && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-300 text-sm font-medium">
-              Call quality optimized for poor network
+              {t('conversations.call_screen_modal.quality_optimized_banner', 'Call quality optimized for poor network')}
             </div>
           )}
 
@@ -1432,7 +1432,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                   {!isReconnectingMedia && callStatus === 'completed' && <PhoneOff className="w-4 h-4" />}
                   {!isReconnectingMedia && ['failed', 'busy', 'no-answer'].includes(callStatus) && <PhoneOff className="w-4 h-4" />}
                   <span className="text-sm font-medium tracking-wide">
-                    {isReconnectingMedia ? 'Reconnecting...' : getStatusTextWithFallback()}
+                    {isReconnectingMedia ? t('conversations.call_screen_modal.reconnecting_ellipsis', 'Reconnecting...') : getStatusTextWithFallback()}
                   </span>
                 </div>
               </div>
@@ -1476,7 +1476,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
             {callStatus === 'in-progress' && (
               <div className="flex flex-col items-center gap-1 mt-2">
                 <span className="text-white/50 text-xs font-medium uppercase tracking-widest">
-                  Call duration
+                  {t('conversations.call_screen_modal.call_duration_label', 'Call duration')}
                 </span>
                 <div className="font-mono text-3xl font-semibold tabular-nums text-white tracking-wide">
                   {formatDuration(callDuration)}
@@ -1586,9 +1586,9 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                 <p className="text-white font-semibold mb-2">{t('conversations.call_screen_modal.poor_quality', 'Call quality is very poor')}</p>
                 <p className="text-white/70 text-sm mb-4">{t('conversations.call_screen_modal.switch_audio_only', 'Would you like to switch to audio-only mode?')}</p>
                 <div className="flex flex-col gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => setShowPoorQualityDialog(false)}>Continue</Button>
-                  <Button variant="outline" size="sm" onClick={() => { degradeCallQuality(); setShowPoorQualityDialog(false); }}>Switch to Audio-Only</Button>
-                  <Button variant="destructive" size="sm" onClick={() => { setShowPoorQualityDialog(false); handleHangUp(); }}>End Call</Button>
+                  <Button variant="secondary" size="sm" onClick={() => setShowPoorQualityDialog(false)}>{t('conversations.call_screen_modal.continue', 'Continue')}</Button>
+                  <Button variant="outline" size="sm" onClick={() => { degradeCallQuality(); setShowPoorQualityDialog(false); }}>{t('conversations.call_screen_modal.switch_audio_only', 'Switch to Audio-Only')}</Button>
+                  <Button variant="destructive" size="sm" onClick={() => { setShowPoorQualityDialog(false); handleHangUp(); }}>{t('conversations.call_screen_modal.end_call_button', 'End Call')}</Button>
                 </div>
               </div>
             </div>
@@ -1607,7 +1607,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                   onClick={onClose}
                   className="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm font-medium transition-colors"
                 >
-                  Close
+                  {t('common.close', 'Close')}
                 </button>
               </div>
             </div>
@@ -1630,13 +1630,13 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                 </div>
                 <p className="text-white text-xl font-semibold mb-2">{errorMessage}</p>
                 <div className="text-left mb-4 p-3 bg-black/20 rounded-lg text-sm text-white/80">
-                  <p className="font-medium text-white/90 mb-1">What you can do:</p>
+                  <p className="font-medium text-white/90 mb-1">{t('conversations.call_screen_modal.what_you_can_do', 'What you can do:')}</p>
                   <ul className="list-disc list-inside space-y-1 text-white/70">
-                    {errorType === 'microphone_access_denied' && <li>Enable microphone in browser settings and reload</li>}
-                    {errorType === 'device_registration_failed' && <li>Refresh the page and try again</li>}
-                    {['media_connection_failed', 'ice_connection_failed'].includes(errorType || '') && <li>Check your network and firewall, then retry</li>}
-                    {errorType === 'signaling_connection_error' && <li>Connection will retry automatically; wait or refresh</li>}
-                    {!['microphone_access_denied', 'device_registration_failed', 'signaling_connection_error', 'media_connection_failed', 'ice_connection_failed'].includes(errorType || '') && <li>Try again or end the call and retry later</li>}
+                    {errorType === 'microphone_access_denied' && <li>{t('conversations.call_screen_modal.action_mic_access', 'Enable microphone in browser settings and reload')}</li>}
+                    {errorType === 'device_registration_failed' && <li>{t('conversations.call_screen_modal.action_device_refresh', 'Refresh the page and try again')}</li>}
+                    {['media_connection_failed', 'ice_connection_failed'].includes(errorType || '') && <li>{t('conversations.call_screen_modal.action_network_check', 'Check your network and firewall, then retry')}</li>}
+                    {errorType === 'signaling_connection_error' && <li>{t('conversations.call_screen_modal.action_connection_retry', 'Connection will retry automatically; wait or refresh')}</li>}
+                    {!['microphone_access_denied', 'device_registration_failed', 'signaling_connection_error', 'media_connection_failed', 'ice_connection_failed'].includes(errorType || '') && <li>{t('conversations.call_screen_modal.action_generic_retry', 'Try again or end the call and retry later')}</li>}
                   </ul>
                 </div>
                 {errorDetails && Object.keys(errorDetails).length > 0 && (
@@ -1684,7 +1684,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                     onClick={handleHangUp}
                     className="px-6 py-2.5 bg-red-500/30 hover:bg-red-500/50 rounded-full text-red-200 text-sm font-medium transition-colors"
                   >
-                    End Call
+                    {t('conversations.call_screen_modal.end_call_button', 'End Call')}
                   </button>
                   <button
                     onClick={onClose}
@@ -1709,7 +1709,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                   onClick={onClose}
                   className="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm font-medium transition-colors"
                 >
-                  Close
+                  {t('common.close', 'Close')}
                 </button>
               </div>
             </div>

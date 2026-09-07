@@ -351,14 +351,14 @@ export function SubscriptionManagement() {
             {pauseStatus?.isPaused && (
               <Alert className="border-primary/20 bg-primary/10">
                 <Pause className="h-4 w-4 text-primary" />
-                <AlertTitle>Subscription Paused</AlertTitle>
+                <AlertTitle>{t('subscription.paused_title', 'Subscription Paused')}</AlertTitle>
                 <AlertDescription>
-                  Your subscription is paused until{' '}
+                  {t('subscription.paused_until', 'Your subscription is paused until')}{' '}
                   {pauseStatus.pauseEndDate && 
                     new Date(pauseStatus.pauseEndDate).toLocaleDateString()
                   }. 
                   {pauseStatus.daysRemaining && (
-                    <> {pauseStatus.daysRemaining} days remaining.</>
+                    <> {pauseStatus.daysRemaining} {t('subscription.days_remaining', 'days remaining.')}</>
                   )}
                 </AlertDescription>
               </Alert>
@@ -377,7 +377,7 @@ export function SubscriptionManagement() {
                   ) : (
                     <Play className="w-4 h-4" />
                   )}
-                  Resume Subscription
+                  {t('subscription.resume_subscription', 'Resume Subscription')}
                 </Button>
               ) : (
                 subscriptionStatus?.status === 'active' && (
@@ -387,7 +387,7 @@ export function SubscriptionManagement() {
                     className="flex items-center gap-2"
                   >
                     <Pause className="w-4 h-4" />
-                    Pause Subscription
+                    {t('subscription.pause_subscription', 'Pause Subscription')}
                   </Button>
                 )
               )}
@@ -464,37 +464,36 @@ export function SubscriptionManagement() {
       <Dialog open={showPauseDialog} onOpenChange={setShowPauseDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Pause Subscription</DialogTitle>
+            <DialogTitle>{t('subscription.pause_subscription', 'Pause Subscription')}</DialogTitle>
             <DialogDescription>
-              Temporarily pause your subscription. Your data will be preserved and you can resume anytime.
+              {t('subscription.pause_dialog_desc', 'Temporarily pause your subscription. Your data will be preserved and you can resume anytime.')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Pause Duration</label>
+              <label className="text-sm font-medium">{t('subscription.pause_duration', 'Pause Duration')}</label>
               <select
                 value={pauseDays}
                 onChange={(e) => setPauseDays(Number(e.target.value))}
                 className="w-full mt-1 p-2 border rounded-md"
               >
-                <option value={7}>7 days</option>
-                <option value={14}>14 days</option>
-                <option value={30}>30 days</option>
-                <option value={60}>60 days</option>
-                <option value={90}>90 days</option>
+                <option value={7}>{t('subscription.days_7', '7 days')}</option>
+                <option value={14}>{t('subscription.days_14', '14 days')}</option>
+                <option value={30}>{t('subscription.days_30', '30 days')}</option>
+                <option value={60}>{t('subscription.days_60', '60 days')}</option>
+                <option value={90}>{t('subscription.days_90', '90 days')}</option>
               </select>
             </div>
             <Alert>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                During the pause, you won't be charged, but access to premium features will be limited.
-                Your subscription will automatically resume after the selected period.
+                {t('subscription.pause_warning', "During the pause, you won't be charged, but access to premium features will be limited. Your subscription will automatically resume after the selected period.")}
               </AlertDescription>
             </Alert>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowPauseDialog(false)}>
-              Cancel
+              {t('subscription.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={() => pauseSubscriptionMutation.mutate(pauseDays)}
@@ -503,7 +502,7 @@ export function SubscriptionManagement() {
               {pauseSubscriptionMutation.isPending && (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               )}
-              Pause Subscription
+              {t('subscription.pause_subscription', 'Pause Subscription')}
             </Button>
           </DialogFooter>
         </DialogContent>

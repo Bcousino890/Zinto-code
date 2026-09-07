@@ -276,7 +276,7 @@ export function ProcessorStatus({
                   <div className="text-green-300">✓ {t('knowledge_base.processor.all_available', 'All processors available')}</div>
                 )}
                 {(!capabilities.processors.pdf && !capabilities.processors.pdfAdvanced) || !capabilities.processors.docx ? (
-                  <div className="text-yellow-300 mt-2">Restart server after installing packages</div>
+                  <div className="text-yellow-300 mt-2">{t('knowledge_base.processor.restart_message', 'Restart server after installing packages')}</div>
                 ) : null}
               </div>
             </div>

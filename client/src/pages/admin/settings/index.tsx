@@ -49,27 +49,27 @@ import FrontendWebsiteManagementSection from '@/components/settings/FrontendWebs
 
 
 const BUILT_IN_CURRENCY_OPTIONS = [
-  { code: 'ARS', label: 'ARS - Argentine Peso' },
-  { code: 'BRL', label: 'BRL - Brazilian Real' },
-  { code: 'MXN', label: 'MXN - Mexican Peso' },
-  { code: 'CLP', label: 'CLP - Chilean Peso' },
-  { code: 'COP', label: 'COP - Colombian Peso' },
-  { code: 'PEN', label: 'PEN - Peruvian Sol' },
-  { code: 'UYU', label: 'UYU - Uruguayan Peso' },
-  { code: 'PYG', label: 'PYG - Paraguayan Guarani' },
-  { code: 'BOB', label: 'BOB - Bolivian Boliviano' },
-  { code: 'VEF', label: 'VEF - Venezuelan Bolívar' },
-  { code: 'PKR', label: 'PKR - Pakistani Rupee' },
-  { code: 'INR', label: 'INR - Indian Rupee' },
-  { code: 'USD', label: 'USD - US Dollar' },
-  { code: 'EUR', label: 'EUR - Euro' },
+  { code: 'ARS', label: 'ARS - Argentine Peso', key: 'admin.settings.currency_ars' },
+  { code: 'BRL', label: 'BRL - Brazilian Real', key: 'admin.settings.currency_brl' },
+  { code: 'MXN', label: 'MXN - Mexican Peso', key: 'admin.settings.currency_mxn' },
+  { code: 'CLP', label: 'CLP - Chilean Peso', key: 'admin.settings.currency_clp' },
+  { code: 'COP', label: 'COP - Colombian Peso', key: 'admin.settings.currency_cop' },
+  { code: 'PEN', label: 'PEN - Peruvian Sol', key: 'admin.settings.currency_pen' },
+  { code: 'UYU', label: 'UYU - Uruguayan Peso', key: 'admin.settings.currency_uyu' },
+  { code: 'PYG', label: 'PYG - Paraguayan Guarani', key: 'admin.settings.currency_pyg' },
+  { code: 'BOB', label: 'BOB - Bolivian Boliviano', key: 'admin.settings.currency_bob' },
+  { code: 'VEF', label: 'VEF - Venezuelan Bolívar', key: 'admin.settings.currency_vef' },
+  { code: 'PKR', label: 'PKR - Pakistani Rupee', key: 'admin.settings.currency_pkr' },
+  { code: 'INR', label: 'INR - Indian Rupee', key: 'admin.settings.currency_inr' },
+  { code: 'USD', label: 'USD - US Dollar', key: 'admin.settings.currency_usd' },
+  { code: 'EUR', label: 'EUR - Euro', key: 'admin.settings.currency_eur' },
   // Paystack-supported currencies
-  { code: 'NGN', label: 'NGN - Nigerian Naira' },
-  { code: 'GHS', label: 'GHS - Ghanaian Cedi' },
-  { code: 'ZAR', label: 'ZAR - South African Rand' },
-  { code: 'KES', label: 'KES - Kenyan Shilling' },
-  { code: 'XOF', label: 'XOF - West African CFA Franc' },
-  { code: 'EGP', label: 'EGP - Egyptian Pound' },
+  { code: 'NGN', label: 'NGN - Nigerian Naira', key: 'admin.settings.currency_ngn' },
+  { code: 'GHS', label: 'GHS - Ghanaian Cedi', key: 'admin.settings.currency_ghs' },
+  { code: 'ZAR', label: 'ZAR - South African Rand', key: 'admin.settings.currency_zar' },
+  { code: 'KES', label: 'KES - Kenyan Shilling', key: 'admin.settings.currency_kes' },
+  { code: 'XOF', label: 'XOF - West African CFA Franc', key: 'admin.settings.currency_xof' },
+  { code: 'EGP', label: 'EGP - Egyptian Pound', key: 'admin.settings.currency_egp' },
 ] as const;
 
 
@@ -4673,7 +4673,7 @@ export default function AdminSettingsPage() {
                       <SelectContent>
                         {BUILT_IN_CURRENCY_OPTIONS.map((currency) => (
                           <SelectItem key={currency.code} value={currency.code}>
-                            {currency.label}
+                            {t(currency.key, currency.label)}
                           </SelectItem>
                         ))}
                         {generalSettingsForm.customCurrencies.length > 0 && (

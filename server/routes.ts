@@ -278,8 +278,9 @@ import {
   isMetaWebhookSignatureBypassAllowed,
   isMetaLegacyTokenOnboardingAllowed,
 } from "./utils/meta-webhook-security";
-import { generateApiKey, hashApiKey } from "./middleware/api-auth";
+import { authenticateApiKey, generateApiKey, hashApiKey } from "./middleware/api-auth";
 import apiV1Routes from "./routes/api-v1";
+import { createApiV2Router } from "./routes/api-v2";
 import channelManager from "./services/channel-manager";
 import {
   sendTeamInvitation,
@@ -1108,6 +1109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAdminRoutes(app);
 
   app.use('/api/v1', apiV1Routes);
+  app.use('/api/v2', createApiV2Router({ authenticate: authenticateApiKey }));
 
   registerPlanRoutes(app);
 

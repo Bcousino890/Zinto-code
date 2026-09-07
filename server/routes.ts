@@ -281,6 +281,7 @@ import {
 import { authenticateApiKey, generateApiKey, hashApiKey } from "./middleware/api-auth";
 import apiV1Routes from "./routes/api-v1";
 import { createApiV2Router } from "./routes/api-v2";
+import { ApiKeyConfigurationError, validateApiKeyConfigurationUpdate } from "./services/integration-api-key-policy";
 import channelManager from "./services/channel-manager";
 import {
   sendTeamInvitation,
@@ -3191,7 +3192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/settings/api-keys', ensureAuthenticated, async (req: any, res) => {
     try {
-      const { name } = req.body;
+      const { name, ...configuration } = req.body;
 
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
         return res.status(400).json({ error: 'API key name is required' });
@@ -3199,18 +3200,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { key, hash, prefix } = generateApiKey();
 
+      const validatedConfiguration = validateApiKeyConfigurationUpdate(configuration);
       const apiKeyData = {
         companyId: req.user.companyId,
         userId: req.user.id,
         name: name.trim(),
         keyHash: hash,
         keyPrefix: prefix,
-        permissions: ['messages:send', 'channels:read', 'messages:read', 'media:upload'],
+        permissions: validatedConfiguration.permissions ?? ['messages:send', 'channels:read', 'messages:read', 'media:upload'],
         isActive: true,
-        rateLimitPerMinute: 60,
-        rateLimitPerHour: 1000,
-        rateLimitPerDay: 10000,
-        allowedIps: [],
+        rateLimitPerMinute: validatedConfiguration.rateLimitPerMinute ?? 60,
+        rateLimitPerHour: validatedConfiguration.rateLimitPerHour ?? 1000,
+        rateLimitPerDay: validatedConfiguration.rateLimitPerDay ?? 10000,
+        allowedIps: validatedConfiguration.allowedIps ?? [],
+        webhookUrl: validatedConfiguration.webhookUrl ?? null,
         metadata: {}
       };
 
@@ -3227,6 +3230,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error creating API key:', error);
+      if (error instanceof ApiKeyConfigurationError) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: error.message });
+      }
       res.status(500).json({ error: 'Failed to create API key' });
     }
   });
@@ -3234,7 +3240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/settings/api-keys/:id', ensureAuthenticated, async (req: any, res) => {
     try {
       const keyId = parseInt(req.params.id);
-      const { isActive, name } = req.body;
+      const { isActive, name, ...configuration } = req.body;
 
       if (isNaN(keyId)) {
         return res.status(400).json({ error: 'Invalid API key ID' });
@@ -3250,6 +3256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updateData: any = {};
       if (typeof isActive === 'boolean') updateData.isActive = isActive;
       if (typeof name === 'string' && name.trim().length > 0) updateData.name = name.trim();
+      Object.assign(updateData, validateApiKeyConfigurationUpdate(configuration));
 
       const updatedKey = await storage.updateApiKey(keyId, updateData);
 
@@ -3265,6 +3272,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error updating API key:', error);
+      if (error instanceof ApiKeyConfigurationError) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: error.message });
+      }
       res.status(500).json({ error: 'Failed to update API key' });
     }
   });

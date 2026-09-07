@@ -31,6 +31,17 @@ test('reports API v2 health without requiring a CRM credential', async () => {
   });
 });
 
+test('publishes an OpenAPI document for CRM developers', async () => {
+  await withServer((_req, _res, next) => next(), async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/openapi.json`);
+    assert.equal(response.status, 200);
+    const body = await response.json() as { openapi: string; paths: Record<string, unknown> };
+    assert.equal(body.openapi, '3.1.0');
+    assert.ok('/health' in body.paths);
+    assert.ok('/capabilities' in body.paths);
+  });
+});
+
 test('does not disclose CRM capabilities to a key without integration permission', async () => {
   await withServer((req, _res, next) => {
     req.apiKey = { permissions: ['messages:send'] } as any;

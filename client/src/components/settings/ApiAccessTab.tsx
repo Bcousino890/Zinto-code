@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, es } from 'date-fns/locale';
+import { API_KEY_SCOPES, toggleApiKeyScope } from './api-key-permissions';
 
 interface ApiKey {
   id: number;
@@ -72,6 +73,9 @@ export function ApiAccessTab() {
   const [newApiKey, setNewApiKey] = useState<string>('');
   const [newKeyName, setNewKeyName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [editingApiKey, setEditingApiKey] = useState<ApiKey | null>(null);
+  const [editingPermissions, setEditingPermissions] = useState<string[]>([]);
+  const [isSavingPermissions, setIsSavingPermissions] = useState(false);
 
   useEffect(() => {
     loadApiKeys();
@@ -218,6 +222,41 @@ export function ApiAccessTab() {
     }
   };
 
+  const openPermissionEditor = (apiKey: ApiKey) => {
+    setEditingApiKey(apiKey);
+    setEditingPermissions(apiKey.permissions);
+  };
+
+  const savePermissions = async () => {
+    if (!editingApiKey) return;
+    setIsSavingPermissions(true);
+    try {
+      const response = await fetch(`/api/settings/api-keys/${editingApiKey.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ permissions: editingPermissions })
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || t('settings.api_access.toast.update_key_failed', 'Failed to update API key'));
+      }
+      await loadApiKeys();
+      setEditingApiKey(null);
+      toast({
+        title: t('settings.api_access.toast.success', 'Success'),
+        description: t('settings.api_access.toast.permissions_updated', 'API key permissions updated')
+      });
+    } catch (error: any) {
+      toast({
+        title: t('settings.api_access.toast.error', 'Error'),
+        description: error.message || t('settings.api_access.toast.update_key_failed', 'Failed to update API key'),
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSavingPermissions(false);
+    }
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
@@ -323,6 +362,14 @@ export function ApiAccessTab() {
                         </CardDescription>
                       </div>
                       <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openPermissionEditor(apiKey)}
+                        >
+                          <Settings className="w-4 h-4 mr-1" />
+                          {t('settings.api_access.edit_permissions', 'Permissions')}
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
@@ -1367,6 +1414,37 @@ app.post('/webhook', express.json(), (req, res) => {
               ) : (
                 t('settings.api_access.create_key', 'Create API Key')
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(editingApiKey)} onOpenChange={(open) => !open && setEditingApiKey(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t('settings.api_access.edit_permissions_title', 'Edit API key permissions')}</DialogTitle>
+            <DialogDescription>
+              {editingApiKey?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto">
+            {API_KEY_SCOPES.map((scope) => (
+              <label key={scope} className="flex items-center gap-2 rounded border p-3 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={editingPermissions.includes(scope)}
+                  onChange={() => setEditingPermissions((current) => toggleApiKeyScope(current, scope))}
+                />
+                <code>{scope}</code>
+              </label>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingApiKey(null)}>
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button onClick={savePermissions} disabled={isSavingPermissions}>
+              {isSavingPermissions ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -7336,6 +7336,10 @@
     "value": "Nombre de la Moneda"
   },
   {
+    "key": "admin.settings.general_settings.currency_name_placeholder",
+    "value": "Dólar estadounidense"
+  },
+  {
     "key": "admin.settings.general_settings.currency_symbol",
     "value": "Símbolo de la Moneda"
   },
@@ -8172,8 +8176,36 @@
     "value": "Conexión con Paystack exitosa"
   },
   {
+    "key": "admin.settings.payment.paystack.currency_egp",
+    "value": "EGP (Libra egipcia)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_ghs",
+    "value": "GHS (Cedi ghanés)"
+  },
+  {
     "key": "admin.settings.payment.paystack.currency_help",
     "value": "Establecer esto si recibes \"Moneda no compatible con comerciante\". Usa la moneda habilitada en tu integración de Paystack (ej. NGN para Nigeria, GHS para Ghana)."
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_kes",
+    "value": "KES (Chelín keniano)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_ngn",
+    "value": "NGN (Naira nigeriana)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_usd",
+    "value": "USD (Dólar estadounidense)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_xof",
+    "value": "XOF (Franco CFA de África Occidental)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_zar",
+    "value": "ZAR (Rand sudafricano)"
   },
   {
     "key": "admin.settings.payment.paystack.description",
@@ -30920,6 +30952,18 @@
     "value": "Asistente IA"
   },
   {
+    "key": "flow_builder.ai_assistant_variables_complete",
+    "value": "Variables completas"
+  },
+  {
+    "key": "flow_builder.ai_assistant_variables_complete_desc",
+    "value": "Se activa cuando se completan todas las variables personalizadas del prompt"
+  },
+  {
+    "key": "flow_builder.ai_assistant_watching_label",
+    "value": "Observando:"
+  },
+  {
     "key": "flow_builder.ai_audio_enabled",
     "value": "Audio habilitado"
   },
@@ -37732,12 +37776,20 @@
     "value": "Completado"
   },
   {
+    "key": "flow_builder.execution_history_contact_id",
+    "value": "ID de contacto:"
+  },
+  {
     "key": "flow_builder.execution_history_context_snapshot",
     "value": "Ruta de ejecución + instantánea de contexto"
   },
   {
     "key": "flow_builder.execution_history_context_tab",
     "value": "Contexto"
+  },
+  {
+    "key": "flow_builder.execution_history_conversation_id",
+    "value": "ID de conversación:"
   },
   {
     "key": "flow_builder.execution_history_current_node",
@@ -37754,6 +37806,10 @@
   {
     "key": "flow_builder.execution_history_empty_filter",
     "value": "Ninguna ejecución coincide con el filtro actual."
+  },
+  {
+    "key": "flow_builder.execution_history_execution_id",
+    "value": "ID de ejecución:"
   },
   {
     "key": "flow_builder.execution_history_identifiers",
@@ -37804,6 +37860,10 @@
     "value": "ID de ejecución {{runId}}"
   },
   {
+    "key": "flow_builder.execution_history_run_id",
+    "value": "ID de ejecución (run):"
+  },
+  {
     "key": "flow_builder.execution_history_run_tab",
     "value": "Datos de ejecución"
   },
@@ -37830,6 +37890,10 @@
   {
     "key": "flow_builder.execution_history_select_step",
     "value": "Selecciona una ejecución de nodo en la línea de tiempo para inspeccionar sus datos."
+  },
+  {
+    "key": "flow_builder.execution_history_session_id",
+    "value": "ID de sesión:"
   },
   {
     "key": "flow_builder.execution_history_started",
@@ -43136,6 +43200,10 @@
     "value": "📤 Soporte de Salida:"
   },
   {
+    "key": "flow_builder.n8n_request_timeout_seconds",
+    "value": "Tiempo de espera de la solicitud: {{timeout}} segundos"
+  },
+  {
     "key": "flow_builder.n8n_required_fields_marked",
     "value": "Los campos requeridos están marcados con *"
   },
@@ -43166,6 +43234,10 @@
   {
     "key": "flow_builder.n8n_test_connection_failed",
     "value": "Fallo al probar la conexión. Por favor, revisa tu configuración e inténtalo de nuevo."
+  },
+  {
+    "key": "flow_builder.n8n_timeout_badge",
+    "value": "Tiempo de espera: {{timeout}}s"
   },
   {
     "key": "flow_builder.n8n_timeout_help_default",
@@ -47564,12 +47636,24 @@
     "value": "Usa las credenciales de la API REST de WooCommerce. En WordPress: WooCommerce → Ajustes → Avanzado → API REST. Crea una clave con permiso Lectura/Escritura. Tu sitio debe tener SSL y enlaces permanentes bonitos activados."
   },
   {
+    "key": "flow_builder.woocommerce.help_connection_label",
+    "value": "Conexión:"
+  },
+  {
     "key": "flow_builder.woocommerce.help_modules",
     "value": "Módulos disponibles: Cupones, Clientes, Pedidos, Notas de pedido, Productos, Atributos y términos de producto, Categorías de producto, Variaciones de producto, Informes, Pasarelas de pago, Zonas de envío, Tasas de impuestos."
   },
   {
+    "key": "flow_builder.woocommerce.help_modules_label",
+    "value": "Módulos:"
+  },
+  {
     "key": "flow_builder.woocommerce.help_operation",
     "value": "Elige qué hacer con el recurso seleccionado (buscar, obtener uno, crear, actualizar, eliminar). La operación determina el método HTTP usado en la llamada a la API."
+  },
+  {
+    "key": "flow_builder.woocommerce.help_operation_label",
+    "value": "Operación:"
   },
   {
     "key": "flow_builder.woocommerce.hide",
@@ -49338,6 +49422,10 @@
   {
     "key": "knowledge_base.document.upload_first",
     "value": "Sube tu primer documento para comenzar"
+  },
+  {
+    "key": "knowledge_base.document_list.close",
+    "value": "Cerrar"
   },
   {
     "key": "knowledge_base.file_type",
@@ -54046,6 +54134,10 @@
   {
     "key": "profile.choose_preferred_language",
     "value": "Elija su idioma preferido para la interfaz."
+  },
+  {
+    "key": "profile.commercial_registration_number_ksa",
+    "value": "Número de registro comercial (KSA)"
   },
   {
     "key": "profile.company_created",
@@ -59202,6 +59294,10 @@
   {
     "key": "settings.email_channel.signature_placeholder",
     "value": "Saludos cordiales, Equipo de soporte"
+  },
+  {
+    "key": "settings.email_channel.smtp_configuration",
+    "value": "Configuración SMTP"
   },
   {
     "key": "settings.email_channel.smtp_username_label",
@@ -66146,6 +66242,10 @@
   {
     "key": "subscription.status",
     "value": "Estado de la suscripción"
+  },
+  {
+    "key": "subscription.usage_limits_exceeded",
+    "value": "Límites de uso excedidos"
   },
   {
     "key": "tasks.actions",

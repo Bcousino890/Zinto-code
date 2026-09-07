@@ -600,7 +600,7 @@ export function DocumentList({
             {/* Close button */}
             <DialogClose className={dialogCloseButtonClassName}>
               <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
+              <span className="sr-only">{t('knowledge_base.document_list.close', 'Close')}</span>
             </DialogClose>
           </DialogPrimitive.Content>
         </DialogPortal>

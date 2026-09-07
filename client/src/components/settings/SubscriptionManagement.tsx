@@ -411,7 +411,7 @@ export function SubscriptionManagement() {
           {usageStatus?.overallStatus === 'blocked' && (
             <Alert className="border-red-200 bg-red-50 mb-4">
               <XCircle className="h-4 w-4" />
-              <AlertTitle>Usage Limits Exceeded</AlertTitle>
+              <AlertTitle>{t('subscription.usage_limits_exceeded', 'Usage Limits Exceeded')}</AlertTitle>
               <AlertDescription>
                 Some features are currently blocked due to usage limits. 
                 Blocked features: {usageStatus.blockedFeatures.join(', ')}

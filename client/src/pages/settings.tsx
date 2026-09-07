@@ -3593,7 +3593,7 @@ export default function Settings() {
                   <CardContent>
                     <Accordion type="single" collapsible defaultValue="smtp">
                       <AccordionItem value="smtp">
-                        <AccordionTrigger>SMTP Configuration</AccordionTrigger>
+                        <AccordionTrigger>{t('settings.email_channel.smtp_configuration', 'SMTP Configuration')}</AccordionTrigger>
                         <AccordionContent>
                           <SmtpConfiguration />
                         </AccordionContent>

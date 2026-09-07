@@ -6463,12 +6463,12 @@ export function AIAssistantNode({ id, data, isConnectable }: AIAssistantNodeProp
               </TooltipTrigger>
               <TooltipContent side="left">
                 <div className="max-w-[250px]">
-                  <p className="text-xs font-medium text-purple-600">Variables Complete</p>
+                  <p className="text-xs font-medium text-purple-600">{t('flow_builder.ai_assistant_variables_complete', 'Variables Complete')}</p>
                   <p className="text-[10px] text-muted-foreground mt-1">
-                    Triggered once all custom variables in the prompt are filled
+                    {t('flow_builder.ai_assistant_variables_complete_desc', 'Triggered once all custom variables in the prompt are filled')}
                   </p>
                   <p className="text-[10px] text-muted-foreground mt-1 italic">
-                    Watching: {activeCustomVarNames.map((n) => `{{${n}}}`).join(', ')}
+                    {t('flow_builder.ai_assistant_watching_label', 'Watching:')} {activeCustomVarNames.map((n) => `{{${n}}}`).join(', ')}
                   </p>
                 </div>
               </TooltipContent>

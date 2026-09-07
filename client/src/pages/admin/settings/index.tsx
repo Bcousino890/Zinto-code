@@ -3481,13 +3481,13 @@ export default function AdminSettingsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="auto">{t('admin.settings.payment.paystack.use_app_default', 'Use app default')}</SelectItem>
-                        <SelectItem value="NGN">NGN (Nigerian Naira)</SelectItem>
-                        <SelectItem value="GHS">GHS (Ghanaian Cedi)</SelectItem>
-                        <SelectItem value="ZAR">ZAR (South African Rand)</SelectItem>
-                        <SelectItem value="USD">USD (US Dollar)</SelectItem>
-                        <SelectItem value="KES">KES (Kenyan Shilling)</SelectItem>
-                        <SelectItem value="XOF">XOF (West African CFA Franc)</SelectItem>
-                        <SelectItem value="EGP">EGP (Egyptian Pound)</SelectItem>
+                        <SelectItem value="NGN">{t('admin.settings.payment.paystack.currency_ngn', 'NGN (Nigerian Naira)')}</SelectItem>
+                        <SelectItem value="GHS">{t('admin.settings.payment.paystack.currency_ghs', 'GHS (Ghanaian Cedi)')}</SelectItem>
+                        <SelectItem value="ZAR">{t('admin.settings.payment.paystack.currency_zar', 'ZAR (South African Rand)')}</SelectItem>
+                        <SelectItem value="USD">{t('admin.settings.payment.paystack.currency_usd', 'USD (US Dollar)')}</SelectItem>
+                        <SelectItem value="KES">{t('admin.settings.payment.paystack.currency_kes', 'KES (Kenyan Shilling)')}</SelectItem>
+                        <SelectItem value="XOF">{t('admin.settings.payment.paystack.currency_xof', 'XOF (West African CFA Franc)')}</SelectItem>
+                        <SelectItem value="EGP">{t('admin.settings.payment.paystack.currency_egp', 'EGP (Egyptian Pound)')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">
@@ -4609,7 +4609,7 @@ export default function AdminSettingsPage() {
                               <Label htmlFor="currency-name">{t('admin.settings.general_settings.currency_name', 'Currency Name')}</Label>
                               <Input
                                 id="currency-name"
-                                placeholder="US Dollar"
+                                placeholder={t('admin.settings.general_settings.currency_name_placeholder', 'US Dollar')}
                                 value={customCurrencyForm.name}
                                 onChange={(e) => setCustomCurrencyForm({...customCurrencyForm, name: e.target.value})}
                               />

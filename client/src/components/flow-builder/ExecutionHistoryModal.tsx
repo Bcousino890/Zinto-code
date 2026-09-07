@@ -690,11 +690,11 @@ export function ExecutionHistoryModal({ isOpen, onClose, flowId }: ExecutionHist
                               <p className="text-xs text-muted-foreground">{t('flow_builder.execution_history_identifiers_subtitle', 'Useful durable references for support and debugging.')}</p>
                             </div>
                             <div className="grid gap-3 text-sm">
-                              <div><span className="text-muted-foreground">Run ID:</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.runId}</code></div>
-                              <div><span className="text-muted-foreground">Execution ID:</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.executionId}</code></div>
-                              <div><span className="text-muted-foreground">Session ID:</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.sessionId ?? '—'}</code></div>
-                              <div><span className="text-muted-foreground">Conversation ID:</span> {detailQuery.data.run.conversationId}</div>
-                              <div><span className="text-muted-foreground">Contact ID:</span> {detailQuery.data.run.contactId}</div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_run_id', 'Run ID:')}</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.runId}</code></div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_execution_id', 'Execution ID:')}</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.executionId}</code></div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_session_id', 'Session ID:')}</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.sessionId ?? '—'}</code></div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_conversation_id', 'Conversation ID:')}</span> {detailQuery.data.run.conversationId}</div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_contact_id', 'Contact ID:')}</span> {detailQuery.data.run.contactId}</div>
                             </div>
                             {selectedPath && (
                               <div className="rounded-xl border bg-muted/10 p-3">

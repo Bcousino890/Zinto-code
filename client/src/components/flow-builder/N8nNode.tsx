@@ -585,12 +585,12 @@ export function N8nNode({ id, data, isConnectable }: N8nNodeProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Badge className="text-[10px] bg-muted text-muted-foreground border border-border px-1 py-0.5 rounded cursor-help">
-                  Timeout: {timeout}s
+                  {t('flow_builder.n8n_timeout_badge', 'Timeout: {{timeout}}s', { timeout })}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p className="text-xs">Request timeout: {timeout} seconds</p>
-                <p className="text-xs text-muted-foreground">Maximum time to wait for n8n response</p>
+                <p className="text-xs">{t('flow_builder.n8n_request_timeout_seconds', 'Request timeout: {{timeout}} seconds', { timeout })}</p>
+                <p className="text-xs text-muted-foreground">{t('flow_builder.n8n_timeout_help_description', 'Maximum time to wait for n8n response')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

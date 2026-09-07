@@ -725,9 +725,9 @@ export function WooCommerceNode({ id, data, isConnectable }: WooCommerceNodeProp
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="mt-2 pt-2 border-t border-border space-y-2 text-[11px] text-muted-foreground">
-                <p><strong className="text-foreground">Connection:</strong> {t('flow_builder.woocommerce.help_connection', WOOCOMMERCE_INLINE_HELP.connection)}</p>
-                <p><strong className="text-foreground">Modules:</strong> {t('flow_builder.woocommerce.help_modules', WOOCOMMERCE_INLINE_HELP.modules)}</p>
-                <p><strong className="text-foreground">Operation:</strong> {t('flow_builder.woocommerce.help_operation', WOOCOMMERCE_INLINE_HELP.operation)}</p>
+                <p><strong className="text-foreground">{t('flow_builder.woocommerce.help_connection_label', 'Connection:')}</strong> {t('flow_builder.woocommerce.help_connection', WOOCOMMERCE_INLINE_HELP.connection)}</p>
+                <p><strong className="text-foreground">{t('flow_builder.woocommerce.help_modules_label', 'Modules:')}</strong> {t('flow_builder.woocommerce.help_modules', WOOCOMMERCE_INLINE_HELP.modules)}</p>
+                <p><strong className="text-foreground">{t('flow_builder.woocommerce.help_operation_label', 'Operation:')}</strong> {t('flow_builder.woocommerce.help_operation', WOOCOMMERCE_INLINE_HELP.operation)}</p>
               </div>
             </CollapsibleContent>
           </Collapsible>

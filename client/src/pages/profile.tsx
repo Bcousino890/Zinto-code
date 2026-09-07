@@ -843,7 +843,7 @@ export default function ProfilePage() {
                             name="registerNumber"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Commercial Registration Number (KSA)</FormLabel>
+                                <FormLabel>{t('profile.commercial_registration_number_ksa', 'Commercial Registration Number (KSA)')}</FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="1234567890"
@@ -876,7 +876,7 @@ export default function ProfilePage() {
 
                               return (
                                 <FormItem>
-                                  <FormLabel>Company IBAN Number (KSA)</FormLabel>
+                                  <FormLabel>{t('admin.companies.iban_label', 'Company IBAN Number (KSA)')}</FormLabel>
                                   <FormControl>
                                     <div className="relative">
                                       <Input

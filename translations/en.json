@@ -7336,6 +7336,10 @@
     "value": "Currency Name"
   },
   {
+    "key": "admin.settings.general_settings.currency_name_placeholder",
+    "value": "US Dollar"
+  },
+  {
     "key": "admin.settings.general_settings.currency_symbol",
     "value": "Currency Symbol"
   },
@@ -8172,8 +8176,36 @@
     "value": "Paystack connection successful"
   },
   {
+    "key": "admin.settings.payment.paystack.currency_egp",
+    "value": "EGP (Egyptian Pound)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_ghs",
+    "value": "GHS (Ghanaian Cedi)"
+  },
+  {
     "key": "admin.settings.payment.paystack.currency_help",
     "value": "Set this if you get \"Currency not supported by merchant\". Use the currency enabled on your Paystack integration (e.g. NGN for Nigeria, GHS for Ghana)."
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_kes",
+    "value": "KES (Kenyan Shilling)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_ngn",
+    "value": "NGN (Nigerian Naira)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_usd",
+    "value": "USD (US Dollar)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_xof",
+    "value": "XOF (West African CFA Franc)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_zar",
+    "value": "ZAR (South African Rand)"
   },
   {
     "key": "admin.settings.payment.paystack.description",
@@ -30920,6 +30952,18 @@
     "value": "AI Assistant"
   },
   {
+    "key": "flow_builder.ai_assistant_variables_complete",
+    "value": "Variables Complete"
+  },
+  {
+    "key": "flow_builder.ai_assistant_variables_complete_desc",
+    "value": "Triggered once all custom variables in the prompt are filled"
+  },
+  {
+    "key": "flow_builder.ai_assistant_watching_label",
+    "value": "Watching:"
+  },
+  {
     "key": "flow_builder.ai_audio_enabled",
     "value": "Audio enabled"
   },
@@ -37732,12 +37776,20 @@
     "value": "Completed"
   },
   {
+    "key": "flow_builder.execution_history_contact_id",
+    "value": "Contact ID:"
+  },
+  {
     "key": "flow_builder.execution_history_context_snapshot",
     "value": "Execution path + context snapshot"
   },
   {
     "key": "flow_builder.execution_history_context_tab",
     "value": "Context"
+  },
+  {
+    "key": "flow_builder.execution_history_conversation_id",
+    "value": "Conversation ID:"
   },
   {
     "key": "flow_builder.execution_history_current_node",
@@ -37754,6 +37806,10 @@
   {
     "key": "flow_builder.execution_history_empty_filter",
     "value": "No executions match the current filter."
+  },
+  {
+    "key": "flow_builder.execution_history_execution_id",
+    "value": "Execution ID:"
   },
   {
     "key": "flow_builder.execution_history_identifiers",
@@ -37804,6 +37860,10 @@
     "value": "Run ID {{runId}}"
   },
   {
+    "key": "flow_builder.execution_history_run_id",
+    "value": "Run ID:"
+  },
+  {
     "key": "flow_builder.execution_history_run_tab",
     "value": "Run data"
   },
@@ -37830,6 +37890,10 @@
   {
     "key": "flow_builder.execution_history_select_step",
     "value": "Select a node execution from the timeline to inspect its data."
+  },
+  {
+    "key": "flow_builder.execution_history_session_id",
+    "value": "Session ID:"
   },
   {
     "key": "flow_builder.execution_history_started",
@@ -43136,6 +43200,10 @@
     "value": "📤 Output Support:"
   },
   {
+    "key": "flow_builder.n8n_request_timeout_seconds",
+    "value": "Request timeout: {{timeout}} seconds"
+  },
+  {
     "key": "flow_builder.n8n_required_fields_marked",
     "value": "Required fields are marked with *"
   },
@@ -43166,6 +43234,10 @@
   {
     "key": "flow_builder.n8n_test_connection_failed",
     "value": "Failed to test connection. Please check your configuration and try again."
+  },
+  {
+    "key": "flow_builder.n8n_timeout_badge",
+    "value": "Timeout: {{timeout}}s"
   },
   {
     "key": "flow_builder.n8n_timeout_help_default",
@@ -47564,12 +47636,24 @@
     "value": "Use your WooCommerce REST API credentials. In WordPress: WooCommerce → Settings → Advanced → REST API. Create a key with Read/Write permission. Your site must have SSL and pretty permalinks enabled."
   },
   {
+    "key": "flow_builder.woocommerce.help_connection_label",
+    "value": "Connection:"
+  },
+  {
     "key": "flow_builder.woocommerce.help_modules",
     "value": "Available modules: Coupons, Customers, Orders, Order notes, Products, Product attributes & terms, Product categories, Product variations, Reports, Payment gateways, Shipping zones, Tax rates."
   },
   {
+    "key": "flow_builder.woocommerce.help_modules_label",
+    "value": "Modules:"
+  },
+  {
     "key": "flow_builder.woocommerce.help_operation",
     "value": "Choose what to do with the selected resource (e.g. search, get one, create, update, delete). The operation determines the HTTP method used for the API call."
+  },
+  {
+    "key": "flow_builder.woocommerce.help_operation_label",
+    "value": "Operation:"
   },
   {
     "key": "flow_builder.woocommerce.hide",
@@ -49338,6 +49422,10 @@
   {
     "key": "knowledge_base.document.upload_first",
     "value": "Upload your first document to get started"
+  },
+  {
+    "key": "knowledge_base.document_list.close",
+    "value": "Close"
   },
   {
     "key": "knowledge_base.file_type",
@@ -54046,6 +54134,10 @@
   {
     "key": "profile.choose_preferred_language",
     "value": "Choose your preferred language for the interface."
+  },
+  {
+    "key": "profile.commercial_registration_number_ksa",
+    "value": "Commercial Registration Number (KSA)"
   },
   {
     "key": "profile.company_created",
@@ -59202,6 +59294,10 @@
   {
     "key": "settings.email_channel.signature_placeholder",
     "value": "Best regards, Support Team"
+  },
+  {
+    "key": "settings.email_channel.smtp_configuration",
+    "value": "SMTP Configuration"
   },
   {
     "key": "settings.email_channel.smtp_username_label",
@@ -66146,6 +66242,10 @@
   {
     "key": "subscription.status",
     "value": "Subscription Status"
+  },
+  {
+    "key": "subscription.usage_limits_exceeded",
+    "value": "Usage Limits Exceeded"
   },
   {
     "key": "tasks.actions",

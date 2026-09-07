@@ -4544,11 +4544,19 @@ async function resolveGroupMessageParticipant(
       notes: null
     };
     contact = await storage.getOrCreateContact(contactData);
-  } else if (pushName && contact.name === contact.phone) {
-    try {
-      contact = await storage.updateContact(contact.id, { name: pushName });
-    } catch (error) {
-      // best effort only
+  } else if (pushName && contact.name && contact.phone) {
+    // Compare digits only: the contact may have been created with a bare
+    // phoneNumber as its name but a "+"-prefixed phone (or vice versa), so a
+    // plain === here never matches and the placeholder name never gets
+    // upgraded once a real display name shows up.
+    const nameDigits = contact.name.replace(/\D/g, '');
+    const phoneDigits = contact.phone.replace(/\D/g, '');
+    if (nameDigits && nameDigits === phoneDigits) {
+      try {
+        contact = await storage.updateContact(contact.id, { name: pushName });
+      } catch (error) {
+        // best effort only
+      }
     }
   }
 
@@ -5072,16 +5080,21 @@ async function handleIncomingMessage(
         console.error('Error auto-adding contact to pipeline:', error);
       }
 
-    } else if (contactDisplayName && contact.name === contact.phone) {
-
-      try {
-        contact = await storage.updateContact(contact.id, {
-          name: contactDisplayName
-        });
-
-      } catch (updateError) {
-        console.error('Error updating contact name:', updateError);
-
+    } else if (contactDisplayName && contact.name && contact.phone) {
+      // Compare digits only: a contact created with a bare phoneNumber as its
+      // name but a "+"-prefixed phone (or vice versa) never matched with a
+      // plain ===, so the placeholder name was never upgraded once a real
+      // WhatsApp display name arrived on a later message.
+      const nameDigits = contact.name.replace(/\D/g, '');
+      const phoneDigits = contact.phone.replace(/\D/g, '');
+      if (nameDigits && nameDigits === phoneDigits) {
+        try {
+          contact = await storage.updateContact(contact.id, {
+            name: contactDisplayName
+          });
+        } catch (updateError) {
+          console.error('Error updating contact name:', updateError);
+        }
       }
     }
 
@@ -8688,7 +8701,10 @@ async function processHistorySyncData(
             const contactData = {
               companyId,
               name: contact.name || contact.notify || (contact as any).verifiedName || phoneNumber,
-              phone: phoneNumber,
+              // "+"-prefixed for consistency with contacts created from a live message
+              // (handleIncomingMessage) and with findWhatsAppInboundContactByPhone /
+              // getActiveContactByPhone, which build their lookup value as "+"+digits.
+              phone: `+${phoneNumber}`,
               email: null,
               avatarUrl: null,
               identifier: phoneNumber,
@@ -8729,7 +8745,8 @@ async function processHistorySyncData(
             const contactData = {
               companyId,
               name: chat.name || (chat as any).notify || (chat as any).pushName || phoneNumber,
-              phone: phoneNumber,
+              // See the contacts loop above for why this needs the "+" prefix.
+              phone: `+${phoneNumber}`,
               email: null,
               avatarUrl: null,
               identifier: phoneNumber,

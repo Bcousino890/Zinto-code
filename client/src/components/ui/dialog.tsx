@@ -64,9 +64,8 @@ const DialogContent = React.forwardRef<
         {children}
       </div>
       {showCloseButton && (
-        <DialogPrimitive.Close className={dialogCloseButtonClassName}>
+        <DialogPrimitive.Close className={dialogCloseButtonClassName} aria-label="Close dialog">
           <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       )}
     </DialogPrimitive.Content>

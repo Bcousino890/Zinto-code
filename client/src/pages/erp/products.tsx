@@ -1760,22 +1760,22 @@ export default function ERPProductsPage() {
                 <div>
                   <div className="font-medium">{t('erp.products.variants.title', 'Variants / SKUs')}</div>
                   <p className="text-xs text-muted-foreground">
-                    Use variants when one product has multiple sellable SKUs, such as sizes, colors, or packages. Each variant can have its own SKU and stock.
+                    {t('erp.products.variants.description', 'Use variants when one product has multiple sellable SKUs, such as sizes, colors, or packages. Each variant can have its own SKU and stock.')}
                   </p>
                 </div>
                 <div className="w-full max-w-full overflow-x-auto rounded-md border">
                   <Table className="min-w-[1220px]">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="min-w-[220px]">Name</TableHead>
-                      <TableHead className="min-w-[150px]">SKU</TableHead>
-                      <TableHead className="min-w-[150px]">Barcode</TableHead>
-                      <TableHead className="min-w-[120px]">Price</TableHead>
-                      <TableHead className="min-w-[120px]">Cost</TableHead>
-                      <TableHead className="min-w-[130px]">Status</TableHead>
-                      <TableHead className="min-w-[90px]">Sort</TableHead>
-                      <TableHead className="min-w-[330px]">Attributes</TableHead>
-                      <TableHead className="min-w-[150px] text-right">Actions</TableHead>
+                      <TableHead className="min-w-[220px]">{t('erp.products.variants.table.name', 'Name')}</TableHead>
+                      <TableHead className="min-w-[150px]">{t('erp.products.variants.table.sku', 'SKU')}</TableHead>
+                      <TableHead className="min-w-[150px]">{t('erp.products.variants.table.barcode', 'Barcode')}</TableHead>
+                      <TableHead className="min-w-[120px]">{t('erp.products.variants.table.price', 'Price')}</TableHead>
+                      <TableHead className="min-w-[120px]">{t('erp.products.variants.table.cost', 'Cost')}</TableHead>
+                      <TableHead className="min-w-[130px]">{t('erp.products.variants.table.status', 'Status')}</TableHead>
+                      <TableHead className="min-w-[90px]">{t('erp.products.variants.table.sort', 'Sort')}</TableHead>
+                      <TableHead className="min-w-[330px]">{t('erp.products.variants.table.attributes', 'Attributes')}</TableHead>
+                      <TableHead className="min-w-[150px] text-right">{t('erp.products.variants.table.actions', 'Actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1802,8 +1802,8 @@ export default function ERPProductsPage() {
                           }}>
                             <SelectTrigger className="min-w-[120px]"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="active">active</SelectItem>
-                              <SelectItem value="inactive">inactive</SelectItem>
+                              <SelectItem value="active">{t('erp.common.active', 'active')}</SelectItem>
+                              <SelectItem value="inactive">{t('erp.common.inactive', 'inactive')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
@@ -1873,20 +1873,20 @@ export default function ERPProductsPage() {
                               }}
                             >
                               <Plus className="mr-2 h-4 w-4" />
-                              Add attribute
+                              {t('erp.products.variants.add_attribute', 'Add attribute')}
                             </Button>
                           </div>
                         </TableCell>
                         <TableCell className="text-right space-x-2 whitespace-nowrap">
-                          <Button type="button" size="sm" onClick={() => saveVariantMutation.mutate(variant)}>Save</Button>
+                          <Button type="button" size="sm" onClick={() => saveVariantMutation.mutate(variant)}>{t('common.save', 'Save')}</Button>
                           {variant.id > 0 && (
-                            <Button type="button" variant="ghost" size="sm" onClick={() => deleteVariantMutation.mutate(variant.id)}>Delete</Button>
+                            <Button type="button" variant="ghost" size="sm" onClick={() => deleteVariantMutation.mutate(variant.id)}>{t('common.delete', 'Delete')}</Button>
                           )}
                         </TableCell>
                       </TableRow>
                     ))}
                     {activeVariants.length === 0 && (
-                      <TableRow><TableCell colSpan={9} className="text-muted-foreground text-sm">No variants yet.</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={9} className="text-muted-foreground text-sm">{t('erp.products.variants.empty', 'No variants yet.')}</TableCell></TableRow>
                     )}
                   </TableBody>
                   </Table>

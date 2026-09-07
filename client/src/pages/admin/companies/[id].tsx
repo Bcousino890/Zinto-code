@@ -657,16 +657,16 @@ export default function CompanyDetailPage() {
                           name="companyEmail"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Company Email</FormLabel>
+                              <FormLabel>{t('admin.companies.company_email_label', 'Company Email')}</FormLabel>
                               <FormControl>
                                 <Input
                                   type="email"
-                                  placeholder="info@company.com"
+                                  placeholder={t('admin.companies.company_email_placeholder', 'info@company.com')}
                                   {...field}
                                 />
                               </FormControl>
                               <FormDescription>
-                                Official email address for the company.
+                                {t('admin.companies.company_email_description', 'Official email address for the company.')}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -678,15 +678,15 @@ export default function CompanyDetailPage() {
                           name="contactPerson"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Contact Person</FormLabel>
+                              <FormLabel>{t('admin.companies.contact_person_label', 'Contact Person')}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="John Doe"
+                                  placeholder={t('admin.companies.contact_person_placeholder', 'John Doe')}
                                   {...field}
                                 />
                               </FormControl>
                               <FormDescription>
-                                Primary contact person for the company.
+                                {t('admin.companies.contact_person_description', 'Primary contact person for the company.')}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -698,10 +698,10 @@ export default function CompanyDetailPage() {
                           name="registerNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Commercial Registration Number (KSA)</FormLabel>
+                              <FormLabel>{t('admin.companies.registration_number_label', 'Commercial Registration Number (KSA)')}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="1234567890"
+                                  placeholder={t('admin.companies.registration_number_placeholder', '1234567890')}
                                   className="font-mono"
                                   maxLength={10}
                                   {...field}
@@ -712,7 +712,7 @@ export default function CompanyDetailPage() {
                                 />
                               </FormControl>
                               <FormDescription>
-                                Company's 10-digit Commercial Registration Number (CR) issued by the KSA Ministry of Commerce.
+                                {t('admin.companies.registration_number_description', "Company's 10-digit Commercial Registration Number (CR) issued by the KSA Ministry of Commerce.")}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>

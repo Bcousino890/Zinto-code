@@ -704,7 +704,7 @@ function PipelineSettingsTab() {
 
 
               <div>
-                <h3 className="text-sm font-medium mb-4">Stage Qualification Notification</h3>
+                <h3 className="text-sm font-medium mb-4">{t('settings.pipeline.stage_qualification_notification_title', 'Stage Qualification Notification')}</h3>
                 <div className="p-4 border rounded-lg space-y-4">
                   <div className="flex items-center justify-between gap-4">
                     <div className="space-y-1 flex-1">
@@ -729,7 +729,7 @@ function PipelineSettingsTab() {
                   </div>
                   {stageQualificationNotificationEnabled ? (
                     <div className="space-y-2">
-                      <Label htmlFor="stage-qualification-notification-message">Notification Message</Label>
+                      <Label htmlFor="stage-qualification-notification-message">{t('settings.pipeline.notification_message', 'Notification Message')}</Label>
                       <Textarea
                         id="stage-qualification-notification-message"
                         ref={notificationTextareaRef}
@@ -2273,18 +2273,18 @@ export default function Settings() {
       <Dialog open={showRenameModal} onOpenChange={setShowRenameModal}>
         <DialogContent className="w-[95vw] max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">Rename Channel</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">{t('settings.channels.rename_channel_title', 'Rename Channel')}</DialogTitle>
             <DialogDescription className="text-sm">
-              Enter a new name for this channel connection to help identify it better in your sidebar and conversations.
+              {t('settings.channels.rename_channel_description', 'Enter a new name for this channel connection to help identify it better in your sidebar and conversations.')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <Label htmlFor="channelName" className="mb-2 block text-sm">Channel Name</Label>
+            <Label htmlFor="channelName" className="mb-2 block text-sm">{t('settings.channels.channel_name', 'Channel Name')}</Label>
             <Input
               id="channelName"
               value={newChannelName}
               onChange={(e) => setNewChannelName(e.target.value)}
-              placeholder="Enter new channel name"
+              placeholder={t('settings.channels.enter_new_channel_name', 'Enter new channel name')}
               className="w-full"
             />
           </div>
@@ -2299,7 +2299,7 @@ export default function Settings() {
               }}
               className="w-full sm:w-auto"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               type="button"
@@ -2308,7 +2308,7 @@ export default function Settings() {
               onClick={handleRenameChannel}
               disabled={!newChannelName.trim()}
             >
-              Save
+              {t('common.save', 'Save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2380,11 +2380,11 @@ export default function Settings() {
       <Dialog open={showDisconnectWarning} onOpenChange={setShowDisconnectWarning}>
         <DialogContent className="w-[95vw] max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">Disconnect WhatsApp Number?</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">{t('settings.channels.disconnect_whatsapp_title', 'Disconnect WhatsApp Number?')}</DialogTitle>
             <DialogDescription className="text-sm">
               <div className="space-y-2 mt-2">
-                <p>Disconnecting will permanently deregister the phone number from WhatsApp Business API.</p>
-                <p>Messaging via this number will stop immediately after disconnection.</p>
+                <p>{t('settings.channels.disconnect_whatsapp_desc1', 'Disconnecting will permanently deregister the phone number from WhatsApp Business API.')}</p>
+                <p>{t('settings.channels.disconnect_whatsapp_desc2', 'Messaging via this number will stop immediately after disconnection.')}</p>
               </div>
             </DialogDescription>
           </DialogHeader>
@@ -2399,7 +2399,7 @@ export default function Settings() {
               className="w-full sm:w-auto"
               disabled={isDisconnectingEmbedded}
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               type="button"
@@ -2414,14 +2414,14 @@ export default function Settings() {
             >
               {isDisconnectingEmbedded ? (
                 <>
-                  <span className="mr-2">Disconnecting...</span>
+                  <span className="mr-2">{t('settings.channels.disconnecting', 'Disconnecting...')}</span>
                   <svg className="animate-spin h-4 w-4 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 </>
               ) : (
-                'Disconnect'
+                t('common.disconnect', 'Disconnect')
               )}
             </Button>
           </DialogFooter>
@@ -3046,7 +3046,7 @@ export default function Settings() {
                   <div className="space-y-6">
                     {/* Connected Channels */}
                     <div>
-                      <h3 className="text-base sm:text-lg font-medium mb-4">Connected Channels</h3>
+                      <h3 className="text-base sm:text-lg font-medium mb-4">{t('settings.channel_connections.connected_channels', 'Connected Channels')}</h3>
                       <div className="space-y-4">
                         {channelConnections.map((connection: any) => {
                           const channelInfo = getChannelInfo(connection.channelType);
@@ -3183,8 +3183,8 @@ export default function Settings() {
                                         className="btn-brand-primary text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 text-xs sm:text-sm"
                                         onClick={() => handleOpenEditEmailModal(connection.id)}
                                       >
-                                        <span className="hidden sm:inline">Edit</span>
-                                        <span className="sm:hidden">Edit</span>
+                                        <span className="hidden sm:inline">{t('common.edit', 'Edit')}</span>
+                                        <span className="sm:hidden">{t('common.edit', 'Edit')}</span>
                                       </Button>
                                     )}
 
@@ -3200,14 +3200,14 @@ export default function Settings() {
                                         {syncingChannels.has(connection.id) ? (
                                           <>
                                             <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                            <span className="hidden sm:inline">Syncing...</span>
-                                            <span className="sm:hidden">Sync...</span>
+                                            <span className="hidden sm:inline">{t('settings.channels.syncing', 'Syncing...')}</span>
+                                            <span className="sm:hidden">{t('settings.channels.syncing_short', 'Sync...')}</span>
                                           </>
                                         ) : (
                                           <>
                                             <RefreshCw className="h-3 w-3 mr-1" />
-                                            <span className="hidden sm:inline">Sync</span>
-                                            <span className="sm:hidden">Sync</span>
+                                            <span className="hidden sm:inline">{t('settings.channels.sync', 'Sync')}</span>
+                                            <span className="sm:hidden">{t('settings.channels.sync', 'Sync')}</span>
                                           </>
                                         )}
                                       </Button>
@@ -3221,8 +3221,8 @@ export default function Settings() {
                                         className="btn-brand-primary text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 text-xs sm:text-sm"
                                         onClick={() => handleOpenEditWhatsAppModal(connection.id)}
                                       >
-                                        <span className="hidden sm:inline">Edit</span>
-                                        <span className="sm:hidden">Edit</span>
+                                        <span className="hidden sm:inline">{t('common.edit', 'Edit')}</span>
+                                        <span className="sm:hidden">{t('common.edit', 'Edit')}</span>
                                       </Button>
                                     )}
 
@@ -3235,8 +3235,8 @@ export default function Settings() {
                                         className="btn-brand-primary text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 text-xs sm:text-sm"
                                         onClick={() => handleOpenEditMessengerModal(connection.id)}
                                       >
-                                        <span className="hidden sm:inline">Edit</span>
-                                        <span className="sm:hidden">Edit</span>
+                                        <span className="hidden sm:inline">{t('common.edit', 'Edit')}</span>
+                                        <span className="sm:hidden">{t('common.edit', 'Edit')}</span>
                                       </Button>
                                     )}
 
@@ -3249,8 +3249,8 @@ export default function Settings() {
                                           className="btn-brand-primary text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 text-xs sm:text-sm"
                                           onClick={() => handleOpenEditWebChatModal(connection.id)}
                                         >
-                                          <span className="hidden sm:inline">Edit</span>
-                                          <span className="sm:hidden">Edit</span>
+                                          <span className="hidden sm:inline">{t('common.edit', 'Edit')}</span>
+                                          <span className="sm:hidden">{t('common.edit', 'Edit')}</span>
                                         </Button>
                                         <Button
                                           variant="brand"
@@ -3258,8 +3258,8 @@ export default function Settings() {
                                           className="btn-brand-primary text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-500 text-xs sm:text-sm"
                                           onClick={() => handleCopyWebChatEmbed(connection.id)}
                                         >
-                                          <span className="hidden sm:inline">Copy Embed</span>
-                                          <span className="sm:hidden">Embed</span>
+                                          <span className="hidden sm:inline">{t('settings.channels.copy_embed', 'Copy Embed')}</span>
+                                          <span className="sm:hidden">{t('settings.channels.embed', 'Embed')}</span>
                                         </Button>
                                       </div>
                                     )}
@@ -3272,8 +3272,8 @@ export default function Settings() {
                                         className="btn-brand-primary text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 text-xs sm:text-sm"
                                         onClick={() => handleOpenEditInstagramModal(connection.id)}
                                       >
-                                        <span className="hidden sm:inline">Edit</span>
-                                        <span className="sm:hidden">Edit</span>
+                                        <span className="hidden sm:inline">{t('common.edit', 'Edit')}</span>
+                                        <span className="sm:hidden">{t('common.edit', 'Edit')}</span>
                                       </Button>
                                     )}
 
@@ -3285,8 +3285,8 @@ export default function Settings() {
                                         className="btn-brand-primary text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 text-xs sm:text-sm"
                                         onClick={() => handleOpenEditTelegramModal(connection.id)}
                                       >
-                                        <span className="hidden sm:inline">Edit</span>
-                                        <span className="sm:hidden">Edit</span>
+                                        <span className="hidden sm:inline">{t('common.edit', 'Edit')}</span>
+                                        <span className="sm:hidden">{t('common.edit', 'Edit')}</span>
                                       </Button>
                                     )}
 
@@ -3296,19 +3296,19 @@ export default function Settings() {
                                         {connection.status === 'active' && (
                                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400">
                                             <span className="w-2 h-2 mr-1 bg-green-500 dark:bg-green-400 rounded-full"></span>
-                                            Active
+                                            {t('common.active', 'Active')}
                                           </span>
                                         )}
                                         {connection.status === 'error' && (
                                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400">
                                             <span className="w-2 h-2 mr-1 bg-red-500 dark:bg-red-400 rounded-full"></span>
-                                            Error
+                                            {t('common.error', 'Error')}
                                           </span>
                                         )}
                                         {connection.status === 'disconnected' && (
                                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                                             <span className="w-2 h-2 mr-1 bg-muted-foreground rounded-full"></span>
-                                            Disconnected
+                                            {t('common.disconnected', 'Disconnected')}
                                           </span>
                                         )}
                                       </div>
@@ -3322,8 +3322,8 @@ export default function Settings() {
                                         className="btn-brand-primary text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 text-xs sm:text-sm"
                                         onClick={() => handleOpenEditTikTokModal(connection.id)}
                                       >
-                                        <span className="hidden sm:inline">View Details</span>
-                                        <span className="sm:hidden">Details</span>
+                                        <span className="hidden sm:inline">{t('settings.channels.view_details', 'View Details')}</span>
+                                        <span className="sm:hidden">{t('settings.channels.details', 'Details')}</span>
                                       </Button>
                                     )}
 
@@ -3335,8 +3335,8 @@ export default function Settings() {
                                         className="btn-brand-primary text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 text-xs sm:text-sm"
                                         onClick={() => handleOpenEditTwilioSmsModal(connection.id)}
                                       >
-                                        <span className="hidden sm:inline">Edit</span>
-                                        <span className="sm:hidden">Edit</span>
+                                        <span className="hidden sm:inline">{t('common.edit', 'Edit')}</span>
+                                        <span className="sm:hidden">{t('common.edit', 'Edit')}</span>
                                       </Button>
                                     )}
 
@@ -3348,8 +3348,8 @@ export default function Settings() {
                                         className="btn-brand-primary text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 text-xs sm:text-sm"
                                         onClick={() => handleOpenEditTwilioVoiceModal(connection.id)}
                                       >
-                                        <span className="hidden sm:inline">Edit</span>
-                                        <span className="sm:hidden">Edit</span>
+                                        <span className="hidden sm:inline">{t('common.edit', 'Edit')}</span>
+                                        <span className="sm:hidden">{t('common.edit', 'Edit')}</span>
                                       </Button>
                                     )}
 
@@ -3361,8 +3361,8 @@ export default function Settings() {
                                       className="btn-brand-primary text-blue-500 hover:text-blue-700 text-xs sm:text-sm"
                                       onClick={() => handleOpenRenameModal(connection.id, connection.accountName)}
                                     >
-                                      <span className="hidden sm:inline">Rename</span>
-                                      <span className="sm:hidden">Rename</span>
+                                      <span className="hidden sm:inline">{t('common.rename', 'Rename')}</span>
+                                      <span className="sm:hidden">{t('common.rename', 'Rename')}</span>
                                     </Button>
 
                                     {/* Disconnect button for embedded signup WhatsApp connections */}
@@ -3383,13 +3383,13 @@ export default function Settings() {
                                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
-                                            <span className="hidden sm:inline">Disconnecting...</span>
-                                            <span className="sm:hidden">Disconnecting...</span>
+                                            <span className="hidden sm:inline">{t('settings.channels.disconnecting', 'Disconnecting...')}</span>
+                                            <span className="sm:hidden">{t('settings.channels.disconnecting', 'Disconnecting...')}</span>
                                           </>
                                         ) : (
                                           <>
-                                            <span className="hidden sm:inline">Disconnect</span>
-                                            <span className="sm:hidden">Disconnect</span>
+                                            <span className="hidden sm:inline">{t('common.disconnect', 'Disconnect')}</span>
+                                            <span className="sm:hidden">{t('common.disconnect', 'Disconnect')}</span>
                                           </>
                                         )}
                                       </Button>
@@ -3404,8 +3404,8 @@ export default function Settings() {
                                         className="btn-brand-primary text-orange-500 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-500 text-xs sm:text-sm"
                                         onClick={() => handleDisconnectChannel(connection.id)}
                                       >
-                                        <span className="hidden sm:inline">Disconnect</span>
-                                        <span className="sm:hidden">Disconnect</span>
+                                        <span className="hidden sm:inline">{t('common.disconnect', 'Disconnect')}</span>
+                                        <span className="sm:hidden">{t('common.disconnect', 'Disconnect')}</span>
                                       </Button>
                                     )}
 
@@ -3415,8 +3415,8 @@ export default function Settings() {
                                       className="btn-brand-primary text-red-500 hover:text-red-700 text-xs sm:text-sm"
                                       onClick={() => handleDeleteChannel(connection.id)}
                                     >
-                                      <span className="hidden sm:inline">Delete</span>
-                                      <span className="sm:hidden">Delete</span>
+                                      <span className="hidden sm:inline">{t('common.delete', 'Delete')}</span>
+                                      <span className="sm:hidden">{t('common.delete', 'Delete')}</span>
                                     </Button>
                                   </div>
                                 </div>
@@ -3427,10 +3427,9 @@ export default function Settings() {
                                   <div className="flex items-start">
                                     <i className="ri-error-warning-line text-yellow-500 dark:text-yellow-400 mr-2 mt-0.5"></i>
                                     <div>
-                                      <p className="text-sm text-yellow-700 dark:text-yellow-400 font-medium">Unofficial Connection</p>
+                                      <p className="text-sm text-yellow-700 dark:text-yellow-400 font-medium">{t('settings.channel_connections.unofficial_connection', 'Unofficial Connection')}</p>
                                       <p className="text-xs text-yellow-600 dark:text-yellow-400">
-                                        This connection is not using the official WhatsApp Business API.
-                                        It may have limitations and could be subject to blocking by WhatsApp.
+                                        {t('settings.channel_connections.unofficial_connection_desc', 'This connection is not using the official WhatsApp Business API. It may have limitations and could be subject to blocking by WhatsApp.')}
                                       </p>
                                     </div>
                                   </div>
@@ -3442,10 +3441,9 @@ export default function Settings() {
                                   <div className="flex items-start">
                                     <i className="ri-check-line text-green-500 dark:text-green-400 mr-2 mt-0.5"></i>
                                     <div>
-                                      <p className="text-sm text-green-700 dark:text-green-400 font-medium">Official WhatsApp Business API (Meta)</p>
+                                      <p className="text-sm text-green-700 dark:text-green-400 font-medium">{t('settings.channel_connections.official_whatsapp_api', 'Official WhatsApp Business API (Meta)')}</p>
                                       <p className="text-xs text-green-600 dark:text-green-400">
-                                        This connection uses the official WhatsApp Business API from Meta.
-                                        It provides reliable messaging with advanced features and compliance.
+                                        {t('settings.channel_connections.official_whatsapp_api_desc', 'This connection uses the official WhatsApp Business API from Meta. It provides reliable messaging with advanced features and compliance.')}
                                       </p>
                                     </div>
                                   </div>
@@ -3460,17 +3458,17 @@ export default function Settings() {
                     </div>
 
                     <div>
-                      <h3 className="text-base sm:text-lg font-medium mb-4">Add New Channel</h3>
+                      <h3 className="text-base sm:text-lg font-medium mb-4">{t('settings.channel_connections.add_new_channel', 'Add New Channel')}</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                         <div className="border border-border rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-accent cursor-pointer transition-colors" onClick={() => handleConnectChannel('WhatsApp Business API')}>
                           <i className="ri-whatsapp-line text-2xl sm:text-3xl mb-2" style={{ color: '#25D366' }}></i>
-                          <h4 className="font-medium text-sm sm:text-base text-center">WhatsApp Business API (Meta)</h4>
-                          <p className="text-xs text-muted-foreground text-center mt-1">Official Meta WhatsApp Business API</p>
+                          <h4 className="font-medium text-sm sm:text-base text-center">{t('settings.channel_cards.whatsapp_business_api_meta', 'WhatsApp Business API (Meta)')}</h4>
+                          <p className="text-xs text-muted-foreground text-center mt-1">{t('settings.channel_cards.whatsapp_business_api_meta_desc', 'Official Meta WhatsApp Business API')}</p>
                           <Button className="mt-3 w-full text-xs py-1" variant="outline" onClick={(e) => {
                             e.stopPropagation();
                             handleConnectChannel('WhatsApp Business Embedded');
                           }}>
-                            Easy Setup
+                            {t('settings.channel_cards.easy_setup', 'Easy Setup')}
                           </Button>
                         </div>
 
@@ -3483,10 +3481,10 @@ export default function Settings() {
 
                         <div className="border border-border rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-accent cursor-pointer transition-colors" onClick={() => handleConnectChannel('WhatsApp Unofficial')}>
                           <i className="ri-whatsapp-line text-2xl sm:text-3xl mb-2" style={{ color: '#25D366' }}></i>
-                          <h4 className="font-medium text-sm sm:text-base text-center">WhatsApp QR Code</h4>
+                          <h4 className="font-medium text-sm sm:text-base text-center">{t('settings.channel_cards.whatsapp_qr_code', 'WhatsApp QR Code')}</h4>
                           <p className="text-xs text-muted-foreground text-center mt-1">
                             <i className="ri-error-warning-line mr-1"></i>
-                            Non-official connection
+                            {t('settings.channel_cards.whatsapp_qr_code_desc', 'Non-official connection')}
                           </p>
                         </div>
 
@@ -3516,8 +3514,8 @@ export default function Settings() {
 
                         <div className="border border-border rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-accent cursor-pointer transition-colors" onClick={() => handleConnectChannel('TikTok')}>
                           <i className="ri-tiktok-line text-2xl sm:text-3xl mb-2"></i>
-                          <h4 className="font-medium text-sm sm:text-base text-center">TikTok</h4>
-                          <p className="text-xs text-muted-foreground text-center mt-1">Business Messaging</p>
+                          <h4 className="font-medium text-sm sm:text-base text-center">{t('settings.channel_cards.tiktok', 'TikTok')}</h4>
+                          <p className="text-xs text-muted-foreground text-center mt-1">{t('settings.channel_cards.tiktok_desc', 'Business Messaging')}</p>
                         </div>
 
                         <div className="border border-border rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-accent cursor-pointer transition-colors" onClick={() => handleConnectChannel('Telegram')}>
@@ -3528,8 +3526,8 @@ export default function Settings() {
 
                         <div className="border border-border rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-accent cursor-pointer transition-colors" onClick={() => handleConnectChannel('Email')}>
                           <i className="ri-mail-line text-2xl sm:text-3xl mb-2" style={{ color: '#3B82F6' }}></i>
-                          <h4 className="font-medium text-sm sm:text-base text-center">Email</h4>
-                          <p className="text-xs text-muted-foreground text-center mt-1">IMAP/SMTP Email Integration</p>
+                          <h4 className="font-medium text-sm sm:text-base text-center">{t('settings.channel_cards.email', 'Email')}</h4>
+                          <p className="text-xs text-muted-foreground text-center mt-1">{t('settings.channel_cards.email_desc', 'IMAP/SMTP Email Integration')}</p>
                         </div>
 
                         <div className="border border-border rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-accent cursor-pointer transition-colors" onClick={() => handleConnectChannel('WebChat')}>
@@ -3538,8 +3536,8 @@ export default function Settings() {
                             alt="WebChat"
                             className="w-7 h-7 sm:w-8 sm:h-8 mb-2 rounded"
                           />
-                          <h4 className="font-medium text-sm sm:text-base text-center">WebChat</h4>
-                          <p className="text-xs text-muted-foreground text-center mt-1">Chat widget for your website</p>
+                          <h4 className="font-medium text-sm sm:text-base text-center">{t('settings.channel_cards.webchat', 'WebChat')}</h4>
+                          <p className="text-xs text-muted-foreground text-center mt-1">{t('settings.channel_cards.webchat_desc', 'Chat widget for your website')}</p>
                         </div>
 
                         <div
@@ -3547,8 +3545,8 @@ export default function Settings() {
                           onClick={() => handleConnectChannel('Voice Calls')}
                         >
                           <TwilioIcon className="h-6 w-6 sm:h-6 sm:w-6 mb-2" style={{ color: '#F22F46' }} />
-                          <h4 className="font-medium text-sm sm:text-base text-center">Voice Calls</h4>
-                          <p className="text-xs text-muted-foreground text-center mt-1">Voice Calls (Basic & AI-Powered)</p>
+                          <h4 className="font-medium text-sm sm:text-base text-center">{t('settings.channel_cards.voice_calls', 'Voice Calls')}</h4>
+                          <p className="text-xs text-muted-foreground text-center mt-1">{t('settings.channel_cards.voice_calls_desc', 'Voice Calls (Basic & AI-Powered)')}</p>
                         </div>
 
                           <div
@@ -3556,8 +3554,8 @@ export default function Settings() {
                             onClick={() => handleConnectChannel('Twilio SMS')}
                           >
                             <TwilioIcon className="h-6 w-6 sm:h-6 sm:w-6 mb-2" style={{ color: '#F22F46' }} />
-                            <h4 className="font-medium text-sm sm:text-base text-center">Twilio SMS</h4>
-                            <p className="text-xs text-muted-foreground text-center mt-1">Programmable Messaging (SMS/MMS)</p>
+                            <h4 className="font-medium text-sm sm:text-base text-center">{t('settings.channel_cards.twilio_sms', 'Twilio SMS')}</h4>
+                            <p className="text-xs text-muted-foreground text-center mt-1">{t('settings.channel_cards.twilio_sms_desc', 'Programmable Messaging (SMS/MMS)')}</p>
                           </div>
                       </div>
                     </div>

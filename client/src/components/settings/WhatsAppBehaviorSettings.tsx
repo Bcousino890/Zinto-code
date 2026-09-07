@@ -508,7 +508,7 @@ export function WhatsAppBehaviorSettings() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="recordingMinDelay">Recording Min Delay (seconds)</Label>
+                  <Label htmlFor="recordingMinDelay">{t('settings.whatsapp.recording_min_delay', 'Recording Min Delay (seconds)')}</Label>
                   <Input
                     id="recordingMinDelay"
                     type="number"
@@ -524,12 +524,12 @@ export function WhatsAppBehaviorSettings() {
                     placeholder="e.g., 2.0"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Minimum time to show recording indicator (1-10 seconds)
+                    {t('settings.whatsapp.recording_min_delay_desc', 'Minimum time to show recording indicator (1-10 seconds)')}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="recordingMaxDelay">Recording Max Delay (seconds)</Label>
+                  <Label htmlFor="recordingMaxDelay">{t('settings.whatsapp.recording_max_delay', 'Recording Max Delay (seconds)')}</Label>
                   <Input
                     id="recordingMaxDelay"
                     type="number"
@@ -545,7 +545,7 @@ export function WhatsAppBehaviorSettings() {
                     placeholder="e.g., 4.0"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Maximum time to show recording indicator (2-15 seconds)
+                    {t('settings.whatsapp.recording_max_delay_desc', 'Maximum time to show recording indicator (2-15 seconds)')}
                   </p>
                 </div>
               </div>
@@ -759,7 +759,7 @@ export function WhatsAppBehaviorSettings() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="randomDelayFactor">Random Delay Factor</Label>
+                  <Label htmlFor="randomDelayFactor">{t('settings.whatsapp.random_delay_factor', 'Random Delay Factor')}</Label>
                   <div className="px-3">
                     <Slider
                       id="randomDelayFactor"
@@ -783,7 +783,7 @@ export function WhatsAppBehaviorSettings() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="minChunkSize">Minimum Chunk Size</Label>
+                  <Label htmlFor="minChunkSize">{t('settings.whatsapp.minimum_chunk_size', 'Minimum Chunk Size')}</Label>
                   <Input
                     id="minChunkSize"
                     type="number"
@@ -795,7 +795,7 @@ export function WhatsAppBehaviorSettings() {
                     }
                   />
                   <p className="text-xs text-muted-foreground">
-                    Minimum characters per chunk to avoid very short messages
+                    {t('settings.whatsapp.minimum_chunk_size_desc', 'Minimum characters per chunk to avoid very short messages')}
                   </p>
                 </div>
               </div>
@@ -803,9 +803,9 @@ export function WhatsAppBehaviorSettings() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Preserve Formatting</Label>
+                    <Label className="text-base">{t('settings.whatsapp.preserve_formatting', 'Preserve Formatting')}</Label>
                     <div className="text-sm text-muted-foreground">
-                      Maintain markdown and text formatting when splitting messages
+                      {t('settings.whatsapp.preserve_formatting_desc', 'Maintain markdown and text formatting when splitting messages')}
                     </div>
                   </div>
                   <Switch
@@ -818,9 +818,9 @@ export function WhatsAppBehaviorSettings() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Smart Boundary Detection</Label>
+                    <Label className="text-base">{t('settings.whatsapp.smart_boundary_detection', 'Smart Boundary Detection')}</Label>
                     <div className="text-sm text-muted-foreground">
-                      Intelligently split at sentence and clause boundaries
+                      {t('settings.whatsapp.smart_boundary_detection_desc', 'Intelligently split at sentence and clause boundaries')}
                     </div>
                   </div>
                   <Switch
@@ -833,9 +833,9 @@ export function WhatsAppBehaviorSettings() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Prioritize Sentence Boundaries</Label>
+                    <Label className="text-base">{t('settings.whatsapp.prioritize_sentence_boundaries', 'Prioritize Sentence Boundaries')}</Label>
                     <div className="text-sm text-muted-foreground">
-                      Prefer splitting at sentence endings over character limits
+                      {t('settings.whatsapp.prioritize_sentence_boundaries_desc', 'Prefer splitting at sentence endings over character limits')}
                     </div>
                   </div>
                   <Switch
@@ -1099,9 +1099,7 @@ export function WhatsAppBehaviorSettings() {
       <Alert>
         <Info className="h-4 w-4" />
         <AlertDescription>
-          These settings apply to all WhatsApp channels and take effect immediately after saving.
-          Typing indicators make bot responses feel more human-like, while message splitting
-          improves readability for long responses.
+          {t('settings.whatsapp.alert_description', 'These settings apply to all WhatsApp channels and take effect immediately after saving. Typing indicators make bot responses feel more human-like, while message splitting improves readability for long responses.')}
         </AlertDescription>
       </Alert>
     </div>

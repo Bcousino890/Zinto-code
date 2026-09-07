@@ -12,6 +12,7 @@ import { ContactCustomFieldsBadges } from '@/components/contacts/ContactCustomFi
 import { useCompanyContactCustomFields } from '@/hooks/use-company-contact-custom-fields';
 import { Button } from '@/components/ui/button';
 import { Users, Phone, Tag, Trash2, ChevronDown, ChevronRight, Mail, Calendar, Activity } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 
 interface ContactPreview {
@@ -37,6 +38,7 @@ export function ContactPreviewTable({
   onExclude,
   className,
 }: ContactPreviewTableProps) {
+  const { t } = useTranslation();
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const { data: companyCustomFields = [] } = useCompanyContactCustomFields();
 
@@ -58,10 +60,10 @@ export function ContactPreviewTable({
         <TableHeader>
           <TableRow>
             <TableHead className="w-10"></TableHead>
-            <TableHead>Contact Name</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Tags</TableHead>
-            <TableHead className="w-20">Actions</TableHead>
+            <TableHead>{t('contacts.preview_table.contact_name', 'Contact Name')}</TableHead>
+            <TableHead>{t('contacts.preview_table.phone', 'Phone')}</TableHead>
+            <TableHead>{t('contacts.preview_table.tags', 'Tags')}</TableHead>
+            <TableHead className="w-20">{t('contacts.preview_table.actions', 'Actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -109,7 +111,7 @@ export function ContactPreviewTable({
                         )}
                       </div>
                     ) : (
-                      <span className="text-muted-foreground text-sm">-</span>
+                      <span className="text-muted-foreground text-sm">{t('contacts.preview_table.no_tags', '-')}</span>
                     )}
                     <ContactCustomFieldsBadges customFields={contact.customFields} schema={companyCustomFields} maxVisible={2} className="mt-1" />
                   </TableCell>
@@ -139,27 +141,27 @@ export function ContactPreviewTable({
                         <div className="grid grid-cols-2 gap-4">
                           <div className="flex items-center gap-2">
                             <Mail className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Email:</span>
+                            <span className="text-muted-foreground">{t('contacts.preview_table.email_label', 'Email')}:</span>
                             <span>{contact.email || '-'}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Created:</span>
+                            <span className="text-muted-foreground">{t('contacts.preview_table.created_label', 'Created')}:</span>
                             <span>{new Date(contact.createdAt).toLocaleDateString()}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Activity className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Last Activity:</span>
+                            <span className="text-muted-foreground">{t('contacts.preview_table.last_activity_label', 'Last Activity')}:</span>
                             <span>
                               {contact.lastActivity
                                 ? new Date(contact.lastActivity).toLocaleDateString()
-                                : 'No activity'}
+                                : t('contacts.preview_table.no_activity', 'No activity')}
                             </span>
                           </div>
                           {contact.company && (
                             <div className="flex items-center gap-2">
                               <Users className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-muted-foreground">Company:</span>
+                              <span className="text-muted-foreground">{t('contacts.preview_table.company_label', 'Company')}:</span>
                               <span>{contact.company}</span>
                             </div>
                           )}

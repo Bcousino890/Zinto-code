@@ -164,7 +164,7 @@ export default function AdminForgotPasswordPage() {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30">
                 <Mail className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
-              <CardTitle className="mt-4">Check your email</CardTitle>
+              <CardTitle className="mt-4">{t('admin.forgot_password.check_email_title', 'Check your email')}</CardTitle>
               <CardDescription>
                 We've sent an admin password reset link to <strong>{email}</strong>
               </CardDescription>
@@ -231,7 +231,7 @@ export default function AdminForgotPasswordPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Admin Email Address</Label>
+                <Label htmlFor="email">{t('admin.forgot_password.email_label', 'Admin Email Address')}</Label>
                 <Input
                   id="email"
                   type="email"

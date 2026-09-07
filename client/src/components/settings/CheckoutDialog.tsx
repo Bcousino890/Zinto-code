@@ -262,8 +262,8 @@ export function CheckoutDialog({
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "Copied to clipboard",
-      description: "The information has been copied to your clipboard.",
+      title: t('common.checkout.copied_to_clipboard', 'Copied to clipboard'),
+      description: t('common.checkout.info_copied', 'The information has been copied to your clipboard.'),
     });
   };
 
@@ -273,8 +273,8 @@ export function CheckoutDialog({
     onClose();
     onSuccess();
     toast({
-      title: "Payment Instructions Received",
-      description: "Please complete the bank transfer. Your subscription will be activated once payment is confirmed.",
+      title: t('common.checkout.instructions_received', 'Payment Instructions Received'),
+      description: t('common.checkout.bank_transfer_confirm', 'Please complete the bank transfer. Your subscription will be activated once payment is confirmed.'),
     });
   };
 
@@ -313,8 +313,8 @@ export function CheckoutDialog({
           script.onerror = (error) => {
             console.error('Failed to load Moyasar script:', error);
             toast({
-              title: "Payment System Error",
-              description: "Failed to load payment system. Please try again.",
+              title: t('common.checkout.payment_error', 'Payment System Error'),
+              description: t('common.checkout.load_failed', 'Failed to load payment system. Please try again.'),
               variant: "destructive"
             });
           };
@@ -345,8 +345,8 @@ export function CheckoutDialog({
           } catch (error) {
             console.error('Error initializing Moyasar form:', error);
             toast({
-              title: "Payment System Error",
-              description: "Failed to initialize payment form. Please try again.",
+              title: t('common.checkout.payment_error', 'Payment System Error'),
+              description: t('common.checkout.init_failed', 'Failed to initialize payment form. Please try again.'),
               variant: "destructive"
             });
           }
@@ -366,26 +366,26 @@ export function CheckoutDialog({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-500" />
-              Bank Transfer Instructions
+              {t('common.checkout.bank_transfer_instructions', 'Bank Transfer Instructions')}
             </DialogTitle>
             <DialogDescription>
-              Please transfer the exact amount to the following bank account. Your subscription will be activated once we confirm the payment.
+              {t('common.checkout.transfer_description', 'Please transfer the exact amount to the following bank account. Your subscription will be activated once we confirm the payment.')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Payment Details</CardTitle>
+                <CardTitle className="text-lg">{t('common.checkout.payment_details', 'Payment Details')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                  <span className="font-semibold">Amount:</span>
+                  <span className="font-semibold">{t('common.checkout.amount', 'Amount:')} </span>
                   <span className="text-lg font-bold">{formatCurrency(plan?.price || 0)}</span>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Account Name</Label>
+                  <Label className="text-sm font-medium">{t('common.checkout.account_name', 'Account Name')}</Label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 p-2 bg-muted rounded text-sm">
                       {bankTransferDetails.bankDetails?.accountName}
@@ -401,7 +401,7 @@ export function CheckoutDialog({
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Account Number</Label>
+                  <Label className="text-sm font-medium">{t('common.checkout.account_number', 'Account Number')}</Label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 p-2 bg-muted rounded text-sm font-mono">
                       {bankTransferDetails.bankDetails?.accountNumber}
@@ -417,7 +417,7 @@ export function CheckoutDialog({
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Bank Name</Label>
+                  <Label className="text-sm font-medium">{t('common.checkout.bank_name', 'Bank Name')}</Label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 p-2 bg-muted rounded text-sm">
                       {bankTransferDetails.bankDetails?.bankName}
@@ -434,7 +434,7 @@ export function CheckoutDialog({
 
                 {bankTransferDetails.bankDetails?.routingNumber && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Routing Number</Label>
+                    <Label className="text-sm font-medium">{t('common.checkout.routing_number', 'Routing Number')}</Label>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 p-2 bg-muted rounded text-sm font-mono">
                         {bankTransferDetails.bankDetails.routingNumber}
@@ -452,7 +452,7 @@ export function CheckoutDialog({
 
                 {bankTransferDetails.bankDetails?.swiftCode && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">SWIFT Code</Label>
+                    <Label className="text-sm font-medium">{t('common.checkout.swift_code', 'SWIFT Code')}</Label>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 p-2 bg-muted rounded text-sm font-mono">
                         {bankTransferDetails.bankDetails.swiftCode}
@@ -469,7 +469,7 @@ export function CheckoutDialog({
                 )}
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Payment Reference</Label>
+                  <Label className="text-sm font-medium">{t('common.checkout.payment_reference', 'Payment Reference')}</Label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm font-mono">
                       {bankTransferDetails.bankDetails?.reference}
@@ -483,13 +483,13 @@ export function CheckoutDialog({
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    ⚠️ Please include this reference in your transfer to ensure quick processing
+                    {t('common.checkout.reference_note', '⚠️ Please include this reference in your transfer to ensure quick processing')}
                   </p>
                 </div>
 
                 {bankTransferDetails.bankDetails?.instructions && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Additional Instructions</Label>
+                    <Label className="text-sm font-medium">{t('common.checkout.additional_instructions', 'Additional Instructions')}</Label>
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded text-sm">
                       {bankTransferDetails.bankDetails.instructions}
                     </div>
@@ -499,22 +499,22 @@ export function CheckoutDialog({
             </Card>
 
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <h4 className="font-medium text-amber-800 mb-2">Important Notes:</h4>
+              <h4 className="font-medium text-amber-800 mb-2">{t('common.checkout.important_notes', 'Important Notes:')}</h4>
               <ul className="text-sm text-amber-700 space-y-1">
-                <li>• Please transfer the exact amount shown above</li>
-                <li>• Include the payment reference in your transfer</li>
-                <li>• Processing may take 1-3 business days</li>
-                <li>• You'll receive an email confirmation once payment is verified</li>
+                <li>• {t('common.checkout.note_1', 'Please transfer the exact amount shown above')}</li>
+                <li>• {t('common.checkout.note_2', 'Include the payment reference in your transfer')}</li>
+                <li>• {t('common.checkout.note_3', 'Processing may take 1-3 business days')}</li>
+                <li>• {t('common.checkout.note_4', "You'll receive an email confirmation once payment is verified")}</li>
               </ul>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={onClose}>
-              Close
+              {t('ui.common.close', 'Close')}
             </Button>
             <Button onClick={handleBankTransferComplete}>
-              I've Made the Transfer
+              {t('common.checkout.made_transfer', "I've Made the Transfer")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -528,22 +528,22 @@ export function CheckoutDialog({
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleMoyasarCancel()}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Complete Payment - {plan.name}</DialogTitle>
+            <DialogTitle>{t('common.checkout.complete_payment', 'Complete Payment')} - {plan.name}</DialogTitle>
             <DialogDescription>
-              Enter your card details to complete the payment securely with Moyasar.
+              {t('common.checkout.enter_card_details', 'Enter your card details to complete the payment securely with Moyasar.')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
             <div className="mb-4">
-              <h3 className="text-sm font-medium mb-2">Payment Summary</h3>
+              <h3 className="text-sm font-medium mb-2">{t('common.checkout.payment_summary', 'Payment Summary')}</h3>
               <div className="bg-muted p-3 rounded-md">
                 <div className="flex justify-between mb-2">
-                  <span className="text-muted-foreground">Plan:</span>
+                  <span className="text-muted-foreground">{t('common.checkout.plan', 'Plan:')}</span>
                   <span className="font-medium">{plan.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Amount:</span>
+                  <span className="text-muted-foreground">{t('common.checkout.amount', 'Amount:')}</span>
                   <span className="font-medium">{formatCurrency(moyasarConfig.amount / 100)}</span>
                 </div>
               </div>
@@ -555,7 +555,7 @@ export function CheckoutDialog({
 
           <DialogFooter>
             <Button variant="outline" onClick={handleMoyasarCancel}>
-              Cancel
+              {t('ui.common.cancel', 'Cancel')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -569,26 +569,26 @@ export function CheckoutDialog({
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleMpesaCancel()}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>MPESA Payment - {plan.name}</DialogTitle>
+            <DialogTitle>{t('common.checkout.mpesa_payment', 'MPESA Payment')} - {plan.name}</DialogTitle>
             <DialogDescription>
-              STK Push has been sent to your phone. Please complete the payment.
+              {t('common.checkout.stk_push_sent', 'STK Push has been sent to your phone. Please complete the payment.')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
             <div className="mb-4">
-              <h3 className="text-sm font-medium mb-2">Payment Summary</h3>
+              <h3 className="text-sm font-medium mb-2">{t('common.checkout.payment_summary', 'Payment Summary')}</h3>
               <div className="bg-muted p-3 rounded-md">
                 <div className="flex justify-between mb-2">
-                  <span className="text-muted-foreground">Plan:</span>
+                  <span className="text-muted-foreground">{t('common.checkout.plan', 'Plan:')}</span>
                   <span className="font-medium">{plan.name}</span>
                 </div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-muted-foreground">Amount:</span>
+                  <span className="text-muted-foreground">{t('common.checkout.amount', 'Amount:')}</span>
                   <span className="font-medium">{formatCurrency(plan.price)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Phone:</span>
+                  <span className="text-muted-foreground">{t('common.checkout.phone', 'Phone:')}</span>
                   <span className="font-medium">{phoneNumber}</span>
                 </div>
               </div>
@@ -597,7 +597,7 @@ export function CheckoutDialog({
             <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
               <div className="flex items-center mb-2">
                 <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                <span className="font-medium text-green-800">STK Push Sent</span>
+                <span className="font-medium text-green-800">{t('common.checkout.stk_push_sent_label', 'STK Push Sent')}</span>
               </div>
               <p className="text-sm text-green-700 mb-2">
                 {mpesaResponse.customerMessage || mpesaResponse.message}
@@ -608,15 +608,15 @@ export function CheckoutDialog({
             </div>
 
             <div className="text-sm text-muted-foreground space-y-2">
-              <p>• Check your phone for the MPESA payment prompt</p>
-              <p>• Enter your MPESA PIN to complete the payment</p>
-              <p>• Your subscription will be activated automatically once payment is confirmed</p>
+              <p>• {t('common.checkout.mpesa_hint_1', 'Check your phone for the MPESA payment prompt')}</p>
+              <p>• {t('common.checkout.mpesa_hint_2', 'Enter your MPESA PIN to complete the payment')}</p>
+              <p>• {t('common.checkout.mpesa_hint_3', 'Your subscription will be activated automatically once payment is confirmed')}</p>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={handleMpesaCancel}>
-              Close
+              {t('ui.common.close', 'Close')}
             </Button>
             <Button
               onClick={() => {
@@ -625,7 +625,7 @@ export function CheckoutDialog({
               }}
               className="btn-brand-primary"
             >
-              I've Completed Payment
+              {t('common.checkout.completed_payment', "I've Completed Payment")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -637,35 +637,35 @@ export function CheckoutDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Subscribe to {plan.name}</DialogTitle>
+          <DialogTitle>{t('common.checkout.subscribe_to', 'Subscribe to')} {plan.name}</DialogTitle>
           <DialogDescription>
-            Choose your preferred payment method to complete your subscription.
+            {t('common.checkout.choose_payment_method', 'Choose your preferred payment method to complete your subscription.')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
           <div className="mb-4">
-            <h3 className="text-sm font-medium mb-2">Plan Details</h3>
+            <h3 className="text-sm font-medium mb-2">{t('common.checkout.plan_details', 'Plan Details')}</h3>
             <div className="bg-muted p-3 rounded-md">
               <div className="flex justify-between mb-2">
-                <span className="text-muted-foreground">Plan:</span>
+                <span className="text-muted-foreground">{t('common.checkout.plan', 'Plan:')}</span>
                 <span className="font-medium">{plan.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Price:</span>
+                <span className="text-muted-foreground">{t('common.checkout.price', 'Price:')}</span>
                 <span className="font-medium">{formatCurrency(plan.price)}{getPlanBillingPeriod(plan)}</span>
               </div>
               {selectedMethod === 'mpesa' && currency.toUpperCase() === 'USD' && mpesaKesAmount != null && (
                 <div className="flex justify-between mt-2 pt-2 border-t border-border/50 text-sm text-muted-foreground">
-                  <span>Charge on M-PESA (KES):</span>
-                  <span>KES {mpesaKesAmount.toLocaleString()} approx.</span>
+                  <span>{t('common.checkout.mpesa_charge_label', 'Charge on M-PESA (KES):')}</span>
+                  <span>{t('common.checkout.mpesa_amount', 'KES {{amount}} approx.', { amount: mpesaKesAmount.toLocaleString() })}</span>
                 </div>
               )}
             </div>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium mb-2">Payment Method</h3>
+            <h3 className="text-sm font-medium mb-2">{t('common.checkout.payment_method', 'Payment Method')}</h3>
             <PaymentMethodSelector
               paymentMethods={paymentMethods}
               selectedMethod={selectedMethod}
@@ -675,7 +675,7 @@ export function CheckoutDialog({
             {/* MPESA Phone Number Input */}
             {selectedMethod === 'mpesa' && (
               <div className="mt-4 space-y-2">
-                <Label htmlFor="phone-number">Phone Number</Label>
+                <Label htmlFor="phone-number">{t('common.checkout.phone_number_label', 'Phone Number')}</Label>
                 <Input
                   id="phone-number"
                   type="tel"
@@ -685,7 +685,7 @@ export function CheckoutDialog({
                   className="w-full"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Enter your Kenyan phone number in the format 254XXXXXXXXX
+                  {t('common.checkout.phone_format_help', 'Enter your Kenyan phone number in the format 254XXXXXXXXX')}
                 </p>
               </div>
             )}
@@ -694,13 +694,13 @@ export function CheckoutDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={checkoutMutation.isPending}>
-            Cancel
+            {t('ui.common.cancel', 'Cancel')}
           </Button>
           <Button className="btn-brand-primary" onClick={handleCheckout} disabled={checkoutMutation.isPending}>
             {checkoutMutation.isPending && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Proceed to Payment
+            {t('common.checkout.proceed_to_payment', 'Proceed to Payment')}
           </Button>
         </DialogFooter>
       </DialogContent>

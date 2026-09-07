@@ -444,9 +444,9 @@ export function N8nNode({ id, data, isConnectable }: N8nNodeProps) {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <img 
-                src="https://registry.npmmirror.com/@lobehub/icons-static-png/1.75.0/files/dark/n8n-color.png" 
-                alt="n8n" 
+              <img
+                src="https://registry.npmmirror.com/@lobehub/icons-static-png/1.75.0/files/dark/n8n-color.png"
+                alt="n8n"
                 className="h-4 w-4"
               />
             </TooltipTrigger>
@@ -455,7 +455,7 @@ export function N8nNode({ id, data, isConnectable }: N8nNodeProps) {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <span>n8n Integration</span>
+        <span>{t('flow_builder.n8n_integration', 'n8n Integration')}</span>
 
         {/* Configuration Progress Badge */}
         <TooltipProvider>

@@ -294,12 +294,12 @@ export function ContactNotificationNode({ id, data, isConnectable }: ContactNoti
           {isEditing ? (
             <>
               <EyeOff className="h-3 w-3" />
-              Hide
+              {t('common.hide', 'Hide')}
             </>
           ) : (
             <>
               <Eye className="h-3 w-3" />
-              Edit
+              {t('common.edit', 'Edit')}
             </>
           )}
         </button>
@@ -448,7 +448,7 @@ export function ContactNotificationNode({ id, data, isConnectable }: ContactNoti
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent side="top">
-                            <p className="text-xs">Refresh captured variables</p>
+                            <p className="text-xs">{t('flow_builder.refresh_variables', 'Refresh captured variables')}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -458,12 +458,12 @@ export function ContactNotificationNode({ id, data, isConnectable }: ContactNoti
                       <CommandEmpty>
                         {error ? (
                           <div className="text-center py-4">
-                            <p className="text-xs text-destructive">Error loading variables</p>
+                            <p className="text-xs text-destructive">{t('flow_builder.error_loading_variables', 'Error loading variables')}</p>
                             <p className="text-xs text-muted-foreground">{error}</p>
                           </div>
                         ) : (
                           <div className="text-center py-4">
-                            <p className="text-xs">No variables found.</p>
+                            <p className="text-xs">{t('flow_builder.no_variables_found', 'No variables found.')}</p>
                           </div>
                         )}
                       </CommandEmpty>

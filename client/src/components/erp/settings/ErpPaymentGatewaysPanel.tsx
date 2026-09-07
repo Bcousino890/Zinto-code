@@ -54,6 +54,7 @@ function GatewayCard({
   saving: boolean;
   testing?: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
@@ -63,18 +64,18 @@ function GatewayCard({
       <CardContent className="space-y-4">
         <div className="flex items-center gap-2">
           <Switch checked={enabled} onCheckedChange={onEnabledChange} />
-          <Label>Enabled</Label>
+          <Label>{t('erp.payment.enabled', 'Enabled')}</Label>
         </div>
         {children}
         <div className="flex flex-wrap gap-2">
           <Button onClick={onSave} disabled={saving || !enabled}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Save
+            {t('common.save', 'Save')}
           </Button>
           {onTest ? (
             <Button variant="outline" onClick={onTest} disabled={testing || !enabled}>
               {testing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Test connection
+              {t('erp.payment.test_connection', 'Test connection')}
             </Button>
           ) : null}
         </div>
@@ -88,7 +89,7 @@ function WebhookUrlField({ url }: { url: string }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-2">
-      <Label>Webhook URL</Label>
+      <Label>{t('erp.payment.webhook_url', 'Webhook URL')}</Label>
       <div className="flex gap-2">
         <Input value={url} readOnly className="font-mono text-xs" />
         <Button
@@ -238,7 +239,7 @@ export default function ErpPaymentGatewaysPanel() {
           }}
         >
           <div className="space-y-2">
-            <Label>Publishable key</Label>
+            <Label>{t('erp.payment.publishable_key', 'Publishable key')}</Label>
             <Input
               value={String(stripe.publishableKey || '')}
               onChange={(e) => patchForm('stripe', { publishableKey: e.target.value })}
@@ -246,7 +247,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Secret key</Label>
+            <Label>{t('erp.payment.secret_key', 'Secret key')}</Label>
             <Input
               type="password"
               value={String(stripe.secretKey || '')}
@@ -256,7 +257,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Webhook secret</Label>
+            <Label>{t('erp.payment.webhook_secret', 'Webhook secret')}</Label>
             <Input
               value={String(stripe.webhookSecret || '')}
               onChange={(e) => patchForm('stripe', { webhookSecret: e.target.value })}
@@ -270,13 +271,13 @@ export default function ErpPaymentGatewaysPanel() {
               onCheckedChange={(testMode) => patchForm('stripe', { testMode })}
               disabled={!stripe.enabled}
             />
-            <Label>Test mode</Label>
+            <Label>{t('erp.payment.test_mode', 'Test mode')}</Label>
           </div>
         </GatewayCard>
 
         <GatewayCard
           title="PayPal"
-          description="Accept PayPal payments"
+          description={t('erp.payment.paypal_desc', 'Accept PayPal payments')}
           enabled={!!paypal.enabled}
           onEnabledChange={(enabled) => patchForm('paypal', { enabled })}
           saving={activeGateway === 'paypal' && saveMutation.isPending}
@@ -291,7 +292,7 @@ export default function ErpPaymentGatewaysPanel() {
           }}
         >
           <div className="space-y-2">
-            <Label>Client ID</Label>
+            <Label>{t('erp.payment.client_id', 'Client ID')}</Label>
             <Input
               value={String(paypal.clientId || '')}
               onChange={(e) => patchForm('paypal', { clientId: e.target.value })}
@@ -299,7 +300,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Client secret</Label>
+            <Label>{t('erp.payment.client_secret', 'Client secret')}</Label>
             <Input
               type="password"
               value={String(paypal.clientSecret || '')}
@@ -312,7 +313,7 @@ export default function ErpPaymentGatewaysPanel() {
 
         <GatewayCard
           title="Paystack"
-          description="Accept Paystack payments"
+          description={t('erp.payment.paystack_desc', 'Accept Paystack payments')}
           enabled={!!paystack.enabled}
           onEnabledChange={(enabled) => patchForm('paystack', { enabled })}
           saving={activeGateway === 'paystack' && saveMutation.isPending}
@@ -327,7 +328,7 @@ export default function ErpPaymentGatewaysPanel() {
           }}
         >
           <div className="space-y-2">
-            <Label>Public key</Label>
+            <Label>{t('erp.payment.public_key', 'Public key')}</Label>
             <Input
               value={String(paystack.publicKey || '')}
               onChange={(e) => patchForm('paystack', { publicKey: e.target.value })}
@@ -335,7 +336,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Secret key</Label>
+            <Label>{t('erp.payment.secret_key_paystack', 'Secret key')}</Label>
             <Input
               type="password"
               value={String(paystack.secretKey || '')}
@@ -344,7 +345,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Merchant currency</Label>
+            <Label>{t('erp.payment.merchant_currency', 'Merchant currency')}</Label>
             <Input
               value={String(paystack.merchantCurrency || '')}
               onChange={(e) => patchForm('paystack', { merchantCurrency: e.target.value })}
@@ -356,7 +357,7 @@ export default function ErpPaymentGatewaysPanel() {
 
         <GatewayCard
           title="Mercado Pago"
-          description="Accept Mercado Pago payments"
+          description={t('erp.payment.mercadopago_desc', 'Accept Mercado Pago payments')}
           enabled={!!mercadopago.enabled}
           onEnabledChange={(enabled) => patchForm('mercadopago', { enabled })}
           saving={activeGateway === 'mercadopago' && saveMutation.isPending}
@@ -371,7 +372,7 @@ export default function ErpPaymentGatewaysPanel() {
           }}
         >
           <div className="space-y-2">
-            <Label>Access token</Label>
+            <Label>{t('erp.payment.access_token', 'Access token')}</Label>
             <Input
               type="password"
               value={String(mercadopago.accessToken || '')}
@@ -384,7 +385,7 @@ export default function ErpPaymentGatewaysPanel() {
 
         <GatewayCard
           title="Moyasar"
-          description="Accept Moyasar payments (SAR)"
+          description={t('erp.payment.moyasar_desc', 'Accept Moyasar payments (SAR)')}
           enabled={!!moyasar.enabled}
           onEnabledChange={(enabled) => patchForm('moyasar', { enabled })}
           saving={activeGateway === 'moyasar' && saveMutation.isPending}
@@ -399,7 +400,7 @@ export default function ErpPaymentGatewaysPanel() {
           }}
         >
           <div className="space-y-2">
-            <Label>Publishable key</Label>
+            <Label>{t('erp.payment.publishable_key', 'Publishable key')}</Label>
             <Input
               value={String(moyasar.publishableKey || '')}
               onChange={(e) => patchForm('moyasar', { publishableKey: e.target.value })}
@@ -407,7 +408,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Secret key</Label>
+            <Label>{t('erp.payment.secret_key', 'Secret key')}</Label>
             <Input
               type="password"
               value={String(moyasar.secretKey || '')}
@@ -420,7 +421,7 @@ export default function ErpPaymentGatewaysPanel() {
 
         <GatewayCard
           title="M-PESA"
-          description="Accept M-PESA mobile money"
+          description={t('erp.payment.mpesa_desc', 'Accept M-PESA mobile money')}
           enabled={!!mpesa.enabled}
           onEnabledChange={(enabled) => patchForm('mpesa', { enabled })}
           saving={activeGateway === 'mpesa' && saveMutation.isPending}
@@ -435,7 +436,7 @@ export default function ErpPaymentGatewaysPanel() {
           }}
         >
           <div className="space-y-2">
-            <Label>Consumer key</Label>
+            <Label>{t('erp.payment.consumer_key', 'Consumer key')}</Label>
             <Input
               value={String(mpesa.consumerKey || '')}
               onChange={(e) => patchForm('mpesa', { consumerKey: e.target.value })}
@@ -443,7 +444,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Consumer secret</Label>
+            <Label>{t('erp.payment.consumer_secret', 'Consumer secret')}</Label>
             <Input
               type="password"
               value={String(mpesa.consumerSecret || '')}
@@ -452,7 +453,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Business shortcode</Label>
+            <Label>{t('erp.payment.business_shortcode', 'Business shortcode')}</Label>
             <Input
               value={String(mpesa.businessShortcode || '')}
               onChange={(e) => patchForm('mpesa', { businessShortcode: e.target.value })}
@@ -460,7 +461,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Passkey</Label>
+            <Label>{t('erp.payment.passkey', 'Passkey')}</Label>
             <Input
               type="password"
               value={String(mpesa.passkey || '')}
@@ -473,7 +474,7 @@ export default function ErpPaymentGatewaysPanel() {
 
         <GatewayCard
           title="Bank transfer"
-          description="Show bank details on invoices"
+          description={t('erp.payment.bank_transfer_desc', 'Show bank details on invoices')}
           enabled={!!bank.enabled}
           onEnabledChange={(enabled) => patchForm('bank_transfer', { enabled })}
           saving={activeGateway === 'bank_transfer' && saveMutation.isPending}
@@ -483,7 +484,7 @@ export default function ErpPaymentGatewaysPanel() {
           }}
         >
           <div className="space-y-2">
-            <Label>Account name</Label>
+            <Label>{t('erp.payment.account_name', 'Account name')}</Label>
             <Input
               value={String(bank.accountName || '')}
               onChange={(e) => patchForm('bank_transfer', { accountName: e.target.value })}
@@ -491,7 +492,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Account number</Label>
+            <Label>{t('erp.payment.account_number', 'Account number')}</Label>
             <Input
               value={String(bank.accountNumber || '')}
               onChange={(e) => patchForm('bank_transfer', { accountNumber: e.target.value })}
@@ -499,7 +500,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Bank name</Label>
+            <Label>{t('erp.payment.bank_name', 'Bank name')}</Label>
             <Input
               value={String(bank.bankName || '')}
               onChange={(e) => patchForm('bank_transfer', { bankName: e.target.value })}
@@ -507,7 +508,7 @@ export default function ErpPaymentGatewaysPanel() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Instructions</Label>
+            <Label>{t('erp.payment.instructions', 'Instructions')}</Label>
             <Textarea
               value={String(bank.instructions || '')}
               onChange={(e) => patchForm('bank_transfer', { instructions: e.target.value })}
@@ -541,7 +542,7 @@ export default function ErpPaymentGatewaysPanel() {
           ))}
           <Button onClick={() => manualMutation.mutate()} disabled={manualMutation.isPending}>
             {manualMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Save manual methods
+            {t('erp.payment.save_manual_methods', 'Save manual methods')}
           </Button>
         </CardContent>
       </Card>

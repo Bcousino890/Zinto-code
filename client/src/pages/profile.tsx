@@ -483,7 +483,7 @@ export default function ProfilePage() {
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-                <p className="text-muted-foreground">Loading your profile...</p>
+                <p className="text-muted-foreground">{t('profile.loading', 'Loading your profile...')}</p>
               </div>
             </div>
           </main>
@@ -771,7 +771,7 @@ export default function ProfilePage() {
                             name="companyEmail"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Company Email</FormLabel>
+                                <FormLabel>{t('profile.company_email', 'Company Email')}</FormLabel>
                                 <FormControl>
                                   <Input
                                     type="email"
@@ -823,7 +823,7 @@ export default function ProfilePage() {
                             name="contactPerson"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Contact Person</FormLabel>
+                                <FormLabel>{t('profile.contact_person', 'Contact Person')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Felix Zona" {...field} />
                                 </FormControl>

@@ -324,7 +324,7 @@ export default function AffiliateManagementPage() {
         <li>Total Commission Earned: ${formatCurrency(metrics.totalCommissionEarned)}</li>
         <li>Conversion Rate: ${metrics.conversionRate.toFixed(1)}%</li>
       </ul>
-    ` : '<p>No metrics available.</p>';
+    ` : `<p>${t('admin.affiliate.report.no_metrics', 'No metrics available.')}</p>`;
 
     const performersRows = topPerformersData.length > 0
       ? topPerformersData.map((performer) => `
@@ -335,12 +335,21 @@ export default function AffiliateManagementPage() {
             <td>${performer.conversionRate.toFixed(1)}%</td>
           </tr>
         `).join('')
-      : '<tr><td colspan="4">No top performer data available.</td></tr>';
+      : `<tr><td colspan="4">${t('admin.affiliate.report.no_performers', 'No top performer data available.')}</td></tr>`;
+
+    const reportTitle = t('admin.affiliate.report.title', 'Affiliate Report');
+    const reportHeading = t('admin.affiliate.report.heading', 'Affiliate Performance Report');
+    const summaryHeading = t('admin.affiliate.report.summary_heading', 'Summary');
+    const topPerformersHeading = t('admin.affiliate.report.top_performers_heading', 'Top Performers');
+    const nameColumn = t('admin.affiliate.report.column_name', 'Name');
+    const revenueColumn = t('admin.affiliate.report.column_revenue', 'Revenue');
+    const conversionsColumn = t('admin.affiliate.report.column_conversions', 'Conversions');
+    const conversionRateColumn = t('admin.affiliate.report.column_conversion_rate', 'Conversion Rate');
 
     printWindow.document.write(`
       <html>
         <head>
-          <title>Affiliate Report</title>
+          <title>${reportTitle}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 32px; color: #111827; }
             h1, h2 { margin-bottom: 12px; }
@@ -351,18 +360,18 @@ export default function AffiliateManagementPage() {
           </style>
         </head>
         <body>
-          <h1>Affiliate Performance Report</h1>
+          <h1>${reportHeading}</h1>
           <p>Generated on ${new Date().toLocaleString()}</p>
-          <h2>Summary</h2>
+          <h2>${summaryHeading}</h2>
           ${metricsSummary}
-          <h2>Top Performers</h2>
+          <h2>${topPerformersHeading}</h2>
           <table>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Revenue</th>
-                <th>Conversions</th>
-                <th>Conversion Rate</th>
+                <th>${nameColumn}</th>
+                <th>${revenueColumn}</th>
+                <th>${conversionsColumn}</th>
+                <th>${conversionRateColumn}</th>
               </tr>
             </thead>
             <tbody>

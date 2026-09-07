@@ -180,6 +180,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
+    const { t } = useTranslation()
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 
     if (collapsible === "none") {
@@ -212,8 +213,8 @@ const Sidebar = React.forwardRef<
             side={side}
           >
             <SheetHeader className="sr-only">
-              <SheetTitle>Sidebar</SheetTitle>
-              <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+              <SheetTitle>{t('common.sidebar.sidebar_title', 'Sidebar')}</SheetTitle>
+              <SheetDescription>{t('common.sidebar.sidebar_description', 'Displays the mobile sidebar.')}</SheetDescription>
             </SheetHeader>
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>

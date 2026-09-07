@@ -434,7 +434,7 @@ export function EmailChannelForm({ isOpen, onClose, onSuccess }: EmailChannelFor
 
             {!formData.useOAuth2 && (
               <div className="grid gap-2">
-                <Label htmlFor="imapPassword">IMAP Password</Label>
+                <Label htmlFor="imapPassword">{t('email.imap_password', 'IMAP Password')}</Label>
                 <div className="relative">
                   <Input
                     id="imapPassword"
@@ -442,7 +442,7 @@ export function EmailChannelForm({ isOpen, onClose, onSuccess }: EmailChannelFor
                     type={showImapPassword ? "text" : "password"}
                     value={formData.imapPassword}
                     onChange={handleInputChange}
-                    placeholder="Your email password or app password"
+                    placeholder={t('email.password_placeholder', 'Your email password or app password')}
                     required={!formData.useOAuth2}
                     className="pr-10"
                   />
@@ -466,29 +466,29 @@ export function EmailChannelForm({ isOpen, onClose, onSuccess }: EmailChannelFor
 
           {/* SMTP Configuration */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">SMTP Settings (Sending)</h3>
+            <h3 className="text-lg font-medium">{t('email.smtp_settings', 'SMTP Settings (Sending)')}</h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="smtpHost">SMTP Host</Label>
+                <Label htmlFor="smtpHost">{t('email.smtp_host', 'SMTP Host')}</Label>
                 <Input
                   id="smtpHost"
                   name="smtpHost"
                   value={formData.smtpHost}
                   onChange={handleInputChange}
-                  placeholder="smtp.gmail.com"
+                  placeholder={t('email.smtp_host_placeholder', 'smtp.gmail.com')}
                   required
                 />
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="smtpPort">SMTP Port</Label>
+                <Label htmlFor="smtpPort">{t('email.smtp_port', 'SMTP Port')}</Label>
                 <Input
                   id="smtpPort"
                   name="smtpPort"
                   value={formData.smtpPort}
                   onChange={handleInputChange}
-                  placeholder="465"
+                  placeholder={t('email.smtp_port_placeholder', '465')}
                   required
                 />
               </div>
@@ -500,23 +500,23 @@ export function EmailChannelForm({ isOpen, onClose, onSuccess }: EmailChannelFor
                 checked={formData.smtpSecure}
                 onCheckedChange={(checked) => handleCheckboxChange('smtpSecure', checked as boolean)}
               />
-              <Label htmlFor="smtpSecure">Use SSL/TLS for SMTP</Label>
+              <Label htmlFor="smtpSecure">{t('email.use_ssl_tls_smtp', 'Use SSL/TLS for SMTP')}</Label>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="smtpUsername">SMTP Username (optional)</Label>
+              <Label htmlFor="smtpUsername">{t('email.smtp_username', 'SMTP Username (optional)')}</Label>
               <Input
                 id="smtpUsername"
                 name="smtpUsername"
                 value={formData.smtpUsername}
                 onChange={handleInputChange}
-                placeholder="Leave empty to use email address"
+                placeholder={t('email.smtp_username_placeholder', 'Leave empty to use email address')}
               />
             </div>
 
             {!formData.useOAuth2 && (
               <div className="grid gap-2">
-                <Label htmlFor="smtpPassword">SMTP Password</Label>
+                <Label htmlFor="smtpPassword">{t('email.smtp_password', 'SMTP Password')}</Label>
                 <div className="relative">
                   <Input
                     id="smtpPassword"
@@ -524,7 +524,7 @@ export function EmailChannelForm({ isOpen, onClose, onSuccess }: EmailChannelFor
                     type={showSmtpPassword ? "text" : "password"}
                     value={formData.smtpPassword}
                     onChange={handleInputChange}
-                    placeholder="Your email password or app password"
+                    placeholder={t('email.password_placeholder', 'Your email password or app password')}
                     required={!formData.useOAuth2}
                     className="pr-10"
                   />
@@ -548,37 +548,37 @@ export function EmailChannelForm({ isOpen, onClose, onSuccess }: EmailChannelFor
 
           {/* Advanced Settings */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Advanced Settings</h3>
+            <h3 className="text-lg font-medium">{t('email.advanced_settings', 'Advanced Settings')}</h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="syncFolder">Sync Folder</Label>
+                <Label htmlFor="syncFolder">{t('email.sync_folder', 'Sync Folder')}</Label>
                 <Input
                   id="syncFolder"
                   name="syncFolder"
                   value={formData.syncFolder}
                   onChange={handleInputChange}
-                  placeholder="INBOX"
+                  placeholder={t('email.sync_folder_placeholder', 'INBOX')}
                 />
                 <p className="text-sm text-gray-500">
-                  Email folder to monitor for new messages
+                  {t('email.sync_folder_help', 'Email folder to monitor for new messages')}
                 </p>
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="maxSyncMessages">Max Messages to Sync</Label>
+                <Label htmlFor="maxSyncMessages">{t('email.max_sync_messages', 'Max Messages to Sync')}</Label>
                 <Input
                   id="maxSyncMessages"
                   name="maxSyncMessages"
                   type="number"
                   value={formData.maxSyncMessages}
                   onChange={handleInputChange}
-                  placeholder="100"
+                  placeholder={t('email.max_sync_messages_placeholder', '100')}
                   min="1"
                   max="1000"
                 />
                 <p className="text-sm text-gray-500">
-                  Maximum number of messages to sync per check
+                  {t('email.max_sync_messages_help', 'Maximum number of messages to sync per check')}
                 </p>
               </div>
             </div>
@@ -592,25 +592,25 @@ export function EmailChannelForm({ isOpen, onClose, onSuccess }: EmailChannelFor
                 checked={formData.useOAuth2}
                 onCheckedChange={(checked) => handleCheckboxChange('useOAuth2', checked as boolean)}
               />
-              <Label htmlFor="useOAuth2">Use OAuth2 Authentication (Recommended for Gmail)</Label>
+              <Label htmlFor="useOAuth2">{t('email.use_oauth2', 'Use OAuth2 Authentication (Recommended for Gmail)')}</Label>
             </div>
 
             {formData.useOAuth2 && (
               <div className="space-y-4 pl-6 border-l-2 border-blue-200">
                 <div className="grid gap-2">
-                  <Label htmlFor="oauth2ClientId">OAuth2 Client ID</Label>
+                  <Label htmlFor="oauth2ClientId">{t('email.oauth2_client_id', 'OAuth2 Client ID')}</Label>
                   <Input
                     id="oauth2ClientId"
                     name="oauth2ClientId"
                     value={formData.oauth2ClientId}
                     onChange={handleInputChange}
-                    placeholder="Your OAuth2 client ID"
+                    placeholder={t('email.oauth2_client_id_placeholder', 'Your OAuth2 client ID')}
                     required={formData.useOAuth2}
                   />
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="oauth2ClientSecret">OAuth2 Client Secret</Label>
+                  <Label htmlFor="oauth2ClientSecret">{t('email.oauth2_client_secret', 'OAuth2 Client Secret')}</Label>
                   <div className="relative">
                     <Input
                       id="oauth2ClientSecret"
@@ -618,7 +618,7 @@ export function EmailChannelForm({ isOpen, onClose, onSuccess }: EmailChannelFor
                       type={showOAuthSecret ? "text" : "password"}
                       value={formData.oauth2ClientSecret}
                       onChange={handleInputChange}
-                      placeholder="Your OAuth2 client secret"
+                      placeholder={t('email.oauth2_client_secret_placeholder', 'Your OAuth2 client secret')}
                       required={formData.useOAuth2}
                       className="pr-10"
                     />
@@ -639,17 +639,17 @@ export function EmailChannelForm({ isOpen, onClose, onSuccess }: EmailChannelFor
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="oauth2RefreshToken">OAuth2 Refresh Token</Label>
+                  <Label htmlFor="oauth2RefreshToken">{t('email.oauth2_refresh_token', 'OAuth2 Refresh Token')}</Label>
                   <Input
                     id="oauth2RefreshToken"
                     name="oauth2RefreshToken"
                     value={formData.oauth2RefreshToken}
                     onChange={handleInputChange}
-                    placeholder="Your OAuth2 refresh token"
+                    placeholder={t('email.oauth2_refresh_token_placeholder', 'Your OAuth2 refresh token')}
                     required={formData.useOAuth2}
                   />
                   <p className="text-sm text-gray-500">
-                    Obtain this from your OAuth2 provider's authorization flow
+                    {t('email.oauth2_refresh_token_help', 'Obtain this from your OAuth2 provider\'s authorization flow')}
                   </p>
                 </div>
               </div>

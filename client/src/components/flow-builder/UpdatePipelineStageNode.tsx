@@ -628,11 +628,11 @@ function UpdatePipelineStageNode({
                       <TooltipTrigger asChild>
                         <Badge variant="destructive" className="text-xs">
                           <AlertCircle className="w-3 h-3 mr-1" />
-                          Invalid Config
+                          {t('flow_builder.update_pipeline_stage_node.invalid_config', 'Invalid Config')}
                         </Badge>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Stage revert is enabled but no target stage is selected</p>
+                        <p>{t('flow_builder.update_pipeline_stage_node.stage_revert_error', 'Stage revert is enabled but no target stage is selected')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -654,7 +654,7 @@ function UpdatePipelineStageNode({
                     <HelpCircle className="w-3 h-3 text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Choose what action to perform in the pipeline</p>
+                    <p>{t('flow_builder.update_pipeline_stage_node.operation_type_help', 'Choose what action to perform in the pipeline')}</p>
                   </TooltipContent>
                 </Tooltip>
               </Label>
@@ -669,19 +669,19 @@ function UpdatePipelineStageNode({
                   <SelectItem value="update_stage">
                     <div className="flex items-center gap-2">
                       <ArrowRightCircle className="w-3 h-3" />
-                      Update Stage
+                      {t('flow_builder.update_pipeline_stage_node.operation_update_stage', 'Update Stage')}
                     </div>
                   </SelectItem>
                   <SelectItem value="create_stage">
                     <div className="flex items-center gap-2">
                       <Plus className="w-3 h-3" />
-                      Create Stage
+                      {t('flow_builder.update_pipeline_stage_node.operation_create_stage', 'Create Stage')}
                     </div>
                   </SelectItem>
                   <SelectItem value="create_deal">
                     <div className="flex items-center gap-2">
                       <DollarSign className="w-3 h-3" />
-                      Create Deal
+                      {t('flow_builder.update_pipeline_stage_node.operation_create_deal', 'Create Deal')}
                     </div>
                   </SelectItem>
                   <SelectItem value="update_deal">
@@ -1239,8 +1239,8 @@ function UpdatePipelineStageNode({
                             )}
                             {field.fieldType === 'boolean' && (() => {
                               const boolOpts = field.options && !Array.isArray(field.options) ? (field.options as { trueLabel?: string; falseLabel?: string }) : null;
-                              const trueLabel = boolOpts?.trueLabel ?? 'Yes';
-                              const falseLabel = boolOpts?.falseLabel ?? 'No';
+                              const trueLabel = boolOpts?.trueLabel ?? t('erp.common.yes', 'Yes');
+                              const falseLabel = boolOpts?.falseLabel ?? t('erp.common.no', 'No');
                               const checked = !!data.customFieldsToSet?.[field.fieldName];
                               return (
                                 <div className="flex items-center space-x-2">
@@ -1276,7 +1276,7 @@ function UpdatePipelineStageNode({
                     <Button variant="ghost" size="sm" className="w-full justify-between h-8">
                       <span className="text-xs flex items-center gap-1">
                         <Tag className="w-3 h-3" />
-                        Tag Management
+                        {t('flow_builder.update_pipeline_stage_node.tag_management', 'Tag Management')}
                       </span>
                       {data.showTagManagement ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                     </Button>

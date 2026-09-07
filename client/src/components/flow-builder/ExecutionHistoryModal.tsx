@@ -569,8 +569,8 @@ export function ExecutionHistoryModal({ isOpen, onClose, flowId }: ExecutionHist
                                         {(step.errorMessage || step.retryCount != null || step.maxRetries != null) && (
                                           <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
                                             {step.errorMessage && <span className="rounded-full bg-destructive/10 px-1.5 py-0.5 text-destructive">{t('common.error', 'Error')}</span>}
-                                            {step.retryCount != null && <span className="rounded-full bg-muted px-1.5 py-0.5">retry {step.retryCount}</span>}
-                                            {step.maxRetries != null && <span className="rounded-full bg-muted px-1.5 py-0.5">max {step.maxRetries}</span>}
+                                            {step.retryCount != null && <span className="rounded-full bg-muted px-1.5 py-0.5">{t('flow_builder.execution_history_retry', 'retry')} {step.retryCount}</span>}
+                                            {step.maxRetries != null && <span className="rounded-full bg-muted px-1.5 py-0.5">{t('flow_builder.execution_history_max', 'max')} {step.maxRetries}</span>}
                                           </div>
                                         )}
                                       </div>
@@ -650,7 +650,7 @@ export function ExecutionHistoryModal({ isOpen, onClose, flowId }: ExecutionHist
                                           <span className="text-right">{formatExecutionDuration(selectedStep.durationMs)}</span>
                                         </div>
                                         <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-                                          <span className="text-muted-foreground">Retries</span>
+                                          <span className="text-muted-foreground">{t('flow_builder.execution_history_retries', 'Retries')}</span>
                                           <span className="text-right">{selectedStep.retryCount ?? 0}/{selectedStep.maxRetries ?? 0}</span>
                                         </div>
                                       </div>

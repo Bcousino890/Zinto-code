@@ -2733,9 +2733,9 @@ export default function Calendar() {
       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel Appointment</AlertDialogTitle>
+            <AlertDialogTitle>{t('calendar.cancel_appointment', 'Cancel Appointment')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to cancel this appointment? This action cannot be undone.
+              {t('calendar.cancel_appointment_confirm', 'Are you sure you want to cancel this appointment? This action cannot be undone.')}
               {selectedEvent && (
                 <div className="mt-2 space-y-2">
                   <div className="font-medium">
@@ -2764,7 +2764,7 @@ export default function Calendar() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>No, Keep It</AlertDialogCancel>
+            <AlertDialogCancel>{t('calendar.no_keep_it', 'No, Keep It')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteEvent}
               className="bg-red-600 focus:ring-red-600"
@@ -2783,9 +2783,9 @@ export default function Calendar() {
       <Dialog open={isAddScheduleModalOpen} onOpenChange={setIsAddScheduleModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add New Schedule</DialogTitle>
+            <DialogTitle>{t('calendar.add_new_schedule', 'Add New Schedule')}</DialogTitle>
             <DialogDescription>
-              Create a new schedule to organize your events.
+              {t('calendar.add_new_schedule_desc', 'Create a new schedule to organize your events.')}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

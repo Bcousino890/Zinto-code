@@ -210,13 +210,13 @@ export function EmailCampaignBuilder() {
         width: 'auto',
         storageManager: false,
         fromElement: false,
-        components: campaignData.content || '<p>Write your email content here.</p>',
+        components: campaignData.content || `<p>${t('emailCampaign.placeholder_editor_content', 'Write your email content here.')}</p>`,
         blockManager: {
           blocks: [
-            { id: 'text', label: 'Text', content: { type: 'text', content: 'Insert text' } },
-            { id: 'section', label: 'Section', content: '<section><h2>Heading</h2><p>Content</p></section>' },
-            { id: 'image', label: 'Image', content: { type: 'image' } },
-            { id: 'link', label: 'Link', content: { type: 'link', content: 'Link', attributes: { href: '#' } } },
+            { id: 'text', label: t('common.wysiwyg.text', 'Text'), content: { type: 'text', content: t('common.wysiwyg.insert_text', 'Insert text') } },
+            { id: 'section', label: t('common.wysiwyg.section', 'Section'), content: `<section><h2>${t('common.wysiwyg.heading', 'Heading')}</h2><p>${t('common.wysiwyg.content', 'Content')}</p></section>` },
+            { id: 'image', label: t('common.wysiwyg.image', 'Image'), content: { type: 'image' } },
+            { id: 'link', label: t('common.wysiwyg.link', 'Link'), content: { type: 'link', content: t('common.wysiwyg.link_text', 'Link'), attributes: { href: '#' } } },
           ],
         },
       });

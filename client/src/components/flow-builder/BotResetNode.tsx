@@ -144,7 +144,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Duplicate node</p>
+              <p className="text-xs">{t('flow_builder.duplicate_node', 'Duplicate node')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -162,7 +162,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Delete node</p>
+              <p className="text-xs">{t('flow_builder.delete_node', 'Delete node')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -170,7 +170,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
 
       <div className="font-medium flex items-center gap-2 mb-2">
         <RefreshCw className="h-4 w-4 text-green-600" />
-        <span>Reset Bot</span>
+        <span>{t('flow_builder.reset_bot_node_title', 'Reset Bot')}</span>
        <button
                 className="ml-auto text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
                 onClick={() => setIsEditing(!isEditing)}
@@ -178,12 +178,12 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
                 {isEditing ? (
                   <>
                     <EyeOff className="h-3 w-3" />
-                    Hide
+                    {t('common.hide', 'Hide')}
                   </>
                 ) : (
                   <>
                     <Eye className="h-3 w-3" />
-                    Edit
+                    {t('common.edit', 'Edit')}
                   </>
                 )}
               </button>
@@ -192,7 +192,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
       <div className="text-sm p-2  rounded border border-border">
         <div className="flex items-center gap-1 mb-1">
           {getResetScopeIcon()}
-          <span className="font-medium text-green-600">Re-enable Bot</span>
+          <span className="font-medium text-green-600">{t('flow_builder.re_enable_bot', 'Re-enable Bot')}</span>
           <span className="text-muted-foreground">•</span>
           <span className="text-xs text-muted-foreground truncate">
             {getResetScopeDisplay()}
@@ -202,22 +202,22 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
         <div className="mt-1 flex flex-wrap gap-1">
           {sendConfirmation && (
             <span className="text-[10px] bg-green-100 text-green-800 px-1 py-0.5 rounded">
-              Send Confirmation
+              {t('flow_builder.send_confirmation', 'Send Confirmation')}
             </span>
           )}
           {clearVariables && (
             <span className="text-[10px] bg-blue-100 text-blue-800 px-1 py-0.5 rounded">
-              Clear Variables
+              {t('flow_builder.clear_variables', 'Clear Variables')}
             </span>
           )}
           {resetFlowPosition && (
             <span className="text-[10px] bg-purple-100 text-purple-800 px-1 py-0.5 rounded">
-              Reset Flow
+              {t('flow_builder.reset_flow', 'Reset Flow')}
             </span>
           )}
           {notifyAgent && (
             <span className="text-[10px] bg-orange-100 text-orange-800 px-1 py-0.5 rounded">
-              Notify Agent
+              {t('flow_builder.notify_agent', 'Notify Agent')}
             </span>
           )}
         </div>
@@ -226,7 +226,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
       {isEditing && (
         <div className="mt-3 text-xs space-y-3 border rounded p-2 ">
           <div>
-            <Label className="block mb-2 font-medium">Reset Scope</Label>
+            <Label className="block mb-2 font-medium">{t('flow_builder.reset_scope', 'Reset Scope')}</Label>
             <Select
               value={resetScope}
               onValueChange={setResetScope}
@@ -249,7 +249,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
 
           {resetScope !== 'bot_only' && (
             <div className="space-y-2 pt-2 border-t">
-              <Label className="block mb-1 font-medium">Advanced Options</Label>
+              <Label className="block mb-1 font-medium">{t('flow_builder.advanced_options', 'Advanced Options')}</Label>
 
               <div className="flex items-center space-x-2">
                 <Switch
@@ -257,7 +257,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
                   checked={clearVariables}
                   onCheckedChange={setClearVariables}
                 />
-                <Label htmlFor="clear-variables" className="text-xs">Clear all flow variables</Label>
+                <Label htmlFor="clear-variables" className="text-xs">{t('flow_builder.clear_all_variables', 'Clear all flow variables')}</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -266,7 +266,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
                   checked={resetFlowPosition}
                   onCheckedChange={setResetFlowPosition}
                 />
-                <Label htmlFor="reset-flow-position" className="text-xs">Reset flow to beginning</Label>
+                <Label htmlFor="reset-flow-position" className="text-xs">{t('flow_builder.reset_flow_beginning', 'Reset flow to beginning')}</Label>
               </div>
             </div>
           )}
@@ -278,12 +278,12 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
                 checked={sendConfirmation}
                 onCheckedChange={setSendConfirmation}
               />
-              <Label htmlFor="send-confirmation" className="text-xs font-medium">Send confirmation message</Label>
+              <Label htmlFor="send-confirmation" className="text-xs font-medium">{t('flow_builder.send_confirmation_message', 'Send confirmation message')}</Label>
             </div>
 
             {sendConfirmation && (
               <div>
-                <Label className="block mb-1 text-xs">Confirmation Message</Label>
+                <Label className="block mb-1 text-xs">{t('flow_builder.confirmation_message', 'Confirmation Message')}</Label>
                 <Textarea
                   placeholder="Message to send when bot is re-enabled"
                   value={confirmationMessage}
@@ -295,7 +295,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
           </div>
 
           <div className="space-y-2 pt-2 border-t">
-            <Label className="block mb-1 font-medium">Agent Notification</Label>
+            <Label className="block mb-1 font-medium">{t('flow_builder.agent_notification', 'Agent Notification')}</Label>
 
             <div className="flex items-center space-x-2">
               <Switch
@@ -303,7 +303,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
                 checked={notifyAgent}
                 onCheckedChange={setNotifyAgent}
               />
-              <Label htmlFor="notify-agent" className="text-xs">Notify agent of bot re-enablement</Label>
+              <Label htmlFor="notify-agent" className="text-xs">{t('flow_builder.notify_agent_reenablement', 'Notify agent of bot re-enablement')}</Label>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -312,7 +312,7 @@ export function BotResetNode({ id, data, isConnectable }: BotResetNodeProps) {
                 checked={autoReassign}
                 onCheckedChange={setAutoReassign}
               />
-              <Label htmlFor="auto-reassign" className="text-xs">Auto-reassign conversation to bot</Label>
+              <Label htmlFor="auto-reassign" className="text-xs">{t('flow_builder.auto_reassign', 'Auto-reassign conversation to bot')}</Label>
             </div>
           </div>
         </div>

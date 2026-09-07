@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation } from 'wouter';
 import { usePermissions, Permission, ERP_DASHBOARD_ROUTE_PERMISSIONS, ERP_REPORTS_ROUTE_PERMISSIONS } from '@/hooks/usePermissions';
 import { useAuth } from '@/hooks/use-auth';
+import { useTranslation } from '@/hooks/use-translation';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -22,13 +23,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { user, isLoading: authLoading } = useAuth();
   const { hasPermission, hasAnyPermission, hasAllPermissions, isLoading: permissionsLoading } = usePermissions();
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   if (authLoading || permissionsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-gray-600">Checking permissions...</p>
+          <p className="text-gray-600">{t('auth.checking_permissions', 'Checking permissions...')}</p>
         </div>
       </div>
     );

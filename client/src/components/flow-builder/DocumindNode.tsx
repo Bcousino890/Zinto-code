@@ -408,7 +408,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Delete node</p>
+              <p className="text-xs">{t('flow_builder.delete_node', 'Delete node')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -436,7 +436,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <span>Documind Integration</span>
+        <span>{t('flow_builder.documind_integration_title', 'Documind Integration')}</span>
 
         {/* Configuration Progress Badge */}
         <TooltipProvider>
@@ -449,13 +449,13 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                   configurationProgress >= 70 ? "bg-primary/10 text-primary" : "bg-muted/50 text-muted-foreground"
                 )}
               >
-                {configurationProgress}% configured
+{t('flow_builder.documind_configured_percent', '{{progress}}% configured', { progress: configurationProgress })}
               </Badge>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Configuration completeness: {configurationProgress}%</p>
+              <p className="text-xs">{t('flow_builder.documind_config_completeness', 'Configuration completeness: {{progress}}%', { progress: configurationProgress })}</p>
               <p className="text-xs text-muted-foreground">
-                {configurationProgress < 70 ? "Complete required fields to reach 70%" : "Configuration ready!"}
+                {configurationProgress < 70 ? t('flow_builder.documind_config_incomplete', 'Complete required fields to reach 70%') : t('flow_builder.documind_config_ready', 'Configuration ready!')}
               </p>
             </TooltipContent>
           </Tooltip>
@@ -473,7 +473,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
               </button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">{isEditing ? 'Hide configuration panel' : 'Show configuration panel'}</p>
+              <p className="text-xs">{isEditing ? t('flow_builder.documind_hide_config', 'Hide configuration panel') : t('flow_builder.documind_show_config', 'Show configuration panel')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -510,15 +510,15 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                     <AlertCircle className="h-3 w-3 text-muted-foreground" />
                   )}
                   <span className="text-xs text-muted-foreground">
-                    {connectionStatus === 'success' && selectedFolder ? 'Ready' : 'Setup Required'}
+                    {connectionStatus === 'success' && selectedFolder ? t('flow_builder.ready', 'Ready') : t('flow_builder.setup_required', 'Setup Required')}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent side="top">
                 <p className="text-xs">
                   {connectionStatus === 'success' && selectedFolder
-                    ? 'Documind is configured and ready to use'
-                    : 'Complete API key and folder configuration'}
+                    ? t('flow_builder.documind_ready_use', 'Documind is configured and ready to use')
+                    : t('flow_builder.documind_complete_config', 'Complete API key and folder configuration')}
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -539,18 +539,18 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground">
               <div className="flex items-center gap-2">
-                <span className="font-medium">Operation:</span>
+                <span className="font-medium">{t('flow_builder.documind_operation_label', 'Operation:')}</span>
                 <span>{DOCUMIND_OPERATIONS.find(op => op.id === operation)?.name || 'Ask Question'}</span>
               </div>
               {selectedFolder && (
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="font-medium">Folder:</span>
+                  <span className="font-medium">{t('flow_builder.documind_folder_label', 'Folder:')}</span>
                   <span>{folders.find(f => f.id === selectedFolder)?.name || selectedFolder}</span>
                 </div>
               )}
               {files.length > 0 && (
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="font-medium">Files:</span>
+                  <span className="font-medium">{t('flow_builder.documind_files_label', 'Files:')}</span>
                   <span>{files.length} document{files.length !== 1 ? 's' : ''}</span>
                 </div>
               )}
@@ -561,8 +561,8 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                 connectionStatus === 'error' ? 'bg-destructive' : 'bg-muted-foreground'
               }`} />
               <span className="text-muted-foreground">
-                {connectionStatus === 'success' ? 'Connected' :
-                 connectionStatus === 'error' ? 'Connection Error' : 'Not Connected'}
+                {connectionStatus === 'success' ? t('flow_builder.documind_connected', 'Connected') :
+                 connectionStatus === 'error' ? t('flow_builder.documind_connection_error', 'Connection Error') : t('flow_builder.documind_not_connected', 'Not Connected')}
               </span>
             </div>
           </div>

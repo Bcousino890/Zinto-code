@@ -304,12 +304,12 @@ export function BotDisableNode({ id, data, isConnectable }: BotDisableNodeProps)
                 {isEditing ? (
                   <>
                     <EyeOff className="h-3 w-3" />
-                    Hide
+                    {t('flow_builder.hide', 'Hide')}
                   </>
                 ) : (
                   <>
                     <Eye className="h-3 w-3" />
-                    Edit
+                    {t('flow_builder.edit', 'Edit')}
                   </>
                 )}
               </button>
@@ -443,7 +443,7 @@ export function BotDisableNode({ id, data, isConnectable }: BotDisableNodeProps)
           </div>
 
           <div className="space-y-2 pt-2 border-t">
-            <Label className="block mb-1 font-medium">Agent Assignment</Label>
+            <Label className="block mb-1 font-medium">{t('flow_builder.bot_disable_agent_assignment_label', 'Agent Assignment')}</Label>
             <Select
               value={assignToAgent}
               onValueChange={setAssignToAgent}
@@ -640,7 +640,7 @@ export function BotDisableNode({ id, data, isConnectable }: BotDisableNodeProps)
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent side="top">
-                                  <p className="text-xs">Refresh captured variables</p>
+                                  <p className="text-xs">{t('flow_builder.bot_disable_refresh_variables_tooltip', 'Refresh captured variables')}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -650,12 +650,12 @@ export function BotDisableNode({ id, data, isConnectable }: BotDisableNodeProps)
                             <CommandEmpty>
                               {error ? (
                                 <div className="text-center py-4">
-                                  <p className="text-xs text-destructive">Error loading variables</p>
+                                  <p className="text-xs text-destructive">{t('flow_builder.bot_disable_error_loading_variables', 'Error loading variables')}</p>
                                   <p className="text-xs text-muted-foreground">{error}</p>
                                 </div>
                               ) : (
                                 <div className="text-center py-4">
-                                  <p className="text-xs">No variables found.</p>
+                                  <p className="text-xs">{t('flow_builder.bot_disable_no_variables', 'No variables found.')}</p>
                                 </div>
                               )}
                             </CommandEmpty>

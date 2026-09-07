@@ -252,10 +252,10 @@ export function SubscriptionManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-foreground" />
-            Current Subscription
+            {t('settings.subscription_current_subscription', 'Current Subscription')}
           </CardTitle>
           <CardDescription>
-            Your active plan and subscription details
+            {t('settings.subscription_active_plan_details', 'Your active plan and subscription details')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -279,8 +279,8 @@ export function SubscriptionManagement() {
             <div className="text-center py-8">
               <div className="bg-secondary/10 border border-secondary/20 rounded-lg p-4">
                 <AlertTriangle className="h-8 w-8 text-secondary mx-auto mb-2" />
-                <h3 className="text-lg font-medium text-secondary mb-1">No Active Subscription</h3>
-                <p className="text-sm text-secondary">Select a plan below to subscribe</p>
+                <h3 className="text-lg font-medium text-secondary mb-1">{t('settings.subscription_no_active', 'No Active Subscription')}</h3>
+                <p className="text-sm text-secondary">{t('settings.subscription_select_plan', 'Select a plan below to subscribe')}</p>
               </div>
             </div>
           )}
@@ -292,17 +292,17 @@ export function SubscriptionManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-foreground" />
-            Subscription Status
+            {t('settings.subscription_status_title', 'Subscription Status')}
           </CardTitle>
           <CardDescription>
-            Current status and management options for your subscription
+            {t('settings.subscription_status_description', 'Current status and management options for your subscription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Current Status</p>
+                <p className="text-sm text-muted-foreground">{t('settings.subscription_current_status', 'Current Status')}</p>
                 <div className="mt-1">
                   {subscriptionStatus && getStatusBadge(subscriptionStatus.status)}
                 </div>
@@ -310,7 +310,7 @@ export function SubscriptionManagement() {
               {subscriptionStatus?.endDate && (
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground">
-                    {subscriptionStatus.status === 'active' ? 'Renews on' : 'Expires on'}
+                    {subscriptionStatus.status === 'active' ? t('settings.subscription_renews_on', 'Renews on') : t('settings.subscription_expires_on', 'Expires on')}
                   </p>
                   <p className="font-medium text-foreground">
                     {new Date(subscriptionStatus.endDate).toLocaleDateString()}
@@ -323,12 +323,12 @@ export function SubscriptionManagement() {
             {subscriptionStatus?.isInGracePeriod && (
               <Alert className="border-secondary/20 bg-secondary/10">
                 <AlertTriangle className="h-4 w-4 text-secondary" />
-                <AlertTitle>Grace Period Active</AlertTitle>
+                <AlertTitle>{t('settings.subscription_grace_period_active', 'Grace Period Active')}</AlertTitle>
                 <AlertDescription>
-                  Your subscription is in a grace period until{' '}
-                  {subscriptionStatus.gracePeriodEndDate && 
+                  {t('settings.subscription_grace_period_message', 'Your subscription is in a grace period until')}{' '}
+                  {subscriptionStatus.gracePeriodEndDate &&
                     new Date(subscriptionStatus.gracePeriodEndDate).toLocaleDateString()
-                  }. Please update your payment method to avoid service interruption.
+                  }. {t('settings.subscription_grace_period_action', 'Please update your payment method to avoid service interruption.')}
                 </AlertDescription>
               </Alert>
             )}
@@ -337,11 +337,11 @@ export function SubscriptionManagement() {
             {dunningStatus?.status === 'active' && (
               <Alert className="border-destructive/20 bg-destructive/10">
                 <XCircle className="h-4 w-4 text-destructive" />
-                <AlertTitle>Payment Retry in Progress</AlertTitle>
+                <AlertTitle>{t('settings.subscription_payment_retry_title', 'Payment Retry in Progress')}</AlertTitle>
                 <AlertDescription>
-                  We're attempting to process your payment. Attempt {dunningStatus.totalAttempts} of {dunningStatus.totalAttempts + dunningStatus.remainingAttempts}.
+                  {t('settings.subscription_payment_retry_message', 'We\'re attempting to process your payment. Attempt')} {dunningStatus.totalAttempts} {t('settings.subscription_payment_retry_of', 'of')} {dunningStatus.totalAttempts + dunningStatus.remainingAttempts}.
                   {dunningStatus.nextAttemptDate && (
-                    <> Next attempt: {new Date(dunningStatus.nextAttemptDate).toLocaleDateString()}</>
+                    <> {t('settings.subscription_next_attempt', 'Next attempt')}: {new Date(dunningStatus.nextAttemptDate).toLocaleDateString()}</>
                   )}
                 </AlertDescription>
               </Alert>

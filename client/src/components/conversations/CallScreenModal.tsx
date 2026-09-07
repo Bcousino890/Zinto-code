@@ -1515,7 +1515,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="top">
-                    <p>{isMuted ? 'Unmute' : isMicrophoneActive ? 'Mute (Recording)' : 'Mute'}</p>
+                    <p>{isMuted ? t('conversations.call_screen_modal.unmute', 'Unmute') : isMicrophoneActive ? t('conversations.call_screen_modal.mute_recording', 'Mute (Recording)') : t('conversations.call_screen_modal.mute', 'Mute')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -1536,7 +1536,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="top">
-                    <p>Speaker</p>
+                    <p>{t('conversations.call_screen_modal.speaker', 'Speaker')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -1561,7 +1561,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                 )}
               </button>
               <span className="text-white/50 text-xs mt-2 font-medium">
-                {hangUpMutation.isPending ? 'Ending...' : 'End Call'}
+                {hangUpMutation.isPending ? t('conversations.call_screen_modal.ending', 'Ending...') : t('conversations.call_screen_modal.end_call', 'End Call')}
               </span>
             </div>
 
@@ -1572,8 +1572,8 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm z-20">
               <div className="text-center p-6 rounded-2xl bg-slate-800/90 border border-yellow-500/30">
                 <div className="w-12 h-12 mx-auto mb-3 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-                <p className="text-white font-medium">Reconnecting call...</p>
-                <p className="text-white/60 text-sm mt-1">Please wait</p>
+                <p className="text-white font-medium">{t('conversations.call_screen_modal.reconnecting_call', 'Reconnecting call...')}</p>
+                <p className="text-white/60 text-sm mt-1">{t('conversations.call_screen_modal.please_wait', 'Please wait')}</p>
               </div>
             </div>
           )}
@@ -1583,8 +1583,8 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-20">
               <div className="text-center p-8 rounded-2xl bg-slate-800/95 border border-orange-500/30 max-w-sm mx-4">
                 <AlertCircle className="w-12 h-12 mx-auto mb-4 text-orange-400" />
-                <p className="text-white font-semibold mb-2">Call quality is very poor</p>
-                <p className="text-white/70 text-sm mb-4">Would you like to switch to audio-only mode?</p>
+                <p className="text-white font-semibold mb-2">{t('conversations.call_screen_modal.poor_quality', 'Call quality is very poor')}</p>
+                <p className="text-white/70 text-sm mb-4">{t('conversations.call_screen_modal.switch_audio_only', 'Would you like to switch to audio-only mode?')}</p>
                 <div className="flex flex-col gap-2">
                   <Button variant="secondary" size="sm" onClick={() => setShowPoorQualityDialog(false)}>Continue</Button>
                   <Button variant="outline" size="sm" onClick={() => { degradeCallQuality(); setShowPoorQualityDialog(false); }}>Switch to Audio-Only</Button>
@@ -1602,7 +1602,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                   <PhoneOff className="w-8 h-8 text-red-400" />
                 </div>
                 <p className="text-white text-xl font-semibold mb-2">{getStatusTextWithFallback()}</p>
-                <p className="text-white/60 text-sm mb-4">The call could not be completed</p>
+                <p className="text-white/60 text-sm mb-4">{t('conversations.call_screen_modal.call_not_completed', 'The call could not be completed')}</p>
                 <button
                   onClick={onClose}
                   className="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm font-medium transition-colors"
@@ -1690,7 +1690,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                     onClick={onClose}
                     className="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm font-medium transition-colors"
                   >
-                    {t('call_screen.close')}
+                    {t('common.close', 'Close')}
                   </button>
                 </div>
               </div>
@@ -1703,8 +1703,8 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
                   <Phone className="w-8 h-8 text-green-400" />
                 </div>
-                <p className="text-white text-xl font-semibold mb-2">Call Ended</p>
-                <p className="text-white/60 text-sm mb-4">Duration: {formatDuration(callDuration)}</p>
+                <p className="text-white text-xl font-semibold mb-2">{t('conversations.call_screen_modal.call_ended', 'Call Ended')}</p>
+                <p className="text-white/60 text-sm mb-4">{t('conversations.call_screen_modal.duration_label', 'Duration')}: {formatDuration(callDuration)}</p>
                 <button
                   onClick={onClose}
                   className="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm font-medium transition-colors"
@@ -1722,7 +1722,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-orange-500/20 flex items-center justify-center">
                   <MicOff className="w-8 h-8 text-orange-400" />
                 </div>
-                <p className="text-white text-xl font-semibold mb-2">Microphone Access Required</p>
+                <p className="text-white text-xl font-semibold mb-2">{t('conversations.call_screen_modal.mic_access_required', 'Microphone Access Required')}</p>
                 <p className="text-white/60 text-sm mb-4">{micPermissionError}</p>
                 <div className="flex flex-col gap-3">
                   <button
@@ -1733,7 +1733,7 @@ export const CallScreenModal: React.FC<CallScreenModalProps> = ({
                     className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 rounded-full text-white text-sm font-medium transition-colors flex items-center justify-center gap-2"
                   >
                     <Mic className="w-4 h-4" />
-                    Try Again
+                    {t('common.try_again', 'Try Again')}
                   </button>
                   <button
                     onClick={onClose}

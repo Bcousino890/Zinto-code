@@ -167,7 +167,7 @@ export function CompanyDataClearDialog({
     return (
       <div className="space-y-3">
         <div className="flex justify-between items-center">
-          <h4 className="font-medium">Select data types to clear:</h4>
+          <h4 className="font-medium">{t('admin.company_data_clear.select_data_types', 'Select data types to clear')}:</h4>
           <div className="flex gap-2">
             <Button
               type="button"
@@ -175,7 +175,7 @@ export function CompanyDataClearDialog({
               size="sm"
               onClick={selectAllCategories}
             >
-              Select All
+              {t('admin.company_data_clear.select_all', 'Select All')}
             </Button>
             <Button
               type="button"
@@ -183,7 +183,7 @@ export function CompanyDataClearDialog({
               size="sm"
               onClick={deselectAllCategories}
             >
-              Clear Selection
+              {t('admin.company_data_clear.clear_selection', 'Clear Selection')}
             </Button>
           </div>
         </div>
@@ -235,7 +235,7 @@ export function CompanyDataClearDialog({
                     </div>
                   )}
                   {!canSelect && category.count === 0 && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">No data to clear</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('admin.company_data_clear.no_data_to_clear', 'No data to clear')}</p>
                   )}
                 </div>
               </div>
@@ -330,7 +330,7 @@ export function CompanyDataClearDialog({
 
               <div className="space-y-4">
                 <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-                  <h4 className="font-medium mb-3">Selected data types to clear:</h4>
+                  <h4 className="font-medium mb-3">{t('admin.company_data_clear.selected_data_types', 'Selected data types to clear')}:</h4>
                   <div className="grid gap-2">
                     {getSelectedCategoriesData().map((category) => {
                       const Icon = category.icon;
@@ -342,7 +342,7 @@ export function CompanyDataClearDialog({
                           </div>
                           <div className="flex items-center space-x-2">
                             <Badge variant="outline" className="text-xs">
-                              {category.count.toLocaleString()} items
+                              {category.count.toLocaleString()} {t('admin.company_data_clear.items_unit', 'items')}
                             </Badge>
                             {category.estimatedSize && (
                               <Badge variant="secondary" className="text-xs">
@@ -404,7 +404,7 @@ export function CompanyDataClearDialog({
               <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">
                 <Info className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                 <AlertDescription className="text-amber-800 dark:text-amber-200">
-                  <strong>Note:</strong> The company account and users will remain active. Only the selected data types will be cleared.
+                  <strong>{t('admin.company_data_clear.note_label', 'Note')}:</strong> {t('admin.company_data_clear.note_content', 'The company account and users will remain active. Only the selected data types will be cleared.')}
                 </AlertDescription>
               </Alert>
             </div>

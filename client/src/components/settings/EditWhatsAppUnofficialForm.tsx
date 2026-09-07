@@ -161,11 +161,11 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'connected':
-        return <Badge variant="default" className="bg-green-100 text-green-800">Connected</Badge>;
+        return <Badge variant="default" className="bg-green-100 text-green-800">{t('settings.whatsapp.connected', 'Connected')}</Badge>;
       case 'disconnected':
-        return <Badge variant="secondary">Disconnected</Badge>;
+        return <Badge variant="secondary">{t('settings.whatsapp.disconnected', 'Disconnected')}</Badge>;
       case 'error':
-        return <Badge variant="destructive">Error</Badge>;
+        return <Badge variant="destructive">{t('settings.whatsapp.error', 'Error')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -189,7 +189,7 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
         <DialogContent className="sm:max-w-[600px]">
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-2">Loading connection data...</span>
+            <span className="ml-2">{t('settings.whatsapp.loadingConnection', 'Loading connection data...')}</span>
           </div>
         </DialogContent>
       </Dialog>
@@ -202,35 +202,35 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Edit className="h-5 w-5 text-green-500" />
-            Edit WhatsApp Unofficial Connection
+            {t('settings.whatsapp.editTitle', 'Edit WhatsApp Unofficial Connection')}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Configuration */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Basic Configuration</h3>
+            <h3 className="text-lg font-medium">{t('settings.whatsapp.basicConfig', 'Basic Configuration')}</h3>
 
             <div className="grid gap-2">
-              <Label htmlFor="accountName">Account Name</Label>
+              <Label htmlFor="accountName">{t('settings.whatsapp.accountName', 'Account Name')}</Label>
               <Input
                 id="accountName"
                 value={accountName}
                 onChange={(e) => setAccountName(e.target.value)}
-                placeholder="e.g. My WhatsApp"
+                placeholder={t('settings.whatsapp.accountNamePlaceholder', 'e.g. My WhatsApp')}
                 required
               />
               <p className="text-sm text-gray-500">
-                A name to identify this connection
+                {t('settings.whatsapp.accountNameHelp', 'A name to identify this connection')}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label>Connection Details</Label>
+              <Label>{t('settings.whatsapp.connectionDetails', 'Connection Details')}</Label>
               <div className="text-sm text-gray-600">
-                <p>ID: {connectionIdDisplay}</p>
-                <p>Type: {channelType}</p>
-                <p>Status: {getStatusBadge(connectionStatus)}</p>
+                <p>{t('settings.whatsapp.id', 'ID')}: {connectionIdDisplay}</p>
+                <p>{t('settings.common.type', 'Type')}: {channelType}</p>
+                <p>{t('settings.common.status', 'Status')}: {getStatusBadge(connectionStatus)}</p>
               </div>
             </div>
           </div>
@@ -238,10 +238,10 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
           {/* Connection Health Metrics */}
           {healthData && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Connection Health Metrics</h3>
+              <h3 className="text-lg font-medium">{t('settings.whatsapp.healthMetrics', 'Connection Health Metrics')}</h3>
 
               <div className="grid gap-2">
-                <Label>Health Score</Label>
+                <Label>{t('settings.whatsapp.healthScore', 'Health Score')}</Label>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
                     <div
@@ -254,30 +254,30 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
                   </span>
                 </div>
                 <p className="text-sm text-gray-500">
-                  Overall connection health score
+                  {t('settings.whatsapp.healthScoreHelp', 'Overall connection health score')}
                 </p>
               </div>
 
               <div className="grid gap-2">
-                <Label>Latency Metrics</Label>
+                <Label>{t('settings.whatsapp.latencyMetrics', 'Latency Metrics')}</Label>
                 <div className="text-sm text-gray-600 space-y-1">
-                  <p>Current: <span className={getLatencyColor(healthData.lastLatency)}>{healthData.lastLatency ?? 0}ms</span></p>
-                  <p>Average: {healthData.averageLatency ?? 0}ms</p>
+                  <p>{t('settings.whatsapp.current', 'Current')}: <span className={getLatencyColor(healthData.lastLatency)}>{healthData.lastLatency ?? 0}ms</span></p>
+                  <p>{t('settings.whatsapp.average', 'Average')}: {healthData.averageLatency ?? 0}ms</p>
                 </div>
                 <p className="text-sm text-gray-500">
-                  Connection latency in milliseconds
+                  {t('settings.whatsapp.latencyHelp', 'Connection latency in milliseconds')}
                 </p>
               </div>
 
               <div className="grid gap-2">
-                <Label>Last Health Check</Label>
+                <Label>{t('settings.whatsapp.lastCheck', 'Last Health Check')}</Label>
                 <p className="text-sm text-gray-600">
                   {new Date(healthData.lastHealthCheck).toLocaleString()}
                 </p>
               </div>
 
               <div className="grid gap-2">
-                <Label>Connection Status</Label>
+                <Label>{t('settings.whatsapp.connectionStatus', 'Connection Status')}</Label>
                 <div className="flex items-center gap-2">
                   {healthData.status === 'healthy' && <CheckCircle className="h-4 w-4 text-green-500" />}
                   {healthData.status === 'degraded' && <AlertCircle className="h-4 w-4 text-yellow-500" />}
@@ -293,7 +293,7 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
           {/* Form Actions */}
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button type="button" variant="outline" onClick={handleClose}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               type="submit"
@@ -305,7 +305,7 @@ export function EditWhatsAppUnofficialForm({ isOpen, onClose, onSuccess, connect
               ) : (
                 <Edit className="h-4 w-4" />
               )}
-              {isSubmitting ? 'Updating...' : 'Update Connection'}
+              {isSubmitting ? t('settings.whatsapp.updating', 'Updating...') : t('settings.whatsapp.updateButton', 'Update Connection')}
             </Button>
           </div>
         </form>

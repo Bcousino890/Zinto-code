@@ -197,10 +197,10 @@ export default function AiUsageAnalytics() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="7d">Last 7 days</SelectItem>
-                  <SelectItem value="30d">Last 30 days</SelectItem>
-                  <SelectItem value="90d">Last 90 days</SelectItem>
-                  <SelectItem value="1y">Last year</SelectItem>
+                  <SelectItem value="7d">{t('settings.ai_usage.date_range_7d', 'Last 7 days')}</SelectItem>
+                  <SelectItem value="30d">{t('settings.ai_usage.date_range_30d', 'Last 30 days')}</SelectItem>
+                  <SelectItem value="90d">{t('settings.ai_usage.date_range_90d', 'Last 90 days')}</SelectItem>
+                  <SelectItem value="1y">{t('settings.ai_usage.date_range_1y', 'Last year')}</SelectItem>
                 </SelectContent>
               </Select>
               <Button

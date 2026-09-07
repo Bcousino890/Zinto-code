@@ -832,6 +832,46 @@
     "value": "Affiliate analytics data has been refreshed."
   },
   {
+    "key": "admin.affiliate.report.column_conversion_rate",
+    "value": "Conversion Rate"
+  },
+  {
+    "key": "admin.affiliate.report.column_conversions",
+    "value": "Conversions"
+  },
+  {
+    "key": "admin.affiliate.report.column_name",
+    "value": "Name"
+  },
+  {
+    "key": "admin.affiliate.report.column_revenue",
+    "value": "Revenue"
+  },
+  {
+    "key": "admin.affiliate.report.heading",
+    "value": "Affiliate Performance Report"
+  },
+  {
+    "key": "admin.affiliate.report.no_metrics",
+    "value": "No metrics available."
+  },
+  {
+    "key": "admin.affiliate.report.no_performers",
+    "value": "No top performer data available."
+  },
+  {
+    "key": "admin.affiliate.report.summary_heading",
+    "value": "Summary"
+  },
+  {
+    "key": "admin.affiliate.report.title",
+    "value": "Affiliate Report"
+  },
+  {
+    "key": "admin.affiliate.report.top_performers_heading",
+    "value": "Top Performers"
+  },
+  {
     "key": "admin.affiliate.settings.commission_rate_label",
     "value": "Registration page commission rate (%)"
   },
@@ -1476,6 +1516,34 @@
     "value": "+{{count}} in the last period"
   },
   {
+    "key": "admin.auth.adminLoginPreview",
+    "value": "Admin Login Preview"
+  },
+  {
+    "key": "admin.auth.previewNotice",
+    "value": "This is a preview. Changes are not saved yet."
+  },
+  {
+    "key": "admin.auth.previewTitle",
+    "value": "Auth Background Preview"
+  },
+  {
+    "key": "admin.auth.priorityColorGradient",
+    "value": "Color/Gradient Only"
+  },
+  {
+    "key": "admin.auth.priorityImageOnly",
+    "value": "Image Only"
+  },
+  {
+    "key": "admin.auth.priorityLayered",
+    "value": "Layered"
+  },
+  {
+    "key": "admin.auth.userLoginPreview",
+    "value": "User Login Preview"
+  },
+  {
     "key": "admin.back_to_login",
     "value": "Back to admin login"
   },
@@ -1548,6 +1616,14 @@
     "value": "Deep verify - test actual restore to temporary database"
   },
   {
+    "key": "admin.backup.automatic_cleanup_desc",
+    "value": "Automatically delete old backups based on retention period"
+  },
+  {
+    "key": "admin.backup.automatic_cleanup_title",
+    "value": "Automatic Cleanup"
+  },
+  {
     "key": "admin.backup.cleanup.last_failed",
     "value": "Last failed"
   },
@@ -1558,6 +1634,10 @@
   {
     "key": "admin.backup.cleanup.title",
     "value": "Backup Cleanup"
+  },
+  {
+    "key": "admin.backup.cleanup_time_label",
+    "value": "Cleanup Time"
   },
   {
     "key": "admin.backup.days.friday",
@@ -2620,6 +2700,30 @@
     "value": "Clear Data"
   },
   {
+    "key": "admin.companies.company_email_description",
+    "value": "Official email address for the company."
+  },
+  {
+    "key": "admin.companies.company_email_label",
+    "value": "Company Email"
+  },
+  {
+    "key": "admin.companies.company_email_placeholder",
+    "value": "info@company.com"
+  },
+  {
+    "key": "admin.companies.contact_person_description",
+    "value": "Primary contact person for the company."
+  },
+  {
+    "key": "admin.companies.contact_person_label",
+    "value": "Contact Person"
+  },
+  {
+    "key": "admin.companies.contact_person_placeholder",
+    "value": "John Doe"
+  },
+  {
     "key": "admin.companies.delete",
     "value": "Delete"
   },
@@ -3048,6 +3152,18 @@
     "value": "Refresh"
   },
   {
+    "key": "admin.companies.registration_number_description",
+    "value": "Company's 10-digit Commercial Registration Number (CR) issued by the KSA Ministry of Commerce."
+  },
+  {
+    "key": "admin.companies.registration_number_label",
+    "value": "Commercial Registration Number (KSA)"
+  },
+  {
+    "key": "admin.companies.registration_number_placeholder",
+    "value": "1234567890"
+  },
+  {
     "key": "admin.companies.search_placeholder",
     "value": "Search companies..."
   },
@@ -3112,6 +3228,10 @@
     "value": "Proceed to Final Step"
   },
   {
+    "key": "admin.company_data_clear.clear_selection",
+    "value": "Clear Selection"
+  },
+  {
     "key": "admin.company_data_clear.confirm.description",
     "value": "To confirm data clearing, type the exact company name"
   },
@@ -3140,12 +3260,28 @@
     "value": "Final Confirmation"
   },
   {
+    "key": "admin.company_data_clear.items_unit",
+    "value": "items"
+  },
+  {
     "key": "admin.company_data_clear.messages.error_title",
     "value": "Data Clear Failed"
   },
   {
     "key": "admin.company_data_clear.messages.success_title",
     "value": "Data Cleared Successfully"
+  },
+  {
+    "key": "admin.company_data_clear.no_data_to_clear",
+    "value": "No data to clear"
+  },
+  {
+    "key": "admin.company_data_clear.note_content",
+    "value": "The company account and users will remain active. Only the selected data types will be cleared."
+  },
+  {
+    "key": "admin.company_data_clear.note_label",
+    "value": "Note"
   },
   {
     "key": "admin.company_data_clear.preview.load_error",
@@ -3162,6 +3298,18 @@
   {
     "key": "admin.company_data_clear.preview.warnings_title",
     "value": "Important Warnings"
+  },
+  {
+    "key": "admin.company_data_clear.select_all",
+    "value": "Select All"
+  },
+  {
+    "key": "admin.company_data_clear.select_data_types",
+    "value": "Select data types to clear"
+  },
+  {
+    "key": "admin.company_data_clear.selected_data_types",
+    "value": "Selected data types to clear"
   },
   {
     "key": "admin.company_data_clear.steps.confirm_description",
@@ -3736,6 +3884,14 @@
     "value": "Error returning to admin"
   },
   {
+    "key": "admin.forgot_password.check_email_title",
+    "value": "Check your email"
+  },
+  {
+    "key": "admin.forgot_password.email_label",
+    "value": "Admin Email Address"
+  },
+  {
     "key": "admin.forgot_password_description",
     "value": "Enter your admin email address and we'll send you a secure reset link."
   },
@@ -3942,6 +4098,22 @@
   {
     "key": "admin.languages_tab",
     "value": "Languages"
+  },
+  {
+    "key": "admin.licenseError",
+    "value": "⚠️ License Error"
+  },
+  {
+    "key": "admin.licenseErrorReason",
+    "value": "Reason"
+  },
+  {
+    "key": "admin.licenseRenewHelp",
+    "value": "Please renew your license or contact support for assistance."
+  },
+  {
+    "key": "admin.licenseValidationFailed",
+    "value": "License validation failed"
   },
   {
     "key": "admin.login_description",
@@ -4216,16 +4388,68 @@
     "value": "Company Payment Details"
   },
   {
+    "key": "admin.payments.company_view.company_id_label",
+    "value": "Company ID:"
+  },
+  {
     "key": "admin.payments.company_view.company_info",
     "value": "Company Information"
+  },
+  {
+    "key": "admin.payments.company_view.company_name_label",
+    "value": "Company Name:"
+  },
+  {
+    "key": "admin.payments.company_view.current_plan_label",
+    "value": "Current Plan:"
   },
   {
     "key": "admin.payments.company_view.description",
     "value": "Comprehensive payment information for this company"
   },
   {
+    "key": "admin.payments.company_view.last_payment_label",
+    "value": "Last Payment:"
+  },
+  {
+    "key": "admin.payments.company_view.member_since_label",
+    "value": "Member Since:"
+  },
+  {
+    "key": "admin.payments.company_view.next_renewal_label",
+    "value": "Next Renewal:"
+  },
+  {
+    "key": "admin.payments.company_view.no_payment_method",
+    "value": "No payment method on file"
+  },
+  {
+    "key": "admin.payments.company_view.no_payments_yet",
+    "value": "No payments yet"
+  },
+  {
+    "key": "admin.payments.company_view.no_renewal_date",
+    "value": "No renewal date set"
+  },
+  {
+    "key": "admin.payments.company_view.no_transactions",
+    "value": "No payment transactions found for this company."
+  },
+  {
+    "key": "admin.payments.company_view.payment_method_label",
+    "value": "Payment Method:"
+  },
+  {
     "key": "admin.payments.company_view.payment_summary",
     "value": "Payment Summary"
+  },
+  {
+    "key": "admin.payments.company_view.showing_transactions",
+    "value": "Showing 5 of {{total}} transactions"
+  },
+  {
+    "key": "admin.payments.company_view.status_label",
+    "value": "Status:"
   },
   {
     "key": "admin.payments.company_view.subscription",
@@ -4234,6 +4458,10 @@
   {
     "key": "admin.payments.company_view.title",
     "value": "Company Payment Details"
+  },
+  {
+    "key": "admin.payments.company_view.total_paid_label",
+    "value": "Total Paid:"
   },
   {
     "key": "admin.payments.company_view.transactions",
@@ -4246,6 +4474,14 @@
   {
     "key": "admin.payments.copied",
     "value": "Copied to clipboard"
+  },
+  {
+    "key": "admin.payments.copied_description",
+    "value": "The text has been copied to your clipboard."
+  },
+  {
+    "key": "admin.payments.copy_error",
+    "value": "Failed to copy to clipboard"
   },
   {
     "key": "admin.payments.dashboard.short",
@@ -4266,6 +4502,10 @@
   {
     "key": "admin.payments.edit.confirm_status_change",
     "value": "Are you sure you want to change this completed payment back to {{status}}? This action may affect billing and should only be done to correct errors."
+  },
+  {
+    "key": "admin.payments.edit.dialog_description",
+    "value": "Modify payment transaction details. Be careful when changing completed payments."
   },
   {
     "key": "admin.payments.edit.external_id",
@@ -4298,6 +4538,10 @@
   {
     "key": "admin.payments.edit.title",
     "value": "Edit Payment Transaction"
+  },
+  {
+    "key": "admin.payments.edit.updated_description",
+    "value": "The payment transaction has been updated."
   },
   {
     "key": "admin.payments.export.button",
@@ -4440,8 +4684,20 @@
     "value": "methods"
   },
   {
+    "key": "admin.payments.performance.revenue_distribution",
+    "value": "Revenue Distribution"
+  },
+  {
     "key": "admin.payments.performance.short",
     "value": "Performance"
+  },
+  {
+    "key": "admin.payments.performance.success_rate",
+    "value": "Success Rate"
+  },
+  {
+    "key": "admin.payments.performance.successful",
+    "value": "{{count}} successful"
   },
   {
     "key": "admin.payments.performance.table.avg_amount",
@@ -4468,12 +4724,24 @@
     "value": "Payment Method Performance"
   },
   {
+    "key": "admin.payments.performance.transactions_count",
+    "value": "{{count}} transactions"
+  },
+  {
+    "key": "admin.payments.reminders.dialog_description",
+    "value": "Send a payment reminder to the selected company."
+  },
+  {
     "key": "admin.payments.reminders.message_placeholder",
     "value": "Enter reminder message..."
   },
   {
     "key": "admin.payments.reminders.send_button",
     "value": "Send Reminder"
+  },
+  {
+    "key": "admin.payments.reminders.sent_to_company",
+    "value": "Payment reminder has been sent to the company."
   },
   {
     "key": "admin.payments.reminders.success",
@@ -4498,6 +4766,10 @@
   {
     "key": "admin.payments.status.pending",
     "value": "Pending"
+  },
+  {
+    "key": "admin.payments.status_update.marked_received",
+    "value": "The payment has been marked as received."
   },
   {
     "key": "admin.payments.status_update.notes_placeholder",
@@ -4608,6 +4880,14 @@
     "value": "Payment Transactions"
   },
   {
+    "key": "admin.payments.trends.description",
+    "value": "Revenue and transaction trends over time"
+  },
+  {
+    "key": "admin.payments.trends.empty",
+    "value": "No trend data available"
+  },
+  {
     "key": "admin.payments.trends.period.12months",
     "value": "Last 12 Months"
   },
@@ -4656,6 +4936,14 @@
     "value": "Created"
   },
   {
+    "key": "admin.payments.view.dialog_description",
+    "value": "Complete information for transaction #{{id}}"
+  },
+  {
+    "key": "admin.payments.view.external_transaction_id",
+    "value": "External Transaction ID:"
+  },
+  {
     "key": "admin.payments.view.notes",
     "value": "Notes"
   },
@@ -4664,8 +4952,16 @@
     "value": "Payment Method Details"
   },
   {
+    "key": "admin.payments.view.payment_intent_id",
+    "value": "Payment Intent ID:"
+  },
+  {
     "key": "admin.payments.view.payment_method",
     "value": "Payment Method"
+  },
+  {
+    "key": "admin.payments.view.paypal_transaction_id",
+    "value": "PayPal Transaction ID:"
   },
   {
     "key": "admin.payments.view.plan_id",
@@ -4676,8 +4972,16 @@
     "value": "Plan Name"
   },
   {
+    "key": "admin.payments.view.reference",
+    "value": "Reference:"
+  },
+  {
     "key": "admin.payments.view.status",
     "value": "Status"
+  },
+  {
+    "key": "admin.payments.view.stripe_payment_intent_id",
+    "value": "Stripe Payment Intent ID:"
   },
   {
     "key": "admin.payments.view.title",
@@ -5524,8 +5828,32 @@
     "value": "Choose Image"
   },
   {
+    "key": "admin.settings.auth_backgrounds.deleted",
+    "value": "Admin auth background deleted"
+  },
+  {
     "key": "admin.settings.auth_backgrounds.description",
     "value": "Keep admin and user login backgrounds organized in compact panels."
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.error_uploading",
+    "value": "Error uploading admin auth background"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.error_uploading_user",
+    "value": "Error uploading user auth background"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.failed_delete",
+    "value": "Failed to delete admin auth background"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.failed_delete_user",
+    "value": "Failed to delete user auth background"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.failed_upload_user",
+    "value": "Failed to upload user auth background"
   },
   {
     "key": "admin.settings.auth_backgrounds.no_preview",
@@ -5544,6 +5872,14 @@
     "value": "Authentication Page Backgrounds"
   },
   {
+    "key": "admin.settings.auth_backgrounds.uploaded",
+    "value": "Admin auth background uploaded"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.uploaded_desc",
+    "value": "The admin authentication background has been uploaded successfully."
+  },
+  {
     "key": "admin.settings.auth_backgrounds.user.alt",
     "value": "User auth background"
   },
@@ -5554,6 +5890,18 @@
   {
     "key": "admin.settings.auth_backgrounds.user.label",
     "value": "User Auth Background"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.user_deleted",
+    "value": "User auth background deleted"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.user_uploaded",
+    "value": "User auth background uploaded"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.user_uploaded_desc",
+    "value": "The user authentication background has been uploaded successfully."
   },
   {
     "key": "admin.settings.backup",
@@ -5760,6 +6108,94 @@
     "value": "Email Settings"
   },
   {
+    "key": "admin.settings.email.common_ports_help",
+    "value": "Common ports: 587 (STARTTLS, recommended), 465 (SSL/TLS), 25 (No encryption)"
+  },
+  {
+    "key": "admin.settings.email.enable_smtp",
+    "value": "Enable SMTP Email"
+  },
+  {
+    "key": "admin.settings.email.enter_password",
+    "value": "Enter password"
+  },
+  {
+    "key": "admin.settings.email.from_email_address",
+    "value": "From Email Address"
+  },
+  {
+    "key": "admin.settings.email.from_name",
+    "value": "From Name"
+  },
+  {
+    "key": "admin.settings.email.gmail_app_password_hint",
+    "value": "For Gmail, use an App Password instead of your regular password"
+  },
+  {
+    "key": "admin.settings.email.leave_empty_keep_password",
+    "value": "Leave empty to keep current password"
+  },
+  {
+    "key": "admin.settings.email.no_encryption",
+    "value": "None (Port 25)"
+  },
+  {
+    "key": "admin.settings.email.password_set_hint",
+    "value": "Password is set. Leave empty to keep it unchanged, or enter new password."
+  },
+  {
+    "key": "admin.settings.email.save_smtp_settings",
+    "value": "Save SMTP Settings"
+  },
+  {
+    "key": "admin.settings.email.security",
+    "value": "Security"
+  },
+  {
+    "key": "admin.settings.email.select_security",
+    "value": "Select security"
+  },
+  {
+    "key": "admin.settings.email.smtp_description",
+    "value": "When enabled, the system will use SMTP to send emails for password resets, notifications, and other system communications."
+  },
+  {
+    "key": "admin.settings.email.smtp_host",
+    "value": "SMTP Host"
+  },
+  {
+    "key": "admin.settings.email.smtp_password",
+    "value": "SMTP Password"
+  },
+  {
+    "key": "admin.settings.email.smtp_port",
+    "value": "SMTP Port"
+  },
+  {
+    "key": "admin.settings.email.smtp_username",
+    "value": "SMTP Username"
+  },
+  {
+    "key": "admin.settings.email.ssl_implicit_tls",
+    "value": "SSL / Implicit TLS (Port 465)"
+  },
+  {
+    "key": "admin.settings.email.starttls",
+    "value": "STARTTLS (Port 587)"
+  },
+  {
+    "key": "admin.settings.email.test_email_address",
+    "value": "Test Email Address"
+  },
+  {
+    "key": "admin.settings.email.test_email_hint",
+    "value": "Email address to send test emails to"
+  },
+  {
+    "key": "admin.settings.email.title",
+    "value": "SMTP Email Configuration"
+  },
+  {
     "key": "admin.settings.embed.allow_fullscreen",
     "value": "Allow Fullscreen"
   },
@@ -5878,6 +6314,10 @@
   {
     "key": "admin.settings.enable_company_registration",
     "value": "Enable Company Registration"
+  },
+  {
+    "key": "admin.settings.error",
+    "value": "Error"
   },
   {
     "key": "admin.settings.error_connecting_stripe",
@@ -6336,6 +6776,18 @@
     "value": "Media Library"
   },
   {
+    "key": "admin.settings.frontend_website.meta_description",
+    "value": "Meta description"
+  },
+  {
+    "key": "admin.settings.frontend_website.meta_keywords",
+    "value": "Meta keywords"
+  },
+  {
+    "key": "admin.settings.frontend_website.meta_title",
+    "value": "Meta title"
+  },
+  {
     "key": "admin.settings.frontend_website.nav_links",
     "value": "Navigation links"
   },
@@ -6350,6 +6802,18 @@
   {
     "key": "admin.settings.frontend_website.no_managed_pages",
     "value": "No pages yet."
+  },
+  {
+    "key": "admin.settings.frontend_website.og_description",
+    "value": "OG description"
+  },
+  {
+    "key": "admin.settings.frontend_website.og_image",
+    "value": "OG image"
+  },
+  {
+    "key": "admin.settings.frontend_website.og_title",
+    "value": "OG title"
   },
   {
     "key": "admin.settings.frontend_website.open_media",
@@ -6374,6 +6838,10 @@
   {
     "key": "admin.settings.frontend_website.page_enabled",
     "value": "Enabled"
+  },
+  {
+    "key": "admin.settings.frontend_website.page_favicon",
+    "value": "Page favicon"
   },
   {
     "key": "admin.settings.frontend_website.page_href",
@@ -6584,6 +7052,10 @@
     "value": "Show hero image"
   },
   {
+    "key": "admin.settings.frontend_website.show_in_navigation_hints",
+    "value": "Show in navigation hints"
+  },
+  {
     "key": "admin.settings.frontend_website.show_language_switcher",
     "value": "Show language switcher"
   },
@@ -6626,6 +7098,10 @@
   {
     "key": "admin.settings.frontend_website.social_twitter",
     "value": "Twitter / X URL"
+  },
+  {
+    "key": "admin.settings.frontend_website.sort_order",
+    "value": "Sort order"
   },
   {
     "key": "admin.settings.frontend_website.stat_label",
@@ -6802,6 +7278,78 @@
   {
     "key": "admin.settings.general",
     "value": "General"
+  },
+  {
+    "key": "admin.settings.general_settings.12_hour",
+    "value": "12-hour (AM/PM)"
+  },
+  {
+    "key": "admin.settings.general_settings.24_hour",
+    "value": "24-hour"
+  },
+  {
+    "key": "admin.settings.general_settings.add_currency",
+    "value": "Add Currency"
+  },
+  {
+    "key": "admin.settings.general_settings.add_custom_currency",
+    "value": "Add Custom Currency"
+  },
+  {
+    "key": "admin.settings.general_settings.add_custom_currency_desc",
+    "value": "Add a custom currency with a 3-letter ISO 4217 code, name, and symbol."
+  },
+  {
+    "key": "admin.settings.general_settings.cancel",
+    "value": "Cancel"
+  },
+  {
+    "key": "admin.settings.general_settings.currency_code",
+    "value": "Currency Code (ISO 4217)"
+  },
+  {
+    "key": "admin.settings.general_settings.currency_code_help",
+    "value": "3 uppercase letters (e.g., USD, EUR, GBP)"
+  },
+  {
+    "key": "admin.settings.general_settings.currency_name",
+    "value": "Currency Name"
+  },
+  {
+    "key": "admin.settings.general_settings.currency_symbol",
+    "value": "Currency Symbol"
+  },
+  {
+    "key": "admin.settings.general_settings.custom_currencies_label",
+    "value": "Custom Currencies:"
+  },
+  {
+    "key": "admin.settings.general_settings.date_format",
+    "value": "Date Format"
+  },
+  {
+    "key": "admin.settings.general_settings.default_currency",
+    "value": "Default Currency"
+  },
+  {
+    "key": "admin.settings.general_settings.select_currency",
+    "value": "Select currency"
+  },
+  {
+    "key": "admin.settings.general_settings.select_date_format",
+    "value": "Select date format"
+  },
+  {
+    "key": "admin.settings.general_settings.select_time_format",
+    "value": "Select time format"
+  },
+  {
+    "key": "admin.settings.general_settings.time_format",
+    "value": "Time Format"
+  },
+  {
+    "key": "admin.settings.general_settings.title",
+    "value": "General Settings"
   },
   {
     "key": "admin.settings.gradient_end",
@@ -7292,6 +7840,426 @@
     "value": "Partner API"
   },
   {
+    "key": "admin.settings.payment.bank_transfer.account_name",
+    "value": "Account Name"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.account_number",
+    "value": "Account Number"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.bank_name",
+    "value": "Bank Name"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.description",
+    "value": "Configure offline payment via bank transfer"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.enable",
+    "value": "Enable Bank Transfer"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.instructions_placeholder",
+    "value": "Include payment reference in transfer details"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.optional",
+    "value": "Optional"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.payment_instructions",
+    "value": "Payment Instructions"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.routing_number",
+    "value": "Routing Number"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.save_settings",
+    "value": "Save Bank Transfer Settings"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.swift_code",
+    "value": "SWIFT Code"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.title",
+    "value": "Bank Transfer"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.access_token",
+    "value": "Access Token"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.access_token_help",
+    "value": "This is the Production Access Token from your Mercado Pago Developer Dashboard. Make sure to use the correct token for test or production mode."
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.client_id",
+    "value": "Client ID"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.client_secret",
+    "value": "Client Secret"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.connected_to_account",
+    "value": "Connected to Mercado Pago account: {{account}}"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.connection_successful",
+    "value": "Mercado Pago connection successful"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.description",
+    "value": "Configure Mercado Pago payment gateway"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.enable",
+    "value": "Enable Mercado Pago Payments"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.error_connecting",
+    "value": "Error connecting to Mercado Pago"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.error_saving",
+    "value": "Error saving Mercado Pago settings"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.failed_save",
+    "value": "Failed to save Mercado Pago settings"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.failed_test",
+    "value": "Failed to test Mercado Pago connection"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.save_settings",
+    "value": "Save Mercado Pago Settings"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.saved",
+    "value": "Mercado Pago settings saved"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.saved_desc",
+    "value": "The Mercado Pago settings have been saved successfully."
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.test_mode",
+    "value": "Test Mode"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.title",
+    "value": "Mercado Pago Integration"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.connected_successfully",
+    "value": "Connected to Moyasar API successfully"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.connection_successful",
+    "value": "Moyasar connection successful"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.description",
+    "value": "Configure Moyasar payment gateway for Saudi Arabia"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.enable",
+    "value": "Enable Moyasar Payments"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.error_connecting",
+    "value": "Error connecting to Moyasar"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.error_saving",
+    "value": "Error saving Moyasar settings"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.failed_save",
+    "value": "Failed to save Moyasar settings"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.failed_test",
+    "value": "Failed to test Moyasar connection"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.publishable_key",
+    "value": "Publishable Key"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.save_settings",
+    "value": "Save Moyasar Settings"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.saved",
+    "value": "Moyasar settings saved"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.saved_desc",
+    "value": "Your Moyasar payment settings have been updated successfully"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.secret_key",
+    "value": "Secret Key"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.test_mode",
+    "value": "Test Mode"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.title",
+    "value": "Moyasar Integration"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.business_shortcode",
+    "value": "Business Shortcode"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.buygoods",
+    "value": "BuyGoods (Till)"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.callback_url",
+    "value": "Callback URL"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.callback_url_help",
+    "value": "Must be a publicly reachable HTTPS URL that accepts MPESA STK callbacks."
+  },
+  {
+    "key": "admin.settings.payment.mpesa.consumer_key",
+    "value": "Consumer Key"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.consumer_secret",
+    "value": "Consumer Secret"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.description",
+    "value": "Configure MPESA payment gateway for Kenya"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.enable",
+    "value": "Enable MPESA Payments"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.hide_consumer_secret",
+    "value": "Hide Consumer Secret"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.hide_passkey",
+    "value": "Hide Passkey"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.passkey",
+    "value": "Passkey"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.paybill",
+    "value": "PayBill"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.save_settings",
+    "value": "Save MPESA Settings"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.select_shortcode_type",
+    "value": "Select shortcode type"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.shortcode_type",
+    "value": "Shortcode Type"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.show_consumer_secret",
+    "value": "Show Consumer Secret"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.show_passkey",
+    "value": "Show Passkey"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.test_mode_sandbox",
+    "value": "Test Mode (Sandbox)"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.title",
+    "value": "MPESA Integration"
+  },
+  {
+    "key": "admin.settings.payment.paypal.client_id",
+    "value": "Client ID"
+  },
+  {
+    "key": "admin.settings.payment.paypal.client_secret",
+    "value": "Client Secret"
+  },
+  {
+    "key": "admin.settings.payment.paypal.connected_to_account",
+    "value": "Connected to PayPal {{environment}} environment"
+  },
+  {
+    "key": "admin.settings.payment.paypal.connection_successful",
+    "value": "PayPal connection successful"
+  },
+  {
+    "key": "admin.settings.payment.paypal.enable",
+    "value": "Enable PayPal Payments"
+  },
+  {
+    "key": "admin.settings.payment.paypal.error_connecting",
+    "value": "Error connecting to PayPal"
+  },
+  {
+    "key": "admin.settings.payment.paypal.error_saving",
+    "value": "Error saving PayPal settings"
+  },
+  {
+    "key": "admin.settings.payment.paypal.failed_save",
+    "value": "Failed to save PayPal settings"
+  },
+  {
+    "key": "admin.settings.payment.paypal.failed_test",
+    "value": "Failed to test PayPal connection"
+  },
+  {
+    "key": "admin.settings.payment.paypal.sandbox_mode",
+    "value": "Sandbox Mode"
+  },
+  {
+    "key": "admin.settings.payment.paypal.save_settings",
+    "value": "Save PayPal Settings"
+  },
+  {
+    "key": "admin.settings.payment.paypal.saved",
+    "value": "PayPal settings saved"
+  },
+  {
+    "key": "admin.settings.payment.paypal.saved_desc",
+    "value": "The PayPal settings have been saved successfully."
+  },
+  {
+    "key": "admin.settings.payment.paypal.title",
+    "value": "PayPal Integration"
+  },
+  {
+    "key": "admin.settings.payment.paystack.connection_successful",
+    "value": "Paystack connection successful"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_help",
+    "value": "Set this if you get \"Currency not supported by merchant\". Use the currency enabled on your Paystack integration (e.g. NGN for Nigeria, GHS for Ghana)."
+  },
+  {
+    "key": "admin.settings.payment.paystack.description",
+    "value": "Configure Paystack payment gateway"
+  },
+  {
+    "key": "admin.settings.payment.paystack.enable",
+    "value": "Enable Paystack Payments"
+  },
+  {
+    "key": "admin.settings.payment.paystack.error_connecting",
+    "value": "Error connecting to Paystack"
+  },
+  {
+    "key": "admin.settings.payment.paystack.error_saving",
+    "value": "Error saving Paystack settings"
+  },
+  {
+    "key": "admin.settings.payment.paystack.failed_save",
+    "value": "Failed to save Paystack settings"
+  },
+  {
+    "key": "admin.settings.payment.paystack.failed_test",
+    "value": "Failed to test Paystack connection"
+  },
+  {
+    "key": "admin.settings.payment.paystack.live_mode",
+    "value": "Connected in live mode"
+  },
+  {
+    "key": "admin.settings.payment.paystack.merchant_currency",
+    "value": "Merchant Currency"
+  },
+  {
+    "key": "admin.settings.payment.paystack.public_key",
+    "value": "Public Key"
+  },
+  {
+    "key": "admin.settings.payment.paystack.save_settings",
+    "value": "Save Paystack Settings"
+  },
+  {
+    "key": "admin.settings.payment.paystack.saved",
+    "value": "Paystack settings saved"
+  },
+  {
+    "key": "admin.settings.payment.paystack.saved_desc",
+    "value": "The Paystack settings have been saved successfully."
+  },
+  {
+    "key": "admin.settings.payment.paystack.secret_key",
+    "value": "Secret Key"
+  },
+  {
+    "key": "admin.settings.payment.paystack.subaccount",
+    "value": "Subaccount (optional)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.test_mode",
+    "value": "Connected in test mode"
+  },
+  {
+    "key": "admin.settings.payment.paystack.title",
+    "value": "Paystack Integration"
+  },
+  {
+    "key": "admin.settings.payment.paystack.use_app_default",
+    "value": "Use app default"
+  },
+  {
+    "key": "admin.settings.payment.paystack.webhook_secret",
+    "value": "Webhook Secret (optional)"
+  },
+  {
+    "key": "admin.settings.payment.stripe.enable",
+    "value": "Enable Stripe Payments"
+  },
+  {
+    "key": "admin.settings.payment.stripe.publishable_key",
+    "value": "Publishable Key"
+  },
+  {
+    "key": "admin.settings.payment.stripe.save_settings",
+    "value": "Save Stripe Settings"
+  },
+  {
+    "key": "admin.settings.payment.stripe.secret_key",
+    "value": "Secret Key"
+  },
+  {
+    "key": "admin.settings.payment.stripe.test_mode",
+    "value": "Test Mode"
+  },
+  {
+    "key": "admin.settings.payment.stripe.title",
+    "value": "Stripe Integration"
+  },
+  {
+    "key": "admin.settings.payment.stripe.webhook_secret",
+    "value": "Webhook Secret"
+  },
+  {
+    "key": "admin.settings.payment.stripe.webhook_url",
+    "value": "Webhook Endpoint URL"
+  },
+  {
     "key": "admin.settings.payment_gateways",
     "value": "Payment Gateways"
   },
@@ -7506,6 +8474,10 @@
   {
     "key": "admin.settings.save_general_settings",
     "value": "Save General Settings"
+  },
+  {
+    "key": "admin.settings.save_settings",
+    "value": "Save Settings"
   },
   {
     "key": "admin.settings.secondary_color",
@@ -9624,8 +10596,16 @@
     "value": "Conversations by Channel"
   },
   {
+    "key": "analytics.custom_range",
+    "value": "Custom Range"
+  },
+  {
     "key": "analytics.date_range.invalid_title",
     "value": "Invalid Date Range"
+  },
+  {
+    "key": "analytics.description",
+    "value": "Track your communication performance and engagement metrics"
   },
   {
     "key": "analytics.export",
@@ -9688,6 +10668,10 @@
     "value": "Support Requests"
   },
   {
+    "key": "analytics.loading",
+    "value": "Loading analytics data..."
+  },
+  {
     "key": "analytics.period.30days",
     "value": "Last 30 days"
   },
@@ -9716,6 +10700,10 @@
     "value": "Pick a date"
   },
   {
+    "key": "analytics.quick_presets",
+    "value": "Quick Presets"
+  },
+  {
     "key": "analytics.response_time",
     "value": "Response Time"
   },
@@ -9738,6 +10726,30 @@
   {
     "key": "analytics.title",
     "value": "Analytics"
+  },
+  {
+    "key": "analytics.tooltip.channel_distribution",
+    "value": "Distribution of conversations across different channels"
+  },
+  {
+    "key": "analytics.tooltip.conversations_by_channel",
+    "value": "Daily conversation trends across different channels"
+  },
+  {
+    "key": "analytics.tooltip.response_rate",
+    "value": "Percentage of messages that received a response in the selected period"
+  },
+  {
+    "key": "analytics.tooltip.total_contacts",
+    "value": "Total number of contacts created in the selected period"
+  },
+  {
+    "key": "analytics.tooltip.total_conversations",
+    "value": "Total number of conversations in the selected period"
+  },
+  {
+    "key": "analytics.tooltip.total_messages",
+    "value": "Total number of messages sent and received in the selected period"
   },
   {
     "key": "analytics.vs_last_period",
@@ -9990,6 +11002,10 @@
   {
     "key": "auth.check_email_title",
     "value": "Check your email"
+  },
+  {
+    "key": "auth.checking_permissions",
+    "value": "Checking permissions..."
   },
   {
     "key": "auth.choose_username",
@@ -10688,6 +11704,14 @@
     "value": "Failed to update bot status"
   },
   {
+    "key": "calendar.add_new_schedule",
+    "value": "Add New Schedule"
+  },
+  {
+    "key": "calendar.add_new_schedule_desc",
+    "value": "Create a new schedule to organize your events."
+  },
+  {
     "key": "calendar.advanced",
     "value": "Advanced"
   },
@@ -10914,6 +11938,14 @@
   {
     "key": "calendar.calendly_readonly_desc",
     "value": "You can view and cancel Calendly events, but cannot create new ones. Please use your Calendly dashboard to create events."
+  },
+  {
+    "key": "calendar.cancel_appointment",
+    "value": "Cancel Appointment"
+  },
+  {
+    "key": "calendar.cancel_appointment_confirm",
+    "value": "Are you sure you want to cancel this appointment? This action cannot be undone."
   },
   {
     "key": "calendar.canceling",
@@ -11298,6 +12330,10 @@
   {
     "key": "calendar.no_calendars",
     "value": "No calendars available"
+  },
+  {
+    "key": "calendar.no_keep_it",
+    "value": "No, Keep It"
   },
   {
     "key": "calendar.not_connected",
@@ -13400,6 +14436,10 @@
     "value": "Timezone is required"
   },
   {
+    "key": "campaigns.channel.whatsapp",
+    "value": "WhatsApp"
+  },
+  {
     "key": "campaigns.completed",
     "value": "Campaign Completed"
   },
@@ -13594,6 +14634,10 @@
   {
     "key": "campaigns.network_error",
     "value": "Network error: {{error}}"
+  },
+  {
+    "key": "campaigns.new_email_campaign",
+    "value": "New Email Campaign"
   },
   {
     "key": "campaigns.no_campaigns_found",
@@ -14212,8 +15256,20 @@
     "value": "Account Holder"
   },
   {
+    "key": "common.checkout.account_name",
+    "value": "Account Name"
+  },
+  {
     "key": "common.checkout.account_number",
     "value": "Account Number"
+  },
+  {
+    "key": "common.checkout.additional_instructions",
+    "value": "Additional Instructions"
+  },
+  {
+    "key": "common.checkout.amount",
+    "value": "Amount:"
   },
   {
     "key": "common.checkout.amount_due",
@@ -14224,8 +15280,24 @@
     "value": "Bank Name"
   },
   {
+    "key": "common.checkout.bank_transfer_confirm",
+    "value": "Please complete the bank transfer. Your subscription will be activated once payment is confirmed."
+  },
+  {
     "key": "common.checkout.bank_transfer_instructions",
     "value": "Bank Transfer Instructions"
+  },
+  {
+    "key": "common.checkout.choose_payment_method",
+    "value": "Choose your preferred payment method to complete your subscription."
+  },
+  {
+    "key": "common.checkout.complete_payment",
+    "value": "Complete Payment"
+  },
+  {
+    "key": "common.checkout.completed_payment",
+    "value": "I've Completed Payment"
   },
   {
     "key": "common.checkout.copied_to_clipboard",
@@ -14240,12 +15312,32 @@
     "value": "Currency Not Supported"
   },
   {
+    "key": "common.checkout.enter_card_details",
+    "value": "Enter your card details to complete the payment securely with Moyasar."
+  },
+  {
     "key": "common.checkout.enter_mpesa_phone",
     "value": "Please enter your phone number for MPESA payment"
   },
   {
     "key": "common.checkout.error_title",
     "value": "Checkout Error"
+  },
+  {
+    "key": "common.checkout.important_notes",
+    "value": "Important Notes:"
+  },
+  {
+    "key": "common.checkout.info_copied",
+    "value": "The information has been copied to your clipboard."
+  },
+  {
+    "key": "common.checkout.init_failed",
+    "value": "Failed to initialize payment form. Please try again."
+  },
+  {
+    "key": "common.checkout.instructions_received",
+    "value": "Payment Instructions Received"
   },
   {
     "key": "common.checkout.invalid_phone",
@@ -14256,6 +15348,14 @@
     "value": "Please enter a valid Kenyan phone number (format: 254XXXXXXXXX)"
   },
   {
+    "key": "common.checkout.load_failed",
+    "value": "Failed to load payment system. Please try again."
+  },
+  {
+    "key": "common.checkout.made_transfer",
+    "value": "I've Made the Transfer"
+  },
+  {
     "key": "common.checkout.mercadopago_unsupported",
     "value": "Currency {{currency}} may not be supported by Mercado Pago. Supported currencies: {{currencies}}. Please verify your Mercado Pago account configuration."
   },
@@ -14264,8 +15364,32 @@
     "value": "Moyasar only supports SAR (Saudi Riyal). Current configured currency is {{currency}}. Please change the default currency to SAR in General Settings."
   },
   {
+    "key": "common.checkout.mpesa_amount",
+    "value": "KES {{amount}} approx."
+  },
+  {
+    "key": "common.checkout.mpesa_charge_label",
+    "value": "Charge on M-PESA (KES):"
+  },
+  {
+    "key": "common.checkout.mpesa_hint_1",
+    "value": "Check your phone for the MPESA payment prompt"
+  },
+  {
+    "key": "common.checkout.mpesa_hint_2",
+    "value": "Enter your MPESA PIN to complete the payment"
+  },
+  {
+    "key": "common.checkout.mpesa_hint_3",
+    "value": "Your subscription will be activated automatically once payment is confirmed"
+  },
+  {
     "key": "common.checkout.mpesa_only_kes",
     "value": "MPESA only supports KES (Kenyan Shillings). Current configured currency is {{currency}}. Please change the default currency to KES in General Settings."
+  },
+  {
+    "key": "common.checkout.mpesa_payment",
+    "value": "MPESA Payment"
   },
   {
     "key": "common.checkout.mpesa_phone",
@@ -14284,12 +15408,48 @@
     "value": "No checkout URL received from server"
   },
   {
+    "key": "common.checkout.note_1",
+    "value": "Please transfer the exact amount shown above"
+  },
+  {
+    "key": "common.checkout.note_2",
+    "value": "Include the payment reference in your transfer"
+  },
+  {
+    "key": "common.checkout.note_3",
+    "value": "Processing may take 1-3 business days"
+  },
+  {
+    "key": "common.checkout.note_4",
+    "value": "You'll receive an email confirmation once payment is verified"
+  },
+  {
     "key": "common.checkout.order_id",
     "value": "Order ID"
   },
   {
+    "key": "common.checkout.payment_details",
+    "value": "Payment Details"
+  },
+  {
+    "key": "common.checkout.payment_error",
+    "value": "Payment System Error"
+  },
+  {
+    "key": "common.checkout.payment_method",
+    "value": "Payment Method"
+  },
+  {
     "key": "common.checkout.payment_method_required",
     "value": "Payment Method Required"
+  },
+  {
+    "key": "common.checkout.payment_reference",
+    "value": "Payment Reference"
+  },
+  {
+    "key": "common.checkout.payment_summary",
+    "value": "Payment Summary"
   },
   {
     "key": "common.checkout.paypal_unsupported",
@@ -14300,8 +15460,40 @@
     "value": "Paystack supports NGN, GHS, ZAR, and USD. Current currency is {{currency}}."
   },
   {
+    "key": "common.checkout.phone",
+    "value": "Phone:"
+  },
+  {
+    "key": "common.checkout.phone_format_help",
+    "value": "Enter your Kenyan phone number in the format 254XXXXXXXXX"
+  },
+  {
+    "key": "common.checkout.phone_number_label",
+    "value": "Phone Number"
+  },
+  {
     "key": "common.checkout.phone_number_required",
     "value": "Phone Number Required"
+  },
+  {
+    "key": "common.checkout.plan",
+    "value": "Plan:"
+  },
+  {
+    "key": "common.checkout.plan_details",
+    "value": "Plan Details"
+  },
+  {
+    "key": "common.checkout.price",
+    "value": "Price:"
+  },
+  {
+    "key": "common.checkout.proceed_to_payment",
+    "value": "Proceed to Payment"
+  },
+  {
+    "key": "common.checkout.reference_note",
+    "value": "⚠️ Please include this reference in your transfer to ensure quick processing"
   },
   {
     "key": "common.checkout.routing_number",
@@ -14316,8 +15508,28 @@
     "value": "Please select a plan and payment method"
   },
   {
+    "key": "common.checkout.stk_push_sent",
+    "value": "STK Push has been sent to your phone. Please complete the payment."
+  },
+  {
+    "key": "common.checkout.stk_push_sent_label",
+    "value": "STK Push Sent"
+  },
+  {
     "key": "common.checkout.stripe_unsupported",
     "value": "Currency {{currency}} is not supported by Stripe. Please configure a supported currency in General Settings."
+  },
+  {
+    "key": "common.checkout.subscribe_to",
+    "value": "Subscribe to"
+  },
+  {
+    "key": "common.checkout.swift_code",
+    "value": "SWIFT Code"
+  },
+  {
+    "key": "common.checkout.transfer_description",
+    "value": "Please transfer the exact amount to the following bank account. Your subscription will be activated once we confirm the payment."
   },
   {
     "key": "common.clear",
@@ -14346,6 +15558,10 @@
   {
     "key": "common.contacts",
     "value": "contacts"
+  },
+  {
+    "key": "common.continue",
+    "value": "Continue"
   },
   {
     "key": "common.copied",
@@ -14408,6 +15624,14 @@
     "value": "Disabled"
   },
   {
+    "key": "common.disconnect",
+    "value": "Disconnect"
+  },
+  {
+    "key": "common.disconnected",
+    "value": "Disconnected"
+  },
+  {
     "key": "common.done",
     "value": "Done"
   },
@@ -14454,6 +15678,10 @@
   {
     "key": "common.failed_fetch_version",
     "value": "Failed to fetch version"
+  },
+  {
+    "key": "common.field",
+    "value": "field"
   },
   {
     "key": "common.file_size.bytes",
@@ -14622,6 +15850,10 @@
   {
     "key": "common.invalid_filters_description",
     "value": "Could not load filters from URL. Using default filters."
+  },
+  {
+    "key": "common.key",
+    "value": "Key"
   },
   {
     "key": "common.language_selector.changing",
@@ -14796,6 +16028,10 @@
     "value": "Remove"
   },
   {
+    "key": "common.rename",
+    "value": "Rename"
+  },
+  {
     "key": "common.reset",
     "value": "Reset"
   },
@@ -14866,6 +16102,14 @@
   {
     "key": "common.showing",
     "value": "Showing"
+  },
+  {
+    "key": "common.sidebar.sidebar_description",
+    "value": "Displays the mobile sidebar."
+  },
+  {
+    "key": "common.sidebar.sidebar_title",
+    "value": "Sidebar"
   },
   {
     "key": "common.sidebar.toggle",
@@ -14984,6 +16228,14 @@
     "value": "Share"
   },
   {
+    "key": "common.value",
+    "value": "value"
+  },
+  {
+    "key": "common.verifying_access",
+    "value": "Verifying access..."
+  },
+  {
     "key": "common.version_fetch_error",
     "value": "Failed to fetch version"
   },
@@ -15012,16 +16264,88 @@
     "value": "Justify"
   },
   {
+    "key": "common.wysiwyg.align_label",
+    "value": "Align"
+  },
+  {
+    "key": "common.wysiwyg.align_left",
+    "value": "Left"
+  },
+  {
     "key": "common.wysiwyg.align_right",
     "value": "Right"
+  },
+  {
+    "key": "common.wysiwyg.content",
+    "value": "Content"
+  },
+  {
+    "key": "common.wysiwyg.heading",
+    "value": "Heading"
+  },
+  {
+    "key": "common.wysiwyg.heading_1",
+    "value": "Heading 1"
+  },
+  {
+    "key": "common.wysiwyg.heading_2",
+    "value": "Heading 2"
+  },
+  {
+    "key": "common.wysiwyg.heading_3",
+    "value": "Heading 3"
+  },
+  {
+    "key": "common.wysiwyg.heading_4",
+    "value": "Heading 4"
+  },
+  {
+    "key": "common.wysiwyg.heading_5",
+    "value": "Heading 5"
+  },
+  {
+    "key": "common.wysiwyg.heading_6",
+    "value": "Heading 6"
   },
   {
     "key": "common.wysiwyg.html_placeholder",
     "value": "Enter HTML code here..."
   },
   {
+    "key": "common.wysiwyg.image",
+    "value": "Image"
+  },
+  {
+    "key": "common.wysiwyg.insert_text",
+    "value": "Insert text"
+  },
+  {
+    "key": "common.wysiwyg.link",
+    "value": "Link"
+  },
+  {
+    "key": "common.wysiwyg.link_text",
+    "value": "Link"
+  },
+  {
     "key": "common.wysiwyg.normal",
     "value": "Normal"
+  },
+  {
+    "key": "common.wysiwyg.section",
+    "value": "Section"
+  },
+  {
+    "key": "common.wysiwyg.switch_code",
+    "value": "Switch to Code View"
+  },
+  {
+    "key": "common.wysiwyg.switch_visual",
+    "value": "Switch to Visual Editor"
+  },
+  {
+    "key": "common.wysiwyg.text",
+    "value": "Text"
   },
   {
     "key": "common.yes",
@@ -15046,6 +16370,22 @@
   {
     "key": "company.ai_credentials.delete_success_desc",
     "value": "AI credential deleted successfully"
+  },
+  {
+    "key": "company.ai_credentials.status_expired",
+    "value": "Expired"
+  },
+  {
+    "key": "company.ai_credentials.status_invalid",
+    "value": "Invalid"
+  },
+  {
+    "key": "company.ai_credentials.status_pending",
+    "value": "Pending"
+  },
+  {
+    "key": "company.ai_credentials.status_valid",
+    "value": "Valid"
   },
   {
     "key": "company.ai_credentials.test_error",
@@ -15338,6 +16678,22 @@
   {
     "key": "contacts.bulk_delete.warning",
     "value": "This will permanently delete these contacts and all associated conversations, messages, and notes. This action cannot be undone."
+  },
+  {
+    "key": "contacts.channels.instagram",
+    "value": "Instagram"
+  },
+  {
+    "key": "contacts.channels.messenger",
+    "value": "Facebook Messenger"
+  },
+  {
+    "key": "contacts.channels.whatsapp_official",
+    "value": "WhatsApp Official"
+  },
+  {
+    "key": "contacts.channels.whatsapp_unofficial",
+    "value": "WhatsApp Unofficial"
   },
   {
     "key": "contacts.choose_channel",
@@ -17084,6 +18440,46 @@
     "value": "Pin contact to top"
   },
   {
+    "key": "contacts.preview_table.actions",
+    "value": "Actions"
+  },
+  {
+    "key": "contacts.preview_table.company_label",
+    "value": "Company"
+  },
+  {
+    "key": "contacts.preview_table.contact_name",
+    "value": "Contact Name"
+  },
+  {
+    "key": "contacts.preview_table.created_label",
+    "value": "Created"
+  },
+  {
+    "key": "contacts.preview_table.email_label",
+    "value": "Email"
+  },
+  {
+    "key": "contacts.preview_table.last_activity_label",
+    "value": "Last Activity"
+  },
+  {
+    "key": "contacts.preview_table.no_activity",
+    "value": "No activity"
+  },
+  {
+    "key": "contacts.preview_table.no_tags",
+    "value": "-"
+  },
+  {
+    "key": "contacts.preview_table.phone",
+    "value": "Phone"
+  },
+  {
+    "key": "contacts.preview_table.tags",
+    "value": "Tags"
+  },
+  {
     "key": "contacts.redirecting_to_inbox",
     "value": "Redirecting to inbox"
   },
@@ -17896,6 +19292,14 @@
     "value": "Audio device disconnected"
   },
   {
+    "key": "conversations.call_screen_modal.call_ended",
+    "value": "Call Ended"
+  },
+  {
+    "key": "conversations.call_screen_modal.call_not_completed",
+    "value": "The call could not be completed"
+  },
+  {
     "key": "conversations.call_screen_modal.call_quality_optimized_description",
     "value": "Call quality optimized for poor network."
   },
@@ -17912,6 +19316,18 @@
     "value": "Call reconnected"
   },
   {
+    "key": "conversations.call_screen_modal.duration_label",
+    "value": "Duration"
+  },
+  {
+    "key": "conversations.call_screen_modal.end_call",
+    "value": "End Call"
+  },
+  {
+    "key": "conversations.call_screen_modal.ending",
+    "value": "Ending..."
+  },
+  {
     "key": "conversations.call_screen_modal.high_latency_description",
     "value": "Latency is high ({{ms}}ms). You may notice delay."
   },
@@ -17920,12 +19336,48 @@
     "value": "High latency"
   },
   {
+    "key": "conversations.call_screen_modal.mic_access_required",
+    "value": "Microphone Access Required"
+  },
+  {
+    "key": "conversations.call_screen_modal.mute",
+    "value": "Mute"
+  },
+  {
+    "key": "conversations.call_screen_modal.mute_recording",
+    "value": "Mute (Recording)"
+  },
+  {
+    "key": "conversations.call_screen_modal.please_wait",
+    "value": "Please wait"
+  },
+  {
     "key": "conversations.call_screen_modal.poor_call_quality_description",
     "value": "Quality score low ({{score}}). Connection may be unstable."
   },
   {
     "key": "conversations.call_screen_modal.poor_call_quality_title",
     "value": "Poor call quality"
+  },
+  {
+    "key": "conversations.call_screen_modal.poor_quality",
+    "value": "Call quality is very poor"
+  },
+  {
+    "key": "conversations.call_screen_modal.reconnecting_call",
+    "value": "Reconnecting call..."
+  },
+  {
+    "key": "conversations.call_screen_modal.speaker",
+    "value": "Speaker"
+  },
+  {
+    "key": "conversations.call_screen_modal.switch_audio_only",
+    "value": "Would you like to switch to audio-only mode?"
+  },
+  {
+    "key": "conversations.call_screen_modal.unmute",
+    "value": "Unmute"
   },
   {
     "key": "conversations.call_type_selection_modal.description",
@@ -19000,6 +20452,10 @@
     "value": "Maximum number of messages to sync per check"
   },
   {
+    "key": "email.max_sync_messages_placeholder",
+    "value": "100"
+  },
+  {
     "key": "email.new_email",
     "value": "New Email"
   },
@@ -19334,6 +20790,10 @@
   {
     "key": "email.smtp_port",
     "value": "SMTP Port"
+  },
+  {
+    "key": "email.smtp_port_placeholder",
+    "value": "465"
   },
   {
     "key": "email.smtp_settings",
@@ -19822,6 +21282,10 @@
   {
     "key": "emailCampaign.placeholder_description",
     "value": "Optional description"
+  },
+  {
+    "key": "emailCampaign.placeholder_editor_content",
+    "value": "Write your email content here."
   },
   {
     "key": "emailCampaign.placeholder_name",
@@ -21912,6 +23376,10 @@
     "value": "Upload document"
   },
   {
+    "key": "erp.dental.palmer",
+    "value": "Palmer"
+  },
+  {
     "key": "erp.dental.patients.activePatient",
     "value": "Active Patient"
   },
@@ -22906,6 +24374,10 @@
   {
     "key": "erp.dental.treatmentPlans.updated",
     "value": "Treatment plan updated"
+  },
+  {
+    "key": "erp.dental.universal",
+    "value": "Universal"
   },
   {
     "key": "erp.electronicInvoicing.apiKey",
@@ -25128,6 +26600,118 @@
     "value": "ERP"
   },
   {
+    "key": "erp.payment.access_token",
+    "value": "Access token"
+  },
+  {
+    "key": "erp.payment.account_name",
+    "value": "Account name"
+  },
+  {
+    "key": "erp.payment.account_number",
+    "value": "Account number"
+  },
+  {
+    "key": "erp.payment.bank_name",
+    "value": "Bank name"
+  },
+  {
+    "key": "erp.payment.bank_transfer_desc",
+    "value": "Show bank details on invoices"
+  },
+  {
+    "key": "erp.payment.business_shortcode",
+    "value": "Business shortcode"
+  },
+  {
+    "key": "erp.payment.client_id",
+    "value": "Client ID"
+  },
+  {
+    "key": "erp.payment.client_secret",
+    "value": "Client secret"
+  },
+  {
+    "key": "erp.payment.consumer_key",
+    "value": "Consumer key"
+  },
+  {
+    "key": "erp.payment.consumer_secret",
+    "value": "Consumer secret"
+  },
+  {
+    "key": "erp.payment.enabled",
+    "value": "Enabled"
+  },
+  {
+    "key": "erp.payment.instructions",
+    "value": "Instructions"
+  },
+  {
+    "key": "erp.payment.mercadopago_desc",
+    "value": "Accept Mercado Pago payments"
+  },
+  {
+    "key": "erp.payment.merchant_currency",
+    "value": "Merchant currency"
+  },
+  {
+    "key": "erp.payment.moyasar_desc",
+    "value": "Accept Moyasar payments (SAR)"
+  },
+  {
+    "key": "erp.payment.mpesa_desc",
+    "value": "Accept M-PESA mobile money"
+  },
+  {
+    "key": "erp.payment.passkey",
+    "value": "Passkey"
+  },
+  {
+    "key": "erp.payment.paypal_desc",
+    "value": "Accept PayPal payments"
+  },
+  {
+    "key": "erp.payment.paystack_desc",
+    "value": "Accept Paystack payments"
+  },
+  {
+    "key": "erp.payment.public_key",
+    "value": "Public key"
+  },
+  {
+    "key": "erp.payment.publishable_key",
+    "value": "Publishable key"
+  },
+  {
+    "key": "erp.payment.save_manual_methods",
+    "value": "Save manual methods"
+  },
+  {
+    "key": "erp.payment.secret_key",
+    "value": "Secret key"
+  },
+  {
+    "key": "erp.payment.secret_key_paystack",
+    "value": "Secret key"
+  },
+  {
+    "key": "erp.payment.test_connection",
+    "value": "Test connection"
+  },
+  {
+    "key": "erp.payment.test_mode",
+    "value": "Test mode"
+  },
+  {
+    "key": "erp.payment.webhook_secret",
+    "value": "Webhook secret"
+  },
+  {
+    "key": "erp.payment.webhook_url",
+    "value": "Webhook URL"
+  },
+  {
     "key": "erp.payroll.actions.addEmployee",
     "value": "Add employee"
   },
@@ -25872,6 +27456,54 @@
     "value": "Variant saved"
   },
   {
+    "key": "erp.products.variants.add_attribute",
+    "value": "Add attribute"
+  },
+  {
+    "key": "erp.products.variants.description",
+    "value": "Use variants when one product has multiple sellable SKUs, such as sizes, colors, or packages. Each variant can have its own SKU and stock."
+  },
+  {
+    "key": "erp.products.variants.empty",
+    "value": "No variants yet."
+  },
+  {
+    "key": "erp.products.variants.table.actions",
+    "value": "Actions"
+  },
+  {
+    "key": "erp.products.variants.table.attributes",
+    "value": "Attributes"
+  },
+  {
+    "key": "erp.products.variants.table.barcode",
+    "value": "Barcode"
+  },
+  {
+    "key": "erp.products.variants.table.cost",
+    "value": "Cost"
+  },
+  {
+    "key": "erp.products.variants.table.name",
+    "value": "Name"
+  },
+  {
+    "key": "erp.products.variants.table.price",
+    "value": "Price"
+  },
+  {
+    "key": "erp.products.variants.table.sku",
+    "value": "SKU"
+  },
+  {
+    "key": "erp.products.variants.table.sort",
+    "value": "Sort"
+  },
+  {
+    "key": "erp.products.variants.table.status",
+    "value": "Status"
+  },
+  {
     "key": "erp.products.variants.title",
     "value": "Variants / SKUs"
   },
@@ -26264,6 +27896,70 @@
     "value": "Purchases total"
   },
   {
+    "key": "erp.reports.restaurant.avgMinutesToReady",
+    "value": "Avg minutes to ready"
+  },
+  {
+    "key": "erp.reports.restaurant.booked",
+    "value": "Booked"
+  },
+  {
+    "key": "erp.reports.restaurant.cancelled",
+    "value": "Cancelled"
+  },
+  {
+    "key": "erp.reports.restaurant.count",
+    "value": "Count"
+  },
+  {
+    "key": "erp.reports.restaurant.currentQty",
+    "value": "Current qty"
+  },
+  {
+    "key": "erp.reports.restaurant.ingredient",
+    "value": "Ingredient"
+  },
+  {
+    "key": "erp.reports.restaurant.ingredientRisk",
+    "value": "Ingredient risk report"
+  },
+  {
+    "key": "erp.reports.restaurant.noShow",
+    "value": "No-show"
+  },
+  {
+    "key": "erp.reports.restaurant.orderMixReport",
+    "value": "Order mix report"
+  },
+  {
+    "key": "erp.reports.restaurant.reorderPoint",
+    "value": "Reorder point"
+  },
+  {
+    "key": "erp.reports.restaurant.reservationLoad",
+    "value": "Reservation load report"
+  },
+  {
+    "key": "erp.reports.restaurant.riskLevel",
+    "value": "Risk level"
+  },
+  {
+    "key": "erp.reports.restaurant.seated",
+    "value": "Seated"
+  },
+  {
+    "key": "erp.reports.restaurant.serviceType",
+    "value": "Service type"
+  },
+  {
+    "key": "erp.reports.restaurant.ticketThroughput",
+    "value": "Ticket throughput report"
+  },
+  {
+    "key": "erp.reports.restaurant.ticketsCompleted",
+    "value": "Tickets completed"
+  },
+  {
     "key": "erp.reports.sales.byGroup",
     "value": "By {{group}}"
   },
@@ -26314,6 +28010,10 @@
   {
     "key": "erp.reports.types.purchases",
     "value": "Purchase Report"
+  },
+  {
+    "key": "erp.reports.types.restaurant",
+    "value": "Restaurant"
   },
   {
     "key": "erp.reports.types.sales",
@@ -27126,6 +28826,18 @@
   {
     "key": "erp.restaurant.tableFloors.shape",
     "value": "Shape"
+  },
+  {
+    "key": "erp.restaurant.tableFloors.shape_circle",
+    "value": "Circle"
+  },
+  {
+    "key": "erp.restaurant.tableFloors.shape_rectangle",
+    "value": "Rectangle"
+  },
+  {
+    "key": "erp.restaurant.tableFloors.shape_square",
+    "value": "Square"
   },
   {
     "key": "erp.restaurant.tableFloors.startNumber",
@@ -28954,6 +30666,10 @@
   {
     "key": "flow_builder.after",
     "value": "After"
+  },
+  {
+    "key": "flow_builder.agent_notification",
+    "value": "Agent Notification"
   },
   {
     "key": "flow_builder.ai.connect_mcp_tools",
@@ -31108,6 +32824,10 @@
     "value": "Channel type is automatically determined from the Message Trigger. The notification will use the same channel as the incoming message."
   },
   {
+    "key": "flow_builder.auto_reassign",
+    "value": "Auto-reassign conversation to bot"
+  },
+  {
     "key": "flow_builder.available_variables",
     "value": "Available Variables"
   },
@@ -31180,6 +32900,10 @@
     "value": "8 hours"
   },
   {
+    "key": "flow_builder.bot_disable_agent_assignment_label",
+    "value": "Agent Assignment"
+  },
+  {
     "key": "flow_builder.bot_disable_agent_badge",
     "value": "Agent"
   },
@@ -31240,6 +32964,10 @@
     "value": "Error loading agents"
   },
   {
+    "key": "flow_builder.bot_disable_error_loading_variables",
+    "value": "Error loading variables"
+  },
+  {
     "key": "flow_builder.bot_disable_handoff_message_label",
     "value": "Handoff Message"
   },
@@ -31260,6 +32988,10 @@
     "value": "No agents available"
   },
   {
+    "key": "flow_builder.bot_disable_no_variables",
+    "value": "No variables found."
+  },
+  {
     "key": "flow_builder.bot_disable_no_whatsapp_channels",
     "value": "No active WhatsApp channels"
   },
@@ -31274,6 +33006,10 @@
   {
     "key": "flow_builder.bot_disable_notify_assigned_agent",
     "value": "Notify assigned agent"
+  },
+  {
+    "key": "flow_builder.bot_disable_refresh_variables_tooltip",
+    "value": "Refresh captured variables"
   },
   {
     "key": "flow_builder.bot_disable_select_agent",
@@ -32084,6 +33820,110 @@
     "value": "Select one or more Meta channels for ad routing. Only Messenger, Instagram, and WhatsApp channels are available in this mode."
   },
   {
+    "key": "flow_builder.chat_pdf.ai_integration_tooltip",
+    "value": "Chat PDF AI Integration"
+  },
+  {
+    "key": "flow_builder.chat_pdf.ai_model_label",
+    "value": "AI Model"
+  },
+  {
+    "key": "flow_builder.chat_pdf.api_key_label",
+    "value": "API Key"
+  },
+  {
+    "key": "flow_builder.chat_pdf.api_key_placeholder",
+    "value": "Enter your Chat PDF API key"
+  },
+  {
+    "key": "flow_builder.chat_pdf.available_documents",
+    "value": "Available Documents"
+  },
+  {
+    "key": "flow_builder.chat_pdf.available_label",
+    "value": "Available"
+  },
+  {
+    "key": "flow_builder.chat_pdf.choose_document",
+    "value": "Choose a document"
+  },
+  {
+    "key": "flow_builder.chat_pdf.configuration",
+    "value": "Configuration"
+  },
+  {
+    "key": "flow_builder.chat_pdf.delete_document",
+    "value": "Delete document"
+  },
+  {
+    "key": "flow_builder.chat_pdf.delete_node",
+    "value": "Delete node"
+  },
+  {
+    "key": "flow_builder.chat_pdf.document_label",
+    "value": "Document"
+  },
+  {
+    "key": "flow_builder.chat_pdf.enable_ocr",
+    "value": "Enable OCR for scanned documents"
+  },
+  {
+    "key": "flow_builder.chat_pdf.get_api_key",
+    "value": "Get API Key"
+  },
+  {
+    "key": "flow_builder.chat_pdf.integration_title",
+    "value": "Chat PDF Integration"
+  },
+  {
+    "key": "flow_builder.chat_pdf.model_label",
+    "value": "Model"
+  },
+  {
+    "key": "flow_builder.chat_pdf.more_documents",
+    "value": "+{{count}} more documents"
+  },
+  {
+    "key": "flow_builder.chat_pdf.operation_label",
+    "value": "Operation"
+  },
+  {
+    "key": "flow_builder.chat_pdf.operation_select_label",
+    "value": "Operation"
+  },
+  {
+    "key": "flow_builder.chat_pdf.ready_tooltip",
+    "value": "Chat PDF is configured and ready to use"
+  },
+  {
+    "key": "flow_builder.chat_pdf.refresh_document_list",
+    "value": "Refresh document list"
+  },
+  {
+    "key": "flow_builder.chat_pdf.setup_tooltip",
+    "value": "Complete API key and document configuration"
+  },
+  {
+    "key": "flow_builder.chat_pdf.status_ready",
+    "value": "Ready"
+  },
+  {
+    "key": "flow_builder.chat_pdf.status_setup_required",
+    "value": "Setup Required"
+  },
+  {
+    "key": "flow_builder.chat_pdf.test_connection",
+    "value": "Test Connection"
+  },
+  {
+    "key": "flow_builder.chat_pdf.upload_new_document",
+    "value": "Upload New Document"
+  },
+  {
+    "key": "flow_builder.chat_pdf.upload_pdf_button",
+    "value": "Upload PDF (Max 4.5MB)"
+  },
+  {
     "key": "flow_builder.chatpdf_analyze_content",
     "value": "Analyze Content"
   },
@@ -32130,6 +33970,18 @@
   {
     "key": "flow_builder.checking",
     "value": "Checking..."
+  },
+  {
+    "key": "flow_builder.clear_all_variables",
+    "value": "Clear all flow variables"
+  },
+  {
+    "key": "flow_builder.clear_variables",
+    "value": "Clear Variables"
+  },
+  {
+    "key": "flow_builder.close",
+    "value": "Close"
   },
   {
     "key": "flow_builder.code_execution",
@@ -33236,6 +35088,10 @@
     "value": "Configured with {{count}} field(s)"
   },
   {
+    "key": "flow_builder.confirmation_message",
+    "value": "Confirmation Message"
+  },
+  {
     "key": "flow_builder.confirmation_required",
     "value": "Confirmation required"
   },
@@ -33572,6 +35428,18 @@
     "value": "Has required fields"
   },
   {
+    "key": "flow_builder.data_capture_help_capture_rule_label",
+    "value": "Capture Rule:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_capture_rules_label",
+    "value": "Capture Rules:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_common_patterns",
+    "value": "Common Patterns:"
+  },
+  {
     "key": "flow_builder.data_capture_help_config_options",
     "value": "Configuration Options"
   },
@@ -33632,6 +35500,22 @@
     "value": "When a field is marked as required, the flow will fail if the data cannot be captured. Use for critical information only."
   },
   {
+    "key": "flow_builder.data_capture_help_result_label",
+    "value": "Result:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_scope_flow",
+    "value": "Flow"
+  },
+  {
+    "key": "flow_builder.data_capture_help_scope_global",
+    "value": "Global"
+  },
+  {
+    "key": "flow_builder.data_capture_help_scope_session",
+    "value": "Session"
+  },
+  {
     "key": "flow_builder.data_capture_help_source_types",
     "value": "Data Source Types"
   },
@@ -33672,6 +35556,14 @@
     "value": "Any text content, no validation"
   },
   {
+    "key": "flow_builder.data_capture_help_usage_in_next_node_label",
+    "value": "Usage in Next Node:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_usage_label",
+    "value": "Usage:"
+  },
+  {
     "key": "flow_builder.data_capture_help_user_input",
     "value": "User Input & Custom Prompt"
   },
@@ -33682,6 +35574,10 @@
   {
     "key": "flow_builder.data_capture_help_user_input_desc",
     "value": "Captures direct user responses or prompts users for specific information."
+  },
+  {
+    "key": "flow_builder.data_capture_help_user_message_label",
+    "value": "User Message:"
   },
   {
     "key": "flow_builder.data_capture_help_validation",
@@ -33972,16 +35868,40 @@
     "value": "Connection mode"
   },
   {
+    "key": "flow_builder.db_connection_string",
+    "value": "Connection String"
+  },
+  {
     "key": "flow_builder.db_connection_string_placeholder",
     "value": "postgres://user:pass@host:5432/db"
+  },
+  {
+    "key": "flow_builder.db_database",
+    "value": "database"
+  },
+  {
+    "key": "flow_builder.db_detected_parameters",
+    "value": "Detected parameters"
   },
   {
     "key": "flow_builder.db_engine",
     "value": "Engine"
   },
   {
+    "key": "flow_builder.db_fields",
+    "value": "Fields"
+  },
+  {
+    "key": "flow_builder.db_host",
+    "value": "host"
+  },
+  {
     "key": "flow_builder.db_json_view",
     "value": "JSON view"
+  },
+  {
+    "key": "flow_builder.db_mysql",
+    "value": "MySQL"
   },
   {
     "key": "flow_builder.db_no_connection",
@@ -33998,6 +35918,26 @@
   {
     "key": "flow_builder.db_param_hint",
     "value": "Use {{syntax}} syntax — values are bound as SQL parameters, never interpolated."
+  },
+  {
+    "key": "flow_builder.db_params",
+    "value": "params"
+  },
+  {
+    "key": "flow_builder.db_password",
+    "value": "password"
+  },
+  {
+    "key": "flow_builder.db_port",
+    "value": "port"
+  },
+  {
+    "key": "flow_builder.db_postgres",
+    "value": "Postgres"
+  },
+  {
+    "key": "flow_builder.db_query_label",
+    "value": "Query"
   },
   {
     "key": "flow_builder.db_query_placeholder",
@@ -34038,6 +35978,14 @@
   {
     "key": "flow_builder.db_truncated_notice",
     "value": "Showing first {{limit}} rows"
+  },
+  {
+    "key": "flow_builder.db_use_ssl",
+    "value": "Use SSL"
+  },
+  {
+    "key": "flow_builder.db_username",
+    "value": "username"
   },
   {
     "key": "flow_builder.deal_id",
@@ -34704,6 +36652,34 @@
     "value": "Ask a question about documents in the selected folder"
   },
   {
+    "key": "flow_builder.documind_complete_config",
+    "value": "Complete API key and folder configuration"
+  },
+  {
+    "key": "flow_builder.documind_config_completeness",
+    "value": "Configuration completeness: {{progress}}%"
+  },
+  {
+    "key": "flow_builder.documind_config_incomplete",
+    "value": "Complete required fields to reach 70%"
+  },
+  {
+    "key": "flow_builder.documind_config_ready",
+    "value": "Configuration ready!"
+  },
+  {
+    "key": "flow_builder.documind_configured_percent",
+    "value": "{{progress}}% configured"
+  },
+  {
+    "key": "flow_builder.documind_connected",
+    "value": "Connected"
+  },
+  {
+    "key": "flow_builder.documind_connection_error",
+    "value": "Connection Error"
+  },
+  {
     "key": "flow_builder.documind_conversation_history",
     "value": "Conversation History"
   },
@@ -34720,6 +36696,18 @@
     "value": "Include conversation history"
   },
   {
+    "key": "flow_builder.documind_files_label",
+    "value": "Files:"
+  },
+  {
+    "key": "flow_builder.documind_folder_label",
+    "value": "Folder:"
+  },
+  {
+    "key": "flow_builder.documind_hide_config",
+    "value": "Hide configuration panel"
+  },
+  {
     "key": "flow_builder.documind_history_help",
     "value": "Previous messages to include for context"
   },
@@ -34728,8 +36716,24 @@
     "value": "Message Limit"
   },
   {
+    "key": "flow_builder.documind_integration_title",
+    "value": "Documind Integration"
+  },
+  {
     "key": "flow_builder.documind_node_title",
     "value": "Documind AI"
+  },
+  {
+    "key": "flow_builder.documind_not_connected",
+    "value": "Not Connected"
+  },
+  {
+    "key": "flow_builder.documind_operation_label",
+    "value": "Operation:"
+  },
+  {
+    "key": "flow_builder.documind_ready_use",
+    "value": "Documind is configured and ready to use"
   },
   {
     "key": "flow_builder.documind_search_content",
@@ -34738,6 +36742,10 @@
   {
     "key": "flow_builder.documind_search_content_description",
     "value": "Search for specific content across documents"
+  },
+  {
+    "key": "flow_builder.documind_show_config",
+    "value": "Show configuration panel"
   },
   {
     "key": "flow_builder.draft",
@@ -35360,6 +37368,10 @@
     "value": "Error loading flow"
   },
   {
+    "key": "flow_builder.error_loading_variables",
+    "value": "Error loading variables"
+  },
+  {
     "key": "flow_builder.error_updating_flow",
     "value": "Error updating flow"
   },
@@ -35504,6 +37516,10 @@
     "value": "Last activity"
   },
   {
+    "key": "flow_builder.execution_history_max",
+    "value": "max"
+  },
+  {
     "key": "flow_builder.execution_history_no_steps",
     "value": "No node execution records were captured for this run."
   },
@@ -35518,6 +37534,14 @@
   {
     "key": "flow_builder.execution_history_recent_runs_subtitle",
     "value": "Pick a run to inspect node-level history."
+  },
+  {
+    "key": "flow_builder.execution_history_retries",
+    "value": "Retries"
+  },
+  {
+    "key": "flow_builder.execution_history_retry",
+    "value": "retry"
   },
   {
     "key": "flow_builder.execution_history_run_details",
@@ -35836,6 +37860,10 @@
     "value": "From Domain"
   },
   {
+    "key": "flow_builder.from_pipeline_optional",
+    "value": "From Pipeline (Optional)"
+  },
+  {
     "key": "flow_builder.fully_configured_ready",
     "value": "Fully configured and ready"
   },
@@ -35920,6 +37948,10 @@
     "value": "Exportar como"
   },
   {
+    "key": "flow_builder.gamma.export_format_png",
+    "value": "PNG (per card)"
+  },
+  {
     "key": "flow_builder.gamma.export_pdf",
     "value": "PDF"
   },
@@ -35962,6 +37994,26 @@
   {
     "key": "flow_builder.gamma.format_presentation",
     "value": "Presentación"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_2_5_flash",
+    "value": "Gemini 2.5 Flash"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_2_5_flash_lite",
+    "value": "Gemini 2.5 Flash-Lite"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_2_5_pro",
+    "value": "Gemini 2.5 Pro"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_3_1_pro",
+    "value": "Gemini 3.1 Pro (recommended)"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_3_5_flash",
+    "value": "Gemini 3.5 Flash (thinking)"
   },
   {
     "key": "flow_builder.gamma.gemini_history_limit",
@@ -36112,6 +38164,30 @@
     "value": "{{contact.name}}-presentacion"
   },
   {
+    "key": "flow_builder.gamma.position_bottom_center",
+    "value": "Bottom Center"
+  },
+  {
+    "key": "flow_builder.gamma.position_bottom_left",
+    "value": "Bottom Left"
+  },
+  {
+    "key": "flow_builder.gamma.position_bottom_right",
+    "value": "Bottom Right"
+  },
+  {
+    "key": "flow_builder.gamma.position_top_center",
+    "value": "Top Center"
+  },
+  {
+    "key": "flow_builder.gamma.position_top_left",
+    "value": "Top Left"
+  },
+  {
+    "key": "flow_builder.gamma.position_top_right",
+    "value": "Top Right"
+  },
+  {
     "key": "flow_builder.gamma.prompt",
     "value": "Indicación"
   },
@@ -36154,6 +38230,22 @@
   {
     "key": "flow_builder.gamma.setup_required",
     "value": "Configuración requerida"
+  },
+  {
+    "key": "flow_builder.gamma.size_lg",
+    "value": "lg (large)"
+  },
+  {
+    "key": "flow_builder.gamma.size_md",
+    "value": "md (medium)"
+  },
+  {
+    "key": "flow_builder.gamma.size_sm",
+    "value": "sm (small)"
+  },
+  {
+    "key": "flow_builder.gamma.size_xl",
+    "value": "xl (extra large)"
   },
   {
     "key": "flow_builder.gamma.system_themes",
@@ -36794,6 +38886,10 @@
   {
     "key": "flow_builder.google_sheets.test_connect_first",
     "value": "Please connect your Google account above to test the connection"
+  },
+  {
+    "key": "flow_builder.google_sheets.test_match_tooltip",
+    "value": "Test if rows matching your criteria exist"
   },
   {
     "key": "flow_builder.google_sheets.test_sample_row",
@@ -37514,6 +39610,14 @@
   {
     "key": "flow_builder.keyword_case_sensitive_suffix",
     "value": "(case sensitive)"
+  },
+  {
+    "key": "flow_builder.keyword_match_placeholder",
+    "value": "Text to match"
+  },
+  {
+    "key": "flow_builder.keyword_match_value",
+    "value": "Match Value:"
   },
   {
     "key": "flow_builder.keyword_match_value_label",
@@ -40668,6 +42772,10 @@
     "value": "Please enter your n8n instance URL"
   },
   {
+    "key": "flow_builder.n8n_integration",
+    "value": "n8n Integration"
+  },
+  {
     "key": "flow_builder.n8n_integration_examples",
     "value": "📋 Integration Examples"
   },
@@ -40948,6 +43056,10 @@
     "value": "No image provided"
   },
   {
+    "key": "flow_builder.no_match_output",
+    "value": "A \"no match\" output will be available for unmatched responses."
+  },
+  {
     "key": "flow_builder.no_match_route",
     "value": "No keyword match"
   },
@@ -40958,6 +43070,10 @@
   {
     "key": "flow_builder.no_url_provided",
     "value": "No URL provided"
+  },
+  {
+    "key": "flow_builder.no_variables_found",
+    "value": "No variables found."
   },
   {
     "key": "flow_builder.node_connections_removed",
@@ -41256,6 +43372,14 @@
     "value": "Notification sent successfully"
   },
   {
+    "key": "flow_builder.notify_agent",
+    "value": "Notify Agent"
+  },
+  {
+    "key": "flow_builder.notify_agent_reenablement",
+    "value": "Notify agent of bot re-enablement"
+  },
+  {
     "key": "flow_builder.operation_type",
     "value": "Operation Type"
   },
@@ -41372,6 +43496,14 @@
     "value": "Please answer:"
   },
   {
+    "key": "flow_builder.poll_display_text",
+    "value": "Display Text:"
+  },
+  {
+    "key": "flow_builder.poll_enable_go_back",
+    "value": "Enable Go Back"
+  },
+  {
     "key": "flow_builder.poll_go_back_default",
     "value": "← Go Back"
   },
@@ -41426,6 +43558,10 @@
   {
     "key": "flow_builder.poll_responds_to",
     "value": "Responds to"
+  },
+  {
+    "key": "flow_builder.poll_response_value",
+    "value": "Response Value:"
   },
   {
     "key": "flow_builder.postman_add_nodes",
@@ -41616,6 +43752,10 @@
     "value": "I have another question."
   },
   {
+    "key": "flow_builder.quick_reply_display_text",
+    "value": "Display Text:"
+  },
+  {
     "key": "flow_builder.quick_reply_each_output",
     "value": "Each option will have its own output connection."
   },
@@ -41628,8 +43768,20 @@
     "value": "← Go Back"
   },
   {
+    "key": "flow_builder.quick_reply_go_back_display_help",
+    "value": "Text shown to users for the go back option"
+  },
+  {
     "key": "flow_builder.quick_reply_go_back_label",
     "value": "Go Back Option:"
+  },
+  {
+    "key": "flow_builder.quick_reply_go_back_value_default",
+    "value": "go_back"
+  },
+  {
+    "key": "flow_builder.quick_reply_go_back_value_help",
+    "value": "Value users can type to trigger the go back action"
   },
   {
     "key": "flow_builder.quick_reply_invalid_response",
@@ -41638,6 +43790,10 @@
   {
     "key": "flow_builder.quick_reply_invalid_response_label",
     "value": "Invalid Response Message"
+  },
+  {
+    "key": "flow_builder.quick_reply_invalid_response_placeholder",
+    "value": "Message to send when user's response doesn't match any option..."
   },
   {
     "key": "flow_builder.quick_reply_message_label",
@@ -41656,8 +43812,36 @@
     "value": "Options"
   },
   {
+    "key": "flow_builder.quick_reply_response_value",
+    "value": "Response Value:"
+  },
+  {
+    "key": "flow_builder.quick_reply_text_to_display",
+    "value": "Text to display"
+  },
+  {
+    "key": "flow_builder.quick_reply_type_message_placeholder",
+    "value": "Type your message here..."
+  },
+  {
+    "key": "flow_builder.quick_reply_value_help",
+    "value": "User can respond with this value to select this option"
+  },
+  {
+    "key": "flow_builder.quick_reply_value_to_match",
+    "value": "Value to match"
+  },
+  {
+    "key": "flow_builder.re_enable_bot",
+    "value": "Re-enable Bot"
+  },
+  {
     "key": "flow_builder.ready",
     "value": "Ready"
+  },
+  {
+    "key": "flow_builder.refresh_variables",
+    "value": "Refresh captured variables"
   },
   {
     "key": "flow_builder.regex_pattern",
@@ -41686,6 +43870,22 @@
   {
     "key": "flow_builder.remove_image",
     "value": "Remove Image"
+  },
+  {
+    "key": "flow_builder.reset_bot_node_title",
+    "value": "Reset Bot"
+  },
+  {
+    "key": "flow_builder.reset_flow",
+    "value": "Reset Flow"
+  },
+  {
+    "key": "flow_builder.reset_flow_beginning",
+    "value": "Reset flow to beginning"
+  },
+  {
+    "key": "flow_builder.reset_scope",
+    "value": "Reset Scope"
   },
   {
     "key": "flow_builder.result",
@@ -41798,6 +43998,14 @@
   {
     "key": "flow_builder.send_audio",
     "value": "Send Audio"
+  },
+  {
+    "key": "flow_builder.send_confirmation",
+    "value": "Send Confirmation"
+  },
+  {
+    "key": "flow_builder.send_confirmation_message",
+    "value": "Send confirmation message"
   },
   {
     "key": "flow_builder.send_document",
@@ -42102,6 +44310,10 @@
   {
     "key": "flow_builder.shopify_webhooks",
     "value": "Webhooks"
+  },
+  {
+    "key": "flow_builder.shortcuts_label",
+    "value": "Shortcuts:"
   },
   {
     "key": "flow_builder.show_configuration_options",
@@ -42470,6 +44682,10 @@
   {
     "key": "flow_builder.timing_config",
     "value": "Timing Configuration"
+  },
+  {
+    "key": "flow_builder.to_pipeline_optional",
+    "value": "To Pipeline (Optional)"
   },
   {
     "key": "flow_builder.translation",
@@ -43224,6 +45440,10 @@
     "value": "Enter value or {{variable}}"
   },
   {
+    "key": "flow_builder.update_pipeline_stage_node.invalid_config",
+    "value": "Invalid Config"
+  },
+  {
     "key": "flow_builder.update_pipeline_stage_node.keep_current",
     "value": "Keep current"
   },
@@ -43262,6 +45482,22 @@
   {
     "key": "flow_builder.update_pipeline_stage_node.only_revert_if_no_activity_help",
     "value": "Only revert the deal if no activity occurred since the stage change"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.operation_create_deal",
+    "value": "Create Deal"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.operation_create_stage",
+    "value": "Create Stage"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.operation_type_help",
+    "value": "Choose what action to perform in the pipeline"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.operation_update_stage",
+    "value": "Update Stage"
   },
   {
     "key": "flow_builder.update_pipeline_stage_node.pipeline_filter_help",
@@ -43308,12 +45544,20 @@
     "value": "Stage Name"
   },
   {
+    "key": "flow_builder.update_pipeline_stage_node.stage_revert_error",
+    "value": "Stage revert is enabled but no target stage is selected"
+  },
+  {
     "key": "flow_builder.update_pipeline_stage_node.stage_revert_help",
     "value": "Automatically revert deal to a previous stage after a specified time if no action is taken"
   },
   {
     "key": "flow_builder.update_pipeline_stage_node.stage_revert_settings",
     "value": "Stage Revert Settings"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.tag_management",
+    "value": "Tag Management"
   },
   {
     "key": "flow_builder.update_pipeline_stage_node.tags_to_add",
@@ -43472,6 +45716,10 @@
     "value": "All Categories"
   },
   {
+    "key": "flow_builder.variable_browser_browse_variables",
+    "value": "Browse Variables"
+  },
+  {
     "key": "flow_builder.variable_browser_clear_all_confirm",
     "value": "Delete All Sessions"
   },
@@ -43500,6 +45748,18 @@
     "value": "Clear all sessions for this flow"
   },
   {
+    "key": "flow_builder.variable_browser_clear_data",
+    "value": "Clear Data"
+  },
+  {
+    "key": "flow_builder.variable_browser_clear_session_dialog_desc",
+    "value": "Are you sure you want to clear all variable data for this session? This action cannot be undone."
+  },
+  {
+    "key": "flow_builder.variable_browser_clear_session_dialog_title",
+    "value": "Clear Session Data"
+  },
+  {
     "key": "flow_builder.variable_browser_clear_session_error_title",
     "value": "Error clearing session data"
   },
@@ -43522,6 +45782,10 @@
   {
     "key": "flow_builder.variable_browser_description",
     "value": "Browse and manage flow variables"
+  },
+  {
+    "key": "flow_builder.variable_browser_description_dialog",
+    "value": "Browse and select variables to use in your flow"
   },
   {
     "key": "flow_builder.variable_browser_error_loading_sessions",
@@ -43653,6 +45917,10 @@
   },
   {
     "key": "flow_builder.variable_browser_title",
+    "value": "Variable Browser"
+  },
+  {
+    "key": "flow_builder.variable_browser_title_dialog",
     "value": "Variable Browser"
   },
   {
@@ -43966,6 +46234,18 @@
   {
     "key": "flow_builder.wait_seconds",
     "value": "Seconds"
+  },
+  {
+    "key": "flow_builder.wait_select_date",
+    "value": "Select date"
+  },
+  {
+    "key": "flow_builder.wait_select_timezone",
+    "value": "Select timezone"
+  },
+  {
+    "key": "flow_builder.wait_select_unit",
+    "value": "Select unit"
   },
   {
     "key": "flow_builder.wait_time",
@@ -44384,6 +46664,18 @@
     "value": "Contact Resolution"
   },
   {
+    "key": "flow_builder.webhook_inspector_contact_id",
+    "value": "Contact ID:"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_contact_name",
+    "value": "Contact name:"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_conversation_id",
+    "value": "Conversation ID:"
+  },
+  {
     "key": "flow_builder.webhook_inspector_error_reason",
     "value": "Error"
   },
@@ -44398,6 +46690,10 @@
   {
     "key": "flow_builder.webhook_inspector_headers",
     "value": "Headers"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_ip",
+    "value": "IP:"
   },
   {
     "key": "flow_builder.webhook_inspector_no_contact",
@@ -44420,8 +46716,16 @@
     "value": "Overview"
   },
   {
+    "key": "flow_builder.webhook_inspector_path",
+    "value": "Path:"
+  },
+  {
     "key": "flow_builder.webhook_inspector_payload",
     "value": "Payload"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_request_id",
+    "value": "Request ID:"
   },
   {
     "key": "flow_builder.webhook_inspector_response_time",
@@ -44432,12 +46736,20 @@
     "value": "Status"
   },
   {
+    "key": "flow_builder.webhook_inspector_strategy",
+    "value": "Strategy:"
+  },
+  {
     "key": "flow_builder.webhook_inspector_timestamp",
     "value": "Timestamp"
   },
   {
     "key": "flow_builder.webhook_inspector_title",
     "value": "Webhook Request"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_user_agent",
+    "value": "User-Agent:"
   },
   {
     "key": "flow_builder.webhook_integration",
@@ -46432,6 +48744,10 @@
     "value": "You are unavailable for inbox assignments. Click to mark yourself available."
   },
   {
+    "key": "knowledge_base.chunks",
+    "value": "Chunks:"
+  },
+  {
     "key": "knowledge_base.config.advanced_retrieval_title",
     "value": "Advanced Retrieval"
   },
@@ -46728,6 +49044,18 @@
     "value": "Upload your first document to get started"
   },
   {
+    "key": "knowledge_base.file_type",
+    "value": "File Type:"
+  },
+  {
+    "key": "knowledge_base.processing_time",
+    "value": "Processing Time:"
+  },
+  {
+    "key": "knowledge_base.processor.all_available",
+    "value": "All processors available"
+  },
+  {
     "key": "knowledge_base.processor.checking",
     "value": "Checking processor capabilities..."
   },
@@ -46752,6 +49080,14 @@
     "value": "Installation Instructions"
   },
   {
+    "key": "knowledge_base.processor.pdf_advanced",
+    "value": "PDF Parser (Advanced)"
+  },
+  {
+    "key": "knowledge_base.processor.pdf_basic",
+    "value": "PDF Parser (Basic)"
+  },
+  {
     "key": "knowledge_base.processor.processors",
     "value": "Document Processors"
   },
@@ -46762,6 +49098,14 @@
   {
     "key": "knowledge_base.processor.title",
     "value": "Document Processor Status"
+  },
+  {
+    "key": "knowledge_base.processor.word_document",
+    "value": "Word Document Parser"
+  },
+  {
+    "key": "knowledge_base.status",
+    "value": "Status:"
   },
   {
     "key": "knowledge_base.status.completed",
@@ -46996,6 +49340,10 @@
     "value": "Failed to load page content"
   },
   {
+    "key": "landing.get_started",
+    "value": "Get Started"
+  },
+  {
     "key": "landing.hero.sign_in",
     "value": "Sign In"
   },
@@ -47106,6 +49454,10 @@
   {
     "key": "landing.pricing.users",
     "value": "Up to {{count}} users"
+  },
+  {
+    "key": "landing.sign_in",
+    "value": "Sign In"
   },
   {
     "key": "landing.trust.enterprise_security",
@@ -48296,6 +50648,94 @@
     "value": "What happens next:"
   },
   {
+    "key": "meta_config.api_accessibility",
+    "value": "API Accessibility"
+  },
+  {
+    "key": "meta_config.companies_using",
+    "value": "Companies Using"
+  },
+  {
+    "key": "meta_config.credentials",
+    "value": "Credentials"
+  },
+  {
+    "key": "meta_config.health_checks",
+    "value": "Health Checks"
+  },
+  {
+    "key": "meta_config.last_checked",
+    "value": "Last checked"
+  },
+  {
+    "key": "meta_config.last_used",
+    "value": "Last Used"
+  },
+  {
+    "key": "meta_config.last_validated",
+    "value": "Last Validated"
+  },
+  {
+    "key": "meta_config.not_subscribed",
+    "value": "Not Subscribed"
+  },
+  {
+    "key": "meta_config.overall_health_status",
+    "value": "Overall Health Status"
+  },
+  {
+    "key": "meta_config.response_time",
+    "value": "Response Time"
+  },
+  {
+    "key": "meta_config.subscribed",
+    "value": "Subscribed"
+  },
+  {
+    "key": "meta_config.troubleshooting_credentials",
+    "value": "Verify your App ID, App Secret, and Business Manager ID are correct"
+  },
+  {
+    "key": "meta_config.troubleshooting_subscriptions",
+    "value": "Check that webhook subscriptions are properly configured in Meta Business Manager"
+  },
+  {
+    "key": "meta_config.troubleshooting_tips",
+    "value": "Troubleshooting Tips"
+  },
+  {
+    "key": "meta_config.troubleshooting_token",
+    "value": "Verify your access token has the required permissions"
+  },
+  {
+    "key": "meta_config.troubleshooting_webhook",
+    "value": "Ensure your webhook URL is publicly accessible and uses HTTPS"
+  },
+  {
+    "key": "meta_config.usage_statistics",
+    "value": "Usage Statistics"
+  },
+  {
+    "key": "meta_config.validation",
+    "value": "Validation"
+  },
+  {
+    "key": "meta_config.validation_status",
+    "value": "Validation Status"
+  },
+  {
+    "key": "meta_config.webhook_connectivity",
+    "value": "Webhook Connectivity"
+  },
+  {
+    "key": "meta_config.webhook_field_subscriptions",
+    "value": "Webhook Field Subscriptions"
+  },
+  {
+    "key": "meta_config.webhook_subscriptions",
+    "value": "Webhook Subscriptions"
+  },
+  {
     "key": "nav.analytics",
     "value": "Analytics"
   },
@@ -48748,6 +51188,10 @@
     "value": "SEO title for search engines"
   },
   {
+    "key": "pages.no_content_available",
+    "value": "No content available"
+  },
+  {
     "key": "pages.page_info",
     "value": "Page Information"
   },
@@ -48762,6 +51206,18 @@
   {
     "key": "pages.public_url",
     "value": "Public URL"
+  },
+  {
+    "key": "pages.public_website.page_not_found_code",
+    "value": "404"
+  },
+  {
+    "key": "pages.public_website.page_not_found_description",
+    "value": "The page you're looking for doesn't exist or has been moved."
+  },
+  {
+    "key": "pages.public_website.page_not_found_title",
+    "value": "Page Not Found"
   },
   {
     "key": "pages.publish",
@@ -49210,6 +51666,10 @@
   {
     "key": "pipeline.avatar_must_be_less_than_5mb",
     "value": "Avatar must be less than 5MB"
+  },
+  {
+    "key": "pipeline.average_days_last_activity",
+    "value": "Average days since last activity"
   },
   {
     "key": "pipeline.back",
@@ -50028,6 +52488,10 @@
     "value": "No other pipelines available. Cannot delete pipeline with deals."
   },
   {
+    "key": "pipeline.no_pipeline_selected",
+    "value": "No pipeline selected. Please select a pipeline to view stages and deals."
+  },
+  {
     "key": "pipeline.no_pipelines_yet",
     "value": "No pipelines yet. Create your first pipeline to get started."
   },
@@ -50212,6 +52676,10 @@
     "value": "Priority"
   },
   {
+    "key": "pipeline.priority_distribution",
+    "value": "Priority Distribution:"
+  },
+  {
     "key": "pipeline.priority_label",
     "value": "Priority: {{priorities}}"
   },
@@ -50260,8 +52728,24 @@
     "value": "Scheduled revert cancelled successfully"
   },
   {
+    "key": "pipeline.revert_executed",
+    "value": "Executed"
+  },
+  {
+    "key": "pipeline.revert_failed",
+    "value": "Failed"
+  },
+  {
     "key": "pipeline.revert_scheduled",
     "value": "Revert {{time}}"
+  },
+  {
+    "key": "pipeline.revert_skipped",
+    "value": "Skipped"
+  },
+  {
+    "key": "pipeline.revert_statistics_title",
+    "value": "Pipeline Stage Revert Statistics"
   },
   {
     "key": "pipeline.reverts",
@@ -50856,6 +53340,10 @@
     "value": "Won"
   },
   {
+    "key": "plan_expiration.next_billing_label",
+    "value": "Next Billing"
+  },
+  {
     "key": "plan_expiration.plan_expiration_checker.action_required",
     "value": "Action Required"
   },
@@ -50874,6 +53362,14 @@
   {
     "key": "plan_expiration.plan_expiration_checker.no_plan_found",
     "value": "No plan found to activate"
+  },
+  {
+    "key": "plan_expiration.plan_label",
+    "value": "Plan"
+  },
+  {
+    "key": "plan_expiration.status_label",
+    "value": "Status"
   },
   {
     "key": "plan_expiration.subscription_expired_modal.access_restricted_body",
@@ -50932,12 +53428,176 @@
     "value": "Subscription Expired - Grace Period"
   },
   {
+    "key": "plan_expiration.subscription_renewal_dialog.access_restricted_label",
+    "value": "Access Restricted:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.access_restricted_message",
+    "value": "Most features are currently disabled. Please renew your subscription to restore access."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.account_name_label",
+    "value": "Account Name"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.account_number_label",
+    "value": "Account Number"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.additional_instructions_label",
+    "value": "Additional Instructions"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.amount_label",
+    "value": "Amount:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.auto_renewal_label",
+    "value": "Enable automatic renewal to prevent future interruptions"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.bank_name_label",
+    "value": "Bank Name"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.bank_transfer_instructions_desc",
+    "value": "Please transfer the exact amount to the following bank account. Your subscription will be renewed once we confirm the payment."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.bank_transfer_instructions_title",
+    "value": "Bank Transfer Instructions - Subscription Renewal"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.cancel_button",
+    "value": "Cancel"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.close_button",
+    "value": "Close"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.company_label",
+    "value": "Company:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.complete_bank_transfer",
+    "value": "Please complete the bank transfer. Your subscription will be renewed once payment is confirmed."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.copied_to_clipboard",
+    "value": "Copied to clipboard"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.current_plan_badge",
+    "value": "Current Plan"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.expired_grace_title",
+    "value": "Subscription Expired - Grace Period"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.expired_on_label",
+    "value": "Expired on:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.expired_title",
+    "value": "Subscription Expired"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.grace_period_active_label",
+    "value": "Grace Period Active:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.grace_period_active_message",
+    "value": "You have limited access until {{date}}. Renew now to restore full functionality."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.grace_period_ends_label",
+    "value": "Grace period ends:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.important_notes_title",
+    "value": "Important Notes:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.include_reference_note",
+    "value": "⚠️ Please include this reference in your transfer to ensure quick processing"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.information_copied",
+    "value": "The information has been copied to your clipboard."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.loading_payment_methods",
+    "value": "Loading payment methods..."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.loading_plans",
+    "value": "Loading plans..."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.made_transfer_button",
+    "value": "I\\"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_email_confirmation",
+    "value": "• You\\"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_include_reference",
+    "value": "• Include the payment reference in your transfer"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_processing_time",
+    "value": "• Processing may take 1-3 business days"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_renewal_on_verify",
+    "value": "• Your subscription will be renewed once payment is verified"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_transfer_exact_amount",
+    "value": "• Please transfer the exact amount shown above"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.payment_instructions_received",
+    "value": "Payment Instructions Received"
+  },
+  {
     "key": "plan_expiration.subscription_renewal_dialog.payment_method_required_description",
     "value": "Please select a payment method to continue."
   },
   {
     "key": "plan_expiration.subscription_renewal_dialog.payment_method_required_title",
     "value": "Payment Method Required"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.payment_reference_label",
+    "value": "Payment Reference"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.plan_label",
+    "value": "Plan:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.plan_label_status",
+    "value": "Plan:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.processing",
+    "value": "Processing..."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.recently",
+    "value": "Recently"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.renew_subscription_button",
+    "value": "Renew Subscription"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.renew_to_continue",
+    "value": "Renew your subscription to continue using all features"
   },
   {
     "key": "plan_expiration.subscription_renewal_dialog.renewal_disabled_description",
@@ -50950,6 +53610,42 @@
   {
     "key": "plan_expiration.subscription_renewal_dialog.renewal_failed_title",
     "value": "Renewal Failed"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.renewal_payment_details",
+    "value": "Renewal Payment Details"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.routing_number_label",
+    "value": "Routing Number"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.select_payment_method_title",
+    "value": "Select Payment Method"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.select_plan_description",
+    "value": "Choose a plan to renew your subscription. You can upgrade, downgrade, or keep your current plan."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.select_plan_title",
+    "value": "Select Subscription Plan"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.selected_plan_total_label",
+    "value": "Selected Plan Total:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.setup_auto_renewal_button",
+    "value": "Setup Auto-Renewal"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.subscription_status_title",
+    "value": "Subscription Status"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.swift_code_label",
+    "value": "SWIFT Code"
   },
   {
     "key": "plans.free",
@@ -51056,6 +53752,10 @@
     "value": "Company Created"
   },
   {
+    "key": "profile.company_email",
+    "value": "Company Email"
+  },
+  {
     "key": "profile.company_info_desc",
     "value": "Manage your company details and settings."
   },
@@ -51074,6 +53774,10 @@
   {
     "key": "profile.company_updated_title",
     "value": "Company Updated"
+  },
+  {
+    "key": "profile.contact_person",
+    "value": "Contact Person"
   },
   {
     "key": "profile.current_password",
@@ -51110,6 +53814,10 @@
   {
     "key": "profile.language_preference",
     "value": "Language Preference"
+  },
+  {
+    "key": "profile.loading",
+    "value": "Loading your profile..."
   },
   {
     "key": "profile.notification_settings",
@@ -54524,6 +57232,10 @@
     "value": "Show API key"
   },
   {
+    "key": "settings.ai_credentials.test",
+    "value": "Test"
+  },
+  {
     "key": "settings.ai_credentials.update",
     "value": "Update Credential"
   },
@@ -54582,6 +57294,22 @@
   {
     "key": "settings.ai_usage.by_provider",
     "value": "Usage by Provider"
+  },
+  {
+    "key": "settings.ai_usage.date_range_1y",
+    "value": "Last year"
+  },
+  {
+    "key": "settings.ai_usage.date_range_30d",
+    "value": "Last 30 days"
+  },
+  {
+    "key": "settings.ai_usage.date_range_7d",
+    "value": "Last 7 days"
+  },
+  {
+    "key": "settings.ai_usage.date_range_90d",
+    "value": "Last 90 days"
   },
   {
     "key": "settings.ai_usage.description",
@@ -55672,6 +58400,14 @@
     "value": "Easy Setup"
   },
   {
+    "key": "settings.channel_cards.email",
+    "value": "Email"
+  },
+  {
+    "key": "settings.channel_cards.email_desc",
+    "value": "IMAP/SMTP Email Integration"
+  },
+  {
     "key": "settings.channel_cards.facebook_messenger",
     "value": "Facebook Messenger"
   },
@@ -55688,12 +58424,120 @@
     "value": "Business Account Integration"
   },
   {
+    "key": "settings.channel_cards.tiktok",
+    "value": "TikTok"
+  },
+  {
+    "key": "settings.channel_cards.tiktok_desc",
+    "value": "Business Messaging"
+  },
+  {
+    "key": "settings.channel_cards.twilio_sms",
+    "value": "Twilio SMS"
+  },
+  {
+    "key": "settings.channel_cards.twilio_sms_desc",
+    "value": "Programmable Messaging (SMS/MMS)"
+  },
+  {
+    "key": "settings.channel_cards.voice_calls",
+    "value": "Voice Calls"
+  },
+  {
+    "key": "settings.channel_cards.voice_calls_desc",
+    "value": "Voice Calls (Basic & AI-Powered)"
+  },
+  {
+    "key": "settings.channel_cards.webchat",
+    "value": "WebChat"
+  },
+  {
+    "key": "settings.channel_cards.webchat_desc",
+    "value": "Chat widget for your website"
+  },
+  {
+    "key": "settings.channel_cards.whatsapp_business_api_meta",
+    "value": "WhatsApp Business API (Meta)"
+  },
+  {
+    "key": "settings.channel_cards.whatsapp_business_api_meta_desc",
+    "value": "Official Meta WhatsApp Business API"
+  },
+  {
+    "key": "settings.channel_cards.whatsapp_qr_code",
+    "value": "WhatsApp QR Code"
+  },
+  {
+    "key": "settings.channel_cards.whatsapp_qr_code_desc",
+    "value": "Non-official connection"
+  },
+  {
+    "key": "settings.channel_connections.add_new_channel",
+    "value": "Add New Channel"
+  },
+  {
+    "key": "settings.channel_connections.connected_channels",
+    "value": "Connected Channels"
+  },
+  {
     "key": "settings.channel_connections.description",
     "value": "Connect and manage your communication channels"
   },
   {
+    "key": "settings.channel_connections.official_whatsapp_api",
+    "value": "Official WhatsApp Business API (Meta)"
+  },
+  {
+    "key": "settings.channel_connections.official_whatsapp_api_desc",
+    "value": "This connection uses the official WhatsApp Business API from Meta. It provides reliable messaging with advanced features and compliance."
+  },
+  {
     "key": "settings.channel_connections.title",
     "value": "Channel Connections"
+  },
+  {
+    "key": "settings.channel_connections.unofficial_connection",
+    "value": "Unofficial Connection"
+  },
+  {
+    "key": "settings.channel_connections.unofficial_connection_desc",
+    "value": "This connection is not using the official WhatsApp Business API. It may have limitations and could be subject to blocking by WhatsApp."
+  },
+  {
+    "key": "settings.channels.channel_name",
+    "value": "Channel Name"
+  },
+  {
+    "key": "settings.channels.copy_embed",
+    "value": "Copy Embed"
+  },
+  {
+    "key": "settings.channels.details",
+    "value": "Details"
+  },
+  {
+    "key": "settings.channels.disconnect_whatsapp_desc1",
+    "value": "Disconnecting will permanently deregister the phone number from WhatsApp Business API."
+  },
+  {
+    "key": "settings.channels.disconnect_whatsapp_desc2",
+    "value": "Messaging via this number will stop immediately after disconnection."
+  },
+  {
+    "key": "settings.channels.disconnect_whatsapp_title",
+    "value": "Disconnect WhatsApp Number?"
+  },
+  {
+    "key": "settings.channels.disconnecting",
+    "value": "Disconnecting..."
+  },
+  {
+    "key": "settings.channels.embed",
+    "value": "Embed"
+  },
+  {
+    "key": "settings.channels.enter_new_channel_name",
+    "value": "Enter new channel name"
   },
   {
     "key": "settings.channels.history_sync_complete",
@@ -55716,8 +58560,20 @@
     "value": "This can take a while depending on the date range and number of chats. You can keep using the app while it runs."
   },
   {
+    "key": "settings.channels.rename_channel_description",
+    "value": "Enter a new name for this channel connection to help identify it better in your sidebar and conversations."
+  },
+  {
+    "key": "settings.channels.rename_channel_title",
+    "value": "Rename Channel"
+  },
+  {
     "key": "settings.channels.start_sync",
     "value": "Start Sync"
+  },
+  {
+    "key": "settings.channels.sync",
+    "value": "Sync"
   },
   {
     "key": "settings.channels.sync_from_date",
@@ -55744,8 +58600,20 @@
     "value": "Syncing..."
   },
   {
+    "key": "settings.channels.view_details",
+    "value": "View Details"
+  },
+  {
     "key": "settings.click_generate_qr",
     "value": "Click \"Generate QR Code\" to start the connection process"
+  },
+  {
+    "key": "settings.common.status",
+    "value": "Status"
+  },
+  {
+    "key": "settings.common.type",
+    "value": "Type"
   },
   {
     "key": "settings.connect_whatsapp",
@@ -58552,6 +61420,10 @@
     "value": "Configure automatic deal creation for new contacts and stage-change notifications."
   },
   {
+    "key": "settings.pipeline.notification_message",
+    "value": "Notification Message"
+  },
+  {
     "key": "settings.pipeline.saved_description",
     "value": "Auto-add, stage notification, and automation rules settings were saved successfully."
   },
@@ -58562,6 +61434,10 @@
   {
     "key": "settings.pipeline.stage_notification_placeholder",
     "value": "Hi {{contact_name}}, your deal \"{{deal_title}}\" is now in stage {{stage_name}} ({{pipeline_name}})."
+  },
+  {
+    "key": "settings.pipeline.stage_qualification_notification_title",
+    "value": "Stage Qualification Notification"
   },
   {
     "key": "settings.pipeline.title",
@@ -58854,6 +61730,70 @@
   {
     "key": "settings.smtp.validation_sender_email_required",
     "value": "Sender email address is required"
+  },
+  {
+    "key": "settings.subscription_active_plan_details",
+    "value": "Your active plan and subscription details"
+  },
+  {
+    "key": "settings.subscription_current_status",
+    "value": "Current Status"
+  },
+  {
+    "key": "settings.subscription_current_subscription",
+    "value": "Current Subscription"
+  },
+  {
+    "key": "settings.subscription_expires_on",
+    "value": "Expires on"
+  },
+  {
+    "key": "settings.subscription_grace_period_action",
+    "value": "Please update your payment method to avoid service interruption."
+  },
+  {
+    "key": "settings.subscription_grace_period_active",
+    "value": "Grace Period Active"
+  },
+  {
+    "key": "settings.subscription_grace_period_message",
+    "value": "Your subscription is in a grace period until"
+  },
+  {
+    "key": "settings.subscription_next_attempt",
+    "value": "Next attempt"
+  },
+  {
+    "key": "settings.subscription_no_active",
+    "value": "No Active Subscription"
+  },
+  {
+    "key": "settings.subscription_payment_retry_message",
+    "value": "We\\"
+  },
+  {
+    "key": "settings.subscription_payment_retry_of",
+    "value": "of"
+  },
+  {
+    "key": "settings.subscription_payment_retry_title",
+    "value": "Payment Retry in Progress"
+  },
+  {
+    "key": "settings.subscription_renews_on",
+    "value": "Renews on"
+  },
+  {
+    "key": "settings.subscription_select_plan",
+    "value": "Select a plan below to subscribe"
+  },
+  {
+    "key": "settings.subscription_status_description",
+    "value": "Current status and management options for your subscription"
+  },
+  {
+    "key": "settings.subscription_status_title",
+    "value": "Subscription Status"
   },
   {
     "key": "settings.subscription_updated",
@@ -59474,6 +62414,78 @@
   {
     "key": "settings.telegramConnectionForm.webhook.step3",
     "value": "Create the connection — the server registers the webhook and keeps the secret token private for verifying inbound updates."
+  },
+  {
+    "key": "settings.tiktok.active",
+    "value": "Active"
+  },
+  {
+    "key": "settings.tiktok.description",
+    "value": "View and refresh your TikTok Business connection."
+  },
+  {
+    "key": "settings.tiktok.disconnected",
+    "value": "Disconnected"
+  },
+  {
+    "key": "settings.tiktok.error",
+    "value": "Error"
+  },
+  {
+    "key": "settings.tiktok.expiresIn",
+    "value": "Expires in {{days}} days"
+  },
+  {
+    "key": "settings.tiktok.learn_more",
+    "value": "Learn More"
+  },
+  {
+    "key": "settings.tiktok.noData",
+    "value": "No connection data available"
+  },
+  {
+    "key": "settings.tiktok.refreshButton",
+    "value": "Refresh Connection"
+  },
+  {
+    "key": "settings.tiktok.refreshSuccess",
+    "value": "TikTok connection refreshed successfully!"
+  },
+  {
+    "key": "settings.tiktok.refreshing",
+    "value": "Refreshing..."
+  },
+  {
+    "key": "settings.tiktok.region_restrictions_description",
+    "value": "Your TikTok account is in a restricted region ({{region}}). Messaging features may be unavailable for this connection."
+  },
+  {
+    "key": "settings.tiktok.region_restrictions_title",
+    "value": "Region restrictions"
+  },
+  {
+    "key": "settings.tiktok.title",
+    "value": "TikTok Connection Details"
+  },
+  {
+    "key": "settings.tiktok.tokenExpired",
+    "value": "Token expired"
+  },
+  {
+    "key": "settings.tiktok.tokenExpiredDesc",
+    "value": "Your TikTok access token has expired. Click \"Refresh Connection\" to renew access."
+  },
+  {
+    "key": "settings.tiktok.tokenExpiredTitle",
+    "value": "Token Expired"
+  },
+  {
+    "key": "settings.tiktok.tokenExpiry",
+    "value": "Token Expiry"
+  },
+  {
+    "key": "settings.tiktok.validFor",
+    "value": "Valid for {{days}} days"
   },
   {
     "key": "settings.tiktok_connection.account_name_label",
@@ -61396,6 +64408,30 @@
     "value": "Welcome message must be 500 characters or less"
   },
   {
+    "key": "settings.whatsapp.accountName",
+    "value": "Account Name"
+  },
+  {
+    "key": "settings.whatsapp.accountNameHelp",
+    "value": "A name to identify this connection"
+  },
+  {
+    "key": "settings.whatsapp.accountNamePlaceholder",
+    "value": "e.g. My WhatsApp"
+  },
+  {
+    "key": "settings.whatsapp.alert_description",
+    "value": "These settings apply to all WhatsApp channels and take effect immediately after saving. Typing indicators make bot responses feel more human-like, while message splitting improves readability for long responses."
+  },
+  {
+    "key": "settings.whatsapp.average",
+    "value": "Average"
+  },
+  {
+    "key": "settings.whatsapp.basicConfig",
+    "value": "Basic Configuration"
+  },
+  {
     "key": "settings.whatsapp.by_characters",
     "value": "By Characters"
   },
@@ -61416,8 +64452,24 @@
     "value": "{{count}} characters"
   },
   {
+    "key": "settings.whatsapp.connected",
+    "value": "Connected"
+  },
+  {
+    "key": "settings.whatsapp.connectionDetails",
+    "value": "Connection Details"
+  },
+  {
+    "key": "settings.whatsapp.connectionStatus",
+    "value": "Connection Status"
+  },
+  {
     "key": "settings.whatsapp.consistent",
     "value": "Consistent"
+  },
+  {
+    "key": "settings.whatsapp.current",
+    "value": "Current"
   },
   {
     "key": "settings.whatsapp.debounce_delay",
@@ -61438,6 +64490,14 @@
   {
     "key": "settings.whatsapp.delay_between_chunks_desc",
     "value": "Time between split message chunks (0.5-10 seconds)"
+  },
+  {
+    "key": "settings.whatsapp.disconnected",
+    "value": "Disconnected"
+  },
+  {
+    "key": "settings.whatsapp.editTitle",
+    "value": "Edit WhatsApp Unofficial Connection"
   },
   {
     "key": "settings.whatsapp.enable_debouncing",
@@ -61468,6 +64528,22 @@
     "value": "Show \"Typing...\" and \"Recording...\" indicators before sending messages"
   },
   {
+    "key": "settings.whatsapp.error",
+    "value": "Error"
+  },
+  {
+    "key": "settings.whatsapp.healthMetrics",
+    "value": "Connection Health Metrics"
+  },
+  {
+    "key": "settings.whatsapp.healthScore",
+    "value": "Health Score"
+  },
+  {
+    "key": "settings.whatsapp.healthScoreHelp",
+    "value": "Overall connection health score"
+  },
+  {
     "key": "settings.whatsapp.history_sync_in_progress",
     "value": "Syncing Phase {phase}/3: {progress}% complete"
   },
@@ -61478,6 +64554,26 @@
   {
     "key": "settings.whatsapp.history_sync_tooltip",
     "value": "Import up to 6 months of chat history from your WhatsApp Business app. Sync may take 4-6 hours depending on message volume."
+  },
+  {
+    "key": "settings.whatsapp.id",
+    "value": "ID"
+  },
+  {
+    "key": "settings.whatsapp.lastCheck",
+    "value": "Last Health Check"
+  },
+  {
+    "key": "settings.whatsapp.latencyHelp",
+    "value": "Connection latency in milliseconds"
+  },
+  {
+    "key": "settings.whatsapp.latencyMetrics",
+    "value": "Latency Metrics"
+  },
+  {
+    "key": "settings.whatsapp.loadingConnection",
+    "value": "Loading connection data..."
   },
   {
     "key": "settings.whatsapp.max_debounce_delay",
@@ -61552,6 +64648,14 @@
     "value": "Minimum time to show typing indicator (0.5-10 seconds)"
   },
   {
+    "key": "settings.whatsapp.minimum_chunk_size",
+    "value": "Minimum Chunk Size"
+  },
+  {
+    "key": "settings.whatsapp.minimum_chunk_size_desc",
+    "value": "Minimum characters per chunk to avoid very short messages"
+  },
+  {
     "key": "settings.whatsapp.preserve_formatting",
     "value": "Preserve Formatting"
   },
@@ -61566,6 +64670,14 @@
   {
     "key": "settings.whatsapp.preview_desc",
     "value": "See how your settings will affect message delivery"
+  },
+  {
+    "key": "settings.whatsapp.prioritize_sentence_boundaries",
+    "value": "Prioritize Sentence Boundaries"
+  },
+  {
+    "key": "settings.whatsapp.prioritize_sentence_boundaries_desc",
+    "value": "Prefer splitting at sentence endings over character limits"
   },
   {
     "key": "settings.whatsapp.prioritize_sentences",
@@ -61644,6 +64756,14 @@
     "value": "Intelligently split at sentence and clause boundaries"
   },
   {
+    "key": "settings.whatsapp.smart_boundary_detection",
+    "value": "Smart Boundary Detection"
+  },
+  {
+    "key": "settings.whatsapp.smart_boundary_detection_desc",
+    "value": "Intelligently split at sentence and clause boundaries"
+  },
+  {
     "key": "settings.whatsapp.split_method",
     "value": "Split Method"
   },
@@ -61666,6 +64786,14 @@
   {
     "key": "settings.whatsapp.typing_time",
     "value": "~{{time}}s typing"
+  },
+  {
+    "key": "settings.whatsapp.updateButton",
+    "value": "Update Connection"
+  },
+  {
+    "key": "settings.whatsapp.updating",
+    "value": "Updating..."
   },
   {
     "key": "settings.whatsappEmbeddedSignup.agree_privacy",
@@ -62198,6 +65326,186 @@
   {
     "key": "sidebar.expand",
     "value": "Expand sidebar"
+  },
+  {
+    "key": "stripe.add_metadata",
+    "value": "Add Metadata"
+  },
+  {
+    "key": "stripe.add_metadata_help",
+    "value": "Add custom metadata to track additional information"
+  },
+  {
+    "key": "stripe.amount",
+    "value": "Amount"
+  },
+  {
+    "key": "stripe.amount_format",
+    "value": "Amount Format"
+  },
+  {
+    "key": "stripe.api_key",
+    "value": "Stripe API Key"
+  },
+  {
+    "key": "stripe.api_key_placeholder",
+    "value": "sk_test_... or sk_live_..."
+  },
+  {
+    "key": "stripe.available_output_variables",
+    "value": "Available Output Variables"
+  },
+  {
+    "key": "stripe.balance_configuration",
+    "value": "Balance Configuration"
+  },
+  {
+    "key": "stripe.cents_help_text",
+    "value": "Enter amounts in cents (1000 for $10.00). This is Stripe\\"
+  },
+  {
+    "key": "stripe.cents_stripe_native",
+    "value": "Cents (Stripe native)"
+  },
+  {
+    "key": "stripe.charge_id_or_payment_intent",
+    "value": "Charge ID or Payment Intent ID"
+  },
+  {
+    "key": "stripe.choose_template",
+    "value": "Choose a template..."
+  },
+  {
+    "key": "stripe.currency",
+    "value": "Currency"
+  },
+  {
+    "key": "stripe.custom_metadata",
+    "value": "Custom Metadata"
+  },
+  {
+    "key": "stripe.customer_configuration",
+    "value": "Customer Configuration"
+  },
+  {
+    "key": "stripe.customer_id",
+    "value": "Customer ID"
+  },
+  {
+    "key": "stripe.customer_id_optional",
+    "value": "Customer ID (optional)"
+  },
+  {
+    "key": "stripe.decimal_format",
+    "value": "Decimal (e.g., 10.00)"
+  },
+  {
+    "key": "stripe.decimal_help_text",
+    "value": "Enter amounts in decimal format (10.00 for $10.00). Will be converted to cents automatically."
+  },
+  {
+    "key": "stripe.description_optional",
+    "value": "Description (optional)"
+  },
+  {
+    "key": "stripe.email",
+    "value": "Email"
+  },
+  {
+    "key": "stripe.enter_cents_format",
+    "value": "Enter 1000 for $10.00"
+  },
+  {
+    "key": "stripe.enter_decimal_format",
+    "value": "Enter 10.00 for $10.00"
+  },
+  {
+    "key": "stripe.limit",
+    "value": "Limit"
+  },
+  {
+    "key": "stripe.name",
+    "value": "Name"
+  },
+  {
+    "key": "stripe.new_price_id_optional",
+    "value": "New Price ID (optional)"
+  },
+  {
+    "key": "stripe.operation",
+    "value": "Operation"
+  },
+  {
+    "key": "stripe.payment_configuration",
+    "value": "Payment Configuration"
+  },
+  {
+    "key": "stripe.payment_description",
+    "value": "Payment description"
+  },
+  {
+    "key": "stripe.payment_method_optional",
+    "value": "Payment Method (optional)"
+  },
+  {
+    "key": "stripe.phone",
+    "value": "Phone"
+  },
+  {
+    "key": "stripe.price_id_or_plan",
+    "value": "Price ID or Plan"
+  },
+  {
+    "key": "stripe.quick_templates",
+    "value": "Quick Templates"
+  },
+  {
+    "key": "stripe.refund_amount_optional",
+    "value": "Refund Amount (optional)"
+  },
+  {
+    "key": "stripe.resource_type",
+    "value": "Resource Type"
+  },
+  {
+    "key": "stripe.select_currency",
+    "value": "Select currency"
+  },
+  {
+    "key": "stripe.select_operation",
+    "value": "Select operation"
+  },
+  {
+    "key": "stripe.select_resource",
+    "value": "Select resource"
+  },
+  {
+    "key": "stripe.source_token",
+    "value": "Stripe Source/Token"
+  },
+  {
+    "key": "stripe.starting_after_optional",
+    "value": "Starting After (optional)"
+  },
+  {
+    "key": "stripe.subscription_configuration",
+    "value": "Subscription Configuration"
+  },
+  {
+    "key": "stripe.subscription_id",
+    "value": "Subscription ID"
+  },
+  {
+    "key": "stripe.supports_test_live_keys",
+    "value": "Supports both test and live keys"
+  },
+  {
+    "key": "stripe.terminal_node_info",
+    "value": "This is a terminal node. Flow execution stops after Stripe operation completes. All response data is stored in variables for reference."
+  },
+  {
+    "key": "stripe.transaction_id",
+    "value": "Transaction ID"
   },
   {
     "key": "subdomain.access_error",
@@ -64624,6 +67932,10 @@
     "value": "Button Text"
   },
   {
+    "key": "whatsapp_cta_url.fix_errors",
+    "value": "Please fix the errors below"
+  },
+  {
     "key": "whatsapp_cta_url.node_title",
     "value": "WhatsApp CTA URL"
   },
@@ -64906,6 +68218,10 @@
   {
     "key": "whatsapp_location_request.body_placeholder",
     "value": "Enter your message text..."
+  },
+  {
+    "key": "whatsapp_location_request.fix_errors",
+    "value": "Please fix the errors below"
   },
   {
     "key": "whatsapp_location_request.node_title",

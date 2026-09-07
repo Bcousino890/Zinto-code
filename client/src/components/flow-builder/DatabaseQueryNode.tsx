@@ -422,11 +422,11 @@ export function DatabaseQueryNode({ id, data, isConnectable }: DatabaseQueryNode
             </div>
             <div className="flex flex-wrap gap-1">
               <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-1 py-0.5 rounded shrink-0">
-                {engine === 'postgres' ? 'Postgres' : 'MySQL'}
+                {engine === 'postgres' ? t('flow_builder.db_postgres', 'Postgres') : t('flow_builder.db_mysql', 'MySQL')}
               </span>
               {detectedParams.length > 0 && (
                 <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-1 py-0.5 rounded shrink-0">
-                  {detectedParams.length} params
+                  {detectedParams.length} {t('flow_builder.db_params', 'params')}
                 </span>
               )}
               {variableMappings.length > 0 && (
@@ -449,8 +449,8 @@ export function DatabaseQueryNode({ id, data, isConnectable }: DatabaseQueryNode
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="z-50" side="top" align="start" sideOffset={8}>
-                    <SelectItem value="postgres">Postgres</SelectItem>
-                    <SelectItem value="mysql">MySQL</SelectItem>
+                    <SelectItem value="postgres">{t('flow_builder.db_postgres', 'Postgres')}</SelectItem>
+                    <SelectItem value="mysql">{t('flow_builder.db_mysql', 'MySQL')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -467,8 +467,8 @@ export function DatabaseQueryNode({ id, data, isConnectable }: DatabaseQueryNode
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="z-50" side="top" align="start" sideOffset={8}>
-                    <SelectItem value="fields">Fields</SelectItem>
-                    <SelectItem value="connectionString">Connection String</SelectItem>
+                    <SelectItem value="fields">{t('flow_builder.db_fields', 'Fields')}</SelectItem>
+                    <SelectItem value="connectionString">{t('flow_builder.db_connection_string', 'Connection String')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -476,7 +476,7 @@ export function DatabaseQueryNode({ id, data, isConnectable }: DatabaseQueryNode
               {connectionMode === 'fields' ? (
                 <div className="space-y-2">
                   <Input
-                    placeholder="host"
+                    placeholder={t('flow_builder.db_host', 'host')}
                     value={host}
                     onChange={(e) => setHost(e.target.value)}
                     className="text-xs h-7"
@@ -484,33 +484,33 @@ export function DatabaseQueryNode({ id, data, isConnectable }: DatabaseQueryNode
                   <div className="flex gap-2">
                     <Input
                       type="number"
-                      placeholder="port"
+                      placeholder={t('flow_builder.db_port', 'port')}
                       value={port}
                       onChange={(e) => setPort(e.target.value === '' ? '' : Number(e.target.value))}
                       className="text-xs h-7 w-24"
                     />
                     <Input
-                      placeholder="database"
+                      placeholder={t('flow_builder.db_database', 'database')}
                       value={database}
                       onChange={(e) => setDatabase(e.target.value)}
                       className="text-xs h-7 flex-1"
                     />
                   </div>
                   <Input
-                    placeholder="username"
+                    placeholder={t('flow_builder.db_username', 'username')}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="text-xs h-7"
                   />
                   <Input
                     type="password"
-                    placeholder="password"
+                    placeholder={t('flow_builder.db_password', 'password')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="text-xs h-7"
                   />
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-medium cursor-pointer">Use SSL</Label>
+                    <Label className="text-xs font-medium cursor-pointer">{t('flow_builder.db_use_ssl', 'Use SSL')}</Label>
                     <Switch checked={ssl} onCheckedChange={setSsl} />
                   </div>
                 </div>
@@ -530,7 +530,7 @@ export function DatabaseQueryNode({ id, data, isConnectable }: DatabaseQueryNode
               )}
 
               <div>
-                <Label className="block mb-1 font-medium">Query</Label>
+                <Label className="block mb-1 font-medium">{t('flow_builder.db_query_label', 'Query')}</Label>
                 <EnhancedVariablePicker
                   customVariables={customVariables}
                   multiline
@@ -555,7 +555,7 @@ export function DatabaseQueryNode({ id, data, isConnectable }: DatabaseQueryNode
 
               {detectedParams.length > 0 && (
                 <div className="rounded border p-2 bg-muted/30">
-                  <Label className="text-[10px] font-medium text-muted-foreground">Detected parameters</Label>
+                  <Label className="text-[10px] font-medium text-muted-foreground">{t('flow_builder.db_detected_parameters', 'Detected parameters')}</Label>
                   <ul className="mt-1 space-y-0.5">
                     {detectedParams.map((name) => (
                       <li key={name} className="text-[10px] font-mono text-foreground">
@@ -719,8 +719,8 @@ export function DatabaseQueryNode({ id, data, isConnectable }: DatabaseQueryNode
                           <table className="w-full text-[10px] font-mono">
                             <thead>
                               <tr className="border-b bg-muted/50">
-                                <th className="text-left p-1 font-medium">field</th>
-                                <th className="text-left p-1 font-medium">value</th>
+                                <th className="text-left p-1 font-medium">{t('common.field', 'field')}</th>
+                                <th className="text-left p-1 font-medium">{t('common.value', 'value')}</th>
                               </tr>
                             </thead>
                             <tbody>

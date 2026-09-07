@@ -1025,13 +1025,13 @@ export default function AdminSettingsPage() {
       await refreshBranding();
 
       toast({
-        title: 'Admin auth background uploaded',
-        description: 'The admin authentication background has been uploaded successfully.'
+        title: t('admin.settings.auth_backgrounds.uploaded', 'Admin auth background uploaded'),
+        description: t('admin.settings.auth_backgrounds.uploaded_desc', 'The admin authentication background has been uploaded successfully.')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error uploading admin auth background',
+        title: t('admin.settings.auth_backgrounds.error_uploading', 'Error uploading admin auth background'),
         description: error.message,
         variant: 'destructive'
       });
@@ -1051,7 +1051,7 @@ export default function AdminSettingsPage() {
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to upload user auth background');
+        throw new Error(error.error || t('admin.settings.auth_backgrounds.failed_upload_user', 'Failed to upload user auth background'));
       }
 
       return res.json();
@@ -1063,13 +1063,13 @@ export default function AdminSettingsPage() {
       await refreshBranding();
 
       toast({
-        title: 'User auth background uploaded',
-        description: 'The user authentication background has been uploaded successfully.'
+        title: t('admin.settings.auth_backgrounds.user_uploaded', 'User auth background uploaded'),
+        description: t('admin.settings.auth_backgrounds.user_uploaded_desc', 'The user authentication background has been uploaded successfully.')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error uploading user auth background',
+        title: t('admin.settings.auth_backgrounds.error_uploading_user', 'Error uploading user auth background'),
         description: error.message,
         variant: 'destructive'
       });
@@ -1079,7 +1079,7 @@ export default function AdminSettingsPage() {
   const deleteAdminAuthBgMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest('DELETE', '/api/admin/settings/branding/admin-auth-background');
-      if (!res.ok) throw new Error('Failed to delete admin auth background');
+      if (!res.ok) throw new Error(t('admin.settings.auth_backgrounds.failed_delete', 'Failed to delete admin auth background'));
       return res.json();
     },
     onSuccess: async () => {
@@ -1088,17 +1088,17 @@ export default function AdminSettingsPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
       queryClient.invalidateQueries({ queryKey: ['/api/branding'] });
       await refreshBranding();
-      toast({ title: 'Admin auth background deleted' });
+      toast({ title: t('admin.settings.auth_backgrounds.deleted', 'Admin auth background deleted') });
     },
     onError: (error: any) => {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: t('admin.settings.error', 'Error'), description: error.message, variant: 'destructive' });
     }
   });
 
   const deleteUserAuthBgMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest('DELETE', '/api/admin/settings/branding/user-auth-background');
-      if (!res.ok) throw new Error('Failed to delete user auth background');
+      if (!res.ok) throw new Error(t('admin.settings.auth_backgrounds.failed_delete_user', 'Failed to delete user auth background'));
       return res.json();
     },
     onSuccess: async () => {
@@ -1107,10 +1107,10 @@ export default function AdminSettingsPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
       queryClient.invalidateQueries({ queryKey: ['/api/branding'] });
       await refreshBranding();
-      toast({ title: 'User auth background deleted' });
+      toast({ title: t('admin.settings.auth_backgrounds.user_deleted', 'User auth background deleted') });
     },
     onError: (error: any) => {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: t('admin.settings.error', 'Error'), description: error.message, variant: 'destructive' });
     }
   });
 
@@ -1200,20 +1200,20 @@ export default function AdminSettingsPage() {
       const res = await apiRequest('POST', '/api/admin/settings/payment/paystack', payload);
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to save Paystack settings');
+        throw new Error(error.error || t('admin.settings.payment.paystack.failed_save', 'Failed to save Paystack settings'));
       }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
       toast({
-        title: 'Paystack settings saved',
-        description: 'The Paystack settings have been saved successfully.'
+        title: t('admin.settings.payment.paystack.saved', 'Paystack settings saved'),
+        description: t('admin.settings.payment.paystack.saved_desc', 'The Paystack settings have been saved successfully.')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error saving Paystack settings',
+        title: t('admin.settings.payment.paystack.error_saving', 'Error saving Paystack settings'),
         description: error.message,
         variant: 'destructive'
       });
@@ -1225,19 +1225,19 @@ export default function AdminSettingsPage() {
       const res = await apiRequest('POST', '/api/admin/settings/payment/paystack/test');
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to test Paystack connection');
+        throw new Error(error.error || t('admin.settings.payment.paystack.failed_test', 'Failed to test Paystack connection'));
       }
       return res.json();
     },
     onSuccess: (data) => {
       toast({
-        title: 'Paystack connection successful',
-        description: data.testMode ? 'Connected in test mode' : 'Connected in live mode'
+        title: t('admin.settings.payment.paystack.connection_successful', 'Paystack connection successful'),
+        description: data.testMode ? t('admin.settings.payment.paystack.test_mode', 'Connected in test mode') : t('admin.settings.payment.paystack.live_mode', 'Connected in live mode')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error connecting to Paystack',
+        title: t('admin.settings.payment.paystack.error_connecting', 'Error connecting to Paystack'),
         description: error.message,
         variant: 'destructive'
       });
@@ -1279,20 +1279,20 @@ export default function AdminSettingsPage() {
       const res = await apiRequest('POST', '/api/admin/settings/payment/mercadopago', payload);
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to save Mercado Pago settings');
+        throw new Error(error.error || t('admin.settings.payment.mercadopago.failed_save', 'Failed to save Mercado Pago settings'));
       }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
       toast({
-        title: 'Mercado Pago settings saved',
-        description: 'The Mercado Pago settings have been saved successfully.'
+        title: t('admin.settings.payment.mercadopago.saved', 'Mercado Pago settings saved'),
+        description: t('admin.settings.payment.mercadopago.saved_desc', 'The Mercado Pago settings have been saved successfully.')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error saving Mercado Pago settings',
+        title: t('admin.settings.payment.mercadopago.error_saving', 'Error saving Mercado Pago settings'),
         description: error.message,
         variant: 'destructive'
       });
@@ -1304,19 +1304,19 @@ export default function AdminSettingsPage() {
       const res = await apiRequest('POST', '/api/admin/settings/payment/mercadopago/test');
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to test Mercado Pago connection');
+        throw new Error(error.error || t('admin.settings.payment.mercadopago.failed_test', 'Failed to test Mercado Pago connection'));
       }
       return res.json();
     },
     onSuccess: (data) => {
       toast({
-        title: 'Mercado Pago connection successful',
-        description: `Connected to Mercado Pago account: ${data.account.email || data.account.nickname}`
+        title: t('admin.settings.payment.mercadopago.connection_successful', 'Mercado Pago connection successful'),
+        description: t('admin.settings.payment.mercadopago.connected_to_account', 'Connected to Mercado Pago account: {{account}}', { account: data.account.email || data.account.nickname })
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error connecting to Mercado Pago',
+        title: t('admin.settings.payment.mercadopago.error_connecting', 'Error connecting to Mercado Pago'),
         description: error.message,
         variant: 'destructive'
       });
@@ -1333,20 +1333,20 @@ export default function AdminSettingsPage() {
       const res = await apiRequest('POST', '/api/admin/settings/payment/paypal', payload);
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to save PayPal settings');
+        throw new Error(error.error || t('admin.settings.payment.paypal.failed_save', 'Failed to save PayPal settings'));
       }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
       toast({
-        title: 'PayPal settings saved',
-        description: 'The PayPal settings have been saved successfully.'
+        title: t('admin.settings.payment.paypal.saved', 'PayPal settings saved'),
+        description: t('admin.settings.payment.paypal.saved_desc', 'The PayPal settings have been saved successfully.')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error saving PayPal settings',
+        title: t('admin.settings.payment.paypal.error_saving', 'Error saving PayPal settings'),
         description: error.message,
         variant: 'destructive'
       });
@@ -1358,19 +1358,19 @@ export default function AdminSettingsPage() {
       const res = await apiRequest('POST', '/api/admin/settings/payment/paypal/test');
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to test PayPal connection');
+        throw new Error(error.error || t('admin.settings.payment.paypal.failed_test', 'Failed to test PayPal connection'));
       }
       return res.json();
     },
     onSuccess: (data) => {
       toast({
-        title: 'PayPal connection successful',
-        description: `Connected to PayPal ${data.account.environment} environment`
+        title: t('admin.settings.payment.paypal.connection_successful', 'PayPal connection successful'),
+        description: t('admin.settings.payment.paypal.connected_to_account', 'Connected to PayPal {{environment}} environment', { environment: data.account.environment })
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error connecting to PayPal',
+        title: t('admin.settings.payment.paypal.error_connecting', 'Error connecting to PayPal'),
         description: error.message,
         variant: 'destructive'
       });
@@ -1386,20 +1386,20 @@ export default function AdminSettingsPage() {
       const res = await apiRequest('POST', '/api/admin/settings/payment/moyasar', payload);
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to save Moyasar settings');
+        throw new Error(error.error || t('admin.settings.payment.moyasar.failed_save', 'Failed to save Moyasar settings'));
       }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
       toast({
-        title: 'Moyasar settings saved',
-        description: 'Your Moyasar payment settings have been updated successfully'
+        title: t('admin.settings.payment.moyasar.saved', 'Moyasar settings saved'),
+        description: t('admin.settings.payment.moyasar.saved_desc', 'Your Moyasar payment settings have been updated successfully')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error saving Moyasar settings',
+        title: t('admin.settings.payment.moyasar.error_saving', 'Error saving Moyasar settings'),
         description: error.message,
         variant: 'destructive'
       });
@@ -1411,19 +1411,19 @@ export default function AdminSettingsPage() {
       const res = await apiRequest('POST', '/api/admin/settings/payment/moyasar/test');
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || 'Failed to test Moyasar connection');
+        throw new Error(error.error || t('admin.settings.payment.moyasar.failed_test', 'Failed to test Moyasar connection'));
       }
       return res.json();
     },
     onSuccess: (data) => {
       toast({
-        title: 'Moyasar connection successful',
-        description: `Connected to Moyasar API successfully`
+        title: t('admin.settings.payment.moyasar.connection_successful', 'Moyasar connection successful'),
+        description: t('admin.settings.payment.moyasar.connected_successfully', 'Connected to Moyasar API successfully')
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error connecting to Moyasar',
+        title: t('admin.settings.payment.moyasar.error_connecting', 'Error connecting to Moyasar'),
         description: error.message,
         variant: 'destructive'
       });
@@ -3306,7 +3306,7 @@ export default function AdminSettingsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Stripe Integration</CardTitle>
+                  <CardTitle>{t('admin.settings.payment.stripe.title', 'Stripe Integration')}</CardTitle>
                   <CardDescription>
                     {t('admin.settings.configure_stripe_gateway', 'Configure Stripe payment gateway')}
                   </CardDescription>
@@ -3318,11 +3318,11 @@ export default function AdminSettingsPage() {
                       checked={stripeForm.enabled}
                       onCheckedChange={(checked) => setStripeForm({...stripeForm, enabled: checked})}
                     />
-                    <Label htmlFor="stripe-enabled">Enable Stripe Payments</Label>
+                    <Label htmlFor="stripe-enabled">{t('admin.settings.payment.stripe.enable', 'Enable Stripe Payments')}</Label>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="publishableKey">Publishable Key</Label>
+                    <Label htmlFor="publishableKey">{t('admin.settings.payment.stripe.publishable_key', 'Publishable Key')}</Label>
                     <Input
                       id="publishableKey"
                       value={stripeForm.publishableKey}
@@ -3333,7 +3333,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="secretKey">Secret Key</Label>
+                    <Label htmlFor="secretKey">{t('admin.settings.payment.stripe.secret_key', 'Secret Key')}</Label>
                     <Input
                       id="secretKey"
                       type="password"
@@ -3345,7 +3345,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="webhookSecret">Webhook Secret</Label>
+                    <Label htmlFor="webhookSecret">{t('admin.settings.payment.stripe.webhook_secret', 'Webhook Secret')}</Label>
                     <Input
                       id="webhookSecret"
                       value={stripeForm.webhookSecret}
@@ -3356,7 +3356,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="webhookUrl">Webhook Endpoint URL</Label>
+                    <Label htmlFor="webhookUrl">{t('admin.settings.payment.stripe.webhook_url', 'Webhook Endpoint URL')}</Label>
                     <Input
                       id="webhookUrl"
                       value={stripeForm.webhookUrl}
@@ -3373,7 +3373,7 @@ export default function AdminSettingsPage() {
                       onCheckedChange={(checked) => setStripeForm({...stripeForm, testMode: checked})}
                       disabled={!stripeForm.enabled}
                     />
-                    <Label htmlFor="stripe-test-mode">Test Mode</Label>
+                    <Label htmlFor="stripe-test-mode">{t('admin.settings.payment.stripe.test_mode', 'Test Mode')}</Label>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
@@ -3386,8 +3386,8 @@ export default function AdminSettingsPage() {
                       {saveStripeMutation.isPending && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      <span className="hidden sm:inline">Save Stripe Settings</span>
-                      <span className="sm:hidden">Save Settings</span>
+                      <span className="hidden sm:inline">{t('admin.settings.payment.stripe.save_settings', 'Save Stripe Settings')}</span>
+                      <span className="sm:hidden">{t('admin.settings.save_settings', 'Save Settings')}</span>
                     </Button>
 
                     <Button
@@ -3409,9 +3409,9 @@ export default function AdminSettingsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Paystack Integration</CardTitle>
+                  <CardTitle>{t('admin.settings.payment.paystack.title', 'Paystack Integration')}</CardTitle>
                   <CardDescription>
-                    Configure Paystack payment gateway
+                    {t('admin.settings.payment.paystack.description', 'Configure Paystack payment gateway')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -3421,11 +3421,11 @@ export default function AdminSettingsPage() {
                       checked={paystackForm.enabled}
                       onCheckedChange={(checked) => setPaystackForm({ ...paystackForm, enabled: checked })}
                     />
-                    <Label htmlFor="paystack-enabled">Enable Paystack Payments</Label>
+                    <Label htmlFor="paystack-enabled">{t('admin.settings.payment.paystack.enable', 'Enable Paystack Payments')}</Label>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="paystack-publicKey">Public Key</Label>
+                    <Label htmlFor="paystack-publicKey">{t('admin.settings.payment.paystack.public_key', 'Public Key')}</Label>
                     <Input
                       id="paystack-publicKey"
                       value={paystackForm.publicKey}
@@ -3436,7 +3436,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="paystack-secretKey">Secret Key</Label>
+                    <Label htmlFor="paystack-secretKey">{t('admin.settings.payment.paystack.secret_key', 'Secret Key')}</Label>
                     <Input
                       id="paystack-secretKey"
                       type="password"
@@ -3448,7 +3448,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="paystack-subaccount">Subaccount (optional)</Label>
+                    <Label htmlFor="paystack-subaccount">{t('admin.settings.payment.paystack.subaccount', 'Subaccount (optional)')}</Label>
                     <Input
                       id="paystack-subaccount"
                       value={paystackForm.subaccount}
@@ -3459,7 +3459,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="paystack-webhookSecret">Webhook Secret (optional)</Label>
+                    <Label htmlFor="paystack-webhookSecret">{t('admin.settings.payment.paystack.webhook_secret', 'Webhook Secret (optional)')}</Label>
                     <Input
                       id="paystack-webhookSecret"
                       value={paystackForm.webhookSecret}
@@ -3470,17 +3470,17 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="paystack-merchantCurrency">Merchant Currency</Label>
+                    <Label htmlFor="paystack-merchantCurrency">{t('admin.settings.payment.paystack.merchant_currency', 'Merchant Currency')}</Label>
                     <Select
                       value={paystackForm.merchantCurrency || 'auto'}
                       onValueChange={(v) => setPaystackForm({ ...paystackForm, merchantCurrency: v === 'auto' ? '' : v })}
                       disabled={!paystackForm.enabled}
                     >
                       <SelectTrigger id="paystack-merchantCurrency">
-                        <SelectValue placeholder="Use app default" />
+                        <SelectValue placeholder={t('admin.settings.payment.paystack.use_app_default', 'Use app default')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="auto">Use app default</SelectItem>
+                        <SelectItem value="auto">{t('admin.settings.payment.paystack.use_app_default', 'Use app default')}</SelectItem>
                         <SelectItem value="NGN">NGN (Nigerian Naira)</SelectItem>
                         <SelectItem value="GHS">GHS (Ghanaian Cedi)</SelectItem>
                         <SelectItem value="ZAR">ZAR (South African Rand)</SelectItem>
@@ -3491,7 +3491,7 @@ export default function AdminSettingsPage() {
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">
-                      Set this if you get &quot;Currency not supported by merchant&quot;. Use the currency enabled on your Paystack integration (e.g. NGN for Nigeria, GHS for Ghana).
+                      {t('admin.settings.payment.paystack.currency_help', 'Set this if you get "Currency not supported by merchant". Use the currency enabled on your Paystack integration (e.g. NGN for Nigeria, GHS for Ghana).')}
                     </p>
                   </div>
 
@@ -3502,7 +3502,7 @@ export default function AdminSettingsPage() {
                       onCheckedChange={(checked) => setPaystackForm({ ...paystackForm, testMode: checked })}
                       disabled={!paystackForm.enabled}
                     />
-                    <Label htmlFor="paystack-test-mode">Test Mode</Label>
+                    <Label htmlFor="paystack-test-mode">{t('admin.settings.payment.paystack.test_mode', 'Test Mode')}</Label>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
@@ -3515,8 +3515,8 @@ export default function AdminSettingsPage() {
                       {savePaystackMutation.isPending && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      <span className="hidden sm:inline">Save Paystack Settings</span>
-                      <span className="sm:hidden">Save Settings</span>
+                      <span className="hidden sm:inline">{t('admin.settings.payment.paystack.save_settings', 'Save Paystack Settings')}</span>
+                      <span className="sm:hidden">{t('admin.settings.save_settings', 'Save Settings')}</span>
                     </Button>
 
                     <Button
@@ -3538,9 +3538,9 @@ export default function AdminSettingsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Mercado Pago Integration</CardTitle>
+                  <CardTitle>{t('admin.settings.payment.mercadopago.title', 'Mercado Pago Integration')}</CardTitle>
                   <CardDescription>
-                    Configure Mercado Pago payment gateway
+                    {t('admin.settings.payment.mercadopago.description', 'Configure Mercado Pago payment gateway')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -3550,11 +3550,11 @@ export default function AdminSettingsPage() {
                       checked={mercadoPagoForm.enabled}
                       onCheckedChange={(checked) => setMercadoPagoForm({...mercadoPagoForm, enabled: checked})}
                     />
-                    <Label htmlFor="mercadopago-enabled">Enable Mercado Pago Payments</Label>
+                    <Label htmlFor="mercadopago-enabled">{t('admin.settings.payment.mercadopago.enable', 'Enable Mercado Pago Payments')}</Label>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="mercadopago-clientId">Client ID</Label>
+                    <Label htmlFor="mercadopago-clientId">{t('admin.settings.payment.mercadopago.client_id', 'Client ID')}</Label>
                     <Input
                       id="mercadopago-clientId"
                       value={mercadoPagoForm.clientId}
@@ -3565,7 +3565,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="mercadopago-clientSecret">Client Secret</Label>
+                    <Label htmlFor="mercadopago-clientSecret">{t('admin.settings.payment.mercadopago.client_secret', 'Client Secret')}</Label>
                     <Input
                       id="mercadopago-clientSecret"
                       type="password"
@@ -3577,7 +3577,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="mercadopago-accessToken">Access Token</Label>
+                    <Label htmlFor="mercadopago-accessToken">{t('admin.settings.payment.mercadopago.access_token', 'Access Token')}</Label>
                     <Input
                       id="mercadopago-accessToken"
                       type="password"
@@ -3587,8 +3587,7 @@ export default function AdminSettingsPage() {
                       disabled={!mercadoPagoForm.enabled}
                     />
                     <p className="text-xs text-muted-foreground">
-                      This is the Production Access Token from your Mercado Pago Developer Dashboard.
-                      Make sure to use the correct token for test or production mode.
+                      {t('admin.settings.payment.mercadopago.access_token_help', 'This is the Production Access Token from your Mercado Pago Developer Dashboard. Make sure to use the correct token for test or production mode.')}
                     </p>
                   </div>
 
@@ -3599,7 +3598,7 @@ export default function AdminSettingsPage() {
                       onCheckedChange={(checked) => setMercadoPagoForm({...mercadoPagoForm, testMode: checked})}
                       disabled={!mercadoPagoForm.enabled}
                     />
-                    <Label htmlFor="mercadopago-test-mode">Test Mode</Label>
+                    <Label htmlFor="mercadopago-test-mode">{t('admin.settings.payment.mercadopago.test_mode', 'Test Mode')}</Label>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
@@ -3612,8 +3611,8 @@ export default function AdminSettingsPage() {
                       {saveMercadoPagoMutation.isPending && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      <span className="hidden sm:inline">Save Mercado Pago Settings</span>
-                      <span className="sm:hidden">Save Settings</span>
+                      <span className="hidden sm:inline">{t('admin.settings.payment.mercadopago.save_settings', 'Save Mercado Pago Settings')}</span>
+                      <span className="sm:hidden">{t('admin.settings.save_settings', 'Save Settings')}</span>
                     </Button>
 
                     <Button
@@ -3635,7 +3634,7 @@ export default function AdminSettingsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>PayPal Integration</CardTitle>
+                  <CardTitle>{t('admin.settings.payment.paypal.title', 'PayPal Integration')}</CardTitle>
                   <CardDescription>
                     {t('admin.settings.configure_paypal_gateway', 'Configure PayPal payment gateway')}
                   </CardDescription>
@@ -3647,11 +3646,11 @@ export default function AdminSettingsPage() {
                       checked={paypalForm.enabled}
                       onCheckedChange={(checked) => setPaypalForm({...paypalForm, enabled: checked})}
                     />
-                    <Label htmlFor="paypal-enabled">Enable PayPal Payments</Label>
+                    <Label htmlFor="paypal-enabled">{t('admin.settings.payment.paypal.enable', 'Enable PayPal Payments')}</Label>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="clientId">Client ID</Label>
+                    <Label htmlFor="clientId">{t('admin.settings.payment.paypal.client_id', 'Client ID')}</Label>
                     <Input
                       id="clientId"
                       value={paypalForm.clientId}
@@ -3662,7 +3661,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="clientSecret">Client Secret</Label>
+                    <Label htmlFor="clientSecret">{t('admin.settings.payment.paypal.client_secret', 'Client Secret')}</Label>
                     <Input
                       id="clientSecret"
                       type="password"
@@ -3680,7 +3679,7 @@ export default function AdminSettingsPage() {
                       onCheckedChange={(checked) => setPaypalForm({...paypalForm, testMode: checked})}
                       disabled={!paypalForm.enabled}
                     />
-                    <Label htmlFor="paypal-test-mode">Sandbox Mode</Label>
+                    <Label htmlFor="paypal-test-mode">{t('admin.settings.payment.paypal.sandbox_mode', 'Sandbox Mode')}</Label>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
@@ -3693,8 +3692,8 @@ export default function AdminSettingsPage() {
                       {savePaypalMutation.isPending && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      <span className="hidden sm:inline">Save PayPal Settings</span>
-                      <span className="sm:hidden">Save Settings</span>
+                      <span className="hidden sm:inline">{t('admin.settings.payment.paypal.save_settings', 'Save PayPal Settings')}</span>
+                      <span className="sm:hidden">{t('admin.settings.save_settings', 'Save Settings')}</span>
                     </Button>
 
                     <Button
@@ -3716,9 +3715,9 @@ export default function AdminSettingsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Moyasar Integration</CardTitle>
+                  <CardTitle>{t('admin.settings.payment.moyasar.title', 'Moyasar Integration')}</CardTitle>
                   <CardDescription>
-                    Configure Moyasar payment gateway for Saudi Arabia
+                    {t('admin.settings.payment.moyasar.description', 'Configure Moyasar payment gateway for Saudi Arabia')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -3728,11 +3727,11 @@ export default function AdminSettingsPage() {
                       checked={moyasarForm.enabled}
                       onCheckedChange={(checked) => setMoyasarForm({...moyasarForm, enabled: checked})}
                     />
-                    <Label htmlFor="moyasar-enabled">Enable Moyasar Payments</Label>
+                    <Label htmlFor="moyasar-enabled">{t('admin.settings.payment.moyasar.enable', 'Enable Moyasar Payments')}</Label>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="publishableKey">Publishable Key</Label>
+                    <Label htmlFor="publishableKey">{t('admin.settings.payment.moyasar.publishable_key', 'Publishable Key')}</Label>
                     <Input
                       id="publishableKey"
                       value={moyasarForm.publishableKey}
@@ -3743,7 +3742,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="secretKey">Secret Key</Label>
+                    <Label htmlFor="secretKey">{t('admin.settings.payment.moyasar.secret_key', 'Secret Key')}</Label>
                     <Input
                       id="secretKey"
                       type="password"
@@ -3761,7 +3760,7 @@ export default function AdminSettingsPage() {
                       onCheckedChange={(checked) => setMoyasarForm({...moyasarForm, testMode: checked})}
                       disabled={!moyasarForm.enabled}
                     />
-                    <Label htmlFor="moyasar-test-mode">Test Mode</Label>
+                    <Label htmlFor="moyasar-test-mode">{t('admin.settings.payment.moyasar.test_mode', 'Test Mode')}</Label>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
@@ -3774,8 +3773,8 @@ export default function AdminSettingsPage() {
                       {saveMoyasarMutation.isPending && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      <span className="hidden sm:inline">Save Moyasar Settings</span>
-                      <span className="sm:hidden">Save Settings</span>
+                      <span className="hidden sm:inline">{t('admin.settings.payment.moyasar.save_settings', 'Save Moyasar Settings')}</span>
+                      <span className="sm:hidden">{t('admin.settings.save_settings', 'Save Settings')}</span>
                     </Button>
 
                     <Button
@@ -3797,9 +3796,9 @@ export default function AdminSettingsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>MPESA Integration</CardTitle>
+                  <CardTitle>{t('admin.settings.payment.mpesa.title', 'MPESA Integration')}</CardTitle>
                   <CardDescription>
-                    Configure MPESA payment gateway for Kenya
+                    {t('admin.settings.payment.mpesa.description', 'Configure MPESA payment gateway for Kenya')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -3809,11 +3808,11 @@ export default function AdminSettingsPage() {
                       checked={mpesaForm.enabled}
                       onCheckedChange={(checked) => setMpesaForm({...mpesaForm, enabled: checked})}
                     />
-                    <Label htmlFor="mpesa-enabled">Enable MPESA Payments</Label>
+                    <Label htmlFor="mpesa-enabled">{t('admin.settings.payment.mpesa.enable', 'Enable MPESA Payments')}</Label>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="consumerKey">Consumer Key</Label>
+                    <Label htmlFor="consumerKey">{t('admin.settings.payment.mpesa.consumer_key', 'Consumer Key')}</Label>
                     <Input
                       id="consumerKey"
                       value={mpesaForm.consumerKey}
@@ -3824,7 +3823,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="consumerSecret">Consumer Secret</Label>
+                    <Label htmlFor="consumerSecret">{t('admin.settings.payment.mpesa.consumer_secret', 'Consumer Secret')}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="consumerSecret"
@@ -3842,7 +3841,7 @@ export default function AdminSettingsPage() {
                           ...mpesaForm,
                           _showConsumerSecret: !(mpesaForm as any)._showConsumerSecret
                         } as any)}
-                        aria-label={(mpesaForm as any)._showConsumerSecret ? 'Hide Consumer Secret' : 'Show Consumer Secret'}
+                        aria-label={(mpesaForm as any)._showConsumerSecret ? t('admin.settings.payment.mpesa.hide_consumer_secret', 'Hide Consumer Secret') : t('admin.settings.payment.mpesa.show_consumer_secret', 'Show Consumer Secret')}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -3850,7 +3849,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="businessShortcode">Business Shortcode</Label>
+                    <Label htmlFor="businessShortcode">{t('admin.settings.payment.mpesa.business_shortcode', 'Business Shortcode')}</Label>
                     <Input
                       id="businessShortcode"
                       value={mpesaForm.businessShortcode}
@@ -3861,24 +3860,24 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="shortcodeType">Shortcode Type</Label>
+                    <Label htmlFor="shortcodeType">{t('admin.settings.payment.mpesa.shortcode_type', 'Shortcode Type')}</Label>
                     <Select
                       value={mpesaForm.shortcodeType}
                       onValueChange={(value) => setMpesaForm({...mpesaForm, shortcodeType: value as any})}
                       disabled={!mpesaForm.enabled}
                     >
                       <SelectTrigger id="shortcodeType">
-                        <SelectValue placeholder="Select shortcode type" />
+                        <SelectValue placeholder={t('admin.settings.payment.mpesa.select_shortcode_type', 'Select shortcode type')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="paybill">PayBill</SelectItem>
-                        <SelectItem value="buygoods">BuyGoods (Till)</SelectItem>
+                        <SelectItem value="paybill">{t('admin.settings.payment.mpesa.paybill', 'PayBill')}</SelectItem>
+                        <SelectItem value="buygoods">{t('admin.settings.payment.mpesa.buygoods', 'BuyGoods (Till)')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="passkey">Passkey</Label>
+                    <Label htmlFor="passkey">{t('admin.settings.payment.mpesa.passkey', 'Passkey')}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="passkey"
@@ -3896,7 +3895,7 @@ export default function AdminSettingsPage() {
                           ...mpesaForm,
                           _showPasskey: !(mpesaForm as any)._showPasskey
                         } as any)}
-                        aria-label={(mpesaForm as any)._showPasskey ? 'Hide Passkey' : 'Show Passkey'}
+                        aria-label={(mpesaForm as any)._showPasskey ? t('admin.settings.payment.mpesa.hide_passkey', 'Hide Passkey') : t('admin.settings.payment.mpesa.show_passkey', 'Show Passkey')}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -3904,7 +3903,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="callbackUrl">Callback URL</Label>
+                    <Label htmlFor="callbackUrl">{t('admin.settings.payment.mpesa.callback_url', 'Callback URL')}</Label>
                     <Input
                       id="callbackUrl"
                       value={mpesaForm.callbackUrl}
@@ -3913,7 +3912,7 @@ export default function AdminSettingsPage() {
                       disabled={!mpesaForm.enabled}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Must be a publicly reachable HTTPS URL that accepts MPESA STK callbacks.
+                      {t('admin.settings.payment.mpesa.callback_url_help', 'Must be a publicly reachable HTTPS URL that accepts MPESA STK callbacks.')}
                     </p>
                   </div>
 
@@ -3924,7 +3923,7 @@ export default function AdminSettingsPage() {
                       onCheckedChange={(checked) => setMpesaForm({...mpesaForm, testMode: checked})}
                       disabled={!mpesaForm.enabled}
                     />
-                    <Label htmlFor="mpesa-test-mode">Test Mode (Sandbox)</Label>
+                    <Label htmlFor="mpesa-test-mode">{t('admin.settings.payment.mpesa.test_mode_sandbox', 'Test Mode (Sandbox)')}</Label>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
@@ -3937,8 +3936,8 @@ export default function AdminSettingsPage() {
                       {saveMpesaMutation.isPending && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      <span className="hidden sm:inline">Save MPESA Settings</span>
-                      <span className="sm:hidden">Save Settings</span>
+                      <span className="hidden sm:inline">{t('admin.settings.payment.mpesa.save_settings', 'Save MPESA Settings')}</span>
+                      <span className="sm:hidden">{t('admin.settings.save_settings', 'Save Settings')}</span>
                     </Button>
 
                     <Button
@@ -3960,9 +3959,9 @@ export default function AdminSettingsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Bank Transfer</CardTitle>
+                  <CardTitle>{t('admin.settings.payment.bank_transfer.title', 'Bank Transfer')}</CardTitle>
                   <CardDescription>
-                    Configure offline payment via bank transfer
+                    {t('admin.settings.payment.bank_transfer.description', 'Configure offline payment via bank transfer')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -3972,11 +3971,11 @@ export default function AdminSettingsPage() {
                       checked={bankTransferForm.enabled}
                       onCheckedChange={(checked) => setBankTransferForm({...bankTransferForm, enabled: checked})}
                     />
-                    <Label htmlFor="bank-transfer-enabled">Enable Bank Transfer</Label>
+                    <Label htmlFor="bank-transfer-enabled">{t('admin.settings.payment.bank_transfer.enable', 'Enable Bank Transfer')}</Label>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="accountName">Account Name</Label>
+                    <Label htmlFor="accountName">{t('admin.settings.payment.bank_transfer.account_name', 'Account Name')}</Label>
                     <Input
                       id="accountName"
                       value={bankTransferForm.accountName}
@@ -3987,7 +3986,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="accountNumber">Account Number</Label>
+                    <Label htmlFor="accountNumber">{t('admin.settings.payment.bank_transfer.account_number', 'Account Number')}</Label>
                     <Input
                       id="accountNumber"
                       value={bankTransferForm.accountNumber}
@@ -3998,7 +3997,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="bankName">Bank Name</Label>
+                    <Label htmlFor="bankName">{t('admin.settings.payment.bank_transfer.bank_name', 'Bank Name')}</Label>
                     <Input
                       id="bankName"
                       value={bankTransferForm.bankName}
@@ -4010,35 +4009,35 @@ export default function AdminSettingsPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="routingNumber">Routing Number</Label>
+                      <Label htmlFor="routingNumber">{t('admin.settings.payment.bank_transfer.routing_number', 'Routing Number')}</Label>
                       <Input
                         id="routingNumber"
                         value={bankTransferForm.routingNumber}
                         onChange={(e) => setBankTransferForm({...bankTransferForm, routingNumber: e.target.value})}
-                        placeholder="Optional"
+                        placeholder={t('admin.settings.payment.bank_transfer.optional', 'Optional')}
                         disabled={!bankTransferForm.enabled}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="swiftCode">SWIFT Code</Label>
+                      <Label htmlFor="swiftCode">{t('admin.settings.payment.bank_transfer.swift_code', 'SWIFT Code')}</Label>
                       <Input
                         id="swiftCode"
                         value={bankTransferForm.swiftCode}
                         onChange={(e) => setBankTransferForm({...bankTransferForm, swiftCode: e.target.value})}
-                        placeholder="Optional"
+                        placeholder={t('admin.settings.payment.bank_transfer.optional', 'Optional')}
                         disabled={!bankTransferForm.enabled}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="instructions">Payment Instructions</Label>
+                    <Label htmlFor="instructions">{t('admin.settings.payment.bank_transfer.payment_instructions', 'Payment Instructions')}</Label>
                     <Input
                       id="instructions"
                       value={bankTransferForm.instructions}
                       onChange={(e) => setBankTransferForm({...bankTransferForm, instructions: e.target.value})}
-                      placeholder="Include payment reference in transfer details"
+                      placeholder={t('admin.settings.payment.bank_transfer.instructions_placeholder', 'Include payment reference in transfer details')}
                       disabled={!bankTransferForm.enabled}
                     />
                   </div>
@@ -4052,7 +4051,7 @@ export default function AdminSettingsPage() {
                     {saveBankTransferMutation.isPending && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Save Bank Transfer Settings
+                    {t('admin.settings.payment.bank_transfer.save_settings', 'Save Bank Transfer Settings')}
                   </Button>
                 </CardContent>
               </Card>
@@ -4062,7 +4061,7 @@ export default function AdminSettingsPage() {
           <TabsContent value="email">
             <Card>
               <CardHeader>
-                <CardTitle>SMTP Email Configuration</CardTitle>
+                <CardTitle>{t('admin.settings.email.title', 'SMTP Email Configuration')}</CardTitle>
                 <CardDescription>
                   {t('admin.settings.configure_smtp_settings', 'Configure SMTP settings for sending system emails, notifications, and password resets')}
                 </CardDescription>
@@ -4074,15 +4073,15 @@ export default function AdminSettingsPage() {
                     checked={smtpForm.enabled}
                     onCheckedChange={(checked) => setSmtpForm({...smtpForm, enabled: checked})}
                   />
-                  <Label htmlFor="smtp-enabled">Enable SMTP Email</Label>
+                  <Label htmlFor="smtp-enabled">{t('admin.settings.email.enable_smtp', 'Enable SMTP Email')}</Label>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  When enabled, the system will use SMTP to send emails for password resets, notifications, and other system communications.
+                  {t('admin.settings.email.smtp_description', 'When enabled, the system will use SMTP to send emails for password resets, notifications, and other system communications.')}
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="smtp-host">SMTP Host</Label>
+                    <Label htmlFor="smtp-host">{t('admin.settings.email.smtp_host', 'SMTP Host')}</Label>
                     <Input
                       id="smtp-host"
                       value={smtpForm.host}
@@ -4092,7 +4091,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="smtp-username">SMTP Username</Label>
+                    <Label htmlFor="smtp-username">{t('admin.settings.email.smtp_username', 'SMTP Username')}</Label>
                     <Input
                       id="smtp-username"
                       value={smtpForm.username}
@@ -4102,7 +4101,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="smtp-port">SMTP Port</Label>
+                    <Label htmlFor="smtp-port">{t('admin.settings.email.smtp_port', 'SMTP Port')}</Label>
                     <Input
                       id="smtp-port"
                       type="number"
@@ -4127,43 +4126,43 @@ export default function AdminSettingsPage() {
                       placeholder="587"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Common ports: 587 (STARTTLS, recommended), 465 (SSL/TLS), 25 (No encryption)
+                      {t('admin.settings.email.common_ports_help', 'Common ports: 587 (STARTTLS, recommended), 465 (SSL/TLS), 25 (No encryption)')}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="smtp-password">SMTP Password</Label>
+                    <Label htmlFor="smtp-password">{t('admin.settings.email.smtp_password', 'SMTP Password')}</Label>
                     <Input
                       id="smtp-password"
                       type="password"
                       value={smtpForm.password}
                       onChange={(e) => setSmtpForm({...smtpForm, password: e.target.value})}
-                      placeholder={storedSmtpPassword ? "Leave empty to keep current password" : "Enter password"}
+                      placeholder={storedSmtpPassword ? t('admin.settings.email.leave_empty_keep_password', 'Leave empty to keep current password') : t('admin.settings.email.enter_password', 'Enter password')}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {storedSmtpPassword ? "Password is set. Leave empty to keep it unchanged, or enter new password." : "For Gmail, use an App Password instead of your regular password"}
+                      {storedSmtpPassword ? t('admin.settings.email.password_set_hint', 'Password is set. Leave empty to keep it unchanged, or enter new password.') : t('admin.settings.email.gmail_app_password_hint', 'For Gmail, use an App Password instead of your regular password')}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="smtp-security">Security</Label>
+                    <Label htmlFor="smtp-security">{t('admin.settings.email.security', 'Security')}</Label>
                     <Select
                       value={smtpForm.security}
                       onValueChange={(value) => setSmtpForm({...smtpForm, security: value})}
                     >
                       <SelectTrigger id="smtp-security">
-                        <SelectValue placeholder="Select security" />
+                        <SelectValue placeholder={t('admin.settings.email.select_security', 'Select security')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="ssl">SSL / Implicit TLS (Port 465)</SelectItem>
-                        <SelectItem value="tls">STARTTLS (Port 587)</SelectItem>
-                        <SelectItem value="none">None (Port 25)</SelectItem>
+                        <SelectItem value="ssl">{t('admin.settings.email.ssl_implicit_tls', 'SSL / Implicit TLS (Port 465)')}</SelectItem>
+                        <SelectItem value="tls">{t('admin.settings.email.starttls', 'STARTTLS (Port 587)')}</SelectItem>
+                        <SelectItem value="none">{t('admin.settings.email.no_encryption', 'None (Port 25)')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="smtp-from-email">From Email Address</Label>
+                    <Label htmlFor="smtp-from-email">{t('admin.settings.email.from_email_address', 'From Email Address')}</Label>
                     <Input
                       id="smtp-from-email"
                       type="email"
@@ -4174,7 +4173,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="smtp-from-name">From Name</Label>
+                    <Label htmlFor="smtp-from-name">{t('admin.settings.email.from_name', 'From Name')}</Label>
                     <Input
                       id="smtp-from-name"
                       value={smtpForm.fromName}
@@ -4184,7 +4183,7 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="smtp-test-email">Test Email Address</Label>
+                    <Label htmlFor="smtp-test-email">{t('admin.settings.email.test_email_address', 'Test Email Address')}</Label>
                     <Input
                       id="smtp-test-email"
                       type="email"
@@ -4193,7 +4192,7 @@ export default function AdminSettingsPage() {
                       placeholder="test@example.com"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Email address to send test emails to
+                      {t('admin.settings.email.test_email_hint', 'Email address to send test emails to')}
                     </p>
                   </div>
                 </div>
@@ -4208,7 +4207,7 @@ export default function AdminSettingsPage() {
                     {saveSmtpMutation.isPending && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Save SMTP Settings
+                    {t('admin.settings.email.save_smtp_settings', 'Save SMTP Settings')}
                   </Button>
 
                   <Button
@@ -4566,7 +4565,7 @@ export default function AdminSettingsPage() {
           <TabsContent value="general">
             <Card>
               <CardHeader>
-                <CardTitle>General Settings</CardTitle>
+                <CardTitle>{t('admin.settings.general_settings.title', 'General Settings')}</CardTitle>
                 <CardDescription>
                   {t('admin.settings.configure_general_settings', 'Configure general application settings')}
                 </CardDescription>
@@ -4574,7 +4573,7 @@ export default function AdminSettingsPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="defaultCurrency">Default Currency</Label>
+                    <Label htmlFor="defaultCurrency">{t('admin.settings.general_settings.default_currency', 'Default Currency')}</Label>
                     
                     {/* Custom Currency Management Section */}
                     <div className="mb-3 space-y-2">
@@ -4582,19 +4581,19 @@ export default function AdminSettingsPage() {
                         <DialogTrigger asChild>
                           <Button type="button" variant="outline" size="sm" className="w-full">
                             <Plus className="mr-2 h-4 w-4" />
-                            Add Custom Currency
+                            {t('admin.settings.general_settings.add_custom_currency', 'Add Custom Currency')}
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Add Custom Currency</DialogTitle>
+                            <DialogTitle>{t('admin.settings.general_settings.add_custom_currency', 'Add Custom Currency')}</DialogTitle>
                             <DialogDescription>
-                              Add a custom currency with a 3-letter ISO 4217 code, name, and symbol.
+                              {t('admin.settings.general_settings.add_custom_currency_desc', 'Add a custom currency with a 3-letter ISO 4217 code, name, and symbol.')}
                             </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4 py-4">
                             <div className="space-y-2">
-                              <Label htmlFor="currency-code">Currency Code (ISO 4217)</Label>
+                              <Label htmlFor="currency-code">{t('admin.settings.general_settings.currency_code', 'Currency Code (ISO 4217)')}</Label>
                               <Input
                                 id="currency-code"
                                 placeholder="USD"
@@ -4603,11 +4602,11 @@ export default function AdminSettingsPage() {
                                 maxLength={3}
                               />
                               <p className="text-xs text-muted-foreground">
-                                3 uppercase letters (e.g., USD, EUR, GBP)
+                                {t('admin.settings.general_settings.currency_code_help', '3 uppercase letters (e.g., USD, EUR, GBP)')}
                               </p>
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="currency-name">Currency Name</Label>
+                              <Label htmlFor="currency-name">{t('admin.settings.general_settings.currency_name', 'Currency Name')}</Label>
                               <Input
                                 id="currency-name"
                                 placeholder="US Dollar"
@@ -4616,7 +4615,7 @@ export default function AdminSettingsPage() {
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="currency-symbol">Currency Symbol</Label>
+                              <Label htmlFor="currency-symbol">{t('admin.settings.general_settings.currency_symbol', 'Currency Symbol')}</Label>
                               <Input
                                 id="currency-symbol"
                                 placeholder="$"
@@ -4630,10 +4629,10 @@ export default function AdminSettingsPage() {
                               setShowCustomCurrencyDialog(false);
                               setCustomCurrencyForm({ code: '', name: '', symbol: '' });
                             }}>
-                              Cancel
+                              {t('admin.settings.general_settings.cancel', 'Cancel')}
                             </Button>
                             <Button onClick={handleAddCustomCurrency}>
-                              Add Currency
+                              {t('admin.settings.general_settings.add_currency', 'Add Currency')}
                             </Button>
                           </DialogFooter>
                         </DialogContent>
@@ -4641,7 +4640,7 @@ export default function AdminSettingsPage() {
 
                       {generalSettingsForm.customCurrencies.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs font-medium text-muted-foreground">Custom Currencies:</p>
+                          <p className="text-xs font-medium text-muted-foreground">{t('admin.settings.general_settings.custom_currencies_label', 'Custom Currencies:')}</p>
                           <div className="space-y-1">
                             {generalSettingsForm.customCurrencies.map((currency) => (
                               <div key={currency.code} className="flex items-center justify-between p-2 border border-border rounded-md">
@@ -4669,7 +4668,7 @@ export default function AdminSettingsPage() {
                       onValueChange={(value) => setGeneralSettingsForm({...generalSettingsForm, defaultCurrency: value})}
                     >
                       <SelectTrigger id="defaultCurrency">
-                        <SelectValue placeholder="Select currency" />
+                        <SelectValue placeholder={t('admin.settings.general_settings.select_currency', 'Select currency')} />
                       </SelectTrigger>
                       <SelectContent>
                         {BUILT_IN_CURRENCY_OPTIONS.map((currency) => (
@@ -4692,13 +4691,13 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="dateFormat">Date Format</Label>
+                    <Label htmlFor="dateFormat">{t('admin.settings.general_settings.date_format', 'Date Format')}</Label>
                     <Select
                       value={generalSettingsForm.dateFormat}
                       onValueChange={(value) => setGeneralSettingsForm({...generalSettingsForm, dateFormat: value})}
                     >
                       <SelectTrigger id="dateFormat">
-                        <SelectValue placeholder="Select date format" />
+                        <SelectValue placeholder={t('admin.settings.general_settings.select_date_format', 'Select date format')} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
@@ -4709,17 +4708,17 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="timeFormat">Time Format</Label>
+                    <Label htmlFor="timeFormat">{t('admin.settings.general_settings.time_format', 'Time Format')}</Label>
                     <Select
                       value={generalSettingsForm.timeFormat}
                       onValueChange={(value) => setGeneralSettingsForm({...generalSettingsForm, timeFormat: value})}
                     >
                       <SelectTrigger id="timeFormat">
-                        <SelectValue placeholder="Select time format" />
+                        <SelectValue placeholder={t('admin.settings.general_settings.select_time_format', 'Select time format')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="12h">12-hour (AM/PM)</SelectItem>
-                        <SelectItem value="24h">24-hour</SelectItem>
+                        <SelectItem value="12h">{t('admin.settings.general_settings.12_hour', '12-hour (AM/PM)')}</SelectItem>
+                        <SelectItem value="24h">{t('admin.settings.general_settings.24_hour', '24-hour')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

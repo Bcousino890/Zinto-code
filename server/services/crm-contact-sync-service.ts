@@ -12,6 +12,7 @@ interface StoredContact extends CrmContactInput {
 }
 
 export interface CrmContactSyncPort {
+  integrationBelongsToCompany(input: { companyId: number; integrationId: number }): Promise<boolean>;
   findByExternalId(input: { companyId: number; integrationId: number; externalId: string }): Promise<StoredContact | undefined>;
   createContact(input: CrmContactInput & { companyId: number }): Promise<StoredContact>;
   updateContact(id: number, input: Partial<CrmContactInput>): Promise<StoredContact>;
@@ -27,6 +28,9 @@ export class CrmContactSyncService {
     externalId: string;
     contact: CrmContactInput;
   }): Promise<{ contact: StoredContact; created: boolean }> {
+    if (!await this.port.integrationBelongsToCompany(input)) {
+      throw new Error('Integration does not belong to this company');
+    }
     const existing = await this.port.findByExternalId(input);
     if (existing) {
       const contact = await this.port.updateContact(existing.id, input.contact);

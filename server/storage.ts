@@ -31,6 +31,7 @@ import {
   apiUsage, type ApiUsage, type InsertApiUsage,
   apiRateLimits, type ApiRateLimit, type InsertApiRateLimit,
   apiWebhooks, type ApiWebhook, type InsertApiWebhook,
+  crmExternalMappings, crmIntegrations,
   flows, type Flow, type InsertFlow,
   flowTemplates, type FlowTemplate, type InsertFlowTemplate,
   flowAssignments, type FlowAssignment, type InsertFlowAssignment,
@@ -864,6 +865,9 @@ export interface IStorage {
   getOrCreateContact(contact: InsertContact): Promise<Contact>;
   getOrCreateContactResult(contact: InsertContact): Promise<GetOrCreateContactResult>;
   updateContact(id: number, contact: Partial<InsertContact>): Promise<Contact>;
+  getContactByCrmExternalId(companyId: number, integrationId: number, externalId: string): Promise<Contact | undefined>;
+  crmIntegrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean>;
+  saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void>;
   deleteContact(id: number): Promise<{ success: boolean; mediaFiles?: string[]; error?: string }>;
 
   getConversations(options?: { companyId?: number; page?: number; limit?: number; search?: string; assignedToUserId?: number }): Promise<{ conversations: Conversation[]; total: number }>;
@@ -4963,6 +4967,40 @@ export class DatabaseStorage implements IStorage {
       )
       .limit(1);
     return contact;
+  }
+
+  async getContactByCrmExternalId(companyId: number, integrationId: number, externalId: string): Promise<Contact | undefined> {
+    const [mapping] = await db.select().from(crmExternalMappings).where(and(
+      eq(crmExternalMappings.companyId, companyId),
+      eq(crmExternalMappings.integrationId, integrationId),
+      eq(crmExternalMappings.entityType, 'contact'),
+      eq(crmExternalMappings.externalId, externalId),
+    )).limit(1);
+    if (!mapping) return undefined;
+    const contact = await this.getContact(Number(mapping.zintoId));
+    return contact?.companyId === companyId ? contact : undefined;
+  }
+
+  async crmIntegrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean> {
+    const [integration] = await db.select({ id: crmIntegrations.id }).from(crmIntegrations).where(and(
+      eq(crmIntegrations.id, integrationId),
+      eq(crmIntegrations.companyId, companyId),
+      eq(crmIntegrations.status, 'active'),
+    )).limit(1);
+    return Boolean(integration);
+  }
+
+  async saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void> {
+    await db.insert(crmExternalMappings).values({
+      companyId,
+      integrationId,
+      entityType: 'contact',
+      externalId,
+      zintoId: String(contactId),
+    }).onConflictDoUpdate({
+      target: [crmExternalMappings.companyId, crmExternalMappings.integrationId, crmExternalMappings.entityType, crmExternalMappings.externalId],
+      set: { zintoId: String(contactId), version: sql`${crmExternalMappings.version} + 1`, updatedAt: new Date() },
+    });
   }
 
   async getInactiveContactByIdentifierAndCompany(
@@ -28606,4 +28644,3 @@ export async function logContactAudit(params: {
 
   }
 }
-

@@ -7,6 +7,7 @@ test('creates a Zinto contact and records its CRM external ID on first sync', as
   const created: Array<Record<string, unknown>> = [];
   const mappings: Array<{ externalId: string; zintoId: number }> = [];
   const service = new CrmContactSyncService({
+    integrationBelongsToCompany: async () => true,
     findByExternalId: async () => undefined,
     createContact: async (input) => { created.push(input); return { id: 91, ...input }; },
     updateContact: async () => { throw new Error('must not update'); },
@@ -29,6 +30,7 @@ test('creates a Zinto contact and records its CRM external ID on first sync', as
 test('updates the mapped Zinto contact instead of creating a duplicate', async () => {
   const updated: Array<{ id: number; input: Record<string, unknown> }> = [];
   const service = new CrmContactSyncService({
+    integrationBelongsToCompany: async () => true,
     findByExternalId: async () => ({ id: 91, name: 'Andrea anterior' }),
     createContact: async () => { throw new Error('must not create'); },
     updateContact: async (id, input) => { updated.push({ id, input }); return { id, ...input }; },
@@ -44,4 +46,19 @@ test('updates the mapped Zinto contact instead of creating a duplicate', async (
 
   assert.equal(result.created, false);
   assert.deepEqual(updated, [{ id: 91, input: { name: 'Andrea Díaz' } }]);
+});
+
+test('refuses an integration ID that belongs to another company', async () => {
+  const service = new CrmContactSyncService({
+    integrationBelongsToCompany: async () => false,
+    findByExternalId: async () => { throw new Error('must not query'); },
+    createContact: async () => { throw new Error('must not create'); },
+    updateContact: async () => { throw new Error('must not update'); },
+    saveMapping: async () => { throw new Error('must not map'); },
+  });
+
+  await assert.rejects(
+    () => service.upsert({ companyId: 12, integrationId: 999, externalId: 'other', contact: { name: 'Andrea Díaz' } }),
+    /Integration does not belong to this company/,
+  );
 });

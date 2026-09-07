@@ -282,6 +282,8 @@ import { authenticateApiKey, generateApiKey, hashApiKey } from "./middleware/api
 import apiV1Routes from "./routes/api-v1";
 import { createApiV2Router } from "./routes/api-v2";
 import { ApiKeyConfigurationError, validateApiKeyConfigurationUpdate } from "./services/integration-api-key-policy";
+import { CrmContactSyncService } from "./services/crm-contact-sync-service";
+import { createCrmContactSyncStorageAdapter } from "./services/crm-contact-sync-storage-adapter";
 import channelManager from "./services/channel-manager";
 import {
   sendTeamInvitation,
@@ -1110,7 +1112,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAdminRoutes(app);
 
   app.use('/api/v1', apiV1Routes);
-  app.use('/api/v2', createApiV2Router({ authenticate: authenticateApiKey }));
+  app.use('/api/v2', createApiV2Router({
+    authenticate: authenticateApiKey,
+    contactSync: new CrmContactSyncService(createCrmContactSyncStorageAdapter(storage)),
+  }));
 
   registerPlanRoutes(app);
 

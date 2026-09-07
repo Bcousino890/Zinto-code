@@ -4,13 +4,16 @@ import test from 'node:test';
 
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { createApiV2Router } from '../../server/routes/api-v2';
+import type { CrmContactSyncService } from '../../server/services/crm-contact-sync-service';
 
 async function withServer(
   middleware: (req: Request, res: Response, next: NextFunction) => void,
   run: (baseUrl: string) => Promise<void>,
+  contactSync?: Pick<CrmContactSyncService, 'upsert'>,
 ) {
   const app = express();
-  app.use('/api/v2', createApiV2Router({ authenticate: middleware }));
+  app.use(express.json());
+  app.use('/api/v2', createApiV2Router({ authenticate: middleware, contactSync }));
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
@@ -64,4 +67,31 @@ test('exposes the supported CRM scopes to an integration administrator', async (
     assert.ok(body.scopes.includes('contacts:write'));
     assert.equal(body.webhookSignature, 'v1=hmac-sha256(timestamp.raw_body)');
   });
+});
+
+test('upserts a contact from a permitted CRM without exposing another company', async () => {
+  const received: unknown[] = [];
+  const contactSync = {
+    upsert: async (input: unknown) => {
+      received.push(input);
+      return { created: true, contact: { id: 91, name: 'Andrea Díaz' } };
+    },
+  } as Pick<CrmContactSyncService, 'upsert'>;
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['contacts:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/contacts/hubspot-441`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ name: 'Andrea Díaz', phone: '+56912345678' }),
+    });
+    assert.equal(response.status, 201);
+    assert.deepEqual(await response.json(), { data: { id: 91, name: 'Andrea Díaz' }, created: true });
+  }, contactSync);
+  assert.deepEqual(received, [{
+    companyId: 12, integrationId: 3, externalId: 'hubspot-441',
+    contact: { name: 'Andrea Díaz', phone: '+56912345678' },
+  }]);
 });

@@ -17,6 +17,7 @@ export class GoogleSheetsAuthService {
   private static instance: GoogleSheetsAuthService;
   private authWindow: Window | null = null;
   private authPromise: Promise<boolean> | null = null;
+  private lastAuthUrlError: string | null = null;
 
   private constructor() {}
 
@@ -50,9 +51,11 @@ export class GoogleSheetsAuthService {
     try {
       const response = await apiRequest('GET', '/api/google/sheets/auth');
       const data: GoogleAuthData = await response.json();
+      this.lastAuthUrlError = null;
       return data.authUrl;
     } catch (error) {
       console.error('Error getting Google Sheets auth URL:', error);
+      this.lastAuthUrlError = error instanceof Error ? error.message : null;
       return null;
     }
   }
@@ -82,7 +85,10 @@ export class GoogleSheetsAuthService {
       const authUrl = await this.getAuthUrl();
       
       if (!authUrl) {
-        throw new Error('Failed to get authentication URL. Please ensure Google Sheets integration is configured by the platform administrator.');
+        throw new Error(
+          this.lastAuthUrlError ||
+          'Failed to get authentication URL. Please ensure Google Sheets integration is configured by the platform administrator.'
+        );
       }
 
 

@@ -4,6 +4,8 @@ import { getApiV2OpenApiDocument } from './api-v2-openapi';
 import { validateCampaignBatch, type CampaignBatchItem } from '../services/campaign-batch-validation';
 import type { CrmContactSyncService } from '../services/crm-contact-sync-service';
 import { normalizeOutboundCrmMessageRequest } from '../services/crm-message-sync-service';
+import type { AppointmentV2Service } from '../services/appointment-v2-service';
+import type { CrmDealPipelineApiV2Service } from '../services/crm-deal-pipeline-api-v2-service';
 
 type AuthenticationMiddleware = (req: Request, res: Response, next: NextFunction) => void;
 type MessageSync = {
@@ -24,17 +26,23 @@ type CampaignSync = {
     campaigns: CampaignBatchItem[];
   }): Promise<void>;
 };
+type AppointmentSync = Pick<AppointmentV2Service, 'sync'>;
+type DealPipelineSync = CrmDealPipelineApiV2Service;
 
 export function createApiV2Router({
   authenticate,
   contactSync,
   messageSync,
   campaignSync,
+  appointmentSync,
+  dealPipelineSync,
 }: {
   authenticate: AuthenticationMiddleware;
   contactSync?: Pick<CrmContactSyncService, 'upsert'>;
   messageSync?: MessageSync;
   campaignSync?: CampaignSync;
+  appointmentSync?: AppointmentSync;
+  dealPipelineSync?: DealPipelineSync;
 }) {
   const router = Router();
 
@@ -151,6 +159,62 @@ export function createApiV2Router({
         return res.status(500).json({
           error: 'CAMPAIGN_SYNC_FAILED',
           message: error instanceof Error ? error.message : 'Campaign synchronization failed',
+        });
+      }
+    });
+  }
+
+  if (appointmentSync) {
+    router.put('/appointments/:externalId', requireIntegrationScope('appointments:write'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const externalId = req.params.externalId?.trim();
+      const idempotencyKey = req.header('Idempotency-Key');
+
+      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !externalId || !idempotencyKey?.trim()) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, external ID, and Idempotency-Key are required' });
+      }
+
+      try {
+        const result = await appointmentSync.sync({
+          companyId,
+          integrationId,
+          externalId,
+          idempotencyKey,
+          appointment: req.body,
+        });
+        return res.status(result.created ? 201 : 200).json({ data: { id: result.id }, created: result.created });
+      } catch (error) {
+        return res.status(500).json({
+          error: 'APPOINTMENT_SYNC_FAILED',
+          message: error instanceof Error ? error.message : 'Appointment synchronization failed',
+        });
+      }
+    });
+  }
+
+  if (dealPipelineSync) {
+    router.post('/deals', requireIntegrationScope('deals:write'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const idempotencyKey = req.header('Idempotency-Key');
+
+      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !idempotencyKey?.trim()) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and Idempotency-Key are required' });
+      }
+
+      try {
+        const result = await dealPipelineSync.upsert({
+          companyId,
+          integrationId,
+          idempotencyKey,
+          deal: req.body,
+        });
+        return res.status(result.created ? 201 : 200).json({ data: result.deal, created: result.created });
+      } catch (error) {
+        return res.status(500).json({
+          error: 'DEAL_PIPELINE_SYNC_FAILED',
+          message: error instanceof Error ? error.message : 'Deal pipeline synchronization failed',
         });
       }
     });

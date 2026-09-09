@@ -6,6 +6,8 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { createApiV2Router } from '../../server/routes/api-v2';
 import type { CampaignBatchItem } from '../../server/services/campaign-batch-validation';
 import type { CrmContactSyncService } from '../../server/services/crm-contact-sync-service';
+import type { AppointmentV2Service } from '../../server/services/appointment-v2-service';
+import type { CrmDealPipelineApiV2Service } from '../../server/services/crm-deal-pipeline-api-v2-service';
 
 type MessageSync = {
   send(input: {
@@ -27,16 +29,28 @@ type CampaignSync = {
   }): Promise<void>;
 };
 
+type AppointmentSync = Pick<AppointmentV2Service, 'sync'>;
+type DealPipelineSync = CrmDealPipelineApiV2Service;
+
 async function withServer(
   middleware: (req: Request, res: Response, next: NextFunction) => void,
   run: (baseUrl: string) => Promise<void>,
   contactSync?: Pick<CrmContactSyncService, 'upsert'>,
   messageSync?: MessageSync,
   campaignSync?: CampaignSync,
+  appointmentSync?: AppointmentSync,
+  dealPipelineSync?: DealPipelineSync,
 ) {
   const app = express();
   app.use(express.json());
-  app.use('/api/v2', createApiV2Router({ authenticate: middleware, contactSync, messageSync, campaignSync }));
+  app.use('/api/v2', createApiV2Router({
+    authenticate: middleware,
+    contactSync,
+    messageSync,
+    campaignSync,
+    appointmentSync,
+    dealPipelineSync,
+  }));
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
@@ -330,4 +344,111 @@ test('reports a campaign sync failure separately from an invalid batch', async (
       throw new Error('Campaign queue unavailable');
     },
   });
+});
+
+test('upserts a CRM appointment with its tenant, integration, and idempotency context', async () => {
+  const received: unknown[] = [];
+  const appointmentSync: AppointmentSync = {
+    sync: async (input) => {
+      received.push(input);
+      return { id: 'appointment-441', created: true };
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['appointments:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/appointments/hubspot-appointment-441`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Zinto-Integration-Id': '3',
+        'Idempotency-Key': 'crm-appointment-441',
+      },
+      body: JSON.stringify({ startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' }),
+    });
+
+    assert.equal(response.status, 201);
+    assert.deepEqual(await response.json(), { data: { id: 'appointment-441' }, created: true });
+  }, undefined, undefined, undefined, appointmentSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12,
+    integrationId: 3,
+    externalId: 'hubspot-appointment-441',
+    idempotencyKey: 'crm-appointment-441',
+    appointment: { startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' },
+  }]);
+});
+
+test('creates a CRM deal through the pipeline with tenant, integration, and idempotency context', async () => {
+  const received: unknown[] = [];
+  const dealPipelineSync: DealPipelineSync = {
+    upsert: async (input) => {
+      received.push(input);
+      return { created: true, deal: { id: 91, externalId: 'hubspot-deal-441' } };
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['deals:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/deals`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Zinto-Integration-Id': '3',
+        'Idempotency-Key': 'crm-deal-441',
+      },
+      body: JSON.stringify({ externalId: 'hubspot-deal-441', title: 'Enterprise rollout', stage: 'proposal', value: 12500 }),
+    });
+
+    assert.equal(response.status, 201);
+    assert.deepEqual(await response.json(), { data: { id: 91, externalId: 'hubspot-deal-441' }, created: true });
+  }, undefined, undefined, undefined, undefined, dealPipelineSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12,
+    integrationId: 3,
+    idempotencyKey: 'crm-deal-441',
+    deal: { externalId: 'hubspot-deal-441', title: 'Enterprise rollout', stage: 'proposal', value: 12500 },
+  }]);
+});
+
+test('does not expose appointment or deal synchronization without their dependencies', async () => {
+  await withServer((_req, _res, next) => next(), async (baseUrl) => {
+    const appointmentResponse = await fetch(`${baseUrl}/api/v2/appointments/hubspot-appointment-441`, { method: 'PUT' });
+    assert.equal(appointmentResponse.status, 404);
+
+    const dealResponse = await fetch(`${baseUrl}/api/v2/deals`, { method: 'POST' });
+    assert.equal(dealResponse.status, 404);
+  });
+});
+
+test('does not synchronize appointments or deals without their write scopes', async () => {
+  const appointmentSync: AppointmentSync = { sync: async () => ({ id: 1, created: true }) };
+  const dealPipelineSync: DealPipelineSync = { upsert: async () => ({ created: true, deal: { id: 1 } }) };
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['contacts:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const appointmentResponse = await fetch(`${baseUrl}/api/v2/appointments/hubspot-appointment-441`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-appointment-441' },
+      body: JSON.stringify({ startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' }),
+    });
+    assert.equal(appointmentResponse.status, 403);
+
+    const dealResponse = await fetch(`${baseUrl}/api/v2/deals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-deal-441' },
+      body: JSON.stringify({ externalId: 'hubspot-deal-441', title: 'Enterprise rollout', stage: 'proposal', value: 12500 }),
+    });
+    assert.equal(dealResponse.status, 403);
+  }, undefined, undefined, undefined, appointmentSync, dealPipelineSync);
 });

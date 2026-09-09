@@ -37,6 +37,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, es } from 'date-fns/locale';
 import { API_KEY_SCOPES, toggleApiKeyScope } from './api-key-permissions';
+import { buildApiKeyCreationPayload, type ApiKeyEnvironment } from './api-key-creation-form';
 
 interface ApiKey {
   id: number;
@@ -72,6 +73,8 @@ export function ApiAccessTab() {
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [newApiKey, setNewApiKey] = useState<string>('');
   const [newKeyName, setNewKeyName] = useState('');
+  const [newKeyEnvironment, setNewKeyEnvironment] = useState<ApiKeyEnvironment>('sandbox');
+  const [newKeyWebhookUrl, setNewKeyWebhookUrl] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [editingApiKey, setEditingApiKey] = useState<ApiKey | null>(null);
   const [editingPermissions, setEditingPermissions] = useState<string[]>([]);
@@ -123,6 +126,15 @@ export function ApiAccessTab() {
       return;
     }
 
+    if (!newKeyWebhookUrl.trim()) {
+      toast({
+        title: t('settings.api_access.toast.error', 'Error'),
+        description: t('settings.api_access.toast.enter_webhook_url', 'Please enter a webhook URL for this API key'),
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsCreating(true);
     try {
       const response = await fetch('/api/settings/api-keys', {
@@ -130,9 +142,11 @@ export function ApiAccessTab() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          name: newKeyName.trim()
-        })
+        body: JSON.stringify(buildApiKeyCreationPayload({
+          name: newKeyName,
+          environment: newKeyEnvironment,
+          webhookUrl: newKeyWebhookUrl,
+        }))
       });
 
       if (response.ok) {
@@ -141,6 +155,8 @@ export function ApiAccessTab() {
         setShowKeyModal(true);
         setShowCreateModal(false);
         setNewKeyName('');
+        setNewKeyEnvironment('sandbox');
+        setNewKeyWebhookUrl('');
         await loadApiKeys();
         
         toast({
@@ -1398,6 +1414,62 @@ app.post('/webhook', express.json(), (req, res) => {
                 onChange={(e) => setNewKeyName(e.target.value)}
                 placeholder={t('settings.api_access.dialog.key_name_placeholder', 'e.g., Production Bot, Marketing Automation')}
               />
+            </div>
+
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-medium">
+                {t('settings.api_access.dialog.environment', 'Environment')}
+              </legend>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex cursor-pointer items-start gap-2 rounded-md border p-3 text-sm">
+                  <input
+                    type="radio"
+                    name="apiKeyEnvironment"
+                    value="sandbox"
+                    checked={newKeyEnvironment === 'sandbox'}
+                    onChange={() => setNewKeyEnvironment('sandbox')}
+                  />
+                  <span>
+                    <span className="block font-medium">{t('settings.api_access.dialog.sandbox', 'Sandbox')}</span>
+                    <span className="text-muted-foreground">
+                      {t('settings.api_access.dialog.sandbox_short', 'Safe local or test integration')}
+                    </span>
+                  </span>
+                </label>
+                <label className="flex cursor-pointer items-start gap-2 rounded-md border p-3 text-sm">
+                  <input
+                    type="radio"
+                    name="apiKeyEnvironment"
+                    value="production"
+                    checked={newKeyEnvironment === 'production'}
+                    onChange={() => setNewKeyEnvironment('production')}
+                  />
+                  <span>
+                    <span className="block font-medium">{t('settings.api_access.dialog.production', 'Production')}</span>
+                    <span className="text-muted-foreground">
+                      {t('settings.api_access.dialog.production_short', 'Live customer-facing integration')}
+                    </span>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div>
+              <Label htmlFor="webhookUrl">{t('settings.api_access.dialog.webhook_url', 'Webhook URL')}</Label>
+              <Input
+                id="webhookUrl"
+                type="url"
+                value={newKeyWebhookUrl}
+                onChange={(e) => setNewKeyWebhookUrl(e.target.value)}
+                placeholder={newKeyEnvironment === 'sandbox'
+                  ? 'http://localhost:3000/webhooks/crm'
+                  : 'https://crm.example.com/webhooks/zinto'}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                {newKeyEnvironment === 'sandbox'
+                  ? t('settings.api_access.dialog.sandbox_webhook_help', 'Sandbox webhooks must use localhost, a .test domain, or an .example domain.')
+                  : t('settings.api_access.dialog.production_webhook_help', 'Production webhooks must use HTTPS and cannot target localhost.')}
+              </p>
             </div>
           </div>
           

@@ -948,11 +948,16 @@ export const crmWebhookEvents = pgTable("crm_webhook_events", {
   payload: jsonb("payload").notNull(),
   status: text("status").notNull().default('pending'),
   attemptCount: integer("attempt_count").notNull().default(0),
-  nextAttemptAt: timestamp("next_attempt_at").notNull().defaultNow(),
+  claimedBy: text("claimed_by"),
+  claimExpiresAt: timestamp("claim_expires_at"),
+  deliveredAt: timestamp("delivered_at"),
+  lastError: text("last_error"),
+  nextAttemptAt: timestamp("next_attempt_at").defaultNow(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => [
   index("crm_webhook_events_pending_idx").on(table.status, table.nextAttemptAt),
+  index("crm_webhook_events_claim_scope_idx").on(table.companyId, table.integrationId, table.status, table.nextAttemptAt),
   index("crm_webhook_events_company_created_idx").on(table.companyId, table.createdAt),
 ]);
 

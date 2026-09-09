@@ -31,7 +31,7 @@ import {
   apiUsage, type ApiUsage, type InsertApiUsage,
   apiRateLimits, type ApiRateLimit, type InsertApiRateLimit,
   apiWebhooks, type ApiWebhook, type InsertApiWebhook,
-  crmExternalMappings, crmIntegrations,
+  crmExternalMappings, crmIntegrations, crmWebhookEvents,
   flows, type Flow, type InsertFlow,
   flowTemplates, type FlowTemplate, type InsertFlowTemplate,
   flowAssignments, type FlowAssignment, type InsertFlowAssignment,
@@ -194,6 +194,11 @@ import {
   type FrontendWebsiteSettingsPayload,
   type FrontendWebsiteMediaLibrary,
 } from "@shared/schema";
+import type {
+  ClaimedDurableWebhookEvent,
+  DurableWebhookClaimPendingInput,
+  DurableWebhookDeliveryUpdate,
+} from "./services/durable-webhook-event-store";
 import {
   buildMetaAdRoutingFootprint,
   deriveFlowTriggerStageScopeFromNodes,
@@ -868,6 +873,8 @@ export interface IStorage {
   getContactByCrmExternalId(companyId: number, integrationId: number, externalId: string): Promise<Contact | undefined>;
   crmIntegrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean>;
   saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void>;
+  claimPending(input: DurableWebhookClaimPendingInput): Promise<ClaimedDurableWebhookEvent | undefined>;
+  updateDelivery(input: DurableWebhookDeliveryUpdate): Promise<boolean>;
   deleteContact(id: number): Promise<{ success: boolean; mediaFiles?: string[]; error?: string }>;
 
   getConversations(options?: { companyId?: number; page?: number; limit?: number; search?: string; assignedToUserId?: number }): Promise<{ conversations: Conversation[]; total: number }>;
@@ -4988,6 +4995,127 @@ export class DatabaseStorage implements IStorage {
       eq(crmIntegrations.status, 'active'),
     )).limit(1);
     return Boolean(integration);
+  }
+
+  /**
+   * Claims one due webhook event for a tenant/integration pair. The lock and
+   * status transition occur in one statement so concurrent workers cannot
+   * receive the same event. A processing row becomes eligible again only when
+   * its lease has expired.
+   */
+  async claimPending(input: DurableWebhookClaimPendingInput): Promise<ClaimedDurableWebhookEvent | undefined> {
+    if (!Number.isSafeInteger(input.companyId) || input.companyId <= 0) {
+      throw new Error('companyId must be a positive integer');
+    }
+    if (!Number.isSafeInteger(input.integrationId) || input.integrationId <= 0) {
+      throw new Error('integrationId must be a positive integer');
+    }
+    if (typeof input.claimedBy !== 'string' || input.claimedBy.trim().length === 0) {
+      throw new Error('claimedBy is required');
+    }
+    if (!Number.isSafeInteger(input.limit) || input.limit <= 0) {
+      throw new Error('limit must be a positive integer');
+    }
+
+    const claimLeaseMs = 5 * 60 * 1000;
+    // The current store contract returns a single event; accepting a larger
+    // limit keeps callers batch-compatible without claiming unseen rows.
+    const claimLimit = Math.min(input.limit, 1);
+    const result = await db.execute(sql`
+      WITH candidate AS (
+        SELECT id
+        FROM crm_webhook_events
+        WHERE company_id = ${input.companyId}
+          AND integration_id = ${input.integrationId}
+          AND (
+            (status = 'pending' AND next_attempt_at <= NOW())
+            OR (status = 'processing' AND claim_expires_at IS NOT NULL AND claim_expires_at <= NOW())
+          )
+        ORDER BY next_attempt_at ASC NULLS LAST, created_at ASC
+        FOR UPDATE SKIP LOCKED
+        LIMIT ${claimLimit}
+      )
+      UPDATE crm_webhook_events AS event
+      SET
+        status = 'processing',
+        attempt_count = event.attempt_count + 1,
+        claimed_by = ${input.claimedBy.trim()},
+        claim_expires_at = NOW() + (${claimLeaseMs} * interval '1 millisecond'),
+        updated_at = NOW()
+      FROM candidate
+      WHERE event.id = candidate.id
+      RETURNING event.id, event.company_id, event.integration_id, event.type,
+        event.payload, event.attempt_count, event.claimed_by, event.claim_expires_at
+    `);
+    const row = (result as { rows?: Array<{
+      id: string;
+      company_id: number;
+      integration_id: number;
+      type: string;
+      payload: Record<string, unknown>;
+      attempt_count: number;
+      claimed_by: string;
+      claim_expires_at: Date | string;
+    }> }).rows?.[0];
+
+    if (!row) return undefined;
+    return {
+      eventId: row.id,
+      companyId: row.company_id,
+      integrationId: row.integration_id,
+      eventType: row.type,
+      payload: row.payload,
+      attemptCount: row.attempt_count,
+      claimedBy: row.claimed_by,
+      claimExpiresAt: row.claim_expires_at instanceof Date
+        ? row.claim_expires_at
+        : new Date(row.claim_expires_at),
+    };
+  }
+
+  /**
+   * Records a WebhookDeliveryWorker outcome. The full tenant/integration scope
+   * prevents an event id from being updated across tenant boundaries, while the
+   * processing-state predicate rejects an event that was never claimed.
+   */
+  async updateDelivery(input: DurableWebhookDeliveryUpdate): Promise<boolean> {
+    if (!Number.isSafeInteger(input.companyId) || input.companyId <= 0) {
+      throw new Error('companyId must be a positive integer');
+    }
+    if (!Number.isSafeInteger(input.integrationId) || input.integrationId <= 0) {
+      throw new Error('integrationId must be a positive integer');
+    }
+    if (typeof input.eventId !== 'string' || input.eventId.trim().length === 0) {
+      throw new Error('eventId is required');
+    }
+    if (input.status === 'processing') {
+      throw new Error('processing is not a delivery outcome');
+    }
+    if (input.status === 'pending' && !input.nextAttemptAt) {
+      throw new Error('pending delivery updates require nextAttemptAt');
+    }
+
+    const now = new Date();
+    const nextAttemptAt = input.status === 'pending' ? input.nextAttemptAt! : null;
+    const [updated] = await db
+      .update(crmWebhookEvents)
+      .set({
+        status: input.status,
+        nextAttemptAt,
+        deliveredAt: input.status === 'delivered' ? input.deliveredAt ?? now : null,
+        lastError: input.lastError ?? null,
+        claimedBy: null,
+        claimExpiresAt: null,
+        updatedAt: now,
+      })
+      .where(and(
+        eq(crmWebhookEvents.id, input.eventId),
+        eq(crmWebhookEvents.companyId, input.companyId),
+        eq(crmWebhookEvents.integrationId, input.integrationId),
+        eq(crmWebhookEvents.status, 'processing'),
+      ))
+      .returning({ id: crmWebhookEvents.id });
+    return Boolean(updated);
   }
 
   async saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void> {

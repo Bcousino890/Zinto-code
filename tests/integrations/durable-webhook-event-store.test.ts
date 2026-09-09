@@ -1,11 +1,37 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { crmWebhookEvents } from '../../shared/schema';
 import {
   assertDurableWebhookEvent,
   type DurableWebhookEventStore,
   type DurableWebhookDeliveryUpdate,
 } from '../../server/services/durable-webhook-event-store';
+
+test('webhook events persist the claim lease and delivery outcome fields', () => {
+  assert.equal(crmWebhookEvents.claimedBy.name, 'claimed_by');
+  assert.equal(crmWebhookEvents.claimExpiresAt.name, 'claim_expires_at');
+  assert.equal(crmWebhookEvents.deliveredAt.name, 'delivered_at');
+  assert.equal(crmWebhookEvents.lastError.name, 'last_error');
+  assert.equal(crmWebhookEvents.nextAttemptAt.notNull, false);
+});
+
+test('does not allow processing as a delivery outcome', async () => {
+  process.env.NODE_ENV = 'development';
+  process.env.DATABASE_URL = 'postgresql://localhost:5432/webhook_storage_test';
+  const { DatabaseStorage } = await import('../../server/storage');
+  const storage = Object.create(DatabaseStorage.prototype) as Pick<DatabaseStorage, 'updateDelivery'>;
+
+  await assert.rejects(
+    storage.updateDelivery({
+      companyId: 41,
+      integrationId: 9,
+      eventId: '82789ebb-9317-454c-9002-7f8acdc70d1a',
+      status: 'processing',
+    }),
+    /processing is not a delivery outcome/,
+  );
+});
 
 const validEvent = {
   companyId: 41,

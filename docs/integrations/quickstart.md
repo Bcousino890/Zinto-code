@@ -1,0 +1,137 @@
+# Zinto CRM Integration API v2 quickstart
+
+This guide covers the public routes mounted by the current implementation. The API base URL is `https://crm.zinto.app/api/v2`.
+
+## What is available now
+
+| Area | Public v2 status | Notes |
+| --- | --- | --- |
+| Contacts | Available | Create or update a contact by external ID. |
+| Messages | Not mounted | A message-sync service exists, but no public v2 message route is registered. |
+| Campaigns | Not mounted | A campaign batch service exists, but no public v2 campaign route is registered. |
+| Appointments | Not mounted | Appointment validation exists, but no public v2 appointment route is registered. |
+| Deals | Not mounted | Deal validation/service code exists, but no public v2 deal route is registered. |
+| Outbound webhooks | Delivery contract only | The signing/delivery helper exists; no public endpoint configures or receives these webhooks. |
+
+Do not construct requests for the unavailable areas from internal service names or declared scopes. The `appointments:*`, `deals:*`, `campaigns:*`, `messages:*`, and `webhooks:manage` scopes may be returned by the capabilities route, but scopes do not themselves make routes available.
+
+## Prerequisites
+
+Obtain an active Zinto API key for the target company and ensure it has the permissions required below. API keys have the format `pcp_` followed by 64 lowercase hexadecimal characters. For a contact sync, obtain the numeric integration ID associated with that company.
+
+Set these values in your client:
+
+```bash
+BASE_URL='https://crm.zinto.app/api/v2'
+API_KEY='pcp_replace_with_your_api_key'
+INTEGRATION_ID='1'
+```
+
+The included [Postman collection](zinto-crm-integration.postman_collection.json) has equivalent variables.
+
+## Check availability
+
+`GET /health` is the sole unauthenticated route:
+
+```bash
+curl "$BASE_URL/health"
+```
+
+It returns:
+
+```json
+{ "status": "ok", "version": "v2" }
+```
+
+## Inspect integration capabilities
+
+`GET /capabilities` requires the `integrations:manage` permission:
+
+```bash
+curl "$BASE_URL/capabilities" \
+  -H "Authorization: Bearer $API_KEY"
+```
+
+The response identifies the v2 scope vocabulary and reports the outbound webhook signature format. It is useful for permission discovery, but is not an endpoint catalog.
+
+## Create or update a contact
+
+`PUT /contacts/{externalId}` requires `contacts:write`. `externalId` is the stable identifier from the CRM. Repeating the request with the same external ID updates the mapped contact.
+
+```bash
+curl --request PUT "$BASE_URL/contacts/crm-contact-123" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "name": "Ada Lovelace",
+    "phone": "+15551234567",
+    "email": "ada@example.com",
+    "company": "Analytical Engines",
+    "tags": ["vip"],
+    "customFields": { "crm_tier": "gold" }
+  }'
+```
+
+`name` is required and must be nonempty. The route accepts optional string `phone`, `email`, and `company`, optional array `tags`, and optional object `customFields`. It returns `201` when it creates the mapping/contact and `200` when it updates one:
+
+```json
+{ "data": { "...": "contact returned by Zinto" }, "created": true }
+```
+
+## Authentication and permissions
+
+Send `Authorization: Bearer <API_KEY>` on every route except `/health`. The authenticated v2 router checks API-key validity, active status, expiry, and any configured IP allow-list before handling the route. A missing or invalid key returns `401`; a valid key without the route's permission returns `403`.
+
+The contact route also requires `X-Zinto-Integration-Id` to be a positive integer. It is tenant-scoped through the API key's company; do not send a company ID in the request body or headers.
+
+## Idempotency
+
+There is no public v2 idempotency-key header or replay contract at present. For the available contact upsert, use the same `externalId` for retries: the route's create-or-update behavior is the implemented deduplication mechanism. Do not assume that `Idempotency-Key` is accepted or that repeated message, campaign, appointment, or deal requests can be replayed—those public routes are not mounted.
+
+## Outbound webhook signature contract
+
+When the integration webhook delivery helper is used by the application, it emits a JSON body and these headers:
+
+| Header | Value |
+| --- | --- |
+| `Content-Type` | `application/json` |
+| `X-Zinto-Event-Id` | Event UUID |
+| `X-Zinto-Timestamp` | Event `occurred_at` string |
+| `X-Zinto-Signature` | `v1=` plus an HMAC-SHA256 digest |
+
+The signed byte sequence is the literal string `timestamp + "." + raw_body`, where `timestamp` is exactly the `X-Zinto-Timestamp` value and `raw_body` is the unmodified JSON request body. The header is `v1=<lowercase hex digest>`.
+
+Example verifier (Node.js):
+
+```js
+import crypto from 'node:crypto';
+
+const expected = `v1=${crypto
+  .createHmac('sha256', webhookSecret)
+  .update(`${timestamp}.${rawBody}`)
+  .digest('hex')}`;
+
+const provided = Buffer.from(signature);
+const expectedBuffer = Buffer.from(expected);
+const valid = provided.length === expectedBuffer.length && crypto.timingSafeEqual(provided, expectedBuffer);
+```
+
+Verify against the raw body before parsing JSON, use a timing-safe comparison after checking equal buffer lengths, and reject stale timestamps according to your receiver's replay policy. The current public API has no route for registering a webhook URL or secret, so this is a receiver contract—not a self-service webhook setup flow.
+
+## Errors and retries
+
+Errors are JSON objects with `error` and `message` fields. The contact route can return:
+
+| Status | Error | Meaning |
+| --- | --- | --- |
+| 400 | `VALIDATION_ERROR` | Missing/invalid company context, integration ID, external ID, or contact name. |
+| 401 | `API_KEY_MISSING`, `API_KEY_INVALID_FORMAT`, `API_KEY_NOT_FOUND`, `API_KEY_INACTIVE`, or `API_KEY_EXPIRED` | Authentication failed. |
+| 403 | `INSUFFICIENT_PERMISSIONS` | The API key lacks `contacts:write` (or `integrations:manage` for capabilities). |
+| 500 | `CONTACT_SYNC_FAILED` | Contact synchronization failed. Retry only after investigating the returned message and with the same external ID. |
+
+For network failures and `5xx`, use bounded exponential backoff with jitter. Do not retry validation or authorization errors until the request or key configuration changes. The current v2 router does not mount the API-key rate-limit middleware, so no v2 `429` response contract is documented here.
+
+## Sandbox
+
+The current implementation does not expose a separate sandbox hostname, environment switch, test API key type, or mock endpoint. Treat `https://crm.zinto.app/api/v2` as the only documented API base URL. Use a dedicated non-production company, integration, API key, and test contacts when you need an isolated integration test.

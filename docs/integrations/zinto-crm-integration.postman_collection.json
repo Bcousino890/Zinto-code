@@ -1,0 +1,100 @@
+{
+  "info": {
+    "_postman_id": "0c8324db-5703-49a0-825c-d3ad14d9b53f",
+    "name": "Zinto CRM Integration API v2",
+    "description": "Collection for the API routes mounted by the current Zinto CRM integration implementation. Configure apiKey and integrationId before sending authenticated requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://crm.zinto.app",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "pcp_replace_with_your_api_key",
+      "type": "string"
+    },
+    {
+      "key": "integrationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "externalContactId",
+      "value": "crm-contact-123",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Get health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "health"]
+            },
+            "description": "Unauthenticated availability check."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Integration administration",
+      "item": [
+        {
+          "name": "Get capabilities",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{apiKey}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/capabilities",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "capabilities"]
+            },
+            "description": "Requires the integrations:manage API-key permission."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contacts",
+      "item": [
+        {
+          "name": "Create or update contact by external ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{apiKey}}", "type": "text" },
+              { "key": "X-Zinto-Integration-Id", "value": "{{integrationId}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ada Lovelace\",\n  \"phone\": \"+15551234567\",\n  \"email\": \"ada@example.com\",\n  \"company\": \"Analytical Engines\",\n  \"tags\": [\"vip\"],\n  \"customFields\": {\n    \"crm_tier\": \"gold\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/contacts/{{externalContactId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "contacts", "{{externalContactId}}"]
+            },
+            "description": "Requires contacts:write. Returns 201 on creation and 200 on update."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

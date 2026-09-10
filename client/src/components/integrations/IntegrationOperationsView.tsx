@@ -28,8 +28,9 @@ export interface IntegrationOperationsViewProps {
   pendingEvents: IntegrationOperationEvent[];
   failedEvents: IntegrationOperationEvent[];
   conflicts: IntegrationConflict[];
-  onRetryFailedEvent: (eventId: string) => void;
+  onRetryFailedEvent?: (eventId: string) => void;
   isRetryingEventId?: string | null;
+  dataAvailabilityMessage?: string;
 }
 
 const statusClassNames: Record<IntegrationOperationsTone, string> = {
@@ -74,6 +75,7 @@ export function IntegrationOperationsView({
   conflicts,
   onRetryFailedEvent,
   isRetryingEventId = null,
+  dataAvailabilityMessage,
 }: IntegrationOperationsViewProps) {
   const status = getIntegrationOperationsStatus({
     health,
@@ -90,6 +92,7 @@ export function IntegrationOperationsView({
             {integrationName} operations
           </h2>
           <p className="text-sm text-muted-foreground">Monitor delivery issues and records requiring review.</p>
+          {dataAvailabilityMessage && <p className="mt-1 text-xs text-muted-foreground">{dataAvailabilityMessage}</p>}
         </div>
         <Badge className={statusClassNames[status.tone]} variant="outline">
           {status.label}
@@ -127,10 +130,12 @@ export function IntegrationOperationsView({
                       {event.detail && <p className="mt-1 text-sm text-muted-foreground">{event.detail}</p>}
                       <time className="mt-1 block text-xs text-muted-foreground">{event.occurredAt}</time>
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => onRetryFailedEvent(event.id)} disabled={isRetryingEventId === event.id}>
-                      <RefreshCw className={isRetryingEventId === event.id ? 'animate-spin' : ''} />
-                      {isRetryingEventId === event.id ? 'Retrying' : 'Retry'}
-                    </Button>
+                    {onRetryFailedEvent && (
+                      <Button size="sm" variant="outline" onClick={() => onRetryFailedEvent(event.id)} disabled={isRetryingEventId === event.id}>
+                        <RefreshCw className={isRetryingEventId === event.id ? 'animate-spin' : ''} />
+                        {isRetryingEventId === event.id ? 'Retrying' : 'Retry'}
+                      </Button>
+                    )}
                   </li>
                 ))}
               </ul>

@@ -38,6 +38,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { enUS, es } from 'date-fns/locale';
 import { API_KEY_SCOPES, toggleApiKeyScope } from './api-key-permissions';
 import { buildApiKeyCreationPayload, type ApiKeyEnvironment } from './api-key-creation-form';
+import { IntegrationOperationsView } from '@/components/integrations/IntegrationOperationsView';
+import { buildIntegrationOperationsData } from '@/components/integrations/integration-operations-data';
 
 interface ApiKey {
   id: number;
@@ -79,6 +81,7 @@ export function ApiAccessTab() {
   const [editingApiKey, setEditingApiKey] = useState<ApiKey | null>(null);
   const [editingPermissions, setEditingPermissions] = useState<string[]>([]);
   const [isSavingPermissions, setIsSavingPermissions] = useState(false);
+  const integrationOperations = buildIntegrationOperationsData(apiKeys);
 
   useEffect(() => {
     loadApiKeys();
@@ -326,6 +329,10 @@ export function ApiAccessTab() {
             <BarChart3 className="w-4 h-4 mr-2" />
             {t('settings.api_access.tabs.usage', 'Usage Statistics')}
           </TabsTrigger>
+          <TabsTrigger value="operations">
+            <Activity className="w-4 h-4 mr-2" />
+            {t('settings.api_access.tabs.operations', 'Integration Operations')}
+          </TabsTrigger>
           <TabsTrigger value="docs">
             <BookOpen className="w-4 h-4 mr-2" />
             {t('settings.api_access.tabs.docs', 'Documentation')}
@@ -504,6 +511,16 @@ export function ApiAccessTab() {
               </Card>
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="operations" className="space-y-4">
+          <IntegrationOperationsView
+            {...integrationOperations}
+            dataAvailabilityMessage={t(
+              'settings.api_access.operations.data_availability',
+              'Availability is based on active CRM API keys and their recorded use. Live webhook delivery, conflict, and retry data are not exposed by this server yet.',
+            )}
+          />
         </TabsContent>
 
         <TabsContent value="docs" className="space-y-4">

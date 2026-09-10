@@ -10,6 +10,7 @@ export interface DurableWebhookEventScope {
 export interface DurableWebhookEvent extends DurableWebhookEventScope {
   eventId: string;
   eventType: string;
+  origin: 'crm' | 'zinto' | 'system';
   payload: Record<string, unknown>;
 }
 
@@ -21,21 +22,25 @@ export type DurableWebhookDeliveryStatus =
   | 'dead_letter';
 
 export interface DurableWebhookClaimPendingInput extends DurableWebhookEventScope {
-  claimedBy: string;
+  /** Opaque, unique value generated for this lease; never reuse a worker id. */
+  claimToken: string;
   limit: number;
 }
 
 export interface ClaimedDurableWebhookEvent extends DurableWebhookEvent {
   attemptCount: number;
-  claimedBy: string;
+  occurredAt: Date;
+  claimToken: string;
   claimExpiresAt: Date;
 }
 
 export interface DurableWebhookDeliveryUpdate extends DurableWebhookEventScope {
   eventId: string;
+  /** Must exactly match the token returned by claimPending. */
+  claimToken: string;
   status: DurableWebhookDeliveryStatus;
   deliveredAt?: Date;
-  nextAttemptAt?: Date;
+  nextAttemptAt?: Date | null;
   lastError?: string;
 }
 
@@ -58,6 +63,9 @@ export function assertDurableWebhookEvent(input: unknown): asserts input is Dura
   assertPositiveInteger(input.integrationId, 'integrationId');
   assertNonEmptyString(input.eventId, 'eventId');
   assertNonEmptyString(input.eventType, 'eventType');
+  if (input.origin !== 'crm' && input.origin !== 'zinto' && input.origin !== 'system') {
+    throw new Error('origin must be crm, zinto, or system');
+  }
 
   if (!isRecord(input.payload) || Array.isArray(input.payload)) {
     throw new Error('payload must be an object');

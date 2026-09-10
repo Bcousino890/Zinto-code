@@ -156,6 +156,24 @@ app.use((req, res, next) => {
         
         }
 
+        logger.info('crm-webhooks', 'Starting durable CRM webhook delivery worker...');
+        try {
+          const [{ storage }, { createDurableWebhookWorkerScheduler }, { decryptValue }] = await Promise.all([
+            import('./storage'),
+            import('./services/durable-webhook-delivery-service'),
+            import('./utils/crypto'),
+          ]);
+          const scheduler = createDurableWebhookWorkerScheduler(storage, {
+            decryptSecret: decryptValue,
+          }, {
+            onError: (error) => logger.error('crm-webhooks', 'Durable webhook delivery run failed', error),
+          });
+          scheduler.start();
+          logger.info('crm-webhooks', 'Durable CRM webhook delivery worker started');
+        } catch (error) {
+          logger.error('crm-webhooks', 'Durable CRM webhook delivery worker failed to start', error);
+        }
+
         try {
           const { backfillRolePermissions } = await import('./backfill-role-permissions');
           await backfillRolePermissions();

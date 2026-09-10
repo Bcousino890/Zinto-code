@@ -198,7 +198,9 @@ import type {
   ClaimedDurableWebhookEvent,
   DurableWebhookClaimPendingInput,
   DurableWebhookDeliveryUpdate,
+  DurableWebhookEventScope,
 } from "./services/durable-webhook-event-store";
+import type { DurableWebhookDeliveryTarget } from "./services/durable-webhook-delivery-service";
 import {
   buildMetaAdRoutingFootprint,
   deriveFlowTriggerStageScopeFromNodes,
@@ -872,9 +874,14 @@ export interface IStorage {
   updateContact(id: number, contact: Partial<InsertContact>): Promise<Contact>;
   getContactByCrmExternalId(companyId: number, integrationId: number, externalId: string): Promise<Contact | undefined>;
   crmIntegrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean>;
+  getCrmIntegrationOperations(companyId: number): Promise<any[]>;
   saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void>;
+  getCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal', externalId: string): Promise<{ zintoId: string } | undefined>;
+  saveCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal', externalId: string, zintoId: number): Promise<void>;
   claimPending(input: DurableWebhookClaimPendingInput): Promise<ClaimedDurableWebhookEvent | undefined>;
   updateDelivery(input: DurableWebhookDeliveryUpdate): Promise<boolean>;
+  listCandidateScopes(): Promise<DurableWebhookEventScope[]>;
+  getDeliveryTarget(scope: DurableWebhookEventScope): Promise<DurableWebhookDeliveryTarget | undefined>;
   deleteContact(id: number): Promise<{ success: boolean; mediaFiles?: string[]; error?: string }>;
 
   getConversations(options?: { companyId?: number; page?: number; limit?: number; search?: string; assignedToUserId?: number }): Promise<{ conversations: Conversation[]; total: number }>;
@@ -4997,6 +5004,74 @@ export class DatabaseStorage implements IStorage {
     return Boolean(integration);
   }
 
+  async listCandidateScopes(): Promise<DurableWebhookEventScope[]> {
+    const result = await db.execute(sql`
+      SELECT DISTINCT event.company_id, event.integration_id
+      FROM crm_webhook_events AS event
+      INNER JOIN crm_integrations AS integration
+        ON integration.id = event.integration_id
+        AND integration.company_id = event.company_id
+      WHERE integration.status = 'active'
+        AND integration.webhook_url IS NOT NULL
+        AND integration.webhook_secret_encrypted IS NOT NULL
+        AND (
+          (event.status = 'pending' AND event.next_attempt_at <= NOW())
+          OR (event.status = 'processing' AND event.claim_expires_at IS NOT NULL AND event.claim_expires_at <= NOW())
+        )
+      ORDER BY event.company_id, event.integration_id
+      LIMIT 100
+    `);
+    return ((result as { rows?: Array<{ company_id: number; integration_id: number }> }).rows ?? []).map((row) => ({
+      companyId: row.company_id,
+      integrationId: row.integration_id,
+    }));
+  }
+
+  async getDeliveryTarget(scope: DurableWebhookEventScope): Promise<DurableWebhookDeliveryTarget | undefined> {
+    if (!Number.isSafeInteger(scope.companyId) || scope.companyId <= 0) {
+      throw new Error('companyId must be a positive integer');
+    }
+    if (!Number.isSafeInteger(scope.integrationId) || scope.integrationId <= 0) {
+      throw new Error('integrationId must be a positive integer');
+    }
+    const [target] = await db.select({
+      url: crmIntegrations.webhookUrl,
+      secretEncrypted: crmIntegrations.webhookSecretEncrypted,
+    }).from(crmIntegrations).where(and(
+      eq(crmIntegrations.id, scope.integrationId),
+      eq(crmIntegrations.companyId, scope.companyId),
+      eq(crmIntegrations.status, 'active'),
+      isNotNull(crmIntegrations.webhookUrl),
+      isNotNull(crmIntegrations.webhookSecretEncrypted),
+    )).limit(1);
+    if (!target?.url || !target.secretEncrypted) return undefined;
+    return target;
+  }
+
+    if (integrations.length === 0) return [];
+
+    const [events, conflicts] = await Promise.all([
+      db.select({
+        id: crmWebhookEvents.id, integrationId: crmWebhookEvents.integrationId,
+        type: crmWebhookEvents.type, status: crmWebhookEvents.status,
+        attemptCount: crmWebhookEvents.attemptCount, createdAt: crmWebhookEvents.createdAt,
+        lastError: crmWebhookEvents.lastError, payload: crmWebhookEvents.payload,
+      }).from(crmWebhookEvents).where(eq(crmWebhookEvents.companyId, companyId)).orderBy(desc(crmWebhookEvents.createdAt)).limit(100),
+      db.select({
+        id: crmSyncConflicts.id, integrationId: crmSyncConflicts.integrationId,
+        entityType: crmSyncConflicts.entityType, externalId: crmSyncConflicts.externalId,
+        status: crmSyncConflicts.status, createdAt: crmSyncConflicts.createdAt,
+      }).from(crmSyncConflicts).where(eq(crmSyncConflicts.companyId, companyId)).orderBy(desc(crmSyncConflicts.createdAt)).limit(100),
+    ]);
+
+    return integrations.map((integration) => ({
+      ...integration,
+      pendingEvents: events.filter((event) => event.integrationId === integration.id && ['pending', 'processing'].includes(event.status)),
+      failedEvents: events.filter((event) => event.integrationId === integration.id && ['failed', 'dead_letter'].includes(event.status)),
+      conflicts: conflicts.filter((conflict) => conflict.integrationId === integration.id && conflict.status === 'pending'),
+    }));
+  }
+
   /**
    * Claims one due webhook event for a tenant/integration pair. The lock and
    * status transition occur in one statement so concurrent workers cannot
@@ -5010,8 +5085,8 @@ export class DatabaseStorage implements IStorage {
     if (!Number.isSafeInteger(input.integrationId) || input.integrationId <= 0) {
       throw new Error('integrationId must be a positive integer');
     }
-    if (typeof input.claimedBy !== 'string' || input.claimedBy.trim().length === 0) {
-      throw new Error('claimedBy is required');
+    if (typeof input.claimToken !== 'string' || input.claimToken.trim().length === 0) {
+      throw new Error('claimToken is required');
     }
     if (!Number.isSafeInteger(input.limit) || input.limit <= 0) {
       throw new Error('limit must be a positive integer');
@@ -5027,6 +5102,15 @@ export class DatabaseStorage implements IStorage {
         FROM crm_webhook_events
         WHERE company_id = ${input.companyId}
           AND integration_id = ${input.integrationId}
+          AND EXISTS (
+            SELECT 1
+            FROM crm_integrations AS integration
+            WHERE integration.id = crm_webhook_events.integration_id
+              AND integration.company_id = crm_webhook_events.company_id
+              AND integration.status = 'active'
+              AND integration.webhook_url IS NOT NULL
+              AND integration.webhook_secret_encrypted IS NOT NULL
+          )
           AND (
             (status = 'pending' AND next_attempt_at <= NOW())
             OR (status = 'processing' AND claim_expires_at IS NOT NULL AND claim_expires_at <= NOW())
@@ -5039,20 +5123,23 @@ export class DatabaseStorage implements IStorage {
       SET
         status = 'processing',
         attempt_count = event.attempt_count + 1,
-        claimed_by = ${input.claimedBy.trim()},
+        claimed_by = ${input.claimToken.trim()},
         claim_expires_at = NOW() + (${claimLeaseMs} * interval '1 millisecond'),
         updated_at = NOW()
       FROM candidate
       WHERE event.id = candidate.id
       RETURNING event.id, event.company_id, event.integration_id, event.type,
-        event.payload, event.attempt_count, event.claimed_by, event.claim_expires_at
+        event.origin, event.payload, event.created_at, event.attempt_count,
+        event.claimed_by, event.claim_expires_at
     `);
     const row = (result as { rows?: Array<{
       id: string;
       company_id: number;
       integration_id: number;
       type: string;
+      origin: 'crm' | 'zinto' | 'system';
       payload: Record<string, unknown>;
+      created_at: Date | string;
       attempt_count: number;
       claimed_by: string;
       claim_expires_at: Date | string;
@@ -5064,9 +5151,11 @@ export class DatabaseStorage implements IStorage {
       companyId: row.company_id,
       integrationId: row.integration_id,
       eventType: row.type,
+      origin: row.origin,
       payload: row.payload,
+      occurredAt: row.created_at instanceof Date ? row.created_at : new Date(row.created_at),
       attemptCount: row.attempt_count,
-      claimedBy: row.claimed_by,
+      claimToken: row.claimed_by,
       claimExpiresAt: row.claim_expires_at instanceof Date
         ? row.claim_expires_at
         : new Date(row.claim_expires_at),
@@ -5088,10 +5177,13 @@ export class DatabaseStorage implements IStorage {
     if (typeof input.eventId !== 'string' || input.eventId.trim().length === 0) {
       throw new Error('eventId is required');
     }
+    if (typeof input.claimToken !== 'string' || input.claimToken.trim().length === 0) {
+      throw new Error('claimToken is required');
+    }
     if (input.status === 'processing') {
       throw new Error('processing is not a delivery outcome');
     }
-    if (input.status === 'pending' && !input.nextAttemptAt) {
+    if (input.status === 'pending' && !(input.nextAttemptAt instanceof Date)) {
       throw new Error('pending delivery updates require nextAttemptAt');
     }
 
@@ -5113,6 +5205,8 @@ export class DatabaseStorage implements IStorage {
         eq(crmWebhookEvents.companyId, input.companyId),
         eq(crmWebhookEvents.integrationId, input.integrationId),
         eq(crmWebhookEvents.status, 'processing'),
+        eq(crmWebhookEvents.claimedBy, input.claimToken.trim()),
+        gt(crmWebhookEvents.claimExpiresAt, now),
       ))
       .returning({ id: crmWebhookEvents.id });
     return Boolean(updated);

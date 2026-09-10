@@ -39,7 +39,7 @@ import { enUS, es } from 'date-fns/locale';
 import { API_KEY_SCOPES, toggleApiKeyScope } from './api-key-permissions';
 import { buildApiKeyCreationPayload, type ApiKeyEnvironment } from './api-key-creation-form';
 import { IntegrationOperationsView } from '@/components/integrations/IntegrationOperationsView';
-import { buildIntegrationOperationsData } from '@/components/integrations/integration-operations-data';
+import { buildCrmOperationsViewData, buildIntegrationOperationsData, type CrmOperationsSource } from '@/components/integrations/integration-operations-data';
 
 interface ApiKey {
   id: number;
@@ -81,11 +81,13 @@ export function ApiAccessTab() {
   const [editingApiKey, setEditingApiKey] = useState<ApiKey | null>(null);
   const [editingPermissions, setEditingPermissions] = useState<string[]>([]);
   const [isSavingPermissions, setIsSavingPermissions] = useState(false);
+  const [crmOperations, setCrmOperations] = useState<CrmOperationsSource[] | null>(null);
   const integrationOperations = buildIntegrationOperationsData(apiKeys);
 
   useEffect(() => {
     loadApiKeys();
     loadUsageStats();
+    fetch('/api/settings/crm-integration-operations').then(async (response) => response.ok ? response.json() : null).then(setCrmOperations).catch(() => setCrmOperations(null));
   }, []);
 
   const loadApiKeys = async () => {
@@ -514,13 +516,12 @@ export function ApiAccessTab() {
         </TabsContent>
 
         <TabsContent value="operations" className="space-y-4">
-          <IntegrationOperationsView
+          {crmOperations && crmOperations.length > 0 ? crmOperations.map((operation) => (
+            <IntegrationOperationsView key={operation.id} {...buildCrmOperationsViewData(operation)} />
+          )) : <IntegrationOperationsView
             {...integrationOperations}
-            dataAvailabilityMessage={t(
-              'settings.api_access.operations.data_availability',
-              'Availability is based on active CRM API keys and their recorded use. Live webhook delivery, conflict, and retry data are not exposed by this server yet.',
-            )}
-          />
+            dataAvailabilityMessage={t('settings.api_access.operations.data_availability', 'No CRM integration records are available yet. Availability is based on active CRM API keys and their recorded use.')}
+          />}
         </TabsContent>
 
         <TabsContent value="docs" className="space-y-4">

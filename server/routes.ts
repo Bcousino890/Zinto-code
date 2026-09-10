@@ -284,6 +284,8 @@ import { createApiV2Router } from "./routes/api-v2";
 import { registerApiKeySettingsRoutes } from "./routes/api-key-settings-routes";
 import { CrmContactSyncService } from "./services/crm-contact-sync-service";
 import { createCrmContactSyncStorageAdapter } from "./services/crm-contact-sync-storage-adapter";
+import { createCrmApiV2MessageAdapter } from "./services/crm-api-v2-message-adapter";
+import apiMessageService from "./services/api-message-service";
 import channelManager from "./services/channel-manager";
 import {
   sendTeamInvitation,
@@ -1115,6 +1117,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/v2', createApiV2Router({
     authenticate: authenticateApiKey,
     contactSync: new CrmContactSyncService(createCrmContactSyncStorageAdapter(storage)),
+    messageSync: createCrmApiV2MessageAdapter({
+      crmIntegrationBelongsToCompany: storage.crmIntegrationBelongsToCompany.bind(storage),
+      getMessageById: storage.getMessageById.bind(storage),
+      updateMessage: storage.updateMessage.bind(storage),
+      sendMessage: apiMessageService.sendMessage.bind(apiMessageService),
+    }),
+    // These contracts deliberately remain conditional until their required
+    // Zinto persistence keys are added to the v2 payloads:
+    // - campaigns: createdById, name, and content;
+    // - appointments: contact identity and title; and
+    // - deals: contact identity and pipeline identity.
+    // Enabling them without those values would fabricate or mis-scope records.
   }));
 
   registerPlanRoutes(app);

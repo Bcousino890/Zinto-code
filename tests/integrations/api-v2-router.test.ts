@@ -93,6 +93,8 @@ test('publishes an OpenAPI document for CRM developers', async () => {
     assert.equal(body.openapi, '3.1.0');
     assert.ok('/health' in body.paths);
     assert.ok('/capabilities' in body.paths);
+    assert.ok('/contacts/{externalId}' in body.paths);
+    assert.ok('/messages' in body.paths);
   });
 });
 

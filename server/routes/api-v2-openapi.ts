@@ -24,6 +24,36 @@ export function getApiV2OpenApiDocument() {
           },
         },
       },
+      '/contacts/{externalId}': {
+        put: {
+          summary: 'Create or update a CRM contact',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: 'externalId', in: 'path', required: true, schema: { type: 'string' } },
+            { name: 'X-Zinto-Integration-Id', in: 'header', required: true, schema: { type: 'integer', minimum: 1 } },
+          ],
+          responses: {
+            '200': { description: 'Contact updated' },
+            '201': { description: 'Contact created' },
+            '400': { description: 'Invalid contact or integration context' },
+            '403': { description: 'Missing contacts:write permission' },
+          },
+        },
+      },
+      '/messages': {
+        post: {
+          summary: 'Send a CRM-originated text message',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: 'X-Zinto-Integration-Id', in: 'header', required: true, schema: { type: 'integer', minimum: 1 } },
+          ],
+          responses: {
+            '202': { description: 'Message accepted for delivery' },
+            '400': { description: 'Invalid message or integration context' },
+            '403': { description: 'Missing messages:send permission' },
+          },
+        },
+      },
     },
     components: {
       securitySchemes: {

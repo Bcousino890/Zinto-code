@@ -7,13 +7,13 @@ This guide covers the public routes mounted by the current implementation. The A
 | Area | Public v2 status | Notes |
 | --- | --- | --- |
 | Contacts | Available | Create or update a contact by external ID. |
-| Messages | Not mounted | A message-sync service exists, but no public v2 message route is registered. |
+| Messages | Available | Send CRM-originated text messages through an existing company channel. |
 | Campaigns | Not mounted | A campaign batch service exists, but no public v2 campaign route is registered. |
 | Appointments | Not mounted | Appointment validation exists, but no public v2 appointment route is registered. |
 | Deals | Not mounted | Deal validation/service code exists, but no public v2 deal route is registered. |
 | Outbound webhooks | Delivery contract only | The signing/delivery helper exists; no public endpoint configures or receives these webhooks. |
 
-Do not construct requests for the unavailable areas from internal service names or declared scopes. The `appointments:*`, `deals:*`, `campaigns:*`, `messages:*`, and `webhooks:manage` scopes may be returned by the capabilities route, but scopes do not themselves make routes available.
+Do not construct requests for the unavailable areas from internal service names or declared scopes. The `appointments:*`, `deals:*`, `campaigns:*`, and `webhooks:manage` scopes may be returned by the capabilities route, but scopes do not themselves make routes available.
 
 ## Prerequisites
 
@@ -79,6 +79,29 @@ curl --request PUT "$BASE_URL/contacts/crm-contact-123" \
 { "data": { "...": "contact returned by Zinto" }, "created": true }
 ```
 
+## Send a CRM-originated message
+
+`POST /messages` requires `messages:send`. `channelId` identifies an existing
+channel belonging to the API key's company; the message is delivered through
+the established Zinto message service and retained with CRM-origin metadata.
+
+```bash
+curl --request POST "$BASE_URL/messages" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "channelId": 42,
+    "recipient": "+15551234567",
+    "text": "Your appointment is confirmed.",
+    "external_message_id": "crm-message-123"
+  }'
+```
+
+`recipient` and `text` must be nonempty strings, and `channelId` must be a
+positive integer. The optional `external_message_id` is returned unchanged in
+the accepted response and stored as CRM metadata; it is not a replay key.
+
 ## Authentication and permissions
 
 Send `Authorization: Bearer <API_KEY>` on every route except `/health`. The authenticated v2 router checks API-key validity, active status, expiry, and any configured IP allow-list before handling the route. A missing or invalid key returns `401`; a valid key without the route's permission returns `403`.
@@ -87,7 +110,7 @@ The contact route also requires `X-Zinto-Integration-Id` to be a positive intege
 
 ## Idempotency
 
-There is no public v2 idempotency-key header or replay contract at present. For the available contact upsert, use the same `externalId` for retries: the route's create-or-update behavior is the implemented deduplication mechanism. Do not assume that `Idempotency-Key` is accepted or that repeated message, campaign, appointment, or deal requests can be replayed—those public routes are not mounted.
+There is no public v2 idempotency-key header or replay contract at present. For the available contact upsert, use the same `externalId` for retries: the route's create-or-update behavior is the implemented deduplication mechanism. Message retries can create a new delivery; `external_message_id` preserves CRM correlation only. Do not assume that `Idempotency-Key` is accepted or that repeated campaign, appointment, or deal requests can be replayed—those public routes are not mounted.
 
 ## Outbound webhook signature contract
 
@@ -121,14 +144,14 @@ Verify against the raw body before parsing JSON, use a timing-safe comparison af
 
 ## Errors and retries
 
-Errors are JSON objects with `error` and `message` fields. The contact route can return:
+Errors are JSON objects with `error` and `message` fields. The contact and message routes can return:
 
 | Status | Error | Meaning |
 | --- | --- | --- |
 | 400 | `VALIDATION_ERROR` | Missing/invalid company context, integration ID, external ID, or contact name. |
 | 401 | `API_KEY_MISSING`, `API_KEY_INVALID_FORMAT`, `API_KEY_NOT_FOUND`, `API_KEY_INACTIVE`, or `API_KEY_EXPIRED` | Authentication failed. |
-| 403 | `INSUFFICIENT_PERMISSIONS` | The API key lacks `contacts:write` (or `integrations:manage` for capabilities). |
-| 500 | `CONTACT_SYNC_FAILED` | Contact synchronization failed. Retry only after investigating the returned message and with the same external ID. |
+| 403 | `INSUFFICIENT_PERMISSIONS` | The API key lacks the required route permission. |
+| 500 | `CONTACT_SYNC_FAILED` or `MESSAGE_SYNC_FAILED` | Contact or message synchronization failed. Retry only after investigating the returned message. |
 
 For network failures and `5xx`, use bounded exponential backoff with jitter. Do not retry validation or authorization errors until the request or key configuration changes. The current v2 router does not mount the API-key rate-limit middleware, so no v2 `429` response contract is documented here.
 

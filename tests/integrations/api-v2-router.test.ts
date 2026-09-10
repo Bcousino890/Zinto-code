@@ -95,6 +95,8 @@ test('publishes an OpenAPI document for CRM developers', async () => {
     assert.ok('/capabilities' in body.paths);
     assert.ok('/contacts/{externalId}' in body.paths);
     assert.ok('/messages' in body.paths);
+    assert.ok('/appointments/{externalId}' in body.paths);
+    assert.ok('/deals' in body.paths);
   });
 });
 
@@ -383,7 +385,7 @@ test('upserts a CRM appointment with its tenant, integration, and idempotency co
         'X-Zinto-Integration-Id': '3',
         'Idempotency-Key': 'crm-appointment-441',
       },
-      body: JSON.stringify({ startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' }),
+      body: JSON.stringify({ contactId: 41, title: 'Initial consultation', startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' }),
     });
 
     assert.equal(response.status, 201);
@@ -395,7 +397,7 @@ test('upserts a CRM appointment with its tenant, integration, and idempotency co
     integrationId: 3,
     externalId: 'hubspot-appointment-441',
     idempotencyKey: 'crm-appointment-441',
-    appointment: { startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' },
+    appointment: { contactId: 41, title: 'Initial consultation', startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed', externalId: 'hubspot-appointment-441' },
   }]);
 });
 
@@ -420,7 +422,7 @@ test('creates a CRM deal through the pipeline with tenant, integration, and idem
         'X-Zinto-Integration-Id': '3',
         'Idempotency-Key': 'crm-deal-441',
       },
-      body: JSON.stringify({ externalId: 'hubspot-deal-441', title: 'Enterprise rollout', stage: 'proposal', value: 12500 }),
+      body: JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 }),
     });
 
     assert.equal(response.status, 201);
@@ -431,7 +433,7 @@ test('creates a CRM deal through the pipeline with tenant, integration, and idem
     companyId: 12,
     integrationId: 3,
     idempotencyKey: 'crm-deal-441',
-    deal: { externalId: 'hubspot-deal-441', title: 'Enterprise rollout', stage: 'proposal', value: 12500 },
+    deal: { externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 },
   }]);
 });
 
@@ -456,14 +458,14 @@ test('does not synchronize appointments or deals without their write scopes', as
     const appointmentResponse = await fetch(`${baseUrl}/api/v2/appointments/hubspot-appointment-441`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-appointment-441' },
-      body: JSON.stringify({ startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' }),
+      body: JSON.stringify({ contactId: 41, title: 'Initial consultation', startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' }),
     });
     assert.equal(appointmentResponse.status, 403);
 
     const dealResponse = await fetch(`${baseUrl}/api/v2/deals`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-deal-441' },
-      body: JSON.stringify({ externalId: 'hubspot-deal-441', title: 'Enterprise rollout', stage: 'proposal', value: 12500 }),
+      body: JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 }),
     });
     assert.equal(dealResponse.status, 403);
   }, undefined, undefined, undefined, appointmentSync, dealPipelineSync);

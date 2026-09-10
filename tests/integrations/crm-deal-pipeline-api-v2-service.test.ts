@@ -22,6 +22,8 @@ test('passes a validated CRM deal, ownership decision, and normalized idempotenc
     idempotencyKey: ' crm-deal-441 ',
     deal: {
       externalId: 'hubspot-deal-441',
+      contactId: 41,
+      pipelineId: 52,
       title: 'Enterprise rollout',
       stage: 'proposal',
       value: 12500,
@@ -35,6 +37,8 @@ test('passes a validated CRM deal, ownership decision, and normalized idempotenc
     idempotencyKey: 'crm-deal-441',
     deal: {
       externalId: 'hubspot-deal-441',
+      contactId: 41,
+      pipelineId: 52,
       title: 'Enterprise rollout',
       stage: 'proposal',
       value: 12500,
@@ -55,7 +59,7 @@ test('rejects a missing, short, or oversized idempotency key before calling the 
       return { created: true, deal: { id: 91 } };
     },
   });
-  const deal = { externalId: 'hubspot-deal-441', title: 'Enterprise rollout', stage: 'lead', value: 0 };
+  const deal = { externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'lead', value: 0 };
 
   for (const idempotencyKey of [undefined, ' short ', 'x'.repeat(129)]) {
     await assert.rejects(
@@ -76,7 +80,7 @@ test('rejects an invalid company or integration before calling the adapter', asy
   });
   const request = {
     idempotencyKey: 'crm-deal-441',
-    deal: { externalId: 'hubspot-deal-441', title: 'Enterprise rollout', stage: 'lead', value: 0 },
+    deal: { externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'lead', value: 0 },
   };
 
   await assert.rejects(() => service.upsert({ ...request, companyId: 0, integrationId: 3 }), /companyId must be a positive integer/);
@@ -98,7 +102,7 @@ test('uses the existing CRM deal validator before handing the request to the ada
       companyId: 12,
       integrationId: 3,
       idempotencyKey: 'crm-deal-441',
-      deal: { externalId: 'hubspot-deal-441', title: 'Enterprise rollout', stage: 'won', value: 0 },
+      deal: { externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'won', value: 0 },
     }),
     /stage must be one of/,
   );

@@ -194,7 +194,7 @@ export function createApiV2Router({
           integrationId,
           externalId,
           idempotencyKey,
-          appointment: req.body,
+          appointment: { ...req.body, externalId },
         });
         return res.status(result.created ? 201 : 200).json({ data: { id: result.id }, created: result.created });
       } catch (error) {

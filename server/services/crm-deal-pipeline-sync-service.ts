@@ -18,6 +18,8 @@ export type CrmDealPipelineStage = typeof crmDealPipelineStages[number];
 
 export interface IncomingCrmDeal {
   externalId: string;
+  contactId: number;
+  pipelineId: number;
   title: string;
   stage: CrmDealPipelineStage;
   value: number;
@@ -51,6 +53,13 @@ function requireNonnegativeInteger(value: unknown): number {
   return value;
 }
 
+function requirePositiveInteger(value: unknown, name: 'contactId' | 'pipelineId'): number {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value <= 0) {
+    throw new TypeError(`${name} must be a positive integer`);
+  }
+  return value;
+}
+
 export function validateIncomingCrmDeal(input: unknown): ValidatedIncomingCrmDeal {
   if (input === null || typeof input !== 'object' || Array.isArray(input)) {
     throw new TypeError('incoming CRM deal must be an object');
@@ -59,6 +68,8 @@ export function validateIncomingCrmDeal(input: unknown): ValidatedIncomingCrmDea
   const record = input as Record<string, unknown>;
   const deal: IncomingCrmDeal = {
     externalId: requireNonBlankString(record.externalId, 'externalId'),
+    contactId: requirePositiveInteger(record.contactId, 'contactId'),
+    pipelineId: requirePositiveInteger(record.pipelineId, 'pipelineId'),
     title: requireNonBlankString(record.title, 'title'),
     stage: requirePipelineStage(record.stage),
     value: requireNonnegativeInteger(record.value),

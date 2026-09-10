@@ -9,11 +9,11 @@ This guide covers the public routes mounted by the current implementation. The A
 | Contacts | Available | Create or update a contact by external ID. |
 | Messages | Available | Send CRM-originated text messages through an existing company channel. |
 | Campaigns | Not mounted | A campaign batch service exists, but no public v2 campaign route is registered. |
-| Appointments | Not mounted | Appointment validation exists, but no public v2 appointment route is registered. |
-| Deals | Not mounted | Deal validation/service code exists, but no public v2 deal route is registered. |
+| Appointments | Available | Upsert an appointment for an existing tenant contact. |
+| Deals | Available | Upsert a deal for an existing tenant contact and pipeline. |
 | Outbound webhooks | Delivery contract only | The signing/delivery helper exists; no public endpoint configures or receives these webhooks. |
 
-Do not construct requests for the unavailable areas from internal service names or declared scopes. The `appointments:*`, `deals:*`, `campaigns:*`, and `webhooks:manage` scopes may be returned by the capabilities route, but scopes do not themselves make routes available.
+Do not construct requests for the unavailable areas from internal service names or declared scopes. The `campaigns:*` and `webhooks:manage` scopes may be returned by the capabilities route, but scopes do not themselves make routes available.
 
 ## Prerequisites
 
@@ -102,6 +102,19 @@ curl --request POST "$BASE_URL/messages" \
 positive integer. The optional `external_message_id` is returned unchanged in
 the accepted response and stored as CRM metadata; it is not a replay key.
 
+## Upsert appointments and deals
+
+`PUT /appointments/{externalId}` requires `appointments:write` and an
+`Idempotency-Key`. Its body must provide an existing tenant `contactId`, a
+nonempty `title`, ISO `startsAt` and `endsAt`, and a Zinto appointment status.
+The external ID maps subsequent requests to the same Zinto appointment.
+
+`POST /deals` requires `deals:write` and an `Idempotency-Key` of 8–128
+characters. Its body must include the CRM `externalId`, plus existing tenant
+`contactId` and `pipelineId`, `title`, supported `stage`, and integer `value`.
+The API verifies every referenced record belongs to the authenticated company
+before creating or updating the mapped deal.
+
 ## Authentication and permissions
 
 Send `Authorization: Bearer <API_KEY>` on every route except `/health`. The authenticated v2 router checks API-key validity, active status, expiry, and any configured IP allow-list before handling the route. A missing or invalid key returns `401`; a valid key without the route's permission returns `403`.
@@ -110,7 +123,7 @@ The contact route also requires `X-Zinto-Integration-Id` to be a positive intege
 
 ## Idempotency
 
-There is no public v2 idempotency-key header or replay contract at present. For the available contact upsert, use the same `externalId` for retries: the route's create-or-update behavior is the implemented deduplication mechanism. Message retries can create a new delivery; `external_message_id` preserves CRM correlation only. Do not assume that `Idempotency-Key` is accepted or that repeated campaign, appointment, or deal requests can be replayed—those public routes are not mounted.
+Contact, appointment, and deal upserts use their stable CRM `externalId` mappings to identify the existing Zinto record. Appointment and deal routes additionally require `Idempotency-Key`; use a stable key for a retry. Message retries can create a new delivery; `external_message_id` preserves CRM correlation only. Campaign requests are not mounted.
 
 ## Outbound webhook signature contract
 

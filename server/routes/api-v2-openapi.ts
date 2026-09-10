@@ -54,6 +54,39 @@ export function getApiV2OpenApiDocument() {
           },
         },
       },
+      '/appointments/{externalId}': {
+        put: {
+          summary: 'Create or update a CRM appointment',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: 'externalId', in: 'path', required: true, schema: { type: 'string' } },
+            { name: 'X-Zinto-Integration-Id', in: 'header', required: true, schema: { type: 'integer', minimum: 1 } },
+            { name: 'Idempotency-Key', in: 'header', required: true, schema: { type: 'string' } },
+          ],
+          responses: {
+            '200': { description: 'Appointment updated' },
+            '201': { description: 'Appointment created' },
+            '400': { description: 'Invalid appointment or integration context' },
+            '403': { description: 'Missing appointments:write permission' },
+          },
+        },
+      },
+      '/deals': {
+        post: {
+          summary: 'Create or update a CRM deal',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: 'X-Zinto-Integration-Id', in: 'header', required: true, schema: { type: 'integer', minimum: 1 } },
+            { name: 'Idempotency-Key', in: 'header', required: true, schema: { type: 'string', minLength: 8, maxLength: 128 } },
+          ],
+          responses: {
+            '200': { description: 'Deal updated' },
+            '201': { description: 'Deal created' },
+            '400': { description: 'Invalid deal or integration context' },
+            '403': { description: 'Missing deals:write permission' },
+          },
+        },
+      },
     },
     components: {
       securitySchemes: {

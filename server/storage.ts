@@ -31,7 +31,7 @@ import {
   apiUsage, type ApiUsage, type InsertApiUsage,
   apiRateLimits, type ApiRateLimit, type InsertApiRateLimit,
   apiWebhooks, type ApiWebhook, type InsertApiWebhook,
-  crmExternalMappings, crmIntegrations, crmWebhookEvents,
+  crmExternalMappings, crmIntegrations, crmWebhookEvents, crmSyncConflicts,
   flows, type Flow, type InsertFlow,
   flowTemplates, type FlowTemplate, type InsertFlowTemplate,
   flowAssignments, type FlowAssignment, type InsertFlowAssignment,
@@ -5048,6 +5048,13 @@ export class DatabaseStorage implements IStorage {
     return target;
   }
 
+  async getCrmIntegrationOperations(companyId: number): Promise<any[]> {
+    const integrations = await db.select({
+      id: crmIntegrations.id,
+      name: crmIntegrations.name,
+      status: crmIntegrations.status,
+      scopes: crmIntegrations.scopes,
+    }).from(crmIntegrations).where(eq(crmIntegrations.companyId, companyId));
     if (integrations.length === 0) return [];
 
     const [events, conflicts] = await Promise.all([
@@ -5222,6 +5229,29 @@ export class DatabaseStorage implements IStorage {
     }).onConflictDoUpdate({
       target: [crmExternalMappings.companyId, crmExternalMappings.integrationId, crmExternalMappings.entityType, crmExternalMappings.externalId],
       set: { zintoId: String(contactId), version: sql`${crmExternalMappings.version} + 1`, updatedAt: new Date() },
+    });
+  }
+
+  async getCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal', externalId: string): Promise<{ zintoId: string } | undefined> {
+    const [mapping] = await db.select({ zintoId: crmExternalMappings.zintoId }).from(crmExternalMappings).where(and(
+      eq(crmExternalMappings.companyId, companyId),
+      eq(crmExternalMappings.integrationId, integrationId),
+      eq(crmExternalMappings.entityType, entityType),
+      eq(crmExternalMappings.externalId, externalId),
+    )).limit(1);
+    return mapping;
+  }
+
+  async saveCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal', externalId: string, zintoId: number): Promise<void> {
+    await db.insert(crmExternalMappings).values({
+      companyId,
+      integrationId,
+      entityType,
+      externalId,
+      zintoId: String(zintoId),
+    }).onConflictDoUpdate({
+      target: [crmExternalMappings.companyId, crmExternalMappings.integrationId, crmExternalMappings.entityType, crmExternalMappings.externalId],
+      set: { zintoId: String(zintoId), version: sql`${crmExternalMappings.version} + 1`, updatedAt: new Date() },
     });
   }
 

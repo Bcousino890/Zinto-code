@@ -282,9 +282,14 @@ import { authenticateApiKey } from "./middleware/api-auth";
 import apiV1Routes from "./routes/api-v1";
 import { createApiV2Router } from "./routes/api-v2";
 import { registerApiKeySettingsRoutes } from "./routes/api-key-settings-routes";
+import { registerCrmIntegrationOperationsRoutes } from "./routes/crm-integration-operations-routes";
 import { CrmContactSyncService } from "./services/crm-contact-sync-service";
 import { createCrmContactSyncStorageAdapter } from "./services/crm-contact-sync-storage-adapter";
 import { createCrmApiV2MessageAdapter } from "./services/crm-api-v2-message-adapter";
+import { createCrmAppointmentStorageAdapter, createCrmDealStorageAdapter, type CrmAppointmentPayload } from "./services/crm-domain-storage-adapters";
+import { AppointmentV2Service } from "./services/appointment-v2-service";
+import { validateIncomingCrmAppointment } from "./services/crm-appointment-sync-service";
+import { createCrmDealPipelineApiV2Service } from "./services/crm-deal-pipeline-api-v2-service";
 import apiMessageService from "./services/api-message-service";
 import channelManager from "./services/channel-manager";
 import {
@@ -1123,12 +1128,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       updateMessage: storage.updateMessage.bind(storage),
       sendMessage: apiMessageService.sendMessage.bind(apiMessageService),
     }),
+    appointmentSync: new AppointmentV2Service<CrmAppointmentPayload>({
+      port: createCrmAppointmentStorageAdapter(storage),
+      validate: (appointment) => {
+        const validated = validateIncomingCrmAppointment(appointment as any);
+        return {
+          contactId: validated.contactId,
+          title: validated.title,
+          startsAt: validated.startsAt,
+          endsAt: validated.endsAt,
+          status: validated.status as CrmAppointmentPayload['status'],
+        };
+      },
+      ownershipPolicy: ({ appointment }) => appointment,
+    }),
+    dealPipelineSync: createCrmDealPipelineApiV2Service(createCrmDealStorageAdapter(storage)),
     // These contracts deliberately remain conditional until their required
     // Zinto persistence keys are added to the v2 payloads:
-    // - campaigns: createdById, name, and content;
-    // - appointments: contact identity and title; and
-    // - deals: contact identity and pipeline identity.
-    // Enabling them without those values would fabricate or mis-scope records.
+    // - campaigns: a non-forgeable creator identity plus name and content.
+    // Enabling campaigns without those values would fabricate or mis-scope records.
   }));
 
   registerPlanRoutes(app);
@@ -3210,6 +3228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   registerApiKeySettingsRoutes(app, storage, ensureAuthenticated);
+  registerCrmIntegrationOperationsRoutes(app, storage, ensureAuthenticated);
 
   app.delete('/api/settings/api-keys/:id', ensureAuthenticated, async (req: any, res) => {
     try {

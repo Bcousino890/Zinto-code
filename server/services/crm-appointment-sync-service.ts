@@ -2,12 +2,15 @@ import {
   resolveSyncConflict,
   type SyncConflictDecision,
 } from './scheduling-pipeline-sync-policy';
+import { CONTACT_APPOINTMENT_STATUSES, type ContactAppointmentStatus } from '@shared/types/dental-booking-types';
 
 export interface IncomingCrmAppointmentInput {
+  contactId: number;
+  title: string;
   externalId: string;
   startsAt: string;
   endsAt: string;
-  status: string;
+  status: ContactAppointmentStatus;
 }
 
 export interface ValidatedIncomingCrmAppointment extends IncomingCrmAppointmentInput {
@@ -17,9 +20,21 @@ export interface ValidatedIncomingCrmAppointment extends IncomingCrmAppointmentI
 const ISO_TIMESTAMP_PATTERN =
   /^(\d{4})-(\d{2})-(\d{2})T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 
-function assertNonEmptyString(value: unknown, field: 'externalId' | 'status'): asserts value is string {
+function assertNonEmptyString(value: unknown, field: 'externalId' | 'title' | 'status'): asserts value is string {
   if (typeof value !== 'string' || value.trim().length === 0) {
     throw new Error(`${field} is required`);
+  }
+}
+
+function assertPositiveInteger(value: unknown, field: 'contactId'): asserts value is number {
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    throw new Error(`${field} must be a positive integer`);
+  }
+}
+
+function assertSupportedStatus(value: unknown): asserts value is ContactAppointmentStatus {
+  if (typeof value !== 'string' || !CONTACT_APPOINTMENT_STATUSES.includes(value as ContactAppointmentStatus)) {
+    throw new Error('status must be a supported appointment status');
   }
 }
 
@@ -50,10 +65,13 @@ function parseIsoTimestamp(value: unknown, field: 'startsAt' | 'endsAt'): number
 export function validateIncomingCrmAppointment(
   input: IncomingCrmAppointmentInput,
 ): ValidatedIncomingCrmAppointment {
+  assertPositiveInteger(input.contactId, 'contactId');
+  assertNonEmptyString(input.title, 'title');
   assertNonEmptyString(input.externalId, 'externalId');
   const startsAt = parseIsoTimestamp(input.startsAt, 'startsAt');
   const endsAt = parseIsoTimestamp(input.endsAt, 'endsAt');
   assertNonEmptyString(input.status, 'status');
+  assertSupportedStatus(input.status);
 
   if (endsAt <= startsAt) {
     throw new Error('endsAt must be after startsAt');

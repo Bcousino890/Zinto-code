@@ -4,6 +4,8 @@ import test from 'node:test';
 import { validateIncomingCrmAppointment } from '../../server/services/crm-appointment-sync-service';
 
 const validAppointment = {
+  contactId: 41,
+  title: 'Initial consultation',
   externalId: 'crm-appointment-441',
   startsAt: '2026-09-07T09:00:00.000Z',
   endsAt: '2026-09-07T09:30:00.000Z',
@@ -51,5 +53,12 @@ test('rejects an appointment without a status', () => {
   assert.throws(
     () => validateIncomingCrmAppointment({ ...validAppointment, status: '' }),
     /status is required/,
+  );
+});
+
+test('rejects an appointment status outside the Zinto appointment lifecycle', () => {
+  assert.throws(
+    () => validateIncomingCrmAppointment({ ...validAppointment, status: 'tentative' }),
+    /status must be a supported appointment status/,
   );
 });

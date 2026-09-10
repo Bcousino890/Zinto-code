@@ -8,6 +8,11 @@ import type { CampaignBatchItem } from '../../server/services/campaign-batch-val
 import type { CrmContactSyncService } from '../../server/services/crm-contact-sync-service';
 import type { AppointmentV2Service } from '../../server/services/appointment-v2-service';
 import type { CrmDealPipelineApiV2Service } from '../../server/services/crm-deal-pipeline-api-v2-service';
+import type {
+  InitialCrmSynchronizationInput,
+  InitialCrmSynchronizationPlan,
+} from '../../server/services/initial-crm-synchronization-plan';
+import { planInitialCrmSynchronization } from '../../server/services/initial-crm-synchronization-plan';
 
 type MessageSync = {
   send(input: {
@@ -31,6 +36,13 @@ type CampaignSync = {
 
 type AppointmentSync = Pick<AppointmentV2Service, 'sync'>;
 type DealPipelineSync = CrmDealPipelineApiV2Service;
+type InitialSync = {
+  plan(input: InitialCrmSynchronizationInput & {
+    companyId: number;
+    integrationId: number;
+    idempotencyKey: string;
+  }): InitialCrmSynchronizationPlan | Promise<InitialCrmSynchronizationPlan>;
+};
 
 async function withServer(
   middleware: (req: Request, res: Response, next: NextFunction) => void,
@@ -40,6 +52,7 @@ async function withServer(
   campaignSync?: CampaignSync,
   appointmentSync?: AppointmentSync,
   dealPipelineSync?: DealPipelineSync,
+  initialSync?: InitialSync,
 ) {
   const app = express();
   app.use(express.json());
@@ -50,6 +63,7 @@ async function withServer(
     campaignSync,
     appointmentSync,
     dealPipelineSync,
+    initialSync,
   }));
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -451,4 +465,108 @@ test('does not synchronize appointments or deals without their write scopes', as
     });
     assert.equal(dealResponse.status, 403);
   }, undefined, undefined, undefined, appointmentSync, dealPipelineSync);
+});
+
+test('plans initial CRM synchronization jobs with tenant, integration, and idempotency context', async () => {
+  const received: unknown[] = [];
+  const plan = {
+    jobs: [{ id: 'contacts:1', entity: 'contacts' as const, records: [{ externalId: 'contact-441' }] }],
+    jobCounts: {
+      total: 1,
+      byEntity: { contacts: 1, appointments: 0, deals: 0, campaigns: 0 },
+    },
+  };
+  const initialSync: InitialSync = {
+    plan: async (input) => {
+      received.push(input);
+      return plan;
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['integrations:manage'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/sync-jobs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Zinto-Integration-Id': '3',
+        'Idempotency-Key': 'crm-initial-sync-441',
+      },
+      body: JSON.stringify({
+        companyId: 99,
+        integrationId: 98,
+        idempotencyKey: 'untrusted-body-value',
+        contacts: [{ externalId: 'contact-441' }],
+        appointments: [],
+        deals: [],
+        campaigns: [],
+      }),
+    });
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await response.json(), { data: plan });
+  }, undefined, undefined, undefined, undefined, undefined, initialSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12,
+    integrationId: 3,
+    idempotencyKey: 'crm-initial-sync-441',
+    contacts: [{ externalId: 'contact-441' }],
+    appointments: [],
+    deals: [],
+    campaigns: [],
+  }]);
+});
+
+test('does not expose initial CRM synchronization planning without its dependency', async () => {
+  await withServer((_req, _res, next) => next(), async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/sync-jobs`, { method: 'POST' });
+    assert.equal(response.status, 404);
+  });
+});
+
+test('does not plan initial CRM synchronization without integrations:manage permission', async () => {
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['contacts:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/sync-jobs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Zinto-Integration-Id': '3',
+        'Idempotency-Key': 'crm-initial-sync-441',
+      },
+      body: JSON.stringify({ contacts: [], appointments: [], deals: [], campaigns: [] }),
+    });
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).error, 'INSUFFICIENT_PERMISSIONS');
+  }, undefined, undefined, undefined, undefined, undefined, { plan: () => ({ jobs: [], jobCounts: { total: 0, byEntity: { contacts: 0, appointments: 0, deals: 0, campaigns: 0 } } }) });
+});
+
+test('returns planner validation failures as bad requests', async () => {
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['integrations:manage'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/sync-jobs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Zinto-Integration-Id': '3',
+        'Idempotency-Key': 'crm-initial-sync-441',
+      },
+      body: JSON.stringify({ contacts: [], appointments: [], deals: [], campaigns: [], batchSize: 0 }),
+    });
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), {
+      error: 'VALIDATION_ERROR',
+      message: 'batchSize must be a positive safe integer',
+    });
+  }, undefined, undefined, undefined, undefined, undefined, { plan: planInitialCrmSynchronization });
 });

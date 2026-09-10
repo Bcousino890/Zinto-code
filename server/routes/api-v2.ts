@@ -6,6 +6,10 @@ import type { CrmContactSyncService } from '../services/crm-contact-sync-service
 import { normalizeOutboundCrmMessageRequest } from '../services/crm-message-sync-service';
 import type { AppointmentV2Service } from '../services/appointment-v2-service';
 import type { CrmDealPipelineApiV2Service } from '../services/crm-deal-pipeline-api-v2-service';
+import type {
+  InitialCrmSynchronizationInput,
+  InitialCrmSynchronizationPlan,
+} from '../services/initial-crm-synchronization-plan';
 
 type AuthenticationMiddleware = (req: Request, res: Response, next: NextFunction) => void;
 type MessageSync = {
@@ -28,6 +32,13 @@ type CampaignSync = {
 };
 type AppointmentSync = Pick<AppointmentV2Service, 'sync'>;
 type DealPipelineSync = CrmDealPipelineApiV2Service;
+type InitialSync = {
+  plan(input: InitialCrmSynchronizationInput & {
+    companyId: number;
+    integrationId: number;
+    idempotencyKey: string;
+  }): InitialCrmSynchronizationPlan | Promise<InitialCrmSynchronizationPlan>;
+};
 
 export function createApiV2Router({
   authenticate,
@@ -36,6 +47,7 @@ export function createApiV2Router({
   campaignSync,
   appointmentSync,
   dealPipelineSync,
+  initialSync,
 }: {
   authenticate: AuthenticationMiddleware;
   contactSync?: Pick<CrmContactSyncService, 'upsert'>;
@@ -43,6 +55,7 @@ export function createApiV2Router({
   campaignSync?: CampaignSync;
   appointmentSync?: AppointmentSync;
   dealPipelineSync?: DealPipelineSync;
+  initialSync?: InitialSync;
 }) {
   const router = Router();
 
@@ -215,6 +228,33 @@ export function createApiV2Router({
         return res.status(500).json({
           error: 'DEAL_PIPELINE_SYNC_FAILED',
           message: error instanceof Error ? error.message : 'Deal pipeline synchronization failed',
+        });
+      }
+    });
+  }
+
+  if (initialSync) {
+    router.post('/sync-jobs', requireIntegrationScope('integrations:manage'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const idempotencyKey = req.header('Idempotency-Key');
+
+      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !idempotencyKey?.trim()) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and Idempotency-Key are required' });
+      }
+
+      try {
+        const plan = await initialSync.plan({
+          ...req.body,
+          companyId,
+          integrationId,
+          idempotencyKey,
+        });
+        return res.status(202).json({ data: plan });
+      } catch (error) {
+        return res.status(400).json({
+          error: 'VALIDATION_ERROR',
+          message: error instanceof Error ? error.message : 'Initial CRM synchronization validation failed',
         });
       }
     });

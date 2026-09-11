@@ -7,7 +7,7 @@ test('creates CRM campaigns with the API-key owner and records their external ma
   const created: unknown[] = [];
   const mappings: unknown[] = [];
   const service = new CrmCampaignSyncService({
-    integrationBelongsToCompany: async () => true,
+    crmIntegrationBelongsToCompany: async () => true,
     getCrmExternalMapping: async () => undefined,
     saveCrmExternalMapping: async (...input) => { mappings.push(input); },
   }, {
@@ -38,7 +38,7 @@ test('creates CRM campaigns with the API-key owner and records their external ma
 test('updates the mapped campaign without creating a duplicate', async () => {
   const updates: unknown[] = [];
   const service = new CrmCampaignSyncService({
-    integrationBelongsToCompany: async () => true,
+    crmIntegrationBelongsToCompany: async () => true,
     getCrmExternalMapping: async () => ({ zintoId: '71' }),
     saveCrmExternalMapping: async () => { throw new Error('not expected'); },
   }, {
@@ -65,7 +65,7 @@ test('updates the mapped campaign without creating a duplicate', async () => {
 
 test('rejects a campaign sync for an integration outside the tenant', async () => {
   const service = new CrmCampaignSyncService({
-    integrationBelongsToCompany: async () => false,
+    crmIntegrationBelongsToCompany: async () => false,
     getCrmExternalMapping: async () => undefined,
     saveCrmExternalMapping: async () => undefined,
   }, {} as any);

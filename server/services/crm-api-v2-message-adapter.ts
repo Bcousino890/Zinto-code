@@ -12,6 +12,9 @@ type StoredMessage = {
   metadata?: unknown;
 };
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+type JsonObject = { [key: string]: JsonValue };
+
 type MessageSender = {
   sendMessage(companyId: number, request: {
     channelId: number;
@@ -24,24 +27,46 @@ type MessageSender = {
 type MessageStorage = {
   crmIntegrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean>;
   getMessageById(id: number): Promise<StoredMessage | undefined>;
-  updateMessage(id: number, updates: { metadata: unknown }): Promise<unknown>;
+  updateMessage(id: number, updates: { metadata: JsonObject }): Promise<unknown>;
 };
 
 export type CrmApiV2MessageAdapter = {
   send(input: CrmMessageInput): Promise<{ id: string | number }>;
 };
 
-function crmMetadata(existingMetadata: unknown, input: CrmMessageInput): Record<string, unknown> {
-  const existing = existingMetadata && typeof existingMetadata === 'object' && !Array.isArray(existingMetadata)
-    ? existingMetadata as Record<string, unknown>
-    : {};
-  const existingCrm = existing.crm && typeof existing.crm === 'object' && !Array.isArray(existing.crm)
-    ? existing.crm as Record<string, unknown>
-    : {};
+function jsonValue(value: unknown): JsonValue | undefined {
+  if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    const values = value.map(jsonValue);
+    return values.every((item) => item !== undefined) ? values as JsonValue[] : undefined;
+  }
+  if (value && typeof value === 'object') {
+    const result: JsonObject = {};
+    for (const [key, item] of Object.entries(value)) {
+      const normalized = jsonValue(item);
+      if (normalized !== undefined) result[key] = normalized;
+    }
+    return result;
+  }
+  return undefined;
+}
+
+function jsonObject(value: unknown): JsonObject {
+  const normalized = jsonValue(value);
+  return normalized && !Array.isArray(normalized) && typeof normalized === 'object' ? normalized : {};
+}
+
+function crmMetadata(existingMetadata: unknown, input: CrmMessageInput): JsonObject {
+  const existing = jsonObject(existingMetadata);
+  const existingCrm = jsonObject(existing.crm);
+  const legacyMetadata = jsonValue(existingMetadata);
+  const hasObjectMetadata = Boolean(existingMetadata) && typeof existingMetadata === 'object' && !Array.isArray(existingMetadata);
 
   return {
     ...existing,
-    ...(existingMetadata !== undefined && existing !== existingMetadata ? { legacyMetadata: existingMetadata } : {}),
+    ...(existingMetadata !== undefined && !hasObjectMetadata && legacyMetadata !== undefined ? { legacyMetadata } : {}),
     crm: {
       ...existingCrm,
       origin: input.origin,

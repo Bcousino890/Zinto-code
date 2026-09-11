@@ -3,7 +3,7 @@ import type { CampaignBatchItem } from './campaign-batch-validation';
 type CampaignRecord = { id: number; companyId?: number };
 
 export type CrmCampaignMappingPort = {
-  integrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean>;
+  crmIntegrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean>;
   getCrmExternalMapping(
     companyId: number,
     integrationId: number,
@@ -54,7 +54,7 @@ export class CrmCampaignSyncService {
     actorUserId?: number;
     campaigns: CampaignBatchItem[];
   }): Promise<void> {
-    if (!await this.mappings.integrationBelongsToCompany(input.companyId, input.integrationId)) {
+    if (!await this.mappings.crmIntegrationBelongsToCompany(input.companyId, input.integrationId)) {
       throw new Error('Integration does not belong to this company');
     }
     if (!Number.isSafeInteger(input.actorUserId) || input.actorUserId <= 0) {

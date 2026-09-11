@@ -290,6 +290,8 @@ import { createCrmAppointmentStorageAdapter, createCrmDealStorageAdapter, type C
 import { AppointmentV2Service } from "./services/appointment-v2-service";
 import { validateIncomingCrmAppointment } from "./services/crm-appointment-sync-service";
 import { createCrmDealPipelineApiV2Service } from "./services/crm-deal-pipeline-api-v2-service";
+import { CrmCampaignSyncService } from "./services/crm-campaign-sync-service";
+import { CampaignService } from "./services/campaignService";
 import apiMessageService from "./services/api-message-service";
 import channelManager from "./services/channel-manager";
 import {
@@ -1143,10 +1145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ownershipPolicy: ({ appointment }) => appointment,
     }),
     dealPipelineSync: createCrmDealPipelineApiV2Service(createCrmDealStorageAdapter(storage)),
-    // These contracts deliberately remain conditional until their required
-    // Zinto persistence keys are added to the v2 payloads:
-    // - campaigns: a non-forgeable creator identity plus name and content.
-    // Enabling campaigns without those values would fabricate or mis-scope records.
+    campaignSync: new CrmCampaignSyncService(storage, new CampaignService()),
   }));
 
   registerPlanRoutes(app);

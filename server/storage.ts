@@ -876,8 +876,8 @@ export interface IStorage {
   crmIntegrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean>;
   getCrmIntegrationOperations(companyId: number): Promise<any[]>;
   saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void>;
-  getCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal', externalId: string): Promise<{ zintoId: string } | undefined>;
-  saveCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal', externalId: string, zintoId: number): Promise<void>;
+  getCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal' | 'campaign', externalId: string): Promise<{ zintoId: string } | undefined>;
+  saveCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal' | 'campaign', externalId: string, zintoId: number): Promise<void>;
   claimPending(input: DurableWebhookClaimPendingInput): Promise<ClaimedDurableWebhookEvent | undefined>;
   updateDelivery(input: DurableWebhookDeliveryUpdate): Promise<boolean>;
   listCandidateScopes(): Promise<DurableWebhookEventScope[]>;
@@ -5232,7 +5232,7 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
-  async getCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal', externalId: string): Promise<{ zintoId: string } | undefined> {
+  async getCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal' | 'campaign', externalId: string): Promise<{ zintoId: string } | undefined> {
     const [mapping] = await db.select({ zintoId: crmExternalMappings.zintoId }).from(crmExternalMappings).where(and(
       eq(crmExternalMappings.companyId, companyId),
       eq(crmExternalMappings.integrationId, integrationId),
@@ -5242,7 +5242,7 @@ export class DatabaseStorage implements IStorage {
     return mapping;
   }
 
-  async saveCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal', externalId: string, zintoId: number): Promise<void> {
+  async saveCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal' | 'campaign', externalId: string, zintoId: number): Promise<void> {
     await db.insert(crmExternalMappings).values({
       companyId,
       integrationId,

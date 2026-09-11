@@ -1,5 +1,12 @@
 export interface CampaignBatchItem {
   externalId: string;
+  name: string;
+  content: string;
+  campaignType?: 'immediate' | 'scheduled' | 'drip' | 'recurring_daily';
+  scheduledAt?: string;
+  timezone?: string;
+  channelType?: 'whatsapp' | 'email';
+  channelId?: number;
 }
 
 /**
@@ -12,6 +19,12 @@ export function validateCampaignBatch(campaigns: readonly CampaignBatchItem[]): 
 
   const externalIds = new Set<string>();
   for (const campaign of campaigns) {
+    if (typeof campaign.name !== 'string' || !campaign.name.trim()) {
+      throw new Error('Campaign name is required');
+    }
+    if (typeof campaign.content !== 'string' || !campaign.content.trim()) {
+      throw new Error('Campaign content is required');
+    }
     if (externalIds.has(campaign.externalId)) {
       throw new Error(`Campaign sync batch contains duplicate external ID: ${campaign.externalId}`);
     }

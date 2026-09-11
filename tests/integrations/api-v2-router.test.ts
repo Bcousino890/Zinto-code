@@ -279,13 +279,13 @@ test('accepts a validated campaign batch from a permitted integration', async ()
 
   await withServer((req, _res, next) => {
     req.companyId = 12;
-    req.apiKey = { permissions: ['campaigns:write'] } as any;
+    req.apiKey = { permissions: ['campaigns:write'], userId: 9 } as any;
     next();
   }, async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
-      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441' }, { externalId: 'crm-campaign-442' }] }),
+      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }, { externalId: 'crm-campaign-442', name: 'Campaign 442', content: 'Hello' }] }),
     });
 
     assert.equal(response.status, 202);
@@ -295,7 +295,8 @@ test('accepts a validated campaign batch from a permitted integration', async ()
   assert.deepEqual(received, [{
     companyId: 12,
     integrationId: 3,
-    campaigns: [{ externalId: 'crm-campaign-441' }, { externalId: 'crm-campaign-442' }],
+    actorUserId: 9,
+    campaigns: [{ externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }, { externalId: 'crm-campaign-442', name: 'Campaign 442', content: 'Hello' }],
   }]);
 });
 
@@ -315,7 +316,7 @@ test('does not synchronize campaigns without campaigns:write permission', async 
     const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
-      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441' }] }),
+      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }] }),
     });
     assert.equal(response.status, 403);
     assert.equal((await response.json()).error, 'INSUFFICIENT_PERMISSIONS');
@@ -331,7 +332,7 @@ test('rejects campaign batches that violate the batch validation contract', asyn
     const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
-      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441' }, { externalId: 'crm-campaign-441' }] }),
+      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }, { externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }] }),
     });
     assert.equal(response.status, 400);
     assert.deepEqual(await response.json(), {
@@ -350,7 +351,7 @@ test('reports a campaign sync failure separately from an invalid batch', async (
     const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
-      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441' }] }),
+      body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }] }),
     });
     assert.equal(response.status, 500);
     assert.deepEqual(await response.json(), {

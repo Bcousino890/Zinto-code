@@ -27,6 +27,7 @@ type CampaignSync = {
   syncBatch(input: {
     companyId: number;
     integrationId: number;
+    actorUserId?: number;
     campaigns: CampaignBatchItem[];
   }): Promise<void>;
 };
@@ -166,7 +167,12 @@ export function createApiV2Router({
       }
 
       try {
-        await campaignSync.syncBatch({ companyId, integrationId, campaigns });
+        await campaignSync.syncBatch({
+          companyId,
+          integrationId,
+          ...(Number.isSafeInteger(req.apiKey?.userId) && req.apiKey!.userId > 0 ? { actorUserId: req.apiKey!.userId } : {}),
+          campaigns,
+        });
         return res.status(202).json({ count: campaigns.length });
       } catch (error) {
         return res.status(500).json({

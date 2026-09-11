@@ -12,9 +12,15 @@ import "./services/message-scheduler"; // Import message scheduler (but don't au
 import { licenseValidator } from "./services/license-validator";
 import { ensureLicenseValid } from "./middleware/license-guard";
 import { assertEncryptionKeyConfigured } from "./utils/crypto";
+import {
+  DurableWebhookWorkerLifecycle,
+  shouldStartDurableWebhookWorker,
+} from "./services/durable-webhook-worker-lifecycle";
 
 
 dotenv.config();
+
+let durableWebhookWorkerLifecycle: DurableWebhookWorkerLifecycle | undefined;
 
 try {
   assertEncryptionKeyConfigured();
@@ -149,29 +155,39 @@ app.use((req, res, next) => {
 
 
         logger.info('migration', 'Running database migrations...');
+        let migrationsReady = false;
         try {
           await migrationSystem.runPendingMigrations();
+          migrationsReady = true;
           logger.info('migration', 'Database migrations completed successfully');
         } catch (error) {
-        
+          logger.error('migration', 'Database migrations failed; durable CRM webhooks will not start', error);
         }
 
         logger.info('crm-webhooks', 'Starting durable CRM webhook delivery worker...');
-        try {
-          const [{ storage }, { createDurableWebhookWorkerScheduler }, { decryptValue }] = await Promise.all([
-            import('./storage'),
-            import('./services/durable-webhook-delivery-service'),
-            import('./utils/crypto'),
-          ]);
-          const scheduler = createDurableWebhookWorkerScheduler(storage, {
-            decryptSecret: decryptValue,
-          }, {
-            onError: (error) => logger.error('crm-webhooks', 'Durable webhook delivery run failed', error),
-          });
-          scheduler.start();
-          logger.info('crm-webhooks', 'Durable CRM webhook delivery worker started');
-        } catch (error) {
-          logger.error('crm-webhooks', 'Durable CRM webhook delivery worker failed to start', error);
+        if (!shouldStartDurableWebhookWorker({ migrationsReady })) {
+          logger.error('crm-webhooks', 'Durable CRM webhook delivery worker not started because migrations are incomplete');
+        } else {
+          try {
+            const [{ storage }, { createDurableWebhookWorkerScheduler }, { decryptValue }] = await Promise.all([
+              import('./storage'),
+              import('./services/durable-webhook-delivery-service'),
+              import('./utils/crypto'),
+            ]);
+            durableWebhookWorkerLifecycle ??= new DurableWebhookWorkerLifecycle(() =>
+              createDurableWebhookWorkerScheduler(storage, {
+                decryptSecret: decryptValue,
+              }, {
+                onError: (error) => logger.error('crm-webhooks', 'Durable webhook delivery run failed', error),
+              }),
+            );
+            const started = durableWebhookWorkerLifecycle.start();
+            logger.info('crm-webhooks', started
+              ? 'Durable CRM webhook delivery worker started'
+              : 'Durable CRM webhook delivery worker is disabled or already started');
+          } catch (error) {
+            logger.error('crm-webhooks', 'Durable CRM webhook delivery worker failed to start', error);
+          }
         }
 
         try {
@@ -634,6 +650,8 @@ app.use((req, res, next) => {
 
   process.on('SIGTERM', async () => {
     logger.info('server', 'SIGTERM received, shutting down TikTok health monitoring...');
+    durableWebhookWorkerLifecycle?.stop();
+    logger.info('crm-webhooks', 'Durable CRM webhook delivery worker stopped');
     try {
       const TikTokService = (await import('./services/channels/tiktok')).default;
       TikTokService.stopAllHealthMonitoring();
@@ -643,5 +661,10 @@ app.use((req, res, next) => {
     }
     await new Promise((r) => setTimeout(r, 5000));
     logger.info('server', 'Shutdown grace period complete');
+  });
+
+  process.once('SIGINT', () => {
+    durableWebhookWorkerLifecycle?.stop();
+    logger.info('crm-webhooks', 'Durable CRM webhook delivery worker stopped');
   });
 })();

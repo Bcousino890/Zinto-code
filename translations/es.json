@@ -68934,5 +68934,125 @@
   {
     "key": "zoho_calendar.start_end_times_required",
     "value": "Las horas de inicio y fin son obligatorias"
+  },
+  {
+    "key": "settings.api_access.dialog.environment",
+    "value": "Entorno"
+  },
+  {
+    "key": "settings.api_access.dialog.sandbox",
+    "value": "Pruebas"
+  },
+  {
+    "key": "settings.api_access.dialog.sandbox_short",
+    "value": "Integración local o de prueba"
+  },
+  {
+    "key": "settings.api_access.dialog.production",
+    "value": "Producción"
+  },
+  {
+    "key": "settings.api_access.dialog.production_short",
+    "value": "Integración activa orientada a clientes"
+  },
+  {
+    "key": "settings.api_access.dialog.webhook_url",
+    "value": "URL del webhook"
+  },
+  {
+    "key": "settings.api_access.dialog.sandbox_webhook_help",
+    "value": "Los webhooks de prueba deben usar localhost, un dominio .test o un dominio .example."
+  },
+  {
+    "key": "settings.api_access.dialog.production_webhook_help",
+    "value": "Los webhooks de producción deben usar HTTPS y no pueden apuntar a localhost."
+  },
+  {
+    "key": "integrations.operations.title",
+    "value": "Operaciones de {{name}}"
+  },
+  {
+    "key": "integrations.operations.description",
+    "value": "Supervisa los problemas de entrega y los registros que requieren revisión."
+  },
+  {
+    "key": "integrations.operations.operational",
+    "value": "Operativa"
+  },
+  {
+    "key": "integrations.operations.monitoring",
+    "value": "En seguimiento"
+  },
+  {
+    "key": "integrations.operations.needs_attention",
+    "value": "Requiere atención"
+  },
+  {
+    "key": "integrations.operations.healthy",
+    "value": "En buen estado"
+  },
+  {
+    "key": "integrations.operations.degraded",
+    "value": "Con incidencias"
+  },
+  {
+    "key": "integrations.operations.unavailable",
+    "value": "No disponible"
+  },
+  {
+    "key": "integrations.operations.health",
+    "value": "Estado de la integración"
+  },
+  {
+    "key": "integrations.operations.pending_events",
+    "value": "Eventos pendientes"
+  },
+  {
+    "key": "integrations.operations.failed_events",
+    "value": "Eventos fallidos"
+  },
+  {
+    "key": "integrations.operations.conflicts",
+    "value": "Conflictos"
+  },
+  {
+    "key": "integrations.operations.pending_description",
+    "value": "Eventos en espera de entrega al sistema conectado."
+  },
+  {
+    "key": "integrations.operations.failed_description",
+    "value": "Vuelve a intentar cada evento cuando se haya resuelto el problema."
+  },
+  {
+    "key": "integrations.operations.conflicts_description",
+    "value": "Registros que requieren una decisión antes de continuar la sincronización."
+  },
+  {
+    "key": "integrations.operations.no_pending_events",
+    "value": "No hay eventos pendientes."
+  },
+  {
+    "key": "integrations.operations.no_failed_events",
+    "value": "No hay eventos fallidos."
+  },
+  {
+    "key": "integrations.operations.no_conflicts",
+    "value": "No hay conflictos para revisar."
+  },
+  {
+    "key": "integrations.operations.retry",
+    "value": "Reintentar"
+  },
+  {
+    "key": "integrations.operations.retrying",
+    "value": "Reintentando..."
+  },
+  {
+    "key": "integrations.operations.pending_review",
+    "value": "Pendiente de revisión"
+  },
+  {
+    "key": "settings.api_access.operations.data_availability",
+    "value": "Todavía no hay registros de integración CRM disponibles. La disponibilidad se basa en las claves API CRM activas y su uso registrado."
   }
 ]

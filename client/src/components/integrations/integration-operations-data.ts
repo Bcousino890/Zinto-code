@@ -40,7 +40,10 @@ export function buildCrmOperationsViewData(source: CrmOperationsSource): Integra
     pendingEvents: source.pendingEvents.map(event),
     failedEvents: source.failedEvents.map(event),
     conflicts: source.conflicts.map((conflict) => ({
-      id: String(conflict.id), label: `${conflict.entityType} · ${conflict.externalId}`, detail: 'Pending review',
+      id: String(conflict.id),
+      label: `${conflict.entityType} · ${conflict.externalId}`,
+      detail: 'Pending review',
+      detailTranslationKey: 'integrations.operations.pending_review',
     })),
   };
 }
@@ -55,7 +58,7 @@ export function buildIntegrationOperationsData(apiKeys: ApiKeyIntegrationSource[
     key.isActive && key.permissions.includes('integrations:manage'));
 
   return {
-    integrationName: 'CRM API integration',
+    integrationName: 'CRM API',
     health: activeIntegrationKeys.length === 0
       ? 'down'
       : activeIntegrationKeys.some((key) => Boolean(key.lastUsedAt))

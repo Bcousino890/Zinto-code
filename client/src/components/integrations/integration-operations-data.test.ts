@@ -20,7 +20,7 @@ test('derives CRM API health from active integration-management keys without inv
     },
   ]);
 
-  assert.equal(data.integrationName, 'CRM API integration');
+  assert.equal(data.integrationName, 'CRM API');
   assert.equal(data.health, 'healthy');
   assert.deepEqual(data.pendingEvents, []);
   assert.deepEqual(data.failedEvents, []);
@@ -62,5 +62,10 @@ test('renders server-provided webhook and conflict records without using their p
   });
   assert.equal(data.health, 'healthy');
   assert.deepEqual(data.failedEvents[0], { id: 'evt-2', label: 'deal.updated', detail: 'Timeout', occurredAt: '2026-09-10T07:00:00.000Z' });
-  assert.deepEqual(data.conflicts[0], { id: '3', label: 'contact · crm-4', detail: 'Pending review' });
+  assert.deepEqual(data.conflicts[0], {
+    id: '3',
+    label: 'contact · crm-4',
+    detail: 'Pending review',
+    detailTranslationKey: 'integrations.operations.pending_review',
+  });
 });

@@ -10,7 +10,10 @@ export interface IntegrationOperationsStatusInput {
 }
 
 export interface IntegrationOperationsStatus {
-  label: 'Operational' | 'Monitoring' | 'Needs attention';
+  labelKey:
+    | 'integrations.operations.operational'
+    | 'integrations.operations.monitoring'
+    | 'integrations.operations.needs_attention';
   tone: IntegrationOperationsTone;
 }
 
@@ -21,12 +24,12 @@ export function getIntegrationOperationsStatus({
   conflictCount,
 }: IntegrationOperationsStatusInput): IntegrationOperationsStatus {
   if (health === 'down' || failedEventCount > 0 || conflictCount > 0) {
-    return { label: 'Needs attention', tone: 'critical' };
+    return { labelKey: 'integrations.operations.needs_attention', tone: 'critical' };
   }
 
   if (health === 'degraded' || pendingEventCount > 0) {
-    return { label: 'Monitoring', tone: 'warning' };
+    return { labelKey: 'integrations.operations.monitoring', tone: 'warning' };
   }
 
-  return { label: 'Operational', tone: 'success' };
+  return { labelKey: 'integrations.operations.operational', tone: 'success' };
 }

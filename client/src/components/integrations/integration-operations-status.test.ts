@@ -12,7 +12,7 @@ test('reports attention when failures or conflicts need an operator', () => {
   });
 
   assert.deepEqual(status, {
-    label: 'Needs attention',
+    labelKey: 'integrations.operations.needs_attention',
     tone: 'critical',
   });
 });
@@ -26,7 +26,7 @@ test('reports monitoring when the integration is degraded or has a backlog', () 
   });
 
   assert.deepEqual(status, {
-    label: 'Monitoring',
+    labelKey: 'integrations.operations.monitoring',
     tone: 'warning',
   });
 });
@@ -40,7 +40,7 @@ test('reports healthy only when the integration is healthy and clear', () => {
   });
 
   assert.deepEqual(status, {
-    label: 'Operational',
+    labelKey: 'integrations.operations.operational',
     tone: 'success',
   });
 });
@@ -54,7 +54,7 @@ test('reports attention when the integration is unavailable', () => {
   });
 
   assert.deepEqual(status, {
-    label: 'Needs attention',
+    labelKey: 'integrations.operations.needs_attention',
     tone: 'critical',
   });
 });

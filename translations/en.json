@@ -68934,5 +68934,125 @@
   {
     "key": "zoho_calendar.start_end_times_required",
     "value": "Start and end times are required"
+  },
+  {
+    "key": "settings.api_access.dialog.environment",
+    "value": "Environment"
+  },
+  {
+    "key": "settings.api_access.dialog.sandbox",
+    "value": "Sandbox"
+  },
+  {
+    "key": "settings.api_access.dialog.sandbox_short",
+    "value": "Safe local or test integration"
+  },
+  {
+    "key": "settings.api_access.dialog.production",
+    "value": "Production"
+  },
+  {
+    "key": "settings.api_access.dialog.production_short",
+    "value": "Live customer-facing integration"
+  },
+  {
+    "key": "settings.api_access.dialog.webhook_url",
+    "value": "Webhook URL"
+  },
+  {
+    "key": "settings.api_access.dialog.sandbox_webhook_help",
+    "value": "Sandbox webhooks must use localhost, a .test domain, or an .example domain."
+  },
+  {
+    "key": "settings.api_access.dialog.production_webhook_help",
+    "value": "Production webhooks must use HTTPS and cannot target localhost."
+  },
+  {
+    "key": "integrations.operations.title",
+    "value": "{{name}} operations"
+  },
+  {
+    "key": "integrations.operations.description",
+    "value": "Monitor delivery issues and records requiring review."
+  },
+  {
+    "key": "integrations.operations.operational",
+    "value": "Operational"
+  },
+  {
+    "key": "integrations.operations.monitoring",
+    "value": "Monitoring"
+  },
+  {
+    "key": "integrations.operations.needs_attention",
+    "value": "Needs attention"
+  },
+  {
+    "key": "integrations.operations.healthy",
+    "value": "Healthy"
+  },
+  {
+    "key": "integrations.operations.degraded",
+    "value": "Degraded"
+  },
+  {
+    "key": "integrations.operations.unavailable",
+    "value": "Unavailable"
+  },
+  {
+    "key": "integrations.operations.health",
+    "value": "Integration health"
+  },
+  {
+    "key": "integrations.operations.pending_events",
+    "value": "Pending events"
+  },
+  {
+    "key": "integrations.operations.failed_events",
+    "value": "Failed events"
+  },
+  {
+    "key": "integrations.operations.conflicts",
+    "value": "Conflicts"
+  },
+  {
+    "key": "integrations.operations.pending_description",
+    "value": "Events waiting to be delivered to the connected system."
+  },
+  {
+    "key": "integrations.operations.failed_description",
+    "value": "Retry individual events after the underlying issue is resolved."
+  },
+  {
+    "key": "integrations.operations.conflicts_description",
+    "value": "Records that require a decision before synchronization can continue."
+  },
+  {
+    "key": "integrations.operations.no_pending_events",
+    "value": "No pending events."
+  },
+  {
+    "key": "integrations.operations.no_failed_events",
+    "value": "No failed events."
+  },
+  {
+    "key": "integrations.operations.no_conflicts",
+    "value": "No conflicts to review."
+  },
+  {
+    "key": "integrations.operations.retry",
+    "value": "Retry"
+  },
+  {
+    "key": "integrations.operations.retrying",
+    "value": "Retrying..."
+  },
+  {
+    "key": "integrations.operations.pending_review",
+    "value": "Pending review"
+  },
+  {
+    "key": "settings.api_access.operations.data_availability",
+    "value": "No CRM integration records are available yet. Availability is based on active CRM API keys and their recorded use."
   }
 ]

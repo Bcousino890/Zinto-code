@@ -23,6 +23,13 @@ test('accepts a valid CRM appointment and applies CRM appointment ownership', ()
   });
 });
 
+test('rejects a non-object CRM appointment before reading its fields', () => {
+  assert.throws(
+    () => validateIncomingCrmAppointment('not-an-appointment'),
+    /incoming CRM appointment must be an object/,
+  );
+});
+
 test('rejects an appointment without an external ID', () => {
   assert.throws(
     () => validateIncomingCrmAppointment({ ...validAppointment, externalId: '  ' }),

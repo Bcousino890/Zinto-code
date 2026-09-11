@@ -38,7 +38,10 @@ function assertSupportedStatus(value: unknown): asserts value is ContactAppointm
   }
 }
 
-function parseIsoTimestamp(value: unknown, field: 'startsAt' | 'endsAt'): number {
+function parseIsoTimestamp(
+  value: unknown,
+  field: 'startsAt' | 'endsAt',
+): { isoTimestamp: string; timestamp: number } {
   const match = typeof value === 'string' ? ISO_TIMESTAMP_PATTERN.exec(value) : null;
   if (!match) {
     throw new Error(`${field} must be a valid ISO timestamp`);
@@ -55,7 +58,7 @@ function parseIsoTimestamp(value: unknown, field: 'startsAt' | 'endsAt'): number
     throw new Error(`${field} must be a valid ISO timestamp`);
   }
 
-  return timestamp;
+  return { isoTimestamp: value, timestamp };
 }
 
 /**
@@ -63,22 +66,32 @@ function parseIsoTimestamp(value: unknown, field: 'startsAt' | 'endsAt'): number
  * scheduling-pipeline ownership decision without performing I/O.
  */
 export function validateIncomingCrmAppointment(
-  input: IncomingCrmAppointmentInput,
+  input: unknown,
 ): ValidatedIncomingCrmAppointment {
-  assertPositiveInteger(input.contactId, 'contactId');
-  assertNonEmptyString(input.title, 'title');
-  assertNonEmptyString(input.externalId, 'externalId');
-  const startsAt = parseIsoTimestamp(input.startsAt, 'startsAt');
-  const endsAt = parseIsoTimestamp(input.endsAt, 'endsAt');
-  assertNonEmptyString(input.status, 'status');
-  assertSupportedStatus(input.status);
+  if (input === null || typeof input !== 'object' || Array.isArray(input)) {
+    throw new Error('incoming CRM appointment must be an object');
+  }
 
-  if (endsAt <= startsAt) {
+  const record = input as Record<string, unknown>;
+  assertPositiveInteger(record.contactId, 'contactId');
+  assertNonEmptyString(record.title, 'title');
+  assertNonEmptyString(record.externalId, 'externalId');
+  const startsAt = parseIsoTimestamp(record.startsAt, 'startsAt');
+  const endsAt = parseIsoTimestamp(record.endsAt, 'endsAt');
+  assertNonEmptyString(record.status, 'status');
+  assertSupportedStatus(record.status);
+
+  if (endsAt.timestamp <= startsAt.timestamp) {
     throw new Error('endsAt must be after startsAt');
   }
 
   return {
-    ...input,
+    contactId: record.contactId,
+    title: record.title,
+    externalId: record.externalId,
+    startsAt: startsAt.isoTimestamp,
+    endsAt: endsAt.isoTimestamp,
+    status: record.status,
     syncDecision: resolveSyncConflict({
       entity: 'appointment',
       incomingSource: 'crm',

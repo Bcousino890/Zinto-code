@@ -33,7 +33,10 @@ function assertPositiveInteger(value: unknown, field: 'contactId'): asserts valu
 }
 
 function assertSupportedStatus(value: unknown): asserts value is ContactAppointmentStatus {
-  if (typeof value !== 'string' || !CONTACT_APPOINTMENT_STATUSES.includes(value as ContactAppointmentStatus)) {
+  if (
+    typeof value !== 'string' ||
+    !CONTACT_APPOINTMENT_STATUSES.some((status) => status === value)
+  ) {
     throw new Error('status must be a supported appointment status');
   }
 }
@@ -42,7 +45,11 @@ function parseIsoTimestamp(
   value: unknown,
   field: 'startsAt' | 'endsAt',
 ): { isoTimestamp: string; timestamp: number } {
-  const match = typeof value === 'string' ? ISO_TIMESTAMP_PATTERN.exec(value) : null;
+  if (typeof value !== 'string') {
+    throw new Error(`${field} must be a valid ISO timestamp`);
+  }
+
+  const match = ISO_TIMESTAMP_PATTERN.exec(value);
   if (!match) {
     throw new Error(`${field} must be a valid ISO timestamp`);
   }

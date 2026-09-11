@@ -53,7 +53,7 @@ function assertTenantRecord(record: ScopedRecord | undefined, companyId: number,
 }
 
 function assertPositiveInteger(value: unknown, label: string): asserts value is number {
-  if (!Number.isSafeInteger(value) || value <= 0) {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value <= 0) {
     throw new Error(`${label} must be a positive integer`);
   }
 }

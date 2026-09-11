@@ -502,7 +502,7 @@ export function CampaignDashboard() {
           <Link href="/campaigns/email/new">
             <Button variant="outline" className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              New Email Campaign
+              {t('campaigns.new_email_campaign', 'New Email Campaign')}
             </Button>
           </Link>
           <Link href="/campaigns/new">
@@ -631,7 +631,7 @@ export function CampaignDashboard() {
                           Email
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-muted-foreground">WhatsApp</Badge>
+                        <Badge variant="outline" className="text-muted-foreground">{t('campaigns.channel.whatsapp', 'WhatsApp')}</Badge>
                       )}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">

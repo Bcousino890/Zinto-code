@@ -408,7 +408,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Delete node</p>
+              <p className="text-xs">{t('flow_builder.delete_node', 'Delete node')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -436,7 +436,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <span>Documind Integration</span>
+        <span>{t('flow_builder.documind_integration_title', 'Documind Integration')}</span>
 
         {/* Configuration Progress Badge */}
         <TooltipProvider>
@@ -449,13 +449,13 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                   configurationProgress >= 70 ? "bg-primary/10 text-primary" : "bg-muted/50 text-muted-foreground"
                 )}
               >
-                {configurationProgress}% configured
+{t('flow_builder.documind_configured_percent', '{{progress}}% configured', { progress: configurationProgress })}
               </Badge>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Configuration completeness: {configurationProgress}%</p>
+              <p className="text-xs">{t('flow_builder.documind_config_completeness', 'Configuration completeness: {{progress}}%', { progress: configurationProgress })}</p>
               <p className="text-xs text-muted-foreground">
-                {configurationProgress < 70 ? "Complete required fields to reach 70%" : "Configuration ready!"}
+                {configurationProgress < 70 ? t('flow_builder.documind_config_incomplete', 'Complete required fields to reach 70%') : t('flow_builder.documind_config_ready', 'Configuration ready!')}
               </p>
             </TooltipContent>
           </Tooltip>
@@ -473,7 +473,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
               </button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">{isEditing ? 'Hide configuration panel' : 'Show configuration panel'}</p>
+              <p className="text-xs">{isEditing ? t('flow_builder.documind_hide_config', 'Hide configuration panel') : t('flow_builder.documind_show_config', 'Show configuration panel')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -510,15 +510,15 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                     <AlertCircle className="h-3 w-3 text-muted-foreground" />
                   )}
                   <span className="text-xs text-muted-foreground">
-                    {connectionStatus === 'success' && selectedFolder ? 'Ready' : 'Setup Required'}
+                    {connectionStatus === 'success' && selectedFolder ? t('flow_builder.ready', 'Ready') : t('flow_builder.setup_required', 'Setup Required')}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent side="top">
                 <p className="text-xs">
                   {connectionStatus === 'success' && selectedFolder
-                    ? 'Documind is configured and ready to use'
-                    : 'Complete API key and folder configuration'}
+                    ? t('flow_builder.documind_ready_use', 'Documind is configured and ready to use')
+                    : t('flow_builder.documind_complete_config', 'Complete API key and folder configuration')}
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -539,18 +539,18 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground">
               <div className="flex items-center gap-2">
-                <span className="font-medium">Operation:</span>
+                <span className="font-medium">{t('flow_builder.documind_operation_label', 'Operation:')}</span>
                 <span>{DOCUMIND_OPERATIONS.find(op => op.id === operation)?.name || 'Ask Question'}</span>
               </div>
               {selectedFolder && (
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="font-medium">Folder:</span>
+                  <span className="font-medium">{t('flow_builder.documind_folder_label', 'Folder:')}</span>
                   <span>{folders.find(f => f.id === selectedFolder)?.name || selectedFolder}</span>
                 </div>
               )}
               {files.length > 0 && (
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="font-medium">Files:</span>
+                  <span className="font-medium">{t('flow_builder.documind_files_label', 'Files:')}</span>
                   <span>{files.length} document{files.length !== 1 ? 's' : ''}</span>
                 </div>
               )}
@@ -561,8 +561,8 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                 connectionStatus === 'error' ? 'bg-destructive' : 'bg-muted-foreground'
               }`} />
               <span className="text-muted-foreground">
-                {connectionStatus === 'success' ? 'Connected' :
-                 connectionStatus === 'error' ? 'Connection Error' : 'Not Connected'}
+                {connectionStatus === 'success' ? t('flow_builder.documind_connected', 'Connected') :
+                 connectionStatus === 'error' ? t('flow_builder.documind_connection_error', 'Connection Error') : t('flow_builder.documind_not_connected', 'Not Connected')}
               </span>
             </div>
           </div>
@@ -572,7 +572,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
             {/* API Key Configuration */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-medium">API Key</Label>
+                <Label className="text-xs font-medium">{t('flow_builder.documind_api_key', 'API Key')}</Label>
                 <Button
                   type="button"
                   variant="outline"
@@ -586,14 +586,14 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                   ) : (
                     <CheckCircle className="h-3 w-3 mr-1" />
                   )}
-                  Test Connection
+                  {t('flow_builder.documind_test_connection', 'Test Connection')}
                 </Button>
               </div>
               <Input
                 type="password"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your Documind API key"
+                placeholder={t('flow_builder.documind_api_key_placeholder', 'Enter your Documind API key')}
                 className="text-xs h-7"
               />
               {connectionMessage && (
@@ -614,7 +614,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                 className="h-6 px-2 text-xs text-primary hover:text-primary/80"
               >
                 <ExternalLink className="h-3 w-3 mr-1" />
-                Get API Key
+                {t('flow_builder.documind_get_api_key', 'Get API Key')}
               </Button>
             </div>
 
@@ -622,7 +622,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
               <>
                 {/* Folder Selection */}
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Folder</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.documind_folder', 'Folder')}</Label>
                   <div className="flex gap-2">
                     <Select
                       value={selectedFolder}
@@ -634,7 +634,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                       }}
                     >
                       <SelectTrigger className="text-xs h-7 flex-1">
-                        <SelectValue placeholder="Choose a folder" />
+                        <SelectValue placeholder={t('flow_builder.documind_choose_folder', 'Choose a folder')} />
                       </SelectTrigger>
                       <SelectContent>
                         {folders.map((folder) => (
@@ -670,7 +670,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Delete folder</p>
+                            <p>{t('flow_builder.documind_delete_folder', 'Delete folder')}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -681,7 +681,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      const folderName = window.prompt('Enter folder name:');
+                      const folderName = window.prompt(t('flow_builder.documind_enter_folder_name', 'Enter folder name:'));
                       if (folderName) {
                         createFolder(folderName);
                       }
@@ -689,7 +689,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                     className="h-6 px-2 text-xs w-full"
                   >
                     <Folder className="h-3 w-3 mr-1" />
-                    Create Folder
+                    {t('flow_builder.documind_create_folder', 'Create Folder')}
                   </Button>
                   {folders.length > 0 && (
                     <p className="text-[10px] text-muted-foreground text-center">
@@ -701,7 +701,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                 {/* Files Section */}
                 {selectedFolder && (
                   <div className="space-y-2">
-                    <Label className="text-xs font-medium">Files</Label>
+                    <Label className="text-xs font-medium">{t('flow_builder.documind_files', 'Files')}</Label>
                     <Button
                       type="button"
                       variant="outline"
@@ -726,7 +726,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                       ) : (
                         <Upload className="h-3 w-3 mr-1" />
                       )}
-                      {isUploadingFile ? 'Uploading...' : 'Upload PDF'}
+                      {isUploadingFile ? t('flow_builder.documind_uploading', 'Uploading...') : t('flow_builder.documind_upload_pdf', 'Upload PDF')}
                     </Button>
                     {files.length > 0 && (
                       <TooltipProvider>
@@ -758,7 +758,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p className="text-xs">Delete file</p>
+                                  <p className="text-xs">{t('flow_builder.documind_delete_file', 'Delete file')}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </div>
@@ -776,10 +776,10 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
 
                 {/* Operation Selection */}
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Operation</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.documind_operation', 'Operation')}</Label>
                   <Select value={operation} onValueChange={setOperation}>
                     <SelectTrigger className="text-xs h-7">
-                      <SelectValue placeholder="Select operation" />
+                      <SelectValue placeholder={t('flow_builder.documind_select_operation', 'Select operation')} />
                     </SelectTrigger>
                     <SelectContent>
                       {DOCUMIND_OPERATIONS.map((op) => (
@@ -798,7 +798,7 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                 {/* System Prompt Configuration */}
                 <div className="space-y-2 mt-3">
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-medium">System Prompt</Label>
+                    <Label className="text-xs font-medium">{t('flow_builder.documind_system_prompt', 'System Prompt')}</Label>
                     <span className={`text-[10px] ${systemPrompt.length > 500 ? 'text-destructive' : 'text-muted-foreground'}`}>{systemPrompt.length}/500</span>
                   </div>
                   <Textarea
@@ -807,11 +807,11 @@ export function DocumindNode({ id, data, isConnectable }: DocumindNodeProps) {
                       const value = e.target.value.length > 500 ? e.target.value.slice(0, 500) : e.target.value;
                       setSystemPrompt(value);
                     }}
-                    placeholder="Enter system instructions to guide the AI's response (e.g., 'Answer in a professional tone', 'Provide bullet points', 'Focus on technical details')"
+                    placeholder={t('flow_builder.documind_system_prompt_placeholder', 'Enter system instructions to guide the AI\'s response (e.g., \'Answer in a professional tone\', \'Provide bullet points\', \'Focus on technical details\')')}
                     className="text-xs min-h-[80px]"
                   />
                   <p className="text-[10px] text-muted-foreground">
-                    Supports variables like {'{{contact.name}}'}, {'{{message.content}}'}. These will be replaced at runtime.
+                    {t('flow_builder.documind_variables_support', 'Supports variables like {{contact.name}}, {{message.content}}. These will be replaced at runtime.')}
                   </p>
                 </div>
 

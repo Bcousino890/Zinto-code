@@ -578,11 +578,11 @@ Leave clear space in the top-left on the first and last cards so the logo does n
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="gemini-3.1-pro-preview">Gemini 3.1 Pro (recommended)</SelectItem>
-                      <SelectItem value="gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
-                      <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash</SelectItem>
-                      <SelectItem value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</SelectItem>
-                      <SelectItem value="gemini-3.5-flash">Gemini 3.5 Flash (thinking)</SelectItem>
+                      <SelectItem value="gemini-3.1-pro-preview">{t('flow_builder.gamma.gemini_3_1_pro', 'Gemini 3.1 Pro (recommended)')}</SelectItem>
+                      <SelectItem value="gemini-2.5-pro">{t('flow_builder.gamma.gemini_2_5_pro', 'Gemini 2.5 Pro')}</SelectItem>
+                      <SelectItem value="gemini-2.5-flash">{t('flow_builder.gamma.gemini_2_5_flash', 'Gemini 2.5 Flash')}</SelectItem>
+                      <SelectItem value="gemini-2.5-flash-lite">{t('flow_builder.gamma.gemini_2_5_flash_lite', 'Gemini 2.5 Flash-Lite')}</SelectItem>
+                      <SelectItem value="gemini-3.5-flash">{t('flow_builder.gamma.gemini_3_5_flash', 'Gemini 3.5 Flash (thinking)')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -719,7 +719,7 @@ Leave clear space in the top-left on the first and last cards so the logo does n
                   <SelectContent>
                     <SelectItem value="pdf">PDF</SelectItem>
                     <SelectItem value="pptx">PPTX</SelectItem>
-                    <SelectItem value="png">PNG (per card)</SelectItem>
+                    <SelectItem value="png">{t('flow_builder.gamma.export_format_png', 'PNG (per card)')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -849,12 +849,12 @@ Leave clear space in the top-left on the first and last cards so the logo does n
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="topLeft">Top Left</SelectItem>
-                        <SelectItem value="topCenter">Top Center</SelectItem>
-                        <SelectItem value="topRight">Top Right</SelectItem>
-                        <SelectItem value="bottomLeft">Bottom Left</SelectItem>
-                        <SelectItem value="bottomCenter">Bottom Center</SelectItem>
-                        <SelectItem value="bottomRight">Bottom Right</SelectItem>
+                        <SelectItem value="topLeft">{t('flow_builder.gamma.position_top_left', 'Top Left')}</SelectItem>
+                        <SelectItem value="topCenter">{t('flow_builder.gamma.position_top_center', 'Top Center')}</SelectItem>
+                        <SelectItem value="topRight">{t('flow_builder.gamma.position_top_right', 'Top Right')}</SelectItem>
+                        <SelectItem value="bottomLeft">{t('flow_builder.gamma.position_bottom_left', 'Bottom Left')}</SelectItem>
+                        <SelectItem value="bottomCenter">{t('flow_builder.gamma.position_bottom_center', 'Bottom Center')}</SelectItem>
+                        <SelectItem value="bottomRight">{t('flow_builder.gamma.position_bottom_right', 'Bottom Right')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -870,10 +870,10 @@ Leave clear space in the top-left on the first and last cards so the logo does n
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="sm">sm (small)</SelectItem>
-                        <SelectItem value="md">md (medium)</SelectItem>
-                        <SelectItem value="lg">lg (large)</SelectItem>
-                        <SelectItem value="xl">xl (extra large)</SelectItem>
+                        <SelectItem value="sm">{t('flow_builder.gamma.size_sm', 'sm (small)')}</SelectItem>
+                        <SelectItem value="md">{t('flow_builder.gamma.size_md', 'md (medium)')}</SelectItem>
+                        <SelectItem value="lg">{t('flow_builder.gamma.size_lg', 'lg (large)')}</SelectItem>
+                        <SelectItem value="xl">{t('flow_builder.gamma.size_xl', 'xl (extra large)')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

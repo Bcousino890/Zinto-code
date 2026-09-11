@@ -3,12 +3,14 @@ import { CheckCircle, XCircle, AlertCircle, Clock, Users, Activity, ExternalLink
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface Props {
   configStatus: any;
 }
 
 export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
+  const { t } = useTranslation();
   const health = configStatus?.health || {};
   const checks = health?.checks || {};
   const metrics = health?.metrics || {};
@@ -47,10 +49,10 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Activity className="w-5 h-5 mr-2" />
-            Overall Health Status
+            {t('meta_config.overall_health_status', 'Overall Health Status')}
           </CardTitle>
           <CardDescription>
-            Last checked: {formatTimestamp(health?.timestamp)}
+            {t('meta_config.last_checked', 'Last checked')}: {formatTimestamp(health?.timestamp)}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -59,7 +61,7 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
             <span className="text-lg font-medium capitalize">{health?.status || 'Unknown'}</span>
             {metrics.responseTime && (
               <span className="text-sm text-gray-600">
-                Response Time: {metrics.responseTime}ms
+                {t('meta_config.response_time', 'Response Time')}: {metrics.responseTime}ms
               </span>
             )}
           </div>
@@ -69,13 +71,13 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
       {/* Health Checks */}
       <Card>
         <CardHeader>
-          <CardTitle>Health Checks</CardTitle>
+          <CardTitle>{t('meta_config.health_checks', 'Health Checks')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               {getStatusIcon(checks.credentials?.valid)}
-              <span>Credentials</span>
+              <span>{t('meta_config.credentials', 'Credentials')}</span>
             </div>
             {checks.credentials?.error && (
               <span className="text-sm text-red-500">{checks.credentials.error}</span>
@@ -85,7 +87,7 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               {getStatusIcon(checks.webhook?.reachable)}
-              <span>Webhook Connectivity</span>
+              <span>{t('meta_config.webhook_connectivity', 'Webhook Connectivity')}</span>
             </div>
             {checks.webhook?.error && (
               <span className="text-sm text-red-500">{checks.webhook.error}</span>
@@ -95,7 +97,7 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               {getStatusIcon(checks.subscriptions?.valid)}
-              <span>Webhook Subscriptions</span>
+              <span>{t('meta_config.webhook_subscriptions', 'Webhook Subscriptions')}</span>
             </div>
             {checks.subscriptions?.error && (
               <span className="text-sm text-red-500">{checks.subscriptions.error}</span>
@@ -105,7 +107,7 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               {getStatusIcon(checks.api?.accessible)}
-              <span>API Accessibility</span>
+              <span>{t('meta_config.api_accessibility', 'API Accessibility')}</span>
             </div>
             {checks.api?.error && (
               <span className="text-sm text-red-500">{checks.api.error}</span>
@@ -120,19 +122,19 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
           <CardHeader>
             <CardTitle className="text-sm font-medium flex items-center">
               <Clock className="w-4 h-4 mr-2" />
-              Validation
+              {t('meta_config.validation', 'Validation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">
               <div>
-                <span className="text-gray-600">Last Validated:</span>
+                <span className="text-gray-600">{t('meta_config.last_validated', 'Last Validated')}:</span>
                 <span className="ml-2 font-medium">
                   {formatTimestamp(configStatus?.lastValidatedAt)}
                 </span>
               </div>
               <div>
-                <span className="text-gray-600">Validation Status:</span>
+                <span className="text-gray-600">{t('meta_config.validation_status', 'Validation Status')}:</span>
                 <Badge className="ml-2" variant={configStatus?.health?.status === 'healthy' ? 'default' : 'destructive'}>
                   {configStatus?.health?.status || 'Unknown'}
                 </Badge>
@@ -145,17 +147,17 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
           <CardHeader>
             <CardTitle className="text-sm font-medium flex items-center">
               <Users className="w-4 h-4 mr-2" />
-              Usage Statistics
+              {t('meta_config.usage_statistics', 'Usage Statistics')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">
               <div>
-                <span className="text-gray-600">Companies Using:</span>
+                <span className="text-gray-600">{t('meta_config.companies_using', 'Companies Using')}:</span>
                 <span className="ml-2 font-medium">{configStatus?.usageCount || 0}</span>
               </div>
               <div>
-                <span className="text-gray-600">Last Used:</span>
+                <span className="text-gray-600">{t('meta_config.last_used', 'Last Used')}:</span>
                 <span className="ml-2 font-medium">
                   {formatTimestamp(configStatus?.lastUsedAt)}
                 </span>
@@ -169,7 +171,7 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
       {configStatus?.config?.webhookFieldSubscriptions && (
         <Card>
           <CardHeader>
-            <CardTitle>Webhook Field Subscriptions</CardTitle>
+            <CardTitle>{t('meta_config.webhook_field_subscriptions', 'Webhook Field Subscriptions')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -181,12 +183,12 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
                     {subscription?.subscribed ? (
                       <Badge variant="default">
                         <CheckCircle className="w-3 h-3 mr-1" />
-                        Subscribed
+                        {t('meta_config.subscribed', 'Subscribed')}
                       </Badge>
                     ) : (
                       <Badge variant="outline">
                         <XCircle className="w-3 h-3 mr-1" />
-                        Not Subscribed
+                        {t('meta_config.not_subscribed', 'Not Subscribed')}
                       </Badge>
                     )}
                   </div>
@@ -203,22 +205,22 @@ export function MetaConfigurationStatusDashboard({ configStatus }: Props) {
           <CardHeader>
             <CardTitle className="text-sm flex items-center">
               <AlertCircle className="w-4 h-4 mr-2 text-yellow-600" />
-              Troubleshooting Tips
+              {t('meta_config.troubleshooting_tips', 'Troubleshooting Tips')}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-yellow-800">
             <ul className="list-disc pl-5 space-y-1">
               {!checks.credentials?.valid && (
-                <li>Verify your App ID, App Secret, and Business Manager ID are correct</li>
+                <li>{t('meta_config.troubleshooting_credentials', 'Verify your App ID, App Secret, and Business Manager ID are correct')}</li>
               )}
               {!checks.webhook?.reachable && (
-                <li>Ensure your webhook URL is publicly accessible and uses HTTPS</li>
+                <li>{t('meta_config.troubleshooting_webhook', 'Ensure your webhook URL is publicly accessible and uses HTTPS')}</li>
               )}
               {!checks.subscriptions?.valid && (
-                <li>Check that webhook subscriptions are properly configured in Meta Business Manager</li>
+                <li>{t('meta_config.troubleshooting_subscriptions', 'Check that webhook subscriptions are properly configured in Meta Business Manager')}</li>
               )}
               {!checks.api?.accessible && (
-                <li>Verify your access token has the required permissions</li>
+                <li>{t('meta_config.troubleshooting_token', 'Verify your access token has the required permissions')}</li>
               )}
             </ul>
           </CardContent>

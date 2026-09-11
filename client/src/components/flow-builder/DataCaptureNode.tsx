@@ -454,7 +454,7 @@ export function DataCaptureNode({ id, data, isConnectable }: DataCaptureNodeProp
                   <DataCaptureHelpContent />
                   <DialogPrimitive.Close className={dialogCloseButtonClassName}>
                     <X className="h-4 w-4" />
-                    <span className="sr-only">Close</span>
+                    <span className="sr-only">{t('flow_builder.close', 'Close')}</span>
                   </DialogPrimitive.Close>
                 </DialogPrimitive.Content>
               </DialogPrimitive.Portal>
@@ -1070,7 +1070,7 @@ function DataCaptureHelpContent() {
                 {t('flow_builder.data_capture_help_regex', 'Uses regular expressions to extract specific patterns from messages.')}
               </p>
               <div className="bg-muted rounded p-2 text-xs font-mono space-y-1">
-                <div><strong>Common Patterns:</strong></div>
+                <div><strong>{t('flow_builder.data_capture_help_common_patterns', 'Common Patterns:')}</strong></div>
                 <div>Name: My name is ([\p&#123;L&#125;]+(?:[\s'-][\p&#123;L&#125;]+)*)</div>
                 <div>Email: ([a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]&#123;2,&#125;)</div>
                 <div>Phone: (\\+?[\\d\\s\\-\\(\\)]&#123;10,15&#125;)</div>
@@ -1150,13 +1150,14 @@ function DataCaptureHelpContent() {
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
               <h4 className="font-medium text-sm mb-2">{t('flow_builder.data_capture_help_variables_work', 'How Variables Work')}</h4>
               <p className="text-xs text-foreground mb-2">
-                Once captured, data becomes available as <code className="bg-muted px-1 rounded">&#123;&#123;variable_name&#125;&#125;</code> tokens
-                that can be used in any subsequent node in your flow.
+                {t('flow_builder.data_capture_help_variables_work_desc_pre', 'Once captured, data becomes available as')}{' '}
+                <code className="bg-muted px-1 rounded">&#123;&#123;variable_name&#125;&#125;</code>{' '}
+                {t('flow_builder.data_capture_help_variables_work_desc_post', 'tokens that can be used in any subsequent node in your flow.')}
               </p>
               <div className="bg-card rounded p-2 text-xs font-mono">
-                Captured: user_name = "John"<br/>
-                Usage: "Hello &#123;&#123;user_name&#125;&#125;, how can I help you today?"<br/>
-                Result: "Hello John, how can I help you today?"
+                {t('flow_builder.data_capture_help_captured_label', 'Captured:')} user_name = "John"<br/>
+                {t('flow_builder.data_capture_help_usage_label', 'Usage:')} "{t('flow_builder.data_capture_help_example_hello_usage', 'Hello {{user_name}}, how can I help you today?')}"<br/>
+                {t('flow_builder.data_capture_help_result_label', 'Result:')} "{t('flow_builder.data_capture_help_example_hello_result', 'Hello John, how can I help you today?')}"
               </div>
             </div>
 
@@ -1164,15 +1165,15 @@ function DataCaptureHelpContent() {
               <h4 className="font-medium text-sm mb-2">{t('flow_builder.data_capture_help_variable_scoping', 'Variable Scoping')}</h4>
               <div className="space-y-2">
                 <div className="flex items-start gap-2">
-                  <Badge variant="outline" className="text-xs">Session</Badge>
+                  <Badge variant="outline" className="text-xs">{t('flow_builder.data_capture_help_scope_session', 'Session')}</Badge>
                   <p className="text-xs text-muted-foreground">{t('flow_builder.data_capture_scope_session', 'Available during the current conversation only')}</p>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Badge variant="outline" className="text-xs">Flow</Badge>
+                  <Badge variant="outline" className="text-xs">{t('flow_builder.data_capture_help_scope_flow', 'Flow')}</Badge>
                   <p className="text-xs text-muted-foreground">{t('flow_builder.data_capture_scope_flow', 'Available throughout the entire flow execution')}</p>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Badge variant="outline" className="text-xs">Global</Badge>
+                  <Badge variant="outline" className="text-xs">{t('flow_builder.data_capture_help_scope_global', 'Global')}</Badge>
                   <p className="text-xs text-muted-foreground">{t('flow_builder.data_capture_scope_global', 'Available across all flows for this contact')}</p>
                 </div>
               </div>
@@ -1231,20 +1232,20 @@ function DataCaptureHelpContent() {
               <h4 className="font-medium text-sm mb-2">{t('flow_builder.data_capture_example1', 'Example 1: Contact Information Collection')}</h4>
               <div className="space-y-2 text-xs">
                 <div className="bg-card rounded p-2">
-                  <strong>User Message:</strong> "Hi, my name is Abid Shafi and my email is abid@pointer.pk"
+                  <strong>{t('flow_builder.data_capture_help_user_message_label', 'User Message:')}</strong> "Hi, my name is Abid Shafi and my email is abid@pointer.pk"
                 </div>
                 <div className="bg-muted rounded p-2 font-mono">
-                  <strong>Capture Rules:</strong><br/>
+                  <strong>{t('flow_builder.data_capture_help_capture_rules_label', 'Capture Rules:')}</strong><br/>
                   Rule 1: user_name | Regex Extract | My name is ([\p&#123;L&#125;]+(?:[\s'-][\p&#123;L&#125;]+)*)<br/>
                   Rule 2: user_email | Regex Extract | ([a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]&#123;2,&#125;)
                 </div>
                 <div className="bg-primary/10 rounded p-2">
-                  <strong>Result:</strong><br/>
+                  <strong>{t('flow_builder.data_capture_help_result_label', 'Result:')}</strong><br/>
                   &#123;&#123;user_name&#125;&#125; = "Abid Shafi"<br/>
                   &#123;&#123;user_email&#125;&#125; = "abid@pointer.pk"
                 </div>
                 <div className="bg-primary/10 rounded p-2">
-                  <strong>Usage in Next Node:</strong><br/>
+                  <strong>{t('flow_builder.data_capture_help_usage_in_next_node_label', 'Usage in Next Node:')}</strong><br/>
                   "Thank you &#123;&#123;user_name&#125;&#125;! I'll send the information to &#123;&#123;user_email&#125;&#125;."
                 </div>
               </div>
@@ -1255,17 +1256,17 @@ function DataCaptureHelpContent() {
               <h4 className="font-medium text-sm mb-2">{t('flow_builder.data_capture_example2', 'Example 2: Order Status Inquiry')}</h4>
               <div className="space-y-2 text-xs">
                 <div className="bg-card rounded p-2">
-                  <strong>User Message:</strong> "I need help with order #ORD-12345"
+                  <strong>{t('flow_builder.data_capture_help_user_message_label', 'User Message:')}</strong> "I need help with order #ORD-12345"
                 </div>
                 <div className="bg-muted rounded p-2 font-mono">
-                  <strong>Capture Rule:</strong><br/>
+                  <strong>{t('flow_builder.data_capture_help_capture_rule_label', 'Capture Rule:')}</strong><br/>
                   order_id | Regex Extract | order[\\s#]*([A-Z0-9-]+)
                 </div>
                 <div className="bg-primary/10 rounded p-2">
-                  <strong>Result:</strong> &#123;&#123;order_id&#125;&#125; = "ORD-12345"
+                  <strong>{t('flow_builder.data_capture_help_result_label', 'Result:')}</strong> &#123;&#123;order_id&#125;&#125; = "ORD-12345"
                 </div>
                 <div className="bg-primary/10 rounded p-2">
-                  <strong>Usage:</strong> Pass to API call node to fetch order details
+                  <strong>{t('flow_builder.data_capture_help_usage_label', 'Usage:')}</strong> Pass to API call node to fetch order details
                 </div>
               </div>
             </div>
@@ -1275,12 +1276,12 @@ function DataCaptureHelpContent() {
               <h4 className="font-medium text-sm mb-2">{t('flow_builder.data_capture_example3', 'Example 3: Guided questions (Custom Prompt)')}</h4>
               <div className="space-y-2 text-xs">
                 <div className="bg-muted rounded p-2 font-mono">
-                  <strong>Capture Rules (form mode):</strong><br/>
+                  <strong>{t('flow_builder.data_capture_help_capture_rules_form_mode_label', 'Capture Rules (form mode):')}</strong><br/>
                   visit_reason | Custom Prompt | “What brings you in today?”<br/>
                   preferred_contact | Custom Prompt | “Email or phone?”
                 </div>
                 <div className="bg-primary/10 rounded p-2">
-                  <strong>Usage:</strong>{' '}
+                  <strong>{t('flow_builder.data_capture_help_usage_label', 'Usage:')}</strong>{' '}
                   {t(
                     'flow_builder.data_capture_example3_usage',
                     'Each rule is asked in order; replies are stored as variables for later nodes.'

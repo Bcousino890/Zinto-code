@@ -489,15 +489,15 @@ export function DocumentList({
                     {/* Document Info */}
                     <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 dark:bg-muted/20 rounded-lg border border-border">
                       <div>
-                        <span className="text-sm font-medium text-foreground">File Type:</span>
+                        <span className="text-sm font-medium text-foreground">{t('knowledge_base.file_type', 'File Type:')}</span>
                         <p className="text-sm text-muted-foreground">{previewDocument.mimeType}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-foreground">Status:</span>
+                        <span className="text-sm font-medium text-foreground">{t('knowledge_base.status', 'Status:')}</span>
                         <p className="text-sm text-muted-foreground">{getStatusBadge(previewDocument.status)}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-foreground">Processing Time:</span>
+                        <span className="text-sm font-medium text-foreground">{t('knowledge_base.processing_time', 'Processing Time:')}</span>
                         <p className="text-sm text-muted-foreground">
                           {previewDocument.processingDurationMs
                             ? `${Math.round(previewDocument.processingDurationMs / 1000)}s`
@@ -506,7 +506,7 @@ export function DocumentList({
                         </p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-foreground">Chunks:</span>
+                        <span className="text-sm font-medium text-foreground">{t('knowledge_base.chunks', 'Chunks:')}</span>
                         <p className="text-sm text-muted-foreground">{previewDocument.chunkCount}</p>
                       </div>
                     </div>
@@ -600,7 +600,7 @@ export function DocumentList({
             {/* Close button */}
             <DialogClose className={dialogCloseButtonClassName}>
               <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
+              <span className="sr-only">{t('knowledge_base.document_list.close', 'Close')}</span>
             </DialogClose>
           </DialogPrimitive.Content>
         </DialogPortal>

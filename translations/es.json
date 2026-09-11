@@ -832,6 +832,46 @@
     "value": "Los datos de análisis de afiliados se han actualizado."
   },
   {
+    "key": "admin.affiliate.report.column_conversion_rate",
+    "value": "Tasa de conversión"
+  },
+  {
+    "key": "admin.affiliate.report.column_conversions",
+    "value": "Conversiones"
+  },
+  {
+    "key": "admin.affiliate.report.column_name",
+    "value": "Nombre"
+  },
+  {
+    "key": "admin.affiliate.report.column_revenue",
+    "value": "Ingresos"
+  },
+  {
+    "key": "admin.affiliate.report.heading",
+    "value": "Informe de desempeño de afiliados"
+  },
+  {
+    "key": "admin.affiliate.report.no_metrics",
+    "value": "No hay métricas disponibles."
+  },
+  {
+    "key": "admin.affiliate.report.no_performers",
+    "value": "No hay datos de principales actores disponibles."
+  },
+  {
+    "key": "admin.affiliate.report.summary_heading",
+    "value": "Resumen"
+  },
+  {
+    "key": "admin.affiliate.report.title",
+    "value": "Informe de afiliados"
+  },
+  {
+    "key": "admin.affiliate.report.top_performers_heading",
+    "value": "Principales actores"
+  },
+  {
     "key": "admin.affiliate.settings.commission_rate_label",
     "value": "Tasa de comisión de la página de registro (%)"
   },
@@ -1476,6 +1516,34 @@
     "value": "+{{count}} en el último período"
   },
   {
+    "key": "admin.auth.adminLoginPreview",
+    "value": "Vista previa de inicio de sesión del administrador"
+  },
+  {
+    "key": "admin.auth.previewNotice",
+    "value": "Esta es una vista previa. Los cambios aún no se guardan."
+  },
+  {
+    "key": "admin.auth.previewTitle",
+    "value": "Vista previa de fondo de autenticación"
+  },
+  {
+    "key": "admin.auth.priorityColorGradient",
+    "value": "Solo color/gradiente"
+  },
+  {
+    "key": "admin.auth.priorityImageOnly",
+    "value": "Solo imagen"
+  },
+  {
+    "key": "admin.auth.priorityLayered",
+    "value": "En capas"
+  },
+  {
+    "key": "admin.auth.userLoginPreview",
+    "value": "Vista previa de inicio de sesión del usuario"
+  },
+  {
     "key": "admin.back_to_login",
     "value": "Volver al inicio de sesión del administrador"
   },
@@ -1548,6 +1616,14 @@
     "value": "Verificación profunda - prueba la restauración real en una base de datos temporal"
   },
   {
+    "key": "admin.backup.automatic_cleanup_desc",
+    "value": "Eliminar automáticamente copias de seguridad antiguas según el período de retención"
+  },
+  {
+    "key": "admin.backup.automatic_cleanup_title",
+    "value": "Limpieza automática"
+  },
+  {
     "key": "admin.backup.cleanup.last_failed",
     "value": "Última falla"
   },
@@ -1558,6 +1634,10 @@
   {
     "key": "admin.backup.cleanup.title",
     "value": "Limpieza de copias de seguridad"
+  },
+  {
+    "key": "admin.backup.cleanup_time_label",
+    "value": "Hora de limpieza"
   },
   {
     "key": "admin.backup.days.friday",
@@ -2620,6 +2700,30 @@
     "value": "Limpiar datos"
   },
   {
+    "key": "admin.companies.company_email_description",
+    "value": "Dirección de correo oficial de la empresa."
+  },
+  {
+    "key": "admin.companies.company_email_label",
+    "value": "Correo de empresa"
+  },
+  {
+    "key": "admin.companies.company_email_placeholder",
+    "value": "info@empresa.com"
+  },
+  {
+    "key": "admin.companies.contact_person_description",
+    "value": "Persona de contacto principal para la empresa."
+  },
+  {
+    "key": "admin.companies.contact_person_label",
+    "value": "Persona de contacto"
+  },
+  {
+    "key": "admin.companies.contact_person_placeholder",
+    "value": "Juan Pérez"
+  },
+  {
     "key": "admin.companies.delete",
     "value": "Eliminar"
   },
@@ -2940,6 +3044,22 @@
     "value": "El slug es obligatorio"
   },
   {
+    "key": "admin.companies.iban_description",
+    "value": "IBAN oficial KSA de la empresa (24 caracteres: SA + 22 dígitos)."
+  },
+  {
+    "key": "admin.companies.iban_invalid_error",
+    "value": "Por favor, introduce un IBAN KSA válido (p. ej., SA0380000000608010167519)"
+  },
+  {
+    "key": "admin.companies.iban_label",
+    "value": "Número de IBAN de la empresa (KSA)"
+  },
+  {
+    "key": "admin.companies.iban_placeholder",
+    "value": "SA03 8000 0000 6080 1016 7519"
+  },
+  {
     "key": "admin.companies.impersonate_description",
     "value": "Está a punto de iniciar sesión como usuario administrador para {{name}}. Esto le permitirá acceder al panel de la empresa y realizar acciones como administrador de la empresa."
   },
@@ -3048,6 +3168,18 @@
     "value": "Actualizar"
   },
   {
+    "key": "admin.companies.registration_number_description",
+    "value": "Número de registro comercial de 10 dígitos (CR) emitido por el Ministerio de Comercio de KSA."
+  },
+  {
+    "key": "admin.companies.registration_number_label",
+    "value": "Número de registro comercial (KSA)"
+  },
+  {
+    "key": "admin.companies.registration_number_placeholder",
+    "value": "1234567890"
+  },
+  {
     "key": "admin.companies.search_placeholder",
     "value": "Buscar empresas..."
   },
@@ -3112,6 +3244,10 @@
     "value": "Proceder al paso final"
   },
   {
+    "key": "admin.company_data_clear.clear_selection",
+    "value": "Limpiar selección"
+  },
+  {
     "key": "admin.company_data_clear.confirm.description",
     "value": "Para confirmar la eliminación de datos, escribe el nombre exacto de la empresa"
   },
@@ -3140,12 +3276,28 @@
     "value": "Confirmación final"
   },
   {
+    "key": "admin.company_data_clear.items_unit",
+    "value": "elementos"
+  },
+  {
     "key": "admin.company_data_clear.messages.error_title",
     "value": "Error al borrar datos"
   },
   {
     "key": "admin.company_data_clear.messages.success_title",
     "value": "Datos borrados correctamente"
+  },
+  {
+    "key": "admin.company_data_clear.no_data_to_clear",
+    "value": "No hay datos para borrar"
+  },
+  {
+    "key": "admin.company_data_clear.note_content",
+    "value": "La cuenta de la empresa y los usuarios permanecerán activos. Solo se borrarán los tipos de datos seleccionados."
+  },
+  {
+    "key": "admin.company_data_clear.note_label",
+    "value": "Nota"
   },
   {
     "key": "admin.company_data_clear.preview.load_error",
@@ -3162,6 +3314,18 @@
   {
     "key": "admin.company_data_clear.preview.warnings_title",
     "value": "Advertencias importantes"
+  },
+  {
+    "key": "admin.company_data_clear.select_all",
+    "value": "Seleccionar todo"
+  },
+  {
+    "key": "admin.company_data_clear.select_data_types",
+    "value": "Selecciona los tipos de datos a borrar"
+  },
+  {
+    "key": "admin.company_data_clear.selected_data_types",
+    "value": "Tipos de datos seleccionados para borrar"
   },
   {
     "key": "admin.company_data_clear.steps.confirm_description",
@@ -3736,6 +3900,14 @@
     "value": "Error al volver al administrador"
   },
   {
+    "key": "admin.forgot_password.check_email_title",
+    "value": "Revisa tu correo electrónico"
+  },
+  {
+    "key": "admin.forgot_password.email_label",
+    "value": "Dirección de correo electrónico del administrador"
+  },
+  {
     "key": "admin.forgot_password_description",
     "value": "Introduce tu dirección de correo electrónico de administrador y te enviaremos un enlace seguro de restablecimiento."
   },
@@ -3942,6 +4114,22 @@
   {
     "key": "admin.languages_tab",
     "value": "Idiomas"
+  },
+  {
+    "key": "admin.licenseError",
+    "value": "⚠️ Error de licencia"
+  },
+  {
+    "key": "admin.licenseErrorReason",
+    "value": "Razón"
+  },
+  {
+    "key": "admin.licenseRenewHelp",
+    "value": "Renueva tu licencia o contacta a soporte para obtener ayuda."
+  },
+  {
+    "key": "admin.licenseValidationFailed",
+    "value": "Falló la validación de licencia"
   },
   {
     "key": "admin.login_description",
@@ -4216,16 +4404,68 @@
     "value": "Detalles de Pago de Empresas"
   },
   {
+    "key": "admin.payments.company_view.company_id_label",
+    "value": "ID de empresa:"
+  },
+  {
     "key": "admin.payments.company_view.company_info",
     "value": "Información de la empresa"
+  },
+  {
+    "key": "admin.payments.company_view.company_name_label",
+    "value": "Nombre de la empresa:"
+  },
+  {
+    "key": "admin.payments.company_view.current_plan_label",
+    "value": "Plan actual:"
   },
   {
     "key": "admin.payments.company_view.description",
     "value": "Información completa de pagos para esta empresa"
   },
   {
+    "key": "admin.payments.company_view.last_payment_label",
+    "value": "Último pago:"
+  },
+  {
+    "key": "admin.payments.company_view.member_since_label",
+    "value": "Miembro desde:"
+  },
+  {
+    "key": "admin.payments.company_view.next_renewal_label",
+    "value": "Próxima renovación:"
+  },
+  {
+    "key": "admin.payments.company_view.no_payment_method",
+    "value": "Sin método de pago registrado"
+  },
+  {
+    "key": "admin.payments.company_view.no_payments_yet",
+    "value": "Aún no hay pagos"
+  },
+  {
+    "key": "admin.payments.company_view.no_renewal_date",
+    "value": "Sin fecha de renovación establecida"
+  },
+  {
+    "key": "admin.payments.company_view.no_transactions",
+    "value": "No se encontraron transacciones de pago para esta empresa."
+  },
+  {
+    "key": "admin.payments.company_view.payment_method_label",
+    "value": "Método de pago:"
+  },
+  {
     "key": "admin.payments.company_view.payment_summary",
     "value": "Resumen de pagos"
+  },
+  {
+    "key": "admin.payments.company_view.showing_transactions",
+    "value": "Mostrando 5 de {{total}} transacciones"
+  },
+  {
+    "key": "admin.payments.company_view.status_label",
+    "value": "Estado:"
   },
   {
     "key": "admin.payments.company_view.subscription",
@@ -4234,6 +4474,10 @@
   {
     "key": "admin.payments.company_view.title",
     "value": "Detalles de pago de la empresa"
+  },
+  {
+    "key": "admin.payments.company_view.total_paid_label",
+    "value": "Total pagado:"
   },
   {
     "key": "admin.payments.company_view.transactions",
@@ -4246,6 +4490,14 @@
   {
     "key": "admin.payments.copied",
     "value": "Copiado al portapapeles"
+  },
+  {
+    "key": "admin.payments.copied_description",
+    "value": "El texto se copió al portapapeles."
+  },
+  {
+    "key": "admin.payments.copy_error",
+    "value": "No se pudo copiar al portapapeles"
   },
   {
     "key": "admin.payments.dashboard.short",
@@ -4266,6 +4518,10 @@
   {
     "key": "admin.payments.edit.confirm_status_change",
     "value": "¿Estás seguro de que deseas cambiar este pago completado nuevamente a {{status}}? Esta acción puede afectar la facturación y debe hacerse solo para corregir errores."
+  },
+  {
+    "key": "admin.payments.edit.dialog_description",
+    "value": "Modifica los detalles de la transacción de pago. Ten cuidado al cambiar pagos completados."
   },
   {
     "key": "admin.payments.edit.external_id",
@@ -4300,6 +4556,10 @@
     "value": "Editar transacción de pago"
   },
   {
+    "key": "admin.payments.edit.updated_description",
+    "value": "La transacción de pago se actualizó."
+  },
+  {
     "key": "admin.payments.export.button",
     "value": "Exportar Datos"
   },
@@ -4318,6 +4578,10 @@
   {
     "key": "admin.payments.export.title",
     "value": "Exportar Datos de Pago"
+  },
+  {
+    "key": "admin.payments.methods.bank_transfer",
+    "value": "Transferencia Bancaria"
   },
   {
     "key": "admin.payments.metrics.active_subscriptions",
@@ -4440,8 +4704,20 @@
     "value": "métodos"
   },
   {
+    "key": "admin.payments.performance.revenue_distribution",
+    "value": "Distribución de ingresos"
+  },
+  {
     "key": "admin.payments.performance.short",
     "value": "Rendimiento"
+  },
+  {
+    "key": "admin.payments.performance.success_rate",
+    "value": "Tasa de éxito"
+  },
+  {
+    "key": "admin.payments.performance.successful",
+    "value": "{{count}} exitosas"
   },
   {
     "key": "admin.payments.performance.table.avg_amount",
@@ -4468,12 +4744,24 @@
     "value": "Rendimiento del Método de Pago"
   },
   {
+    "key": "admin.payments.performance.transactions_count",
+    "value": "{{count}} transacciones"
+  },
+  {
+    "key": "admin.payments.reminders.dialog_description",
+    "value": "Envía un recordatorio de pago a la empresa seleccionada."
+  },
+  {
     "key": "admin.payments.reminders.message_placeholder",
     "value": "Ingrese el mensaje de recordatorio..."
   },
   {
     "key": "admin.payments.reminders.send_button",
     "value": "Enviar Recordatorio"
+  },
+  {
+    "key": "admin.payments.reminders.sent_to_company",
+    "value": "El recordatorio de pago se envió a la empresa."
   },
   {
     "key": "admin.payments.reminders.success",
@@ -4498,6 +4786,10 @@
   {
     "key": "admin.payments.status.pending",
     "value": "Pendiente"
+  },
+  {
+    "key": "admin.payments.status_update.marked_received",
+    "value": "El pago ha sido marcado como recibido."
   },
   {
     "key": "admin.payments.status_update.notes_placeholder",
@@ -4608,6 +4900,14 @@
     "value": "Transacciones de Pago"
   },
   {
+    "key": "admin.payments.trends.description",
+    "value": "Tendencias de ingresos y transacciones a lo largo del tiempo"
+  },
+  {
+    "key": "admin.payments.trends.empty",
+    "value": "No hay datos de tendencias disponibles"
+  },
+  {
     "key": "admin.payments.trends.period.12months",
     "value": "Últimos 12 Meses"
   },
@@ -4656,6 +4956,14 @@
     "value": "Creado"
   },
   {
+    "key": "admin.payments.view.dialog_description",
+    "value": "Información completa de la transacción #{{id}}"
+  },
+  {
+    "key": "admin.payments.view.external_transaction_id",
+    "value": "ID de transacción externa:"
+  },
+  {
     "key": "admin.payments.view.notes",
     "value": "Notas"
   },
@@ -4664,8 +4972,16 @@
     "value": "Detalles del método de pago"
   },
   {
+    "key": "admin.payments.view.payment_intent_id",
+    "value": "ID de intento de pago:"
+  },
+  {
     "key": "admin.payments.view.payment_method",
     "value": "Método de pago"
+  },
+  {
+    "key": "admin.payments.view.paypal_transaction_id",
+    "value": "ID de transacción de PayPal:"
   },
   {
     "key": "admin.payments.view.plan_id",
@@ -4676,8 +4992,16 @@
     "value": "Nombre del plan"
   },
   {
+    "key": "admin.payments.view.reference",
+    "value": "Referencia:"
+  },
+  {
     "key": "admin.payments.view.status",
     "value": "Estado"
+  },
+  {
+    "key": "admin.payments.view.stripe_payment_intent_id",
+    "value": "ID de intento de pago de Stripe:"
   },
   {
     "key": "admin.payments.view.title",
@@ -5524,8 +5848,32 @@
     "value": "Elegir imagen"
   },
   {
+    "key": "admin.settings.auth_backgrounds.deleted",
+    "value": "Fondo de autenticación de administrador eliminado"
+  },
+  {
     "key": "admin.settings.auth_backgrounds.description",
     "value": "Mantén organizados los fondos de inicio de sesión de administración y de usuario en paneles compactos."
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.error_uploading",
+    "value": "Error al subir el fondo de autenticación de administrador"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.error_uploading_user",
+    "value": "Error al subir el fondo de autenticación de usuario"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.failed_delete",
+    "value": "No se pudo eliminar el fondo de autenticación de administrador"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.failed_delete_user",
+    "value": "No se pudo eliminar el fondo de autenticación de usuario"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.failed_upload_user",
+    "value": "No se pudo subir el fondo de autenticación de usuario"
   },
   {
     "key": "admin.settings.auth_backgrounds.no_preview",
@@ -5544,6 +5892,14 @@
     "value": "Fondos de las páginas de autenticación"
   },
   {
+    "key": "admin.settings.auth_backgrounds.uploaded",
+    "value": "Fondo de autenticación de administrador subido"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.uploaded_desc",
+    "value": "El fondo de autenticación de administrador se subió correctamente."
+  },
+  {
     "key": "admin.settings.auth_backgrounds.user.alt",
     "value": "Fondo de autenticación de usuario"
   },
@@ -5554,6 +5910,18 @@
   {
     "key": "admin.settings.auth_backgrounds.user.label",
     "value": "Fondo de autenticación de usuario"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.user_deleted",
+    "value": "Fondo de autenticación de usuario eliminado"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.user_uploaded",
+    "value": "Fondo de autenticación de usuario subido"
+  },
+  {
+    "key": "admin.settings.auth_backgrounds.user_uploaded_desc",
+    "value": "El fondo de autenticación de usuario se subió correctamente."
   },
   {
     "key": "admin.settings.backup",
@@ -5760,6 +6128,94 @@
     "value": "Configuración de Correo Electrónico"
   },
   {
+    "key": "admin.settings.email.common_ports_help",
+    "value": "Puertos comunes: 587 (STARTTLS, recomendado), 465 (SSL/TLS), 25 (Sin encriptación)"
+  },
+  {
+    "key": "admin.settings.email.enable_smtp",
+    "value": "Habilitar Email SMTP"
+  },
+  {
+    "key": "admin.settings.email.enter_password",
+    "value": "Ingresar contraseña"
+  },
+  {
+    "key": "admin.settings.email.from_email_address",
+    "value": "Dirección de Email De"
+  },
+  {
+    "key": "admin.settings.email.from_name",
+    "value": "Nombre De"
+  },
+  {
+    "key": "admin.settings.email.gmail_app_password_hint",
+    "value": "Para Gmail, usa una Contraseña de Aplicación en lugar de tu contraseña regular"
+  },
+  {
+    "key": "admin.settings.email.leave_empty_keep_password",
+    "value": "Dejar vacío para mantener la contraseña actual"
+  },
+  {
+    "key": "admin.settings.email.no_encryption",
+    "value": "Ninguno (Puerto 25)"
+  },
+  {
+    "key": "admin.settings.email.password_set_hint",
+    "value": "La contraseña está establecida. Dejar vacío para mantenerla sin cambios, o ingresa una nueva contraseña."
+  },
+  {
+    "key": "admin.settings.email.save_smtp_settings",
+    "value": "Guardar Configuración SMTP"
+  },
+  {
+    "key": "admin.settings.email.security",
+    "value": "Seguridad"
+  },
+  {
+    "key": "admin.settings.email.select_security",
+    "value": "Seleccionar seguridad"
+  },
+  {
+    "key": "admin.settings.email.smtp_description",
+    "value": "Cuando está habilitado, el sistema utilizará SMTP para enviar correos electrónicos para restablecimiento de contraseñas, notificaciones y otras comunicaciones del sistema."
+  },
+  {
+    "key": "admin.settings.email.smtp_host",
+    "value": "Host SMTP"
+  },
+  {
+    "key": "admin.settings.email.smtp_password",
+    "value": "Contraseña SMTP"
+  },
+  {
+    "key": "admin.settings.email.smtp_port",
+    "value": "Puerto SMTP"
+  },
+  {
+    "key": "admin.settings.email.smtp_username",
+    "value": "Usuario SMTP"
+  },
+  {
+    "key": "admin.settings.email.ssl_implicit_tls",
+    "value": "SSL / TLS Implícito (Puerto 465)"
+  },
+  {
+    "key": "admin.settings.email.starttls",
+    "value": "STARTTLS (Puerto 587)"
+  },
+  {
+    "key": "admin.settings.email.test_email_address",
+    "value": "Dirección de Email de Prueba"
+  },
+  {
+    "key": "admin.settings.email.test_email_hint",
+    "value": "Dirección de correo electrónico para enviar correos de prueba"
+  },
+  {
+    "key": "admin.settings.email.title",
+    "value": "Configuración de Email SMTP"
+  },
+  {
     "key": "admin.settings.embed.allow_fullscreen",
     "value": "Permitir pantalla completa"
   },
@@ -5878,6 +6334,10 @@
   {
     "key": "admin.settings.enable_company_registration",
     "value": "Habilitar Registro de Empresas"
+  },
+  {
+    "key": "admin.settings.error",
+    "value": "Error"
   },
   {
     "key": "admin.settings.error_connecting_stripe",
@@ -6336,6 +6796,18 @@
     "value": "Biblioteca de medios"
   },
   {
+    "key": "admin.settings.frontend_website.meta_description",
+    "value": "Descripción Meta"
+  },
+  {
+    "key": "admin.settings.frontend_website.meta_keywords",
+    "value": "Palabras clave Meta"
+  },
+  {
+    "key": "admin.settings.frontend_website.meta_title",
+    "value": "Título Meta"
+  },
+  {
     "key": "admin.settings.frontend_website.nav_links",
     "value": "Enlaces de navegación"
   },
@@ -6350,6 +6822,18 @@
   {
     "key": "admin.settings.frontend_website.no_managed_pages",
     "value": "Aún no hay páginas."
+  },
+  {
+    "key": "admin.settings.frontend_website.og_description",
+    "value": "Descripción OG"
+  },
+  {
+    "key": "admin.settings.frontend_website.og_image",
+    "value": "Imagen OG"
+  },
+  {
+    "key": "admin.settings.frontend_website.og_title",
+    "value": "Título OG"
   },
   {
     "key": "admin.settings.frontend_website.open_media",
@@ -6374,6 +6858,10 @@
   {
     "key": "admin.settings.frontend_website.page_enabled",
     "value": "Habilitada"
+  },
+  {
+    "key": "admin.settings.frontend_website.page_favicon",
+    "value": "Ícono de Página"
   },
   {
     "key": "admin.settings.frontend_website.page_href",
@@ -6584,6 +7072,10 @@
     "value": "Mostrar imagen del hero"
   },
   {
+    "key": "admin.settings.frontend_website.show_in_navigation_hints",
+    "value": "Mostrar en Sugerencias de Navegación"
+  },
+  {
     "key": "admin.settings.frontend_website.show_language_switcher",
     "value": "Mostrar selector de idioma"
   },
@@ -6626,6 +7118,10 @@
   {
     "key": "admin.settings.frontend_website.social_twitter",
     "value": "URL de Twitter / X"
+  },
+  {
+    "key": "admin.settings.frontend_website.sort_order",
+    "value": "Orden de Clasificación"
   },
   {
     "key": "admin.settings.frontend_website.stat_label",
@@ -6802,6 +7298,82 @@
   {
     "key": "admin.settings.general",
     "value": "General"
+  },
+  {
+    "key": "admin.settings.general_settings.12_hour",
+    "value": "12 horas (AM/PM)"
+  },
+  {
+    "key": "admin.settings.general_settings.24_hour",
+    "value": "24 horas"
+  },
+  {
+    "key": "admin.settings.general_settings.add_currency",
+    "value": "Agregar Moneda"
+  },
+  {
+    "key": "admin.settings.general_settings.add_custom_currency",
+    "value": "Agregar Moneda Personalizada"
+  },
+  {
+    "key": "admin.settings.general_settings.add_custom_currency_desc",
+    "value": "Agrega una moneda personalizada con un código ISO 4217 de 3 letras, nombre y símbolo."
+  },
+  {
+    "key": "admin.settings.general_settings.cancel",
+    "value": "Cancelar"
+  },
+  {
+    "key": "admin.settings.general_settings.currency_code",
+    "value": "Código de Moneda (ISO 4217)"
+  },
+  {
+    "key": "admin.settings.general_settings.currency_code_help",
+    "value": "3 letras mayúsculas (ej. USD, EUR, GBP)"
+  },
+  {
+    "key": "admin.settings.general_settings.currency_name",
+    "value": "Nombre de la Moneda"
+  },
+  {
+    "key": "admin.settings.general_settings.currency_name_placeholder",
+    "value": "Dólar estadounidense"
+  },
+  {
+    "key": "admin.settings.general_settings.currency_symbol",
+    "value": "Símbolo de la Moneda"
+  },
+  {
+    "key": "admin.settings.general_settings.custom_currencies_label",
+    "value": "Monedas Personalizadas:"
+  },
+  {
+    "key": "admin.settings.general_settings.date_format",
+    "value": "Formato de Fecha"
+  },
+  {
+    "key": "admin.settings.general_settings.default_currency",
+    "value": "Moneda Predeterminada"
+  },
+  {
+    "key": "admin.settings.general_settings.select_currency",
+    "value": "Seleccionar moneda"
+  },
+  {
+    "key": "admin.settings.general_settings.select_date_format",
+    "value": "Seleccionar formato de fecha"
+  },
+  {
+    "key": "admin.settings.general_settings.select_time_format",
+    "value": "Seleccionar formato de hora"
+  },
+  {
+    "key": "admin.settings.general_settings.time_format",
+    "value": "Formato de Hora"
+  },
+  {
+    "key": "admin.settings.general_settings.title",
+    "value": "Configuración General"
   },
   {
     "key": "admin.settings.gradient_end",
@@ -7292,6 +7864,454 @@
     "value": "API de Socios"
   },
   {
+    "key": "admin.settings.payment.bank_transfer.account_name",
+    "value": "Nombre de la Cuenta"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.account_number",
+    "value": "Número de Cuenta"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.bank_name",
+    "value": "Nombre del Banco"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.description",
+    "value": "Configurar pago sin conexión mediante transferencia bancaria"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.enable",
+    "value": "Habilitar Transferencia Bancaria"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.instructions_placeholder",
+    "value": "Incluir referencia de pago en detalles de transferencia"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.optional",
+    "value": "Opcional"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.payment_instructions",
+    "value": "Instrucciones de Pago"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.routing_number",
+    "value": "Número de Enrutamiento"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.save_settings",
+    "value": "Guardar configuración de Transferencia Bancaria"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.swift_code",
+    "value": "Código SWIFT"
+  },
+  {
+    "key": "admin.settings.payment.bank_transfer.title",
+    "value": "Transferencia Bancaria"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.access_token",
+    "value": "Token de Acceso"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.access_token_help",
+    "value": "Este es el Token de Acceso de Producción de tu Panel de Desarrollador de Mercado Pago. Asegúrate de usar el token correcto para modo de prueba o producción."
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.client_id",
+    "value": "ID del Cliente"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.client_secret",
+    "value": "Secreto del Cliente"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.connected_to_account",
+    "value": "Conectado a la cuenta de Mercado Pago: {{account}}"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.connection_successful",
+    "value": "Conexión con Mercado Pago exitosa"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.description",
+    "value": "Configurar pasarela de pagos Mercado Pago"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.enable",
+    "value": "Habilitar pagos con Mercado Pago"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.error_connecting",
+    "value": "Error al conectar con Mercado Pago"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.error_saving",
+    "value": "Error al guardar la configuración de Mercado Pago"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.failed_save",
+    "value": "No se pudo guardar la configuración de Mercado Pago"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.failed_test",
+    "value": "No se pudo probar la conexión con Mercado Pago"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.save_settings",
+    "value": "Guardar configuración de Mercado Pago"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.saved",
+    "value": "Configuración de Mercado Pago guardada"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.saved_desc",
+    "value": "La configuración de Mercado Pago se guardó correctamente."
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.test_mode",
+    "value": "Modo de Prueba"
+  },
+  {
+    "key": "admin.settings.payment.mercadopago.title",
+    "value": "Integración con Mercado Pago"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.connected_successfully",
+    "value": "Conectado a la API de Moyasar correctamente"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.connection_successful",
+    "value": "Conexión con Moyasar exitosa"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.description",
+    "value": "Configurar pasarela de pagos Moyasar para Arabia Saudita"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.enable",
+    "value": "Habilitar pagos con Moyasar"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.error_connecting",
+    "value": "Error al conectar con Moyasar"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.error_saving",
+    "value": "Error al guardar la configuración de Moyasar"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.failed_save",
+    "value": "No se pudo guardar la configuración de Moyasar"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.failed_test",
+    "value": "No se pudo probar la conexión con Moyasar"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.publishable_key",
+    "value": "Clave Pública"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.save_settings",
+    "value": "Guardar configuración de Moyasar"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.saved",
+    "value": "Configuración de Moyasar guardada"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.saved_desc",
+    "value": "Tu configuración de pagos de Moyasar se actualizó correctamente"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.secret_key",
+    "value": "Clave Secreta"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.test_mode",
+    "value": "Modo de Prueba"
+  },
+  {
+    "key": "admin.settings.payment.moyasar.title",
+    "value": "Integración con Moyasar"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.business_shortcode",
+    "value": "Código Corto del Negocio"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.buygoods",
+    "value": "Comprar Bienes (Caja)"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.callback_url",
+    "value": "URL de Devolución de Llamada"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.callback_url_help",
+    "value": "Debe ser una URL HTTPS accesible públicamente que acepte devoluciones de llamada de MPESA STK."
+  },
+  {
+    "key": "admin.settings.payment.mpesa.consumer_key",
+    "value": "Clave de Consumidor"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.consumer_secret",
+    "value": "Secreto del Consumidor"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.description",
+    "value": "Configurar pasarela de pagos MPESA para Kenia"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.enable",
+    "value": "Habilitar pagos con MPESA"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.hide_consumer_secret",
+    "value": "Ocultar Secreto del Consumidor"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.hide_passkey",
+    "value": "Ocultar Contraseña"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.passkey",
+    "value": "Contraseña"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.paybill",
+    "value": "Factura de Pago"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.save_settings",
+    "value": "Guardar configuración de MPESA"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.select_shortcode_type",
+    "value": "Seleccionar tipo de código corto"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.shortcode_type",
+    "value": "Tipo de Código Corto"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.show_consumer_secret",
+    "value": "Mostrar Secreto del Consumidor"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.show_passkey",
+    "value": "Mostrar Contraseña"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.test_mode_sandbox",
+    "value": "Modo de Prueba (Sandbox)"
+  },
+  {
+    "key": "admin.settings.payment.mpesa.title",
+    "value": "Integración con MPESA"
+  },
+  {
+    "key": "admin.settings.payment.paypal.client_id",
+    "value": "ID del Cliente"
+  },
+  {
+    "key": "admin.settings.payment.paypal.client_secret",
+    "value": "Secreto del Cliente"
+  },
+  {
+    "key": "admin.settings.payment.paypal.connected_to_account",
+    "value": "Conectado al entorno {{environment}} de PayPal"
+  },
+  {
+    "key": "admin.settings.payment.paypal.connection_successful",
+    "value": "Conexión con PayPal exitosa"
+  },
+  {
+    "key": "admin.settings.payment.paypal.enable",
+    "value": "Habilitar pagos con PayPal"
+  },
+  {
+    "key": "admin.settings.payment.paypal.error_connecting",
+    "value": "Error al conectar con PayPal"
+  },
+  {
+    "key": "admin.settings.payment.paypal.error_saving",
+    "value": "Error al guardar la configuración de PayPal"
+  },
+  {
+    "key": "admin.settings.payment.paypal.failed_save",
+    "value": "No se pudo guardar la configuración de PayPal"
+  },
+  {
+    "key": "admin.settings.payment.paypal.failed_test",
+    "value": "No se pudo probar la conexión con PayPal"
+  },
+  {
+    "key": "admin.settings.payment.paypal.sandbox_mode",
+    "value": "Modo Sandbox"
+  },
+  {
+    "key": "admin.settings.payment.paypal.save_settings",
+    "value": "Guardar configuración de PayPal"
+  },
+  {
+    "key": "admin.settings.payment.paypal.saved",
+    "value": "Configuración de PayPal guardada"
+  },
+  {
+    "key": "admin.settings.payment.paypal.saved_desc",
+    "value": "La configuración de PayPal se guardó correctamente."
+  },
+  {
+    "key": "admin.settings.payment.paypal.title",
+    "value": "Integración con PayPal"
+  },
+  {
+    "key": "admin.settings.payment.paystack.connection_successful",
+    "value": "Conexión con Paystack exitosa"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_egp",
+    "value": "EGP (Libra egipcia)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_ghs",
+    "value": "GHS (Cedi ghanés)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_help",
+    "value": "Establecer esto si recibes \"Moneda no compatible con comerciante\". Usa la moneda habilitada en tu integración de Paystack (ej. NGN para Nigeria, GHS para Ghana)."
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_kes",
+    "value": "KES (Chelín keniano)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_ngn",
+    "value": "NGN (Naira nigeriana)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_usd",
+    "value": "USD (Dólar estadounidense)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_xof",
+    "value": "XOF (Franco CFA de África Occidental)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.currency_zar",
+    "value": "ZAR (Rand sudafricano)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.description",
+    "value": "Configurar pasarela de pagos Paystack"
+  },
+  {
+    "key": "admin.settings.payment.paystack.enable",
+    "value": "Habilitar pagos con Paystack"
+  },
+  {
+    "key": "admin.settings.payment.paystack.error_connecting",
+    "value": "Error al conectar con Paystack"
+  },
+  {
+    "key": "admin.settings.payment.paystack.error_saving",
+    "value": "Error al guardar la configuración de Paystack"
+  },
+  {
+    "key": "admin.settings.payment.paystack.failed_save",
+    "value": "No se pudo guardar la configuración de Paystack"
+  },
+  {
+    "key": "admin.settings.payment.paystack.failed_test",
+    "value": "No se pudo probar la conexión con Paystack"
+  },
+  {
+    "key": "admin.settings.payment.paystack.live_mode",
+    "value": "Conectado en modo en vivo"
+  },
+  {
+    "key": "admin.settings.payment.paystack.merchant_currency",
+    "value": "Moneda del Comerciante"
+  },
+  {
+    "key": "admin.settings.payment.paystack.public_key",
+    "value": "Clave Pública"
+  },
+  {
+    "key": "admin.settings.payment.paystack.save_settings",
+    "value": "Guardar configuración de Paystack"
+  },
+  {
+    "key": "admin.settings.payment.paystack.saved",
+    "value": "Configuración de Paystack guardada"
+  },
+  {
+    "key": "admin.settings.payment.paystack.saved_desc",
+    "value": "La configuración de Paystack se guardó correctamente."
+  },
+  {
+    "key": "admin.settings.payment.paystack.secret_key",
+    "value": "Clave Secreta"
+  },
+  {
+    "key": "admin.settings.payment.paystack.subaccount",
+    "value": "Subcuenta (opcional)"
+  },
+  {
+    "key": "admin.settings.payment.paystack.test_mode",
+    "value": "Conectado en modo de prueba"
+  },
+  {
+    "key": "admin.settings.payment.paystack.title",
+    "value": "Integración con Paystack"
+  },
+  {
+    "key": "admin.settings.payment.paystack.use_app_default",
+    "value": "Usar predeterminado de la app"
+  },
+  {
+    "key": "admin.settings.payment.paystack.webhook_secret",
+    "value": "Secreto del Webhook (opcional)"
+  },
+  {
+    "key": "admin.settings.payment.stripe.enable",
+    "value": "Habilitar pagos con Stripe"
+  },
+  {
+    "key": "admin.settings.payment.stripe.publishable_key",
+    "value": "Clave Pública"
+  },
+  {
+    "key": "admin.settings.payment.stripe.save_settings",
+    "value": "Guardar configuración de Stripe"
+  },
+  {
+    "key": "admin.settings.payment.stripe.secret_key",
+    "value": "Clave Secreta"
+  },
+  {
+    "key": "admin.settings.payment.stripe.test_mode",
+    "value": "Modo de Prueba"
+  },
+  {
+    "key": "admin.settings.payment.stripe.title",
+    "value": "Integración con Stripe"
+  },
+  {
+    "key": "admin.settings.payment.stripe.webhook_secret",
+    "value": "Secreto del Webhook"
+  },
+  {
+    "key": "admin.settings.payment.stripe.webhook_url",
+    "value": "URL del Endpoint del Webhook"
+  },
+  {
     "key": "admin.settings.payment_gateways",
     "value": "Pasarelas de Pago"
   },
@@ -7506,6 +8526,10 @@
   {
     "key": "admin.settings.save_general_settings",
     "value": "Guardar configuración general"
+  },
+  {
+    "key": "admin.settings.save_settings",
+    "value": "Guardar Configuración"
   },
   {
     "key": "admin.settings.secondary_color",
@@ -9624,8 +10648,16 @@
     "value": "Conversaciones por Canal"
   },
   {
+    "key": "analytics.custom_range",
+    "value": "Rango personalizado"
+  },
+  {
     "key": "analytics.date_range.invalid_title",
     "value": "Rango de fechas no válido"
+  },
+  {
+    "key": "analytics.description",
+    "value": "Realiza un seguimiento de tu rendimiento de comunicación y métricas de engagement"
   },
   {
     "key": "analytics.export",
@@ -9688,6 +10720,10 @@
     "value": "Solicitudes de Soporte"
   },
   {
+    "key": "analytics.loading",
+    "value": "Cargando datos de análisis..."
+  },
+  {
     "key": "analytics.period.30days",
     "value": "Últimos 30 días"
   },
@@ -9716,6 +10752,10 @@
     "value": "Elige una fecha"
   },
   {
+    "key": "analytics.quick_presets",
+    "value": "Presets rápidos"
+  },
+  {
     "key": "analytics.response_time",
     "value": "Tiempo de Respuesta"
   },
@@ -9738,6 +10778,30 @@
   {
     "key": "analytics.title",
     "value": "Analíticas"
+  },
+  {
+    "key": "analytics.tooltip.channel_distribution",
+    "value": "Distribución de conversaciones entre los diferentes canales"
+  },
+  {
+    "key": "analytics.tooltip.conversations_by_channel",
+    "value": "Distribución de conversaciones por canal"
+  },
+  {
+    "key": "analytics.tooltip.response_rate",
+    "value": "Porcentaje de mensajes respondidos"
+  },
+  {
+    "key": "analytics.tooltip.total_contacts",
+    "value": "Número total de contactos"
+  },
+  {
+    "key": "analytics.tooltip.total_conversations",
+    "value": "Número total de conversaciones"
+  },
+  {
+    "key": "analytics.tooltip.total_messages",
+    "value": "Número total de mensajes"
   },
   {
     "key": "analytics.vs_last_period",
@@ -9990,6 +11054,10 @@
   {
     "key": "auth.check_email_title",
     "value": "Revisa tu correo electrónico"
+  },
+  {
+    "key": "auth.checking_permissions",
+    "value": "Verificando permisos..."
   },
   {
     "key": "auth.choose_username",
@@ -10688,6 +11756,14 @@
     "value": "No se pudo actualizar el estado del bot"
   },
   {
+    "key": "calendar.add_new_schedule",
+    "value": "Agregar nuevo horario"
+  },
+  {
+    "key": "calendar.add_new_schedule_desc",
+    "value": "Crear un nuevo horario para organizar tus eventos."
+  },
+  {
     "key": "calendar.advanced",
     "value": "Avanzado"
   },
@@ -10714,6 +11790,14 @@
   {
     "key": "calendar.attendees",
     "value": "Asistentes"
+  },
+  {
+    "key": "calendar.available_time_slots_description",
+    "value": "Selecciona un horario para crear una nueva cita."
+  },
+  {
+    "key": "calendar.available_time_slots_title",
+    "value": "Horarios disponibles"
   },
   {
     "key": "calendar.bot_appointment_cancelled",
@@ -10914,6 +11998,14 @@
   {
     "key": "calendar.calendly_readonly_desc",
     "value": "Puedes ver y cancelar eventos de Calendly, pero no puedes crear nuevos. Usa tu panel de control de Calendly para crear eventos."
+  },
+  {
+    "key": "calendar.cancel_appointment",
+    "value": "Cancelar cita"
+  },
+  {
+    "key": "calendar.cancel_appointment_confirm",
+    "value": "¿Estás seguro de que deseas cancelar esta cita? Esta acción no se puede deshacer."
   },
   {
     "key": "calendar.canceling",
@@ -11152,6 +12244,14 @@
     "value": "Día"
   },
   {
+    "key": "calendar.delete_schedule_description",
+    "value": "¿Estás seguro de que deseas eliminar esta agenda? No se puede deshacer esta acción."
+  },
+  {
+    "key": "calendar.delete_schedule_title",
+    "value": "Eliminar agenda"
+  },
+  {
     "key": "calendar.description",
     "value": "Descripción"
   },
@@ -11186,6 +12286,14 @@
   {
     "key": "calendar.edit_appointment",
     "value": "Editar cita"
+  },
+  {
+    "key": "calendar.edit_schedule_description",
+    "value": "Actualiza los detalles de tu agenda."
+  },
+  {
+    "key": "calendar.edit_schedule_title",
+    "value": "Editar agenda"
   },
   {
     "key": "calendar.enable_calendar",
@@ -11298,6 +12406,10 @@
   {
     "key": "calendar.no_calendars",
     "value": "No hay calendarios disponibles"
+  },
+  {
+    "key": "calendar.no_keep_it",
+    "value": "No, mantenerla"
   },
   {
     "key": "calendar.not_connected",
@@ -13400,6 +14512,10 @@
     "value": "Se requiere zona horaria"
   },
   {
+    "key": "campaigns.channel.whatsapp",
+    "value": "WhatsApp"
+  },
+  {
     "key": "campaigns.completed",
     "value": "Campaña Completada"
   },
@@ -13594,6 +14710,10 @@
   {
     "key": "campaigns.network_error",
     "value": "Error de red: {{error}}"
+  },
+  {
+    "key": "campaigns.new_email_campaign",
+    "value": "Nueva campaña de correo electrónico"
   },
   {
     "key": "campaigns.no_campaigns_found",
@@ -14212,8 +15332,20 @@
     "value": "Titular de la cuenta"
   },
   {
+    "key": "common.checkout.account_name",
+    "value": "Nombre de la cuenta"
+  },
+  {
     "key": "common.checkout.account_number",
     "value": "Número de cuenta"
+  },
+  {
+    "key": "common.checkout.additional_instructions",
+    "value": "Instrucciones adicionales"
+  },
+  {
+    "key": "common.checkout.amount",
+    "value": "Monto:"
   },
   {
     "key": "common.checkout.amount_due",
@@ -14224,8 +15356,24 @@
     "value": "Nombre del banco"
   },
   {
+    "key": "common.checkout.bank_transfer_confirm",
+    "value": "Completa la transferencia bancaria. Tu suscripción se activará una vez confirmado el pago."
+  },
+  {
     "key": "common.checkout.bank_transfer_instructions",
     "value": "Instrucciones de transferencia bancaria"
+  },
+  {
+    "key": "common.checkout.choose_payment_method",
+    "value": "Elige tu método de pago preferido para completar tu suscripción."
+  },
+  {
+    "key": "common.checkout.complete_payment",
+    "value": "Completar pago"
+  },
+  {
+    "key": "common.checkout.completed_payment",
+    "value": "Ya completé el pago"
   },
   {
     "key": "common.checkout.copied_to_clipboard",
@@ -14240,12 +15388,32 @@
     "value": "Moneda no admitida"
   },
   {
+    "key": "common.checkout.enter_card_details",
+    "value": "Ingresa los datos de tu tarjeta para completar el pago de forma segura con Moyasar."
+  },
+  {
     "key": "common.checkout.enter_mpesa_phone",
     "value": "Por favor ingresa tu número de teléfono para el pago MPESA"
   },
   {
     "key": "common.checkout.error_title",
     "value": "Error de pago"
+  },
+  {
+    "key": "common.checkout.important_notes",
+    "value": "Notas importantes:"
+  },
+  {
+    "key": "common.checkout.info_copied",
+    "value": "La información se copió al portapapeles."
+  },
+  {
+    "key": "common.checkout.init_failed",
+    "value": "No se pudo inicializar el formulario de pago. Intenta de nuevo."
+  },
+  {
+    "key": "common.checkout.instructions_received",
+    "value": "Instrucciones de pago recibidas"
   },
   {
     "key": "common.checkout.invalid_phone",
@@ -14256,6 +15424,14 @@
     "value": "Por favor ingresa un número de teléfono keniata válido (formato: 254XXXXXXXXX)"
   },
   {
+    "key": "common.checkout.load_failed",
+    "value": "No se pudo cargar el sistema de pagos. Intenta de nuevo."
+  },
+  {
+    "key": "common.checkout.made_transfer",
+    "value": "Ya hice la transferencia"
+  },
+  {
     "key": "common.checkout.mercadopago_unsupported",
     "value": "La moneda {{currency}} puede no ser compatible con Mercado Pago. Monedas admitidas: {{currencies}}. Por favor, verifica tu configuración de cuenta de Mercado Pago."
   },
@@ -14264,8 +15440,32 @@
     "value": "Moyasar solo admite SAR (Riyal Saudí). La moneda actual configurada es {{currency}}. Por favor, cambia la moneda predeterminada a SAR en Configuración General."
   },
   {
+    "key": "common.checkout.mpesa_amount",
+    "value": "KES {{amount}} aproximadamente"
+  },
+  {
+    "key": "common.checkout.mpesa_charge_label",
+    "value": "Cobro en M-PESA (KES):"
+  },
+  {
+    "key": "common.checkout.mpesa_hint_1",
+    "value": "Revisa tu teléfono para ver el aviso de pago de MPESA"
+  },
+  {
+    "key": "common.checkout.mpesa_hint_2",
+    "value": "Ingresa tu PIN de MPESA para completar el pago"
+  },
+  {
+    "key": "common.checkout.mpesa_hint_3",
+    "value": "Tu suscripción se activará automáticamente una vez confirmado el pago"
+  },
+  {
     "key": "common.checkout.mpesa_only_kes",
     "value": "MPESA solo admite KES (Chelines Kenianos). La moneda actual configurada es {{currency}}. Por favor, cambia la moneda predeterminada a KES en Configuración General."
+  },
+  {
+    "key": "common.checkout.mpesa_payment",
+    "value": "Pago con MPESA"
   },
   {
     "key": "common.checkout.mpesa_phone",
@@ -14284,12 +15484,48 @@
     "value": "No se recibió URL de pago del servidor"
   },
   {
+    "key": "common.checkout.note_1",
+    "value": "Transfiere el monto exacto que se muestra arriba"
+  },
+  {
+    "key": "common.checkout.note_2",
+    "value": "Incluye la referencia de pago en tu transferencia"
+  },
+  {
+    "key": "common.checkout.note_3",
+    "value": "El procesamiento puede tardar de 1 a 3 días hábiles"
+  },
+  {
+    "key": "common.checkout.note_4",
+    "value": "Recibirás un correo de confirmación una vez verificado el pago"
+  },
+  {
     "key": "common.checkout.order_id",
     "value": "ID de pedido"
   },
   {
+    "key": "common.checkout.payment_details",
+    "value": "Detalles del pago"
+  },
+  {
+    "key": "common.checkout.payment_error",
+    "value": "Error del sistema de pagos"
+  },
+  {
+    "key": "common.checkout.payment_method",
+    "value": "Método de pago"
+  },
+  {
     "key": "common.checkout.payment_method_required",
     "value": "Método de pago requerido"
+  },
+  {
+    "key": "common.checkout.payment_reference",
+    "value": "Referencia de pago"
+  },
+  {
+    "key": "common.checkout.payment_summary",
+    "value": "Resumen de pago"
   },
   {
     "key": "common.checkout.paypal_unsupported",
@@ -14300,8 +15536,40 @@
     "value": "Paystack admite NGN, GHS, ZAR y USD. La moneda actual es {{currency}}."
   },
   {
+    "key": "common.checkout.phone",
+    "value": "Teléfono:"
+  },
+  {
+    "key": "common.checkout.phone_format_help",
+    "value": "Ingresa tu número de teléfono keniano en el formato 254XXXXXXXXX"
+  },
+  {
+    "key": "common.checkout.phone_number_label",
+    "value": "Número de teléfono"
+  },
+  {
     "key": "common.checkout.phone_number_required",
     "value": "Número de teléfono requerido"
+  },
+  {
+    "key": "common.checkout.plan",
+    "value": "Plan:"
+  },
+  {
+    "key": "common.checkout.plan_details",
+    "value": "Detalles del plan"
+  },
+  {
+    "key": "common.checkout.price",
+    "value": "Precio:"
+  },
+  {
+    "key": "common.checkout.proceed_to_payment",
+    "value": "Proceder al pago"
+  },
+  {
+    "key": "common.checkout.reference_note",
+    "value": "⚠️ Incluye esta referencia en tu transferencia para asegurar un procesamiento rápido"
   },
   {
     "key": "common.checkout.routing_number",
@@ -14316,8 +15584,28 @@
     "value": "Por favor, selecciona un plan y un método de pago"
   },
   {
+    "key": "common.checkout.stk_push_sent",
+    "value": "Se envió un STK Push a tu teléfono. Completa el pago."
+  },
+  {
+    "key": "common.checkout.stk_push_sent_label",
+    "value": "STK Push enviado"
+  },
+  {
     "key": "common.checkout.stripe_unsupported",
     "value": "La moneda {{currency}} no es compatible con Stripe. Por favor, configura una moneda admitida en Configuración General."
+  },
+  {
+    "key": "common.checkout.subscribe_to",
+    "value": "Suscribirse a"
+  },
+  {
+    "key": "common.checkout.swift_code",
+    "value": "Código SWIFT"
+  },
+  {
+    "key": "common.checkout.transfer_description",
+    "value": "Transfiere el monto exacto a la siguiente cuenta bancaria. Tu suscripción se activará una vez confirmemos el pago."
   },
   {
     "key": "common.clear",
@@ -14346,6 +15634,10 @@
   {
     "key": "common.contacts",
     "value": "contactos"
+  },
+  {
+    "key": "common.continue",
+    "value": "Continuar"
   },
   {
     "key": "common.copied",
@@ -14408,6 +15700,14 @@
     "value": "Deshabilitado"
   },
   {
+    "key": "common.disconnect",
+    "value": "Desconectar"
+  },
+  {
+    "key": "common.disconnected",
+    "value": "Desconectado"
+  },
+  {
     "key": "common.done",
     "value": "Hecho"
   },
@@ -14454,6 +15754,10 @@
   {
     "key": "common.failed_fetch_version",
     "value": "Error al obtener la versión"
+  },
+  {
+    "key": "common.field",
+    "value": "campo"
   },
   {
     "key": "common.file_size.bytes",
@@ -14622,6 +15926,10 @@
   {
     "key": "common.invalid_filters_description",
     "value": "No se pudieron cargar los filtros desde la URL. Usando filtros por defecto."
+  },
+  {
+    "key": "common.key",
+    "value": "Clave"
   },
   {
     "key": "common.language_selector.changing",
@@ -14796,6 +16104,10 @@
     "value": "Eliminar"
   },
   {
+    "key": "common.rename",
+    "value": "Renombrar"
+  },
+  {
     "key": "common.reset",
     "value": "Reiniciar"
   },
@@ -14866,6 +16178,14 @@
   {
     "key": "common.showing",
     "value": "Mostrando"
+  },
+  {
+    "key": "common.sidebar.sidebar_description",
+    "value": "Muestra la barra lateral móvil."
+  },
+  {
+    "key": "common.sidebar.sidebar_title",
+    "value": "Barra Lateral"
   },
   {
     "key": "common.sidebar.toggle",
@@ -14984,6 +16304,14 @@
     "value": "Compartir"
   },
   {
+    "key": "common.value",
+    "value": "valor"
+  },
+  {
+    "key": "common.verifying_access",
+    "value": "Verificando acceso..."
+  },
+  {
     "key": "common.version_fetch_error",
     "value": "No se pudo obtener la versión"
   },
@@ -15012,16 +16340,88 @@
     "value": "Justificar"
   },
   {
+    "key": "common.wysiwyg.align_label",
+    "value": "Alinear"
+  },
+  {
+    "key": "common.wysiwyg.align_left",
+    "value": "Izquierda"
+  },
+  {
     "key": "common.wysiwyg.align_right",
     "value": "Derecha"
+  },
+  {
+    "key": "common.wysiwyg.content",
+    "value": "Contenido"
+  },
+  {
+    "key": "common.wysiwyg.heading",
+    "value": "Encabezado"
+  },
+  {
+    "key": "common.wysiwyg.heading_1",
+    "value": "Encabezado 1"
+  },
+  {
+    "key": "common.wysiwyg.heading_2",
+    "value": "Encabezado 2"
+  },
+  {
+    "key": "common.wysiwyg.heading_3",
+    "value": "Encabezado 3"
+  },
+  {
+    "key": "common.wysiwyg.heading_4",
+    "value": "Encabezado 4"
+  },
+  {
+    "key": "common.wysiwyg.heading_5",
+    "value": "Encabezado 5"
+  },
+  {
+    "key": "common.wysiwyg.heading_6",
+    "value": "Encabezado 6"
   },
   {
     "key": "common.wysiwyg.html_placeholder",
     "value": "Introduzca el código HTML aquí..."
   },
   {
+    "key": "common.wysiwyg.image",
+    "value": "Imagen"
+  },
+  {
+    "key": "common.wysiwyg.insert_text",
+    "value": "Insertar texto"
+  },
+  {
+    "key": "common.wysiwyg.link",
+    "value": "Enlace"
+  },
+  {
+    "key": "common.wysiwyg.link_text",
+    "value": "Enlace"
+  },
+  {
     "key": "common.wysiwyg.normal",
     "value": "Normal"
+  },
+  {
+    "key": "common.wysiwyg.section",
+    "value": "Sección"
+  },
+  {
+    "key": "common.wysiwyg.switch_code",
+    "value": "Cambiar a Vista de Código"
+  },
+  {
+    "key": "common.wysiwyg.switch_visual",
+    "value": "Cambiar a Editor Visual"
+  },
+  {
+    "key": "common.wysiwyg.text",
+    "value": "Texto"
   },
   {
     "key": "common.yes",
@@ -15046,6 +16446,22 @@
   {
     "key": "company.ai_credentials.delete_success_desc",
     "value": "Credencial de IA eliminada correctamente"
+  },
+  {
+    "key": "company.ai_credentials.status_expired",
+    "value": "Vencida"
+  },
+  {
+    "key": "company.ai_credentials.status_invalid",
+    "value": "Inválida"
+  },
+  {
+    "key": "company.ai_credentials.status_pending",
+    "value": "Pendiente"
+  },
+  {
+    "key": "company.ai_credentials.status_valid",
+    "value": "Válida"
   },
   {
     "key": "company.ai_credentials.test_error",
@@ -15338,6 +16754,22 @@
   {
     "key": "contacts.bulk_delete.warning",
     "value": "Esto eliminará permanentemente estos contactos y todas las conversaciones, mensajes y notas asociadas. Esta acción no se puede deshacer."
+  },
+  {
+    "key": "contacts.channels.instagram",
+    "value": "Instagram"
+  },
+  {
+    "key": "contacts.channels.messenger",
+    "value": "Facebook Messenger"
+  },
+  {
+    "key": "contacts.channels.whatsapp_official",
+    "value": "WhatsApp Oficial"
+  },
+  {
+    "key": "contacts.channels.whatsapp_unofficial",
+    "value": "WhatsApp No oficial"
   },
   {
     "key": "contacts.choose_channel",
@@ -17084,6 +18516,46 @@
     "value": "Fijar contacto arriba"
   },
   {
+    "key": "contacts.preview_table.actions",
+    "value": "Acciones"
+  },
+  {
+    "key": "contacts.preview_table.company_label",
+    "value": "Empresa"
+  },
+  {
+    "key": "contacts.preview_table.contact_name",
+    "value": "Nombre del contacto"
+  },
+  {
+    "key": "contacts.preview_table.created_label",
+    "value": "Creado"
+  },
+  {
+    "key": "contacts.preview_table.email_label",
+    "value": "Correo electrónico"
+  },
+  {
+    "key": "contacts.preview_table.last_activity_label",
+    "value": "Última actividad"
+  },
+  {
+    "key": "contacts.preview_table.no_activity",
+    "value": "Sin actividad"
+  },
+  {
+    "key": "contacts.preview_table.no_tags",
+    "value": "-"
+  },
+  {
+    "key": "contacts.preview_table.phone",
+    "value": "Teléfono"
+  },
+  {
+    "key": "contacts.preview_table.tags",
+    "value": "Etiquetas"
+  },
+  {
     "key": "contacts.redirecting_to_inbox",
     "value": "Redirigiendo a la bandeja de entrada"
   },
@@ -17888,12 +19360,44 @@
     "value": "Llamada iniciada"
   },
   {
+    "key": "conversations.call_screen_modal.action_connection_retry",
+    "value": "La conexión se reintentará automáticamente; espera o actualiza"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_device_refresh",
+    "value": "Actualiza la página e intenta de nuevo"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_generic_retry",
+    "value": "Intenta de nuevo o termina la llamada e intenta más tarde"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_mic_access",
+    "value": "Habilita el micrófono en los ajustes del navegador y recarga"
+  },
+  {
+    "key": "conversations.call_screen_modal.action_network_check",
+    "value": "Verifica tu conexión y firewall, luego intenta de nuevo"
+  },
+  {
     "key": "conversations.call_screen_modal.audio_device_disconnected_description",
     "value": "Cambiando al dispositivo predeterminado."
   },
   {
     "key": "conversations.call_screen_modal.audio_device_disconnected_title",
     "value": "Dispositivo de audio desconectado"
+  },
+  {
+    "key": "conversations.call_screen_modal.call_duration_label",
+    "value": "Duración de la llamada"
+  },
+  {
+    "key": "conversations.call_screen_modal.call_ended",
+    "value": "Llamada finalizada"
+  },
+  {
+    "key": "conversations.call_screen_modal.call_not_completed",
+    "value": "La llamada no se pudo completar"
   },
   {
     "key": "conversations.call_screen_modal.call_quality_optimized_description",
@@ -17912,6 +19416,26 @@
     "value": "Llamada reconectada"
   },
   {
+    "key": "conversations.call_screen_modal.continue",
+    "value": "Continuar"
+  },
+  {
+    "key": "conversations.call_screen_modal.duration_label",
+    "value": "Duración"
+  },
+  {
+    "key": "conversations.call_screen_modal.end_call",
+    "value": "Finalizar llamada"
+  },
+  {
+    "key": "conversations.call_screen_modal.end_call_button",
+    "value": "Terminar llamada"
+  },
+  {
+    "key": "conversations.call_screen_modal.ending",
+    "value": "Terminando..."
+  },
+  {
     "key": "conversations.call_screen_modal.high_latency_description",
     "value": "La latencia es alta ({{ms}}ms). Es posible que note retrasos."
   },
@@ -17920,12 +19444,64 @@
     "value": "Latencia alta"
   },
   {
+    "key": "conversations.call_screen_modal.mic_access_required",
+    "value": "Acceso al micrófono requerido"
+  },
+  {
+    "key": "conversations.call_screen_modal.mute",
+    "value": "Silenciar"
+  },
+  {
+    "key": "conversations.call_screen_modal.mute_recording",
+    "value": "Silenciar (Grabando)"
+  },
+  {
+    "key": "conversations.call_screen_modal.please_wait",
+    "value": "Por favor espera"
+  },
+  {
     "key": "conversations.call_screen_modal.poor_call_quality_description",
     "value": "Puntuación de calidad baja ({{score}}). La conexión puede ser inestable."
   },
   {
     "key": "conversations.call_screen_modal.poor_call_quality_title",
     "value": "Calidad de llamada deficiente"
+  },
+  {
+    "key": "conversations.call_screen_modal.poor_quality",
+    "value": "La calidad de llamada es muy pobre"
+  },
+  {
+    "key": "conversations.call_screen_modal.quality_optimized_banner",
+    "value": "Calidad de llamada optimizada para red lenta"
+  },
+  {
+    "key": "conversations.call_screen_modal.reconnecting_call",
+    "value": "Reconectando llamada..."
+  },
+  {
+    "key": "conversations.call_screen_modal.reconnecting_ellipsis",
+    "value": "Reconectando..."
+  },
+  {
+    "key": "conversations.call_screen_modal.reconnecting_to_call",
+    "value": "Reconectando a la llamada..."
+  },
+  {
+    "key": "conversations.call_screen_modal.speaker",
+    "value": "Altavoz"
+  },
+  {
+    "key": "conversations.call_screen_modal.switch_audio_only",
+    "value": "¿Deseas cambiar a modo solo audio?"
+  },
+  {
+    "key": "conversations.call_screen_modal.unmute",
+    "value": "Desmutar"
+  },
+  {
+    "key": "conversations.call_screen_modal.what_you_can_do",
+    "value": "Lo que puedes hacer:"
   },
   {
     "key": "conversations.call_type_selection_modal.description",
@@ -19000,6 +20576,10 @@
     "value": "Número máximo de mensajes a sincronizar por comprobación"
   },
   {
+    "key": "email.max_sync_messages_placeholder",
+    "value": "100"
+  },
+  {
     "key": "email.new_email",
     "value": "Nuevo email"
   },
@@ -19334,6 +20914,10 @@
   {
     "key": "email.smtp_port",
     "value": "Puerto SMTP"
+  },
+  {
+    "key": "email.smtp_port_placeholder",
+    "value": "465"
   },
   {
     "key": "email.smtp_settings",
@@ -19824,6 +21408,10 @@
     "value": "Descripción opcional"
   },
   {
+    "key": "emailCampaign.placeholder_editor_content",
+    "value": "Escribe el contenido de tu email aquí."
+  },
+  {
     "key": "emailCampaign.placeholder_name",
     "value": "Mi campaña de correo"
   },
@@ -19950,6 +21538,10 @@
   {
     "key": "emailCampaign.subject_required",
     "value": "El asunto del correo es obligatorio."
+  },
+  {
+    "key": "emailCampaign.template",
+    "value": "Plantilla"
   },
   {
     "key": "emailCampaign.timezone_label",
@@ -20894,6 +22486,10 @@
   {
     "key": "erp.common.view",
     "value": "Ver"
+  },
+  {
+    "key": "erp.common.warehouse",
+    "value": "Almacén"
   },
   {
     "key": "erp.common.yes",
@@ -21912,6 +23508,10 @@
     "value": "Subir documento"
   },
   {
+    "key": "erp.dental.palmer",
+    "value": "Palmer"
+  },
+  {
     "key": "erp.dental.patients.activePatient",
     "value": "Paciente activo"
   },
@@ -22906,6 +24506,10 @@
   {
     "key": "erp.dental.treatmentPlans.updated",
     "value": "Plan de tratamiento actualizado"
+  },
+  {
+    "key": "erp.dental.universal",
+    "value": "Universal"
   },
   {
     "key": "erp.electronicInvoicing.apiKey",
@@ -25128,6 +26732,118 @@
     "value": "ERP"
   },
   {
+    "key": "erp.payment.access_token",
+    "value": "Token de acceso"
+  },
+  {
+    "key": "erp.payment.account_name",
+    "value": "Nombre de la cuenta"
+  },
+  {
+    "key": "erp.payment.account_number",
+    "value": "Número de cuenta"
+  },
+  {
+    "key": "erp.payment.bank_name",
+    "value": "Nombre del banco"
+  },
+  {
+    "key": "erp.payment.bank_transfer_desc",
+    "value": "Mostrar datos bancarios en las facturas"
+  },
+  {
+    "key": "erp.payment.business_shortcode",
+    "value": "Código corto de negocio"
+  },
+  {
+    "key": "erp.payment.client_id",
+    "value": "ID de cliente"
+  },
+  {
+    "key": "erp.payment.client_secret",
+    "value": "Secreto de cliente"
+  },
+  {
+    "key": "erp.payment.consumer_key",
+    "value": "Clave de consumidor"
+  },
+  {
+    "key": "erp.payment.consumer_secret",
+    "value": "Secreto de consumidor"
+  },
+  {
+    "key": "erp.payment.enabled",
+    "value": "Activado"
+  },
+  {
+    "key": "erp.payment.instructions",
+    "value": "Instrucciones"
+  },
+  {
+    "key": "erp.payment.mercadopago_desc",
+    "value": "Aceptar pagos con Mercado Pago"
+  },
+  {
+    "key": "erp.payment.merchant_currency",
+    "value": "Moneda del comercio"
+  },
+  {
+    "key": "erp.payment.moyasar_desc",
+    "value": "Aceptar pagos con Moyasar (SAR)"
+  },
+  {
+    "key": "erp.payment.mpesa_desc",
+    "value": "Aceptar dinero móvil M-PESA"
+  },
+  {
+    "key": "erp.payment.passkey",
+    "value": "Clave de acceso"
+  },
+  {
+    "key": "erp.payment.paypal_desc",
+    "value": "Aceptar pagos con PayPal"
+  },
+  {
+    "key": "erp.payment.paystack_desc",
+    "value": "Aceptar pagos con Paystack"
+  },
+  {
+    "key": "erp.payment.public_key",
+    "value": "Clave pública"
+  },
+  {
+    "key": "erp.payment.publishable_key",
+    "value": "Clave publicable"
+  },
+  {
+    "key": "erp.payment.save_manual_methods",
+    "value": "Guardar métodos manuales"
+  },
+  {
+    "key": "erp.payment.secret_key",
+    "value": "Clave secreta"
+  },
+  {
+    "key": "erp.payment.secret_key_paystack",
+    "value": "Clave secreta"
+  },
+  {
+    "key": "erp.payment.test_connection",
+    "value": "Probar conexión"
+  },
+  {
+    "key": "erp.payment.test_mode",
+    "value": "Modo de prueba"
+  },
+  {
+    "key": "erp.payment.webhook_secret",
+    "value": "Secreto del webhook"
+  },
+  {
+    "key": "erp.payment.webhook_url",
+    "value": "URL del webhook"
+  },
+  {
     "key": "erp.payroll.actions.addEmployee",
     "value": "Agregar empleado"
   },
@@ -25284,6 +27000,10 @@
     "value": "Buscar productos o SKU de variante..."
   },
   {
+    "key": "erp.products.adjust",
+    "value": "Ajustar"
+  },
+  {
     "key": "erp.products.allCategories",
     "value": "Todas las categorías"
   },
@@ -25294,6 +27014,14 @@
   {
     "key": "erp.products.allTypes",
     "value": "Todos los tipos"
+  },
+  {
+    "key": "erp.products.attribute_key_placeholder",
+    "value": "p. ej. Talla"
+  },
+  {
+    "key": "erp.products.attribute_value_placeholder",
+    "value": "p. ej. M"
   },
   {
     "key": "erp.products.category.editTitle",
@@ -25334,6 +27062,10 @@
   {
     "key": "erp.products.copyId",
     "value": "Copiar Product ID"
+  },
+  {
+    "key": "erp.products.create_stock_row",
+    "value": "Crear fila de stock"
   },
   {
     "key": "erp.products.customFields.requiredError",
@@ -25616,6 +27348,10 @@
     "value": "Importar Productos"
   },
   {
+    "key": "erp.products.initialize_first_warehouse_stock_row",
+    "value": "Inicializar la primera fila de stock del almacén"
+  },
+  {
     "key": "erp.products.kitchenStation",
     "value": "Estación de cocina"
   },
@@ -25652,6 +27388,14 @@
     "value": "Nuevo producto"
   },
   {
+    "key": "erp.products.on_hand",
+    "value": "En existencia"
+  },
+  {
+    "key": "erp.products.opening_qty",
+    "value": "Cantidad inicial"
+  },
+  {
     "key": "erp.products.prepTime",
     "value": "Tiempo de preparación (minutos)"
   },
@@ -25660,8 +27404,20 @@
     "value": "Producto #{{id}}"
   },
   {
+    "key": "erp.products.qty_adjustment_placeholder",
+    "value": "+/- cant."
+  },
+  {
     "key": "erp.products.recipeIngredients",
     "value": "Ingredientes de receta"
+  },
+  {
+    "key": "erp.products.reorder_pt",
+    "value": "Punto de reorden"
+  },
+  {
+    "key": "erp.products.reorder_qty",
+    "value": "Cantidad de reorden"
   },
   {
     "key": "erp.products.restaurantSettings",
@@ -25670,6 +27426,10 @@
   {
     "key": "erp.products.searchPlaceholder",
     "value": "Buscar nombre, SKU o campos personalizados…"
+  },
+  {
+    "key": "erp.products.select_warehouse",
+    "value": "Selecciona un almacén"
   },
   {
     "key": "erp.products.sort",
@@ -25836,6 +27596,10 @@
     "value": "Tipo"
   },
   {
+    "key": "erp.products.tags_placeholder",
+    "value": "estacional, importado"
+  },
+  {
     "key": "erp.products.title",
     "value": "Productos"
   },
@@ -25864,12 +27628,68 @@
     "value": "Producto actualizado"
   },
   {
+    "key": "erp.products.variant",
+    "value": "Variante"
+  },
+  {
     "key": "erp.products.variant.deleted",
     "value": "Variante eliminada"
   },
   {
     "key": "erp.products.variant.saved",
     "value": "Variante guardada"
+  },
+  {
+    "key": "erp.products.variant_stock_by_warehouse",
+    "value": "Stock de variantes por almacén"
+  },
+  {
+    "key": "erp.products.variants.add_attribute",
+    "value": "Agregar atributo"
+  },
+  {
+    "key": "erp.products.variants.description",
+    "value": "Usa variantes cuando un producto tenga varios SKU vendibles, como tallas, colores o paquetes. Cada variante puede tener su propio SKU y stock."
+  },
+  {
+    "key": "erp.products.variants.empty",
+    "value": "Aún no hay variantes."
+  },
+  {
+    "key": "erp.products.variants.table.actions",
+    "value": "Acciones"
+  },
+  {
+    "key": "erp.products.variants.table.attributes",
+    "value": "Atributos"
+  },
+  {
+    "key": "erp.products.variants.table.barcode",
+    "value": "Código de barras"
+  },
+  {
+    "key": "erp.products.variants.table.cost",
+    "value": "Costo"
+  },
+  {
+    "key": "erp.products.variants.table.name",
+    "value": "Nombre"
+  },
+  {
+    "key": "erp.products.variants.table.price",
+    "value": "Precio"
+  },
+  {
+    "key": "erp.products.variants.table.sku",
+    "value": "SKU"
+  },
+  {
+    "key": "erp.products.variants.table.sort",
+    "value": "Orden"
+  },
+  {
+    "key": "erp.products.variants.table.status",
+    "value": "Estado"
   },
   {
     "key": "erp.products.variants.title",
@@ -26264,6 +28084,70 @@
     "value": "Total de compras"
   },
   {
+    "key": "erp.reports.restaurant.avgMinutesToReady",
+    "value": "Promedio de minutos para listo"
+  },
+  {
+    "key": "erp.reports.restaurant.booked",
+    "value": "Reservado"
+  },
+  {
+    "key": "erp.reports.restaurant.cancelled",
+    "value": "Cancelado"
+  },
+  {
+    "key": "erp.reports.restaurant.count",
+    "value": "Cantidad"
+  },
+  {
+    "key": "erp.reports.restaurant.currentQty",
+    "value": "Cantidad actual"
+  },
+  {
+    "key": "erp.reports.restaurant.ingredient",
+    "value": "Ingrediente"
+  },
+  {
+    "key": "erp.reports.restaurant.ingredientRisk",
+    "value": "Reporte de riesgo de ingredientes"
+  },
+  {
+    "key": "erp.reports.restaurant.noShow",
+    "value": "No presentado"
+  },
+  {
+    "key": "erp.reports.restaurant.orderMixReport",
+    "value": "Reporte de mezcla de órdenes"
+  },
+  {
+    "key": "erp.reports.restaurant.reorderPoint",
+    "value": "Punto de reorden"
+  },
+  {
+    "key": "erp.reports.restaurant.reservationLoad",
+    "value": "Reporte de carga de reservas"
+  },
+  {
+    "key": "erp.reports.restaurant.riskLevel",
+    "value": "Nivel de riesgo"
+  },
+  {
+    "key": "erp.reports.restaurant.seated",
+    "value": "Sentado"
+  },
+  {
+    "key": "erp.reports.restaurant.serviceType",
+    "value": "Tipo de servicio"
+  },
+  {
+    "key": "erp.reports.restaurant.ticketThroughput",
+    "value": "Reporte de throughput de tickets"
+  },
+  {
+    "key": "erp.reports.restaurant.ticketsCompleted",
+    "value": "Tickets completados"
+  },
+  {
     "key": "erp.reports.sales.byGroup",
     "value": "Por {{group}}"
   },
@@ -26314,6 +28198,10 @@
   {
     "key": "erp.reports.types.purchases",
     "value": "Reporte de compras"
+  },
+  {
+    "key": "erp.reports.types.restaurant",
+    "value": "Restaurante"
   },
   {
     "key": "erp.reports.types.sales",
@@ -27126,6 +29014,18 @@
   {
     "key": "erp.restaurant.tableFloors.shape",
     "value": "Forma"
+  },
+  {
+    "key": "erp.restaurant.tableFloors.shape_circle",
+    "value": "Círculo"
+  },
+  {
+    "key": "erp.restaurant.tableFloors.shape_rectangle",
+    "value": "Rectángulo"
+  },
+  {
+    "key": "erp.restaurant.tableFloors.shape_square",
+    "value": "Cuadrado"
   },
   {
     "key": "erp.restaurant.tableFloors.startNumber",
@@ -28956,6 +30856,10 @@
     "value": "Después"
   },
   {
+    "key": "flow_builder.agent_notification",
+    "value": "Notificación al agente"
+  },
+  {
     "key": "flow_builder.ai.connect_mcp_tools",
     "value": "Conecte aquí los nodos Herramienta cliente MCP"
   },
@@ -29046,6 +30950,18 @@
   {
     "key": "flow_builder.ai_assistant_node_title",
     "value": "Asistente IA"
+  },
+  {
+    "key": "flow_builder.ai_assistant_variables_complete",
+    "value": "Variables completas"
+  },
+  {
+    "key": "flow_builder.ai_assistant_variables_complete_desc",
+    "value": "Se activa cuando se completan todas las variables personalizadas del prompt"
+  },
+  {
+    "key": "flow_builder.ai_assistant_watching_label",
+    "value": "Observando:"
   },
   {
     "key": "flow_builder.ai_audio_enabled",
@@ -31108,6 +33024,10 @@
     "value": "El tipo de canal se determina automáticamente a partir del disparador de mensaje. La notificación utilizará el mismo canal que el mensaje entrante."
   },
   {
+    "key": "flow_builder.auto_reassign",
+    "value": "Reasignar automáticamente la conversación al bot"
+  },
+  {
     "key": "flow_builder.available_variables",
     "value": "Variables Disponibles"
   },
@@ -31180,6 +33100,10 @@
     "value": "8 horas"
   },
   {
+    "key": "flow_builder.bot_disable_agent_assignment_label",
+    "value": "Asignación de agente"
+  },
+  {
     "key": "flow_builder.bot_disable_agent_badge",
     "value": "Agente"
   },
@@ -31240,6 +33164,10 @@
     "value": "Error al cargar agentes"
   },
   {
+    "key": "flow_builder.bot_disable_error_loading_variables",
+    "value": "Error al cargar variables"
+  },
+  {
     "key": "flow_builder.bot_disable_handoff_message_label",
     "value": "Mensaje de transferencia"
   },
@@ -31260,6 +33188,10 @@
     "value": "No hay agentes disponibles"
   },
   {
+    "key": "flow_builder.bot_disable_no_variables",
+    "value": "No se encontraron variables."
+  },
+  {
     "key": "flow_builder.bot_disable_no_whatsapp_channels",
     "value": "No hay canales de WhatsApp activos"
   },
@@ -31274,6 +33206,10 @@
   {
     "key": "flow_builder.bot_disable_notify_assigned_agent",
     "value": "Notificar al agente asignado"
+  },
+  {
+    "key": "flow_builder.bot_disable_refresh_variables_tooltip",
+    "value": "Actualizar variables capturadas"
   },
   {
     "key": "flow_builder.bot_disable_select_agent",
@@ -32084,6 +34020,110 @@
     "value": "Selecciona uno o más canales Meta para el enrutamiento de anuncios. Solo Messenger, Instagram y WhatsApp están disponibles en este modo."
   },
   {
+    "key": "flow_builder.chat_pdf.ai_integration_tooltip",
+    "value": "Integración de IA Chat PDF"
+  },
+  {
+    "key": "flow_builder.chat_pdf.ai_model_label",
+    "value": "Modelo de IA"
+  },
+  {
+    "key": "flow_builder.chat_pdf.api_key_label",
+    "value": "Clave API"
+  },
+  {
+    "key": "flow_builder.chat_pdf.api_key_placeholder",
+    "value": "Ingresa tu clave de API de Chat PDF"
+  },
+  {
+    "key": "flow_builder.chat_pdf.available_documents",
+    "value": "Documentos disponibles"
+  },
+  {
+    "key": "flow_builder.chat_pdf.available_label",
+    "value": "Disponible"
+  },
+  {
+    "key": "flow_builder.chat_pdf.choose_document",
+    "value": "Elige un documento"
+  },
+  {
+    "key": "flow_builder.chat_pdf.configuration",
+    "value": "Configuración"
+  },
+  {
+    "key": "flow_builder.chat_pdf.delete_document",
+    "value": "Eliminar documento"
+  },
+  {
+    "key": "flow_builder.chat_pdf.delete_node",
+    "value": "Eliminar nodo"
+  },
+  {
+    "key": "flow_builder.chat_pdf.document_label",
+    "value": "Documento"
+  },
+  {
+    "key": "flow_builder.chat_pdf.enable_ocr",
+    "value": "Habilitar OCR para documentos escaneados"
+  },
+  {
+    "key": "flow_builder.chat_pdf.get_api_key",
+    "value": "Obtener clave de API"
+  },
+  {
+    "key": "flow_builder.chat_pdf.integration_title",
+    "value": "Integración de Chat PDF"
+  },
+  {
+    "key": "flow_builder.chat_pdf.model_label",
+    "value": "Modelo"
+  },
+  {
+    "key": "flow_builder.chat_pdf.more_documents",
+    "value": "+{{count}} documentos más"
+  },
+  {
+    "key": "flow_builder.chat_pdf.operation_label",
+    "value": "Operación"
+  },
+  {
+    "key": "flow_builder.chat_pdf.operation_select_label",
+    "value": "Operación"
+  },
+  {
+    "key": "flow_builder.chat_pdf.ready_tooltip",
+    "value": "Chat PDF está configurado y listo para usar"
+  },
+  {
+    "key": "flow_builder.chat_pdf.refresh_document_list",
+    "value": "Actualizar lista de documentos"
+  },
+  {
+    "key": "flow_builder.chat_pdf.setup_tooltip",
+    "value": "Completa la configuración de la clave de API y del documento"
+  },
+  {
+    "key": "flow_builder.chat_pdf.status_ready",
+    "value": "Listo"
+  },
+  {
+    "key": "flow_builder.chat_pdf.status_setup_required",
+    "value": "Configuración requerida"
+  },
+  {
+    "key": "flow_builder.chat_pdf.test_connection",
+    "value": "Probar conexión"
+  },
+  {
+    "key": "flow_builder.chat_pdf.upload_new_document",
+    "value": "Subir nuevo documento"
+  },
+  {
+    "key": "flow_builder.chat_pdf.upload_pdf_button",
+    "value": "Subir PDF (máx. 4.5MB)"
+  },
+  {
     "key": "flow_builder.chatpdf_analyze_content",
     "value": "Analizar Contenido"
   },
@@ -32130,6 +34170,18 @@
   {
     "key": "flow_builder.checking",
     "value": "Comprobando..."
+  },
+  {
+    "key": "flow_builder.clear_all_variables",
+    "value": "Limpiar todas las variables del flujo"
+  },
+  {
+    "key": "flow_builder.clear_variables",
+    "value": "Limpiar variables"
+  },
+  {
+    "key": "flow_builder.close",
+    "value": "Cierra"
   },
   {
     "key": "flow_builder.code_execution",
@@ -33236,6 +35288,10 @@
     "value": "Configurado con {{count}} campo(s)"
   },
   {
+    "key": "flow_builder.confirmation_message",
+    "value": "Mensaje de confirmación"
+  },
+  {
     "key": "flow_builder.confirmation_required",
     "value": "Confirmación requerida"
   },
@@ -33572,6 +35628,26 @@
     "value": "Tiene campos obligatorios"
   },
   {
+    "key": "flow_builder.data_capture_help_capture_rule_label",
+    "value": "Regla de captura:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_capture_rules_form_mode_label",
+    "value": "Reglas de captura (modo formulario):"
+  },
+  {
+    "key": "flow_builder.data_capture_help_capture_rules_label",
+    "value": "Reglas de captura:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_captured_label",
+    "value": "Capturado:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_common_patterns",
+    "value": "Patrones comunes:"
+  },
+  {
     "key": "flow_builder.data_capture_help_config_options",
     "value": "Opciones de Configuración"
   },
@@ -33594,6 +35670,14 @@
   {
     "key": "flow_builder.data_capture_help_description",
     "value": "Aprende a capturar y usar datos efectivamente en tus flujos"
+  },
+  {
+    "key": "flow_builder.data_capture_help_example_hello_result",
+    "value": "Hola John, ¿en qué puedo ayudarte hoy?"
+  },
+  {
+    "key": "flow_builder.data_capture_help_example_hello_usage",
+    "value": "Hola {{user_name}}, ¿en qué puedo ayudarte hoy?"
   },
   {
     "key": "flow_builder.data_capture_help_examples",
@@ -33630,6 +35714,22 @@
   {
     "key": "flow_builder.data_capture_help_required_desc",
     "value": "Cuando un campo está marcado como obligatorio, el flujo fallará si no se puede capturar el dato. Usar solo para información crítica."
+  },
+  {
+    "key": "flow_builder.data_capture_help_result_label",
+    "value": "Resultado:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_scope_flow",
+    "value": "Flujo"
+  },
+  {
+    "key": "flow_builder.data_capture_help_scope_global",
+    "value": "Global"
+  },
+  {
+    "key": "flow_builder.data_capture_help_scope_session",
+    "value": "Sesión"
   },
   {
     "key": "flow_builder.data_capture_help_source_types",
@@ -33672,6 +35772,14 @@
     "value": "Cualquier contenido de texto, sin validación"
   },
   {
+    "key": "flow_builder.data_capture_help_usage_in_next_node_label",
+    "value": "Uso en el siguiente nodo:"
+  },
+  {
+    "key": "flow_builder.data_capture_help_usage_label",
+    "value": "Uso:"
+  },
+  {
     "key": "flow_builder.data_capture_help_user_input",
     "value": "Entrada del Usuario y Prompt Personalizado"
   },
@@ -33682,6 +35790,10 @@
   {
     "key": "flow_builder.data_capture_help_user_input_desc",
     "value": "Captura respuestas directas del usuario o solicita información específica al usuario."
+  },
+  {
+    "key": "flow_builder.data_capture_help_user_message_label",
+    "value": "Mensaje del usuario:"
   },
   {
     "key": "flow_builder.data_capture_help_validation",
@@ -33698,6 +35810,14 @@
   {
     "key": "flow_builder.data_capture_help_variables_work",
     "value": "Cómo Funcionan las Variables"
+  },
+  {
+    "key": "flow_builder.data_capture_help_variables_work_desc_post",
+    "value": "tokens que se pueden usar en cualquier nodo posterior de tu flujo."
+  },
+  {
+    "key": "flow_builder.data_capture_help_variables_work_desc_pre",
+    "value": "Una vez capturado, el dato queda disponible como"
   },
   {
     "key": "flow_builder.data_capture_media_kind",
@@ -33972,16 +36092,40 @@
     "value": "Modo de conexión"
   },
   {
+    "key": "flow_builder.db_connection_string",
+    "value": "Cadena de conexión"
+  },
+  {
     "key": "flow_builder.db_connection_string_placeholder",
     "value": "postgres://user:pass@host:5432/db"
+  },
+  {
+    "key": "flow_builder.db_database",
+    "value": "base de datos"
+  },
+  {
+    "key": "flow_builder.db_detected_parameters",
+    "value": "Parámetros detectados"
   },
   {
     "key": "flow_builder.db_engine",
     "value": "Motor"
   },
   {
+    "key": "flow_builder.db_fields",
+    "value": "Campos"
+  },
+  {
+    "key": "flow_builder.db_host",
+    "value": "host"
+  },
+  {
     "key": "flow_builder.db_json_view",
     "value": "Vista JSON"
+  },
+  {
+    "key": "flow_builder.db_mysql",
+    "value": "MySQL"
   },
   {
     "key": "flow_builder.db_no_connection",
@@ -33998,6 +36142,26 @@
   {
     "key": "flow_builder.db_param_hint",
     "value": "Use la sintaxis {{syntax}} — los valores se enlazan como parámetros SQL, nunca se interpolan."
+  },
+  {
+    "key": "flow_builder.db_params",
+    "value": "parámetros"
+  },
+  {
+    "key": "flow_builder.db_password",
+    "value": "contraseña"
+  },
+  {
+    "key": "flow_builder.db_port",
+    "value": "puerto"
+  },
+  {
+    "key": "flow_builder.db_postgres",
+    "value": "Postgres"
+  },
+  {
+    "key": "flow_builder.db_query_label",
+    "value": "Consulta"
   },
   {
     "key": "flow_builder.db_query_placeholder",
@@ -34038,6 +36202,14 @@
   {
     "key": "flow_builder.db_truncated_notice",
     "value": "Mostrando las primeras {{limit}} filas"
+  },
+  {
+    "key": "flow_builder.db_use_ssl",
+    "value": "Usar SSL"
+  },
+  {
+    "key": "flow_builder.db_username",
+    "value": "usuario"
   },
   {
     "key": "flow_builder.deal_id",
@@ -34696,6 +36868,14 @@
     "value": "Analiza todos los documentos de la carpeta y proporciona información"
   },
   {
+    "key": "flow_builder.documind_api_key",
+    "value": "Clave API"
+  },
+  {
+    "key": "flow_builder.documind_api_key_placeholder",
+    "value": "Introduce tu clave API de Documind"
+  },
+  {
     "key": "flow_builder.documind_ask_question",
     "value": "Hacer Pregunta"
   },
@@ -34704,8 +36884,52 @@
     "value": "Haz una pregunta sobre los documentos de la carpeta seleccionada"
   },
   {
+    "key": "flow_builder.documind_choose_folder",
+    "value": "Elige una carpeta"
+  },
+  {
+    "key": "flow_builder.documind_complete_config",
+    "value": "Completa la configuración de clave API y carpeta"
+  },
+  {
+    "key": "flow_builder.documind_config_completeness",
+    "value": "Integridad de la configuración: {{progress}}%"
+  },
+  {
+    "key": "flow_builder.documind_config_incomplete",
+    "value": "Completa los campos requeridos para alcanzar 70%"
+  },
+  {
+    "key": "flow_builder.documind_config_ready",
+    "value": "¡Configuración lista!"
+  },
+  {
+    "key": "flow_builder.documind_configured_percent",
+    "value": "{{progress}}% configurado"
+  },
+  {
+    "key": "flow_builder.documind_connected",
+    "value": "Conectado"
+  },
+  {
+    "key": "flow_builder.documind_connection_error",
+    "value": "Error de conexión"
+  },
+  {
     "key": "flow_builder.documind_conversation_history",
     "value": "Historial de Conversación"
+  },
+  {
+    "key": "flow_builder.documind_create_folder",
+    "value": "Crear Carpeta"
+  },
+  {
+    "key": "flow_builder.documind_delete_file",
+    "value": "Eliminar archivo"
+  },
+  {
+    "key": "flow_builder.documind_delete_folder",
+    "value": "Eliminar carpeta"
   },
   {
     "key": "flow_builder.documind_delete_node",
@@ -34720,6 +36944,34 @@
     "value": "Incluir historial de conversación"
   },
   {
+    "key": "flow_builder.documind_enter_folder_name",
+    "value": "Introduce el nombre de la carpeta:"
+  },
+  {
+    "key": "flow_builder.documind_files",
+    "value": "Archivos"
+  },
+  {
+    "key": "flow_builder.documind_files_label",
+    "value": "Archivos:"
+  },
+  {
+    "key": "flow_builder.documind_folder",
+    "value": "Carpeta"
+  },
+  {
+    "key": "flow_builder.documind_folder_label",
+    "value": "Carpeta:"
+  },
+  {
+    "key": "flow_builder.documind_get_api_key",
+    "value": "Obtener Clave API"
+  },
+  {
+    "key": "flow_builder.documind_hide_config",
+    "value": "Ocultar panel de configuración"
+  },
+  {
     "key": "flow_builder.documind_history_help",
     "value": "Mensajes anteriores a incluir para el contexto"
   },
@@ -34728,8 +36980,28 @@
     "value": "Límite de Mensajes"
   },
   {
+    "key": "flow_builder.documind_integration_title",
+    "value": "Integración de Documind"
+  },
+  {
     "key": "flow_builder.documind_node_title",
     "value": "IA Documind"
+  },
+  {
+    "key": "flow_builder.documind_not_connected",
+    "value": "No conectado"
+  },
+  {
+    "key": "flow_builder.documind_operation",
+    "value": "Operación"
+  },
+  {
+    "key": "flow_builder.documind_operation_label",
+    "value": "Operación:"
+  },
+  {
+    "key": "flow_builder.documind_ready_use",
+    "value": "Documind está configurado y listo para usar"
   },
   {
     "key": "flow_builder.documind_search_content",
@@ -34738,6 +37010,38 @@
   {
     "key": "flow_builder.documind_search_content_description",
     "value": "Busca contenido específico en todos los documentos"
+  },
+  {
+    "key": "flow_builder.documind_select_operation",
+    "value": "Selecciona operación"
+  },
+  {
+    "key": "flow_builder.documind_show_config",
+    "value": "Mostrar panel de configuración"
+  },
+  {
+    "key": "flow_builder.documind_system_prompt",
+    "value": "Prompt del Sistema"
+  },
+  {
+    "key": "flow_builder.documind_system_prompt_placeholder",
+    "value": "Introduce instrucciones del sistema para guiar la respuesta de la IA (p.ej., 'Responde en tono profesional', 'Proporciona puntos', 'Enfócate en detalles técnicos')"
+  },
+  {
+    "key": "flow_builder.documind_test_connection",
+    "value": "Probar Conexión"
+  },
+  {
+    "key": "flow_builder.documind_upload_pdf",
+    "value": "Cargar PDF"
+  },
+  {
+    "key": "flow_builder.documind_uploading",
+    "value": "Cargando..."
+  },
+  {
+    "key": "flow_builder.documind_variables_support",
+    "value": "Soporta variables como {{contact.name}}, {{message.content}}. Estas se reemplazarán en tiempo de ejecución."
   },
   {
     "key": "flow_builder.draft",
@@ -35360,6 +37664,10 @@
     "value": "Error al cargar el flujo"
   },
   {
+    "key": "flow_builder.error_loading_variables",
+    "value": "Error al cargar variables"
+  },
+  {
     "key": "flow_builder.error_updating_flow",
     "value": "Error al actualizar el flujo"
   },
@@ -35468,12 +37776,20 @@
     "value": "Completado"
   },
   {
+    "key": "flow_builder.execution_history_contact_id",
+    "value": "ID de contacto:"
+  },
+  {
     "key": "flow_builder.execution_history_context_snapshot",
     "value": "Ruta de ejecución + instantánea de contexto"
   },
   {
     "key": "flow_builder.execution_history_context_tab",
     "value": "Contexto"
+  },
+  {
+    "key": "flow_builder.execution_history_conversation_id",
+    "value": "ID de conversación:"
   },
   {
     "key": "flow_builder.execution_history_current_node",
@@ -35492,6 +37808,10 @@
     "value": "Ninguna ejecución coincide con el filtro actual."
   },
   {
+    "key": "flow_builder.execution_history_execution_id",
+    "value": "ID de ejecución:"
+  },
+  {
     "key": "flow_builder.execution_history_identifiers",
     "value": "Identificadores"
   },
@@ -35502,6 +37822,10 @@
   {
     "key": "flow_builder.execution_history_last_activity",
     "value": "Última actividad"
+  },
+  {
+    "key": "flow_builder.execution_history_max",
+    "value": "máx"
   },
   {
     "key": "flow_builder.execution_history_no_steps",
@@ -35520,12 +37844,24 @@
     "value": "Elige una ejecución para inspeccionar el historial a nivel de nodo."
   },
   {
+    "key": "flow_builder.execution_history_retries",
+    "value": "Reintentos"
+  },
+  {
+    "key": "flow_builder.execution_history_retry",
+    "value": "reintentar"
+  },
+  {
     "key": "flow_builder.execution_history_run_details",
     "value": "Ejecución"
   },
   {
     "key": "flow_builder.execution_history_run_details_subtitle",
     "value": "ID de ejecución {{runId}}"
+  },
+  {
+    "key": "flow_builder.execution_history_run_id",
+    "value": "ID de ejecución (run):"
   },
   {
     "key": "flow_builder.execution_history_run_tab",
@@ -35554,6 +37890,10 @@
   {
     "key": "flow_builder.execution_history_select_step",
     "value": "Selecciona una ejecución de nodo en la línea de tiempo para inspeccionar sus datos."
+  },
+  {
+    "key": "flow_builder.execution_history_session_id",
+    "value": "ID de sesión:"
   },
   {
     "key": "flow_builder.execution_history_started",
@@ -35836,6 +38176,10 @@
     "value": "Dominio de origen"
   },
   {
+    "key": "flow_builder.from_pipeline_optional",
+    "value": "Desde Pipeline (Opcional)"
+  },
+  {
     "key": "flow_builder.fully_configured_ready",
     "value": "Totalmente configurado y listo"
   },
@@ -35920,6 +38264,10 @@
     "value": "Exportar como"
   },
   {
+    "key": "flow_builder.gamma.export_format_png",
+    "value": "PNG (por tarjeta)"
+  },
+  {
     "key": "flow_builder.gamma.export_pdf",
     "value": "PDF"
   },
@@ -35962,6 +38310,26 @@
   {
     "key": "flow_builder.gamma.format_presentation",
     "value": "Presentación"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_2_5_flash",
+    "value": "Gemini 2.5 Flash"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_2_5_flash_lite",
+    "value": "Gemini 2.5 Flash-Lite"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_2_5_pro",
+    "value": "Gemini 2.5 Pro"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_3_1_pro",
+    "value": "Gemini 3.1 Pro (recomendado)"
+  },
+  {
+    "key": "flow_builder.gamma.gemini_3_5_flash",
+    "value": "Gemini 3.5 Flash (razonamiento)"
   },
   {
     "key": "flow_builder.gamma.gemini_history_limit",
@@ -36112,6 +38480,30 @@
     "value": "{{contact.name}}-presentacion"
   },
   {
+    "key": "flow_builder.gamma.position_bottom_center",
+    "value": "Centro inferior"
+  },
+  {
+    "key": "flow_builder.gamma.position_bottom_left",
+    "value": "Inferior izquierda"
+  },
+  {
+    "key": "flow_builder.gamma.position_bottom_right",
+    "value": "Inferior derecha"
+  },
+  {
+    "key": "flow_builder.gamma.position_top_center",
+    "value": "Centro superior"
+  },
+  {
+    "key": "flow_builder.gamma.position_top_left",
+    "value": "Superior izquierda"
+  },
+  {
+    "key": "flow_builder.gamma.position_top_right",
+    "value": "Superior derecha"
+  },
+  {
     "key": "flow_builder.gamma.prompt",
     "value": "Indicación"
   },
@@ -36154,6 +38546,22 @@
   {
     "key": "flow_builder.gamma.setup_required",
     "value": "Configuración requerida"
+  },
+  {
+    "key": "flow_builder.gamma.size_lg",
+    "value": "lg (grande)"
+  },
+  {
+    "key": "flow_builder.gamma.size_md",
+    "value": "md (mediano)"
+  },
+  {
+    "key": "flow_builder.gamma.size_sm",
+    "value": "sm (pequeño)"
+  },
+  {
+    "key": "flow_builder.gamma.size_xl",
+    "value": "xl (extra grande)"
   },
   {
     "key": "flow_builder.gamma.system_themes",
@@ -36794,6 +39202,10 @@
   {
     "key": "flow_builder.google_sheets.test_connect_first",
     "value": "Conecte su cuenta de Google arriba para probar la conexión"
+  },
+  {
+    "key": "flow_builder.google_sheets.test_match_tooltip",
+    "value": "Prueba si existen filas que coincidan con tus criterios"
   },
   {
     "key": "flow_builder.google_sheets.test_sample_row",
@@ -37514,6 +39926,18 @@
   {
     "key": "flow_builder.keyword_case_sensitive_suffix",
     "value": "(distingue mayúsculas y minúsculas)"
+  },
+  {
+    "key": "flow_builder.keyword_item",
+    "value": "Palabra clave {{index}}"
+  },
+  {
+    "key": "flow_builder.keyword_match_placeholder",
+    "value": "Texto para buscar"
+  },
+  {
+    "key": "flow_builder.keyword_match_value",
+    "value": "Valor a buscar:"
   },
   {
     "key": "flow_builder.keyword_match_value_label",
@@ -40320,6 +42744,10 @@
     "value": "Redacta tu mensaje de seguimiento. Usa la sintaxis {{variable}} para insertar contenido dinámico"
   },
   {
+    "key": "flow_builder.message_label",
+    "value": "Mensaje"
+  },
+  {
     "key": "flow_builder.message_lowercase",
     "value": "mensaje"
   },
@@ -40668,6 +43096,10 @@
     "value": "Por favor, introduce la URL de tu instancia de n8n"
   },
   {
+    "key": "flow_builder.n8n_integration",
+    "value": "Integración n8n"
+  },
+  {
     "key": "flow_builder.n8n_integration_examples",
     "value": "📋 Ejemplos de Integración"
   },
@@ -40768,6 +43200,10 @@
     "value": "📤 Soporte de Salida:"
   },
   {
+    "key": "flow_builder.n8n_request_timeout_seconds",
+    "value": "Tiempo de espera de la solicitud: {{timeout}} segundos"
+  },
+  {
     "key": "flow_builder.n8n_required_fields_marked",
     "value": "Los campos requeridos están marcados con *"
   },
@@ -40798,6 +43234,10 @@
   {
     "key": "flow_builder.n8n_test_connection_failed",
     "value": "Fallo al probar la conexión. Por favor, revisa tu configuración e inténtalo de nuevo."
+  },
+  {
+    "key": "flow_builder.n8n_timeout_badge",
+    "value": "Tiempo de espera: {{timeout}}s"
   },
   {
     "key": "flow_builder.n8n_timeout_help_default",
@@ -40948,6 +43388,10 @@
     "value": "No se proporcionó imagen"
   },
   {
+    "key": "flow_builder.no_match_output",
+    "value": "Habrá una salida de \"sin coincidencia\" disponible para respuestas que no coincidan."
+  },
+  {
     "key": "flow_builder.no_match_route",
     "value": "Sin coincidencia de palabra clave"
   },
@@ -40958,6 +43402,10 @@
   {
     "key": "flow_builder.no_url_provided",
     "value": "No se proporcionó URL"
+  },
+  {
+    "key": "flow_builder.no_variables_found",
+    "value": "No se encontraron variables."
   },
   {
     "key": "flow_builder.node_connections_removed",
@@ -41256,6 +43704,14 @@
     "value": "Notificación enviada correctamente"
   },
   {
+    "key": "flow_builder.notify_agent",
+    "value": "Notificar al agente"
+  },
+  {
+    "key": "flow_builder.notify_agent_reenablement",
+    "value": "Notificar al agente cuando se reactive el bot"
+  },
+  {
     "key": "flow_builder.operation_type",
     "value": "Tipo de operación"
   },
@@ -41266,6 +43722,10 @@
   {
     "key": "flow_builder.operator",
     "value": "Operador"
+  },
+  {
+    "key": "flow_builder.option_item",
+    "value": "Opción {{index}}"
   },
   {
     "key": "flow_builder.or_enter_image_url",
@@ -41372,6 +43832,14 @@
     "value": "Por favor, responde:"
   },
   {
+    "key": "flow_builder.poll_display_text",
+    "value": "Texto a mostrar:"
+  },
+  {
+    "key": "flow_builder.poll_enable_go_back",
+    "value": "Habilitar volver atrás"
+  },
+  {
     "key": "flow_builder.poll_go_back_default",
     "value": "← Volver"
   },
@@ -41426,6 +43894,10 @@
   {
     "key": "flow_builder.poll_responds_to",
     "value": "Responde a"
+  },
+  {
+    "key": "flow_builder.poll_response_value",
+    "value": "Valor de respuesta:"
   },
   {
     "key": "flow_builder.postman_add_nodes",
@@ -41580,6 +44052,10 @@
     "value": "Previsualizar Audio"
   },
   {
+    "key": "flow_builder.preview_button",
+    "value": "Vista previa"
+  },
+  {
     "key": "flow_builder.preview_document",
     "value": "Previsualizar Documento"
   },
@@ -41616,6 +44092,10 @@
     "value": "Tengo otra pregunta."
   },
   {
+    "key": "flow_builder.quick_reply_display_text",
+    "value": "Texto a mostrar:"
+  },
+  {
     "key": "flow_builder.quick_reply_each_output",
     "value": "Cada opción tendrá su propia conexión de salida."
   },
@@ -41628,8 +44108,20 @@
     "value": "← Atrás"
   },
   {
+    "key": "flow_builder.quick_reply_go_back_display_help",
+    "value": "Texto mostrado a los usuarios para la opción de volver atrás"
+  },
+  {
     "key": "flow_builder.quick_reply_go_back_label",
     "value": "Opción Atrás:"
+  },
+  {
+    "key": "flow_builder.quick_reply_go_back_value_default",
+    "value": "go_back"
+  },
+  {
+    "key": "flow_builder.quick_reply_go_back_value_help",
+    "value": "Valor que los usuarios pueden escribir para activar la acción de volver atrás"
   },
   {
     "key": "flow_builder.quick_reply_invalid_response",
@@ -41638,6 +44130,10 @@
   {
     "key": "flow_builder.quick_reply_invalid_response_label",
     "value": "Mensaje de Respuesta Inválida"
+  },
+  {
+    "key": "flow_builder.quick_reply_invalid_response_placeholder",
+    "value": "Mensaje a enviar cuando la respuesta del usuario no coincida con ninguna opción..."
   },
   {
     "key": "flow_builder.quick_reply_message_label",
@@ -41656,8 +44152,36 @@
     "value": "Opciones"
   },
   {
+    "key": "flow_builder.quick_reply_response_value",
+    "value": "Valor de respuesta:"
+  },
+  {
+    "key": "flow_builder.quick_reply_text_to_display",
+    "value": "Texto a mostrar"
+  },
+  {
+    "key": "flow_builder.quick_reply_type_message_placeholder",
+    "value": "Escribe tu mensaje aquí..."
+  },
+  {
+    "key": "flow_builder.quick_reply_value_help",
+    "value": "El usuario puede responder con este valor para seleccionar esta opción"
+  },
+  {
+    "key": "flow_builder.quick_reply_value_to_match",
+    "value": "Valor para emparejar"
+  },
+  {
+    "key": "flow_builder.re_enable_bot",
+    "value": "Reactivar bot"
+  },
+  {
     "key": "flow_builder.ready",
     "value": "Listo"
+  },
+  {
+    "key": "flow_builder.refresh_variables",
+    "value": "Refrescar variables capturadas"
   },
   {
     "key": "flow_builder.regex_pattern",
@@ -41686,6 +44210,26 @@
   {
     "key": "flow_builder.remove_image",
     "value": "Eliminar Imagen"
+  },
+  {
+    "key": "flow_builder.reset_bot_node_title",
+    "value": "Reiniciar bot"
+  },
+  {
+    "key": "flow_builder.reset_flow",
+    "value": "Reiniciar flujo"
+  },
+  {
+    "key": "flow_builder.reset_flow_beginning",
+    "value": "Reiniciar flujo desde el principio"
+  },
+  {
+    "key": "flow_builder.reset_scope",
+    "value": "Alcance del reinicio"
+  },
+  {
+    "key": "flow_builder.responds_to",
+    "value": "Responde a:"
   },
   {
     "key": "flow_builder.result",
@@ -41798,6 +44342,14 @@
   {
     "key": "flow_builder.send_audio",
     "value": "Enviar Audio"
+  },
+  {
+    "key": "flow_builder.send_confirmation",
+    "value": "Enviar confirmación"
+  },
+  {
+    "key": "flow_builder.send_confirmation_message",
+    "value": "Enviar mensaje de confirmación"
   },
   {
     "key": "flow_builder.send_document",
@@ -42104,8 +44656,20 @@
     "value": "Webhooks"
   },
   {
+    "key": "flow_builder.shortcuts_label",
+    "value": "Atajos:"
+  },
+  {
     "key": "flow_builder.show_configuration_options",
     "value": "Mostrar opciones de configuración"
+  },
+  {
+    "key": "flow_builder.show_preview_values",
+    "value": "Mostrar valores de vista previa"
+  },
+  {
+    "key": "flow_builder.show_variables",
+    "value": "Mostrar variables"
   },
   {
     "key": "flow_builder.simple_mode",
@@ -42470,6 +45034,10 @@
   {
     "key": "flow_builder.timing_config",
     "value": "Configuración de temporización"
+  },
+  {
+    "key": "flow_builder.to_pipeline_optional",
+    "value": "Hacia Pipeline (Opcional)"
   },
   {
     "key": "flow_builder.translation",
@@ -43224,6 +45792,10 @@
     "value": "Introduzca un valor o {{variable}}"
   },
   {
+    "key": "flow_builder.update_pipeline_stage_node.invalid_config",
+    "value": "Configuración inválida"
+  },
+  {
     "key": "flow_builder.update_pipeline_stage_node.keep_current",
     "value": "Mantener actual"
   },
@@ -43262,6 +45834,22 @@
   {
     "key": "flow_builder.update_pipeline_stage_node.only_revert_if_no_activity_help",
     "value": "Revertir el negocio solo si no ocurrió actividad desde el cambio de etapa"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.operation_create_deal",
+    "value": "Crear negociación"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.operation_create_stage",
+    "value": "Crear etapa"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.operation_type_help",
+    "value": "Elige qué acción realizar en la canalización"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.operation_update_stage",
+    "value": "Actualizar etapa"
   },
   {
     "key": "flow_builder.update_pipeline_stage_node.pipeline_filter_help",
@@ -43308,12 +45896,20 @@
     "value": "Nombre de la etapa"
   },
   {
+    "key": "flow_builder.update_pipeline_stage_node.stage_revert_error",
+    "value": "La reversión de etapa está habilitada pero no hay etapa de destino seleccionada"
+  },
+  {
     "key": "flow_builder.update_pipeline_stage_node.stage_revert_help",
     "value": "Revertir automáticamente el negocio a una etapa anterior después de un tiempo especificado si no se realiza ninguna acción"
   },
   {
     "key": "flow_builder.update_pipeline_stage_node.stage_revert_settings",
     "value": "Configuración de reversión de etapa"
+  },
+  {
+    "key": "flow_builder.update_pipeline_stage_node.tag_management",
+    "value": "Gestión de etiquetas"
   },
   {
     "key": "flow_builder.update_pipeline_stage_node.tags_to_add",
@@ -43472,6 +46068,10 @@
     "value": "Todas las Categorías"
   },
   {
+    "key": "flow_builder.variable_browser_browse_variables",
+    "value": "Examinar Variables"
+  },
+  {
     "key": "flow_builder.variable_browser_clear_all_confirm",
     "value": "Eliminar Todas las Sesiones"
   },
@@ -43500,6 +46100,18 @@
     "value": "Borrar todas las sesiones de este flujo"
   },
   {
+    "key": "flow_builder.variable_browser_clear_data",
+    "value": "Borrar Datos"
+  },
+  {
+    "key": "flow_builder.variable_browser_clear_session_dialog_desc",
+    "value": "¿Estás seguro de que quieres borrar todos los datos de variables para esta sesión? Esta acción no se puede deshacer."
+  },
+  {
+    "key": "flow_builder.variable_browser_clear_session_dialog_title",
+    "value": "Borrar Datos de Sesión"
+  },
+  {
     "key": "flow_builder.variable_browser_clear_session_error_title",
     "value": "Error al borrar los datos de sesión"
   },
@@ -43522,6 +46134,10 @@
   {
     "key": "flow_builder.variable_browser_description",
     "value": "Explora y gestiona las variables del flujo"
+  },
+  {
+    "key": "flow_builder.variable_browser_description_dialog",
+    "value": "Examina y selecciona variables para usar en tu flujo"
   },
   {
     "key": "flow_builder.variable_browser_error_loading_sessions",
@@ -43656,6 +46272,10 @@
     "value": "Explorador de Variables"
   },
   {
+    "key": "flow_builder.variable_browser_title_dialog",
+    "value": "Explorador de Variables"
+  },
+  {
     "key": "flow_builder.variable_browser_unexpected_error",
     "value": "Ocurrió un error inesperado"
   },
@@ -43776,6 +46396,10 @@
     "value": "Resultado del Flujo"
   },
   {
+    "key": "flow_builder.variable_issues",
+    "value": "Problemas de variables:"
+  },
+  {
     "key": "flow_builder.variable_message_content_desc",
     "value": "Contenido de texto del mensaje"
   },
@@ -43817,6 +46441,10 @@
   },
   {
     "key": "flow_builder.variables",
+    "value": "Variables"
+  },
+  {
+    "key": "flow_builder.variables_button",
     "value": "Variables"
   },
   {
@@ -43968,6 +46596,18 @@
     "value": "Segundos"
   },
   {
+    "key": "flow_builder.wait_select_date",
+    "value": "Selecciona fecha"
+  },
+  {
+    "key": "flow_builder.wait_select_timezone",
+    "value": "Selecciona zona horaria"
+  },
+  {
+    "key": "flow_builder.wait_select_unit",
+    "value": "Selecciona unidad"
+  },
+  {
     "key": "flow_builder.wait_time",
     "value": "Hora"
   },
@@ -44050,6 +46690,10 @@
   {
     "key": "flow_builder.webhook_config_progress",
     "value": "Progreso de configuración"
+  },
+  {
+    "key": "flow_builder.webhook_connected",
+    "value": "Webhook Conectado"
   },
   {
     "key": "flow_builder.webhook_contact_association_tooltip",
@@ -44384,6 +47028,18 @@
     "value": "Resolución de contacto"
   },
   {
+    "key": "flow_builder.webhook_inspector_contact_id",
+    "value": "ID de contacto:"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_contact_name",
+    "value": "Nombre del contacto:"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_conversation_id",
+    "value": "ID de conversación:"
+  },
+  {
     "key": "flow_builder.webhook_inspector_error_reason",
     "value": "Error"
   },
@@ -44398,6 +47054,10 @@
   {
     "key": "flow_builder.webhook_inspector_headers",
     "value": "Encabezados"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_ip",
+    "value": "IP:"
   },
   {
     "key": "flow_builder.webhook_inspector_no_contact",
@@ -44420,8 +47080,16 @@
     "value": "Resumen"
   },
   {
+    "key": "flow_builder.webhook_inspector_path",
+    "value": "Ruta:"
+  },
+  {
     "key": "flow_builder.webhook_inspector_payload",
     "value": "Payload"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_request_id",
+    "value": "ID de solicitud:"
   },
   {
     "key": "flow_builder.webhook_inspector_response_time",
@@ -44432,12 +47100,20 @@
     "value": "Estado"
   },
   {
+    "key": "flow_builder.webhook_inspector_strategy",
+    "value": "Estrategia:"
+  },
+  {
     "key": "flow_builder.webhook_inspector_timestamp",
     "value": "Marca de tiempo"
   },
   {
     "key": "flow_builder.webhook_inspector_title",
     "value": "Solicitud de webhook"
+  },
+  {
+    "key": "flow_builder.webhook_inspector_user_agent",
+    "value": "User-Agent:"
   },
   {
     "key": "flow_builder.webhook_integration",
@@ -44792,6 +47468,10 @@
     "value": "URL de Webhook"
   },
   {
+    "key": "flow_builder.webhook_url_configured",
+    "value": "URL del Webhook configurada"
+  },
+  {
     "key": "flow_builder.webhook_url_copied",
     "value": "URL del webhook copiada al portapapeles"
   },
@@ -44956,12 +47636,24 @@
     "value": "Usa las credenciales de la API REST de WooCommerce. En WordPress: WooCommerce → Ajustes → Avanzado → API REST. Crea una clave con permiso Lectura/Escritura. Tu sitio debe tener SSL y enlaces permanentes bonitos activados."
   },
   {
+    "key": "flow_builder.woocommerce.help_connection_label",
+    "value": "Conexión:"
+  },
+  {
     "key": "flow_builder.woocommerce.help_modules",
     "value": "Módulos disponibles: Cupones, Clientes, Pedidos, Notas de pedido, Productos, Atributos y términos de producto, Categorías de producto, Variaciones de producto, Informes, Pasarelas de pago, Zonas de envío, Tasas de impuestos."
   },
   {
+    "key": "flow_builder.woocommerce.help_modules_label",
+    "value": "Módulos:"
+  },
+  {
     "key": "flow_builder.woocommerce.help_operation",
     "value": "Elige qué hacer con el recurso seleccionado (buscar, obtener uno, crear, actualizar, eliminar). La operación determina el método HTTP usado en la llamada a la API."
+  },
+  {
+    "key": "flow_builder.woocommerce.help_operation_label",
+    "value": "Operación:"
   },
   {
     "key": "flow_builder.woocommerce.hide",
@@ -46432,6 +49124,10 @@
     "value": "No estás disponible para asignaciones del inbox. Haz clic para marcarte como disponible."
   },
   {
+    "key": "knowledge_base.chunks",
+    "value": "Fragmentos:"
+  },
+  {
     "key": "knowledge_base.config.advanced_retrieval_title",
     "value": "Recuperación avanzada"
   },
@@ -46728,6 +49424,22 @@
     "value": "Sube tu primer documento para comenzar"
   },
   {
+    "key": "knowledge_base.document_list.close",
+    "value": "Cerrar"
+  },
+  {
+    "key": "knowledge_base.file_type",
+    "value": "Tipo de archivo:"
+  },
+  {
+    "key": "knowledge_base.processing_time",
+    "value": "Tiempo de procesamiento:"
+  },
+  {
+    "key": "knowledge_base.processor.all_available",
+    "value": "Todos los procesadores disponibles"
+  },
+  {
     "key": "knowledge_base.processor.checking",
     "value": "Comprobando capacidades del procesador..."
   },
@@ -46752,8 +49464,20 @@
     "value": "Instrucciones de Instalación"
   },
   {
+    "key": "knowledge_base.processor.pdf_advanced",
+    "value": "Analizador de PDF (Avanzado)"
+  },
+  {
+    "key": "knowledge_base.processor.pdf_basic",
+    "value": "Analizador de PDF (Básico)"
+  },
+  {
     "key": "knowledge_base.processor.processors",
     "value": "Procesadores de Documentos"
+  },
+  {
+    "key": "knowledge_base.processor.restart_message",
+    "value": "Reinicia el servidor después de instalar los paquetes"
   },
   {
     "key": "knowledge_base.processor.supported_formats",
@@ -46762,6 +49486,14 @@
   {
     "key": "knowledge_base.processor.title",
     "value": "Estado del Procesador de Documentos"
+  },
+  {
+    "key": "knowledge_base.processor.word_document",
+    "value": "Analizador de documentos de Word"
+  },
+  {
+    "key": "knowledge_base.status",
+    "value": "Estado:"
   },
   {
     "key": "knowledge_base.status.completed",
@@ -46996,6 +49728,10 @@
     "value": "Error al cargar el contenido de la página"
   },
   {
+    "key": "landing.get_started",
+    "value": "Comenzar"
+  },
+  {
     "key": "landing.hero.sign_in",
     "value": "Iniciar sesión"
   },
@@ -47106,6 +49842,10 @@
   {
     "key": "landing.pricing.users",
     "value": "Hasta {{count}} usuarios"
+  },
+  {
+    "key": "landing.sign_in",
+    "value": "Iniciar sesión"
   },
   {
     "key": "landing.trust.enterprise_security",
@@ -48296,6 +51036,94 @@
     "value": "Qué sucede a continuación:"
   },
   {
+    "key": "meta_config.api_accessibility",
+    "value": "Accesibilidad de API"
+  },
+  {
+    "key": "meta_config.companies_using",
+    "value": "Empresas Usando"
+  },
+  {
+    "key": "meta_config.credentials",
+    "value": "Credenciales"
+  },
+  {
+    "key": "meta_config.health_checks",
+    "value": "Verificaciones de Salud"
+  },
+  {
+    "key": "meta_config.last_checked",
+    "value": "Última verificación"
+  },
+  {
+    "key": "meta_config.last_used",
+    "value": "Último Uso"
+  },
+  {
+    "key": "meta_config.last_validated",
+    "value": "Última Validación"
+  },
+  {
+    "key": "meta_config.not_subscribed",
+    "value": "No Suscrito"
+  },
+  {
+    "key": "meta_config.overall_health_status",
+    "value": "Estado General de Salud"
+  },
+  {
+    "key": "meta_config.response_time",
+    "value": "Tiempo de Respuesta"
+  },
+  {
+    "key": "meta_config.subscribed",
+    "value": "Suscrito"
+  },
+  {
+    "key": "meta_config.troubleshooting_credentials",
+    "value": "Verifica que tu ID de Aplicación, Secreto de Aplicación e ID de Gerente de Negocios sean correctos"
+  },
+  {
+    "key": "meta_config.troubleshooting_subscriptions",
+    "value": "Verifica que las suscripciones de webhook estén correctamente configuradas en Meta Business Manager"
+  },
+  {
+    "key": "meta_config.troubleshooting_tips",
+    "value": "Consejos de Solución de Problemas"
+  },
+  {
+    "key": "meta_config.troubleshooting_token",
+    "value": "Verifica que tu token de acceso tenga los permisos requeridos"
+  },
+  {
+    "key": "meta_config.troubleshooting_webhook",
+    "value": "Asegúrate de que tu URL de webhook sea públicamente accesible y use HTTPS"
+  },
+  {
+    "key": "meta_config.usage_statistics",
+    "value": "Estadísticas de Uso"
+  },
+  {
+    "key": "meta_config.validation",
+    "value": "Validación"
+  },
+  {
+    "key": "meta_config.validation_status",
+    "value": "Estado de Validación"
+  },
+  {
+    "key": "meta_config.webhook_connectivity",
+    "value": "Conectividad de Webhook"
+  },
+  {
+    "key": "meta_config.webhook_field_subscriptions",
+    "value": "Suscripciones de Campo Webhook"
+  },
+  {
+    "key": "meta_config.webhook_subscriptions",
+    "value": "Suscripciones de Webhook"
+  },
+  {
     "key": "nav.analytics",
     "value": "Analíticas"
   },
@@ -48748,6 +51576,10 @@
     "value": "Título SEO para motores de búsqueda"
   },
   {
+    "key": "pages.no_content_available",
+    "value": "Sin contenido disponible"
+  },
+  {
     "key": "pages.page_info",
     "value": "Información de la página"
   },
@@ -48762,6 +51594,18 @@
   {
     "key": "pages.public_url",
     "value": "URL pública"
+  },
+  {
+    "key": "pages.public_website.page_not_found_code",
+    "value": "404"
+  },
+  {
+    "key": "pages.public_website.page_not_found_description",
+    "value": "La página que buscas no existe o fue movida."
+  },
+  {
+    "key": "pages.public_website.page_not_found_title",
+    "value": "Página no encontrada"
   },
   {
     "key": "pages.publish",
@@ -49210,6 +52054,10 @@
   {
     "key": "pipeline.avatar_must_be_less_than_5mb",
     "value": "El avatar debe ser menor a 5MB"
+  },
+  {
+    "key": "pipeline.average_days_last_activity",
+    "value": "Promedio de días desde la última actividad"
   },
   {
     "key": "pipeline.back",
@@ -50028,6 +52876,10 @@
     "value": "No hay otros pipelines disponibles. No se puede eliminar pipeline con oportunidades."
   },
   {
+    "key": "pipeline.no_pipeline_selected",
+    "value": "No hay pipeline seleccionado. Por favor selecciona un pipeline para ver etapas y acuerdos."
+  },
+  {
     "key": "pipeline.no_pipelines_yet",
     "value": "Aún no hay pipelines. Crea tu primer pipeline para comenzar."
   },
@@ -50212,6 +53064,10 @@
     "value": "Prioridad"
   },
   {
+    "key": "pipeline.priority_distribution",
+    "value": "Distribución de prioridades:"
+  },
+  {
     "key": "pipeline.priority_label",
     "value": "Prioridad: {{priorities}}"
   },
@@ -50260,8 +53116,24 @@
     "value": "Reversión programada cancelada exitosamente"
   },
   {
+    "key": "pipeline.revert_executed",
+    "value": "Ejecutado"
+  },
+  {
+    "key": "pipeline.revert_failed",
+    "value": "Fallido"
+  },
+  {
     "key": "pipeline.revert_scheduled",
     "value": "Revertir {{time}}"
+  },
+  {
+    "key": "pipeline.revert_skipped",
+    "value": "Omitido"
+  },
+  {
+    "key": "pipeline.revert_statistics_title",
+    "value": "Estadísticas de reversión de etapa de pipeline"
   },
   {
     "key": "pipeline.reverts",
@@ -50856,6 +53728,10 @@
     "value": "Ganado"
   },
   {
+    "key": "plan_expiration.next_billing_label",
+    "value": "Próxima facturación"
+  },
+  {
     "key": "plan_expiration.plan_expiration_checker.action_required",
     "value": "Acción requerida"
   },
@@ -50874,6 +53750,14 @@
   {
     "key": "plan_expiration.plan_expiration_checker.no_plan_found",
     "value": "No se encontró ningún plan para activar"
+  },
+  {
+    "key": "plan_expiration.plan_label",
+    "value": "Plan"
+  },
+  {
+    "key": "plan_expiration.status_label",
+    "value": "Estado"
   },
   {
     "key": "plan_expiration.subscription_expired_modal.access_restricted_body",
@@ -50932,12 +53816,176 @@
     "value": "Suscripción vencida - Período de gracia"
   },
   {
+    "key": "plan_expiration.subscription_renewal_dialog.access_restricted_label",
+    "value": "Acceso Restringido:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.access_restricted_message",
+    "value": "La mayoría de las funciones están deshabilitadas actualmente. Por favor renueva tu suscripción para restaurar el acceso."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.account_name_label",
+    "value": "Nombre de la Cuenta"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.account_number_label",
+    "value": "Número de Cuenta"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.additional_instructions_label",
+    "value": "Instrucciones Adicionales"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.amount_label",
+    "value": "Cantidad:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.auto_renewal_label",
+    "value": "Habilitar renovación automática para evitar futuras interrupciones"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.bank_name_label",
+    "value": "Nombre del Banco"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.bank_transfer_instructions_desc",
+    "value": "Por favor transfiere la cantidad exacta a la siguiente cuenta bancaria. Tu suscripción se renovará una vez confirmemos el pago."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.bank_transfer_instructions_title",
+    "value": "Instrucciones de Transferencia Bancaria - Renovación de Suscripción"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.cancel_button",
+    "value": "Cancelar"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.close_button",
+    "value": "Cerrar"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.company_label",
+    "value": "Empresa:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.complete_bank_transfer",
+    "value": "Por favor completa la transferencia bancaria. Tu suscripción se renovará una vez confirmemos el pago."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.copied_to_clipboard",
+    "value": "Copiado al portapapeles"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.current_plan_badge",
+    "value": "Plan Actual"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.expired_grace_title",
+    "value": "Suscripción Vencida - Período de Gracia"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.expired_on_label",
+    "value": "Vencido el:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.expired_title",
+    "value": "Suscripción Vencida"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.grace_period_active_label",
+    "value": "Período de Gracia Activo:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.grace_period_active_message",
+    "value": "Tienes acceso limitado hasta {{date}}. Renueva ahora para restaurar la funcionalidad completa."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.grace_period_ends_label",
+    "value": "El período de gracia termina:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.important_notes_title",
+    "value": "Notas Importantes:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.include_reference_note",
+    "value": "⚠️ Por favor incluye esta referencia en tu transferencia para asegurar un procesamiento rápido"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.information_copied",
+    "value": "La información ha sido copiada a tu portapapeles."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.loading_payment_methods",
+    "value": "Cargando métodos de pago..."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.loading_plans",
+    "value": "Cargando planes..."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.made_transfer_button",
+    "value": "Ya Hice la Transferencia"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_email_confirmation",
+    "value": "• Recibirás una confirmación por correo una vez se procese el pago"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_include_reference",
+    "value": "• Incluye la referencia de pago en tu transferencia"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_processing_time",
+    "value": "• El procesamiento puede tomar de 1 a 3 días hábiles"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_renewal_on_verify",
+    "value": "• Tu suscripción se renovará una vez se verifique el pago"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.note_transfer_exact_amount",
+    "value": "• Por favor transfiere la cantidad exacta mostrada arriba"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.payment_instructions_received",
+    "value": "Instrucciones de Pago Recibidas"
+  },
+  {
     "key": "plan_expiration.subscription_renewal_dialog.payment_method_required_description",
     "value": "Seleccione un método de pago para continuar."
   },
   {
     "key": "plan_expiration.subscription_renewal_dialog.payment_method_required_title",
     "value": "Se requiere método de pago"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.payment_reference_label",
+    "value": "Referencia de Pago"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.plan_label",
+    "value": "Plan:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.plan_label_status",
+    "value": "Plan:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.processing",
+    "value": "Procesando..."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.recently",
+    "value": "Recientemente"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.renew_subscription_button",
+    "value": "Renovar Suscripción"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.renew_to_continue",
+    "value": "Renueva tu suscripción para continuar usando todas las funciones"
   },
   {
     "key": "plan_expiration.subscription_renewal_dialog.renewal_disabled_description",
@@ -50950,6 +53998,42 @@
   {
     "key": "plan_expiration.subscription_renewal_dialog.renewal_failed_title",
     "value": "Error en la renovación"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.renewal_payment_details",
+    "value": "Detalles de Pago de Renovación"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.routing_number_label",
+    "value": "Número de Ruta"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.select_payment_method_title",
+    "value": "Selecciona Método de Pago"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.select_plan_description",
+    "value": "Elige un plan para renovar tu suscripción. Puedes cambiar de nivel, reducir o mantener tu plan actual."
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.select_plan_title",
+    "value": "Selecciona un Plan de Suscripción"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.selected_plan_total_label",
+    "value": "Total del Plan Seleccionado:"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.setup_auto_renewal_button",
+    "value": "Configurar Renovación Automática"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.subscription_status_title",
+    "value": "Estado de Suscripción"
+  },
+  {
+    "key": "plan_expiration.subscription_renewal_dialog.swift_code_label",
+    "value": "Código SWIFT"
   },
   {
     "key": "plans.free",
@@ -51052,8 +54136,16 @@
     "value": "Elija su idioma preferido para la interfaz."
   },
   {
+    "key": "profile.commercial_registration_number_ksa",
+    "value": "Número de registro comercial (KSA)"
+  },
+  {
     "key": "profile.company_created",
     "value": "Empresa creada"
+  },
+  {
+    "key": "profile.company_email",
+    "value": "Email de la empresa"
   },
   {
     "key": "profile.company_info_desc",
@@ -51074,6 +54166,10 @@
   {
     "key": "profile.company_updated_title",
     "value": "Empresa actualizada"
+  },
+  {
+    "key": "profile.contact_person",
+    "value": "Persona de contacto"
   },
   {
     "key": "profile.current_password",
@@ -51112,6 +54208,10 @@
     "value": "Idioma preferido"
   },
   {
+    "key": "profile.loading",
+    "value": "Cargando tu perfil..."
+  },
+  {
     "key": "profile.notification_settings",
     "value": "Configuración de notificaciones"
   },
@@ -51148,8 +54248,20 @@
     "value": "Color de marca principal de su empresa."
   },
   {
+    "key": "profile.save_company_info",
+    "value": "Guardar información de la empresa"
+  },
+  {
+    "key": "profile.save_notification_settings",
+    "value": "Guardar configuración de notificaciones"
+  },
+  {
     "key": "profile.saving_changes",
     "value": "Guardando cambios"
+  },
+  {
+    "key": "profile.saving_settings",
+    "value": "Guardando configuración"
   },
   {
     "key": "profile.select_language",
@@ -54524,6 +57636,10 @@
     "value": "Mostrar clave API"
   },
   {
+    "key": "settings.ai_credentials.test",
+    "value": "Probar"
+  },
+  {
     "key": "settings.ai_credentials.update",
     "value": "Actualizar Credencial"
   },
@@ -54582,6 +57698,22 @@
   {
     "key": "settings.ai_usage.by_provider",
     "value": "Uso por Proveedor"
+  },
+  {
+    "key": "settings.ai_usage.date_range_1y",
+    "value": "Último año"
+  },
+  {
+    "key": "settings.ai_usage.date_range_30d",
+    "value": "Últimos 30 días"
+  },
+  {
+    "key": "settings.ai_usage.date_range_7d",
+    "value": "Últimos 7 días"
+  },
+  {
+    "key": "settings.ai_usage.date_range_90d",
+    "value": "Últimos 90 días"
   },
   {
     "key": "settings.ai_usage.description",
@@ -55672,6 +58804,14 @@
     "value": "Configuración fácil"
   },
   {
+    "key": "settings.channel_cards.email",
+    "value": "Correo electrónico"
+  },
+  {
+    "key": "settings.channel_cards.email_desc",
+    "value": "Integración de correo IMAP/SMTP"
+  },
+  {
     "key": "settings.channel_cards.facebook_messenger",
     "value": "Facebook Messenger"
   },
@@ -55688,12 +58828,120 @@
     "value": "Integración de cuenta Business"
   },
   {
+    "key": "settings.channel_cards.tiktok",
+    "value": "TikTok"
+  },
+  {
+    "key": "settings.channel_cards.tiktok_desc",
+    "value": "Mensajería empresarial"
+  },
+  {
+    "key": "settings.channel_cards.twilio_sms",
+    "value": "Twilio SMS"
+  },
+  {
+    "key": "settings.channel_cards.twilio_sms_desc",
+    "value": "Mensajería programable (SMS/MMS)"
+  },
+  {
+    "key": "settings.channel_cards.voice_calls",
+    "value": "Llamadas de voz"
+  },
+  {
+    "key": "settings.channel_cards.voice_calls_desc",
+    "value": "Llamadas de voz (básicas y con IA)"
+  },
+  {
+    "key": "settings.channel_cards.webchat",
+    "value": "WebChat"
+  },
+  {
+    "key": "settings.channel_cards.webchat_desc",
+    "value": "Widget de chat para tu sitio web"
+  },
+  {
+    "key": "settings.channel_cards.whatsapp_business_api_meta",
+    "value": "API de WhatsApp Business (Meta)"
+  },
+  {
+    "key": "settings.channel_cards.whatsapp_business_api_meta_desc",
+    "value": "API oficial de WhatsApp Business de Meta"
+  },
+  {
+    "key": "settings.channel_cards.whatsapp_qr_code",
+    "value": "Código QR de WhatsApp"
+  },
+  {
+    "key": "settings.channel_cards.whatsapp_qr_code_desc",
+    "value": "Conexión no oficial"
+  },
+  {
+    "key": "settings.channel_connections.add_new_channel",
+    "value": "Agregar nuevo canal"
+  },
+  {
+    "key": "settings.channel_connections.connected_channels",
+    "value": "Canales conectados"
+  },
+  {
     "key": "settings.channel_connections.description",
     "value": "Conecta y gestiona tus canales de comunicación"
   },
   {
+    "key": "settings.channel_connections.official_whatsapp_api",
+    "value": "API oficial de WhatsApp Business (Meta)"
+  },
+  {
+    "key": "settings.channel_connections.official_whatsapp_api_desc",
+    "value": "Esta conexión usa la API oficial de WhatsApp Business de Meta. Ofrece mensajería confiable con funciones avanzadas y cumplimiento normativo."
+  },
+  {
     "key": "settings.channel_connections.title",
     "value": "Conexiones de Canal"
+  },
+  {
+    "key": "settings.channel_connections.unofficial_connection",
+    "value": "Conexión no oficial"
+  },
+  {
+    "key": "settings.channel_connections.unofficial_connection_desc",
+    "value": "Esta conexión no usa la API oficial de WhatsApp Business. Puede tener limitaciones y estar sujeta a bloqueos por parte de WhatsApp."
+  },
+  {
+    "key": "settings.channels.channel_name",
+    "value": "Nombre del canal"
+  },
+  {
+    "key": "settings.channels.copy_embed",
+    "value": "Copiar código de inserción"
+  },
+  {
+    "key": "settings.channels.details",
+    "value": "Detalles"
+  },
+  {
+    "key": "settings.channels.disconnect_whatsapp_desc1",
+    "value": "Al desconectar se dará de baja permanentemente el número de teléfono de la API de WhatsApp Business."
+  },
+  {
+    "key": "settings.channels.disconnect_whatsapp_desc2",
+    "value": "La mensajería a través de este número se detendrá de inmediato tras la desconexión."
+  },
+  {
+    "key": "settings.channels.disconnect_whatsapp_title",
+    "value": "¿Desconectar el número de WhatsApp?"
+  },
+  {
+    "key": "settings.channels.disconnecting",
+    "value": "Desconectando..."
+  },
+  {
+    "key": "settings.channels.embed",
+    "value": "Insertar"
+  },
+  {
+    "key": "settings.channels.enter_new_channel_name",
+    "value": "Ingresa el nuevo nombre del canal"
   },
   {
     "key": "settings.channels.history_sync_complete",
@@ -55716,8 +58964,20 @@
     "value": "Esto puede tardar dependiendo del rango de fechas y la cantidad de chats. Podés seguir usando la app mientras se ejecuta."
   },
   {
+    "key": "settings.channels.rename_channel_description",
+    "value": "Ingresa un nuevo nombre para esta conexión de canal para identificarla mejor en tu barra lateral y conversaciones."
+  },
+  {
+    "key": "settings.channels.rename_channel_title",
+    "value": "Renombrar canal"
+  },
+  {
     "key": "settings.channels.start_sync",
     "value": "Iniciar Sincronización"
+  },
+  {
+    "key": "settings.channels.sync",
+    "value": "Sincronizar"
   },
   {
     "key": "settings.channels.sync_from_date",
@@ -55744,8 +59004,20 @@
     "value": "Sincronizando..."
   },
   {
+    "key": "settings.channels.view_details",
+    "value": "Ver detalles"
+  },
+  {
     "key": "settings.click_generate_qr",
     "value": "Haz clic en \"Generar Código QR\" para iniciar el proceso de conexión"
+  },
+  {
+    "key": "settings.common.status",
+    "value": "Estado"
+  },
+  {
+    "key": "settings.common.type",
+    "value": "Tipo"
   },
   {
     "key": "settings.connect_whatsapp",
@@ -55980,6 +59252,10 @@
     "value": "Todos los mensajes"
   },
   {
+    "key": "settings.email_channel.folder_inbox",
+    "value": "BANDEJA DE ENTRADA"
+  },
+  {
     "key": "settings.email_channel.folder_sent",
     "value": "Enviados"
   },
@@ -56018,6 +59294,10 @@
   {
     "key": "settings.email_channel.signature_placeholder",
     "value": "Saludos cordiales, Equipo de soporte"
+  },
+  {
+    "key": "settings.email_channel.smtp_configuration",
+    "value": "Configuración SMTP"
   },
   {
     "key": "settings.email_channel.smtp_username_label",
@@ -56152,6 +59432,34 @@
     "value": "Solicitando QR desde WhatsApp… normalmente 1–2 segundos"
   },
   {
+    "key": "settings.google_calendar_client_id",
+    "value": "ID de Cliente"
+  },
+  {
+    "key": "settings.google_calendar_client_id_help",
+    "value": "ID de Cliente desde las credenciales OAuth de Google Cloud Console"
+  },
+  {
+    "key": "settings.google_calendar_client_id_placeholder",
+    "value": "Tu ID de Cliente OAuth de Google"
+  },
+  {
+    "key": "settings.google_calendar_client_secret",
+    "value": "Secreto de Cliente"
+  },
+  {
+    "key": "settings.google_calendar_client_secret_help",
+    "value": "Secreto de Cliente desde las credenciales OAuth de Google Cloud Console"
+  },
+  {
+    "key": "settings.google_calendar_client_secret_placeholder",
+    "value": "Tu Secreto de Cliente OAuth de Google"
+  },
+  {
+    "key": "settings.google_calendar_configure_credentials",
+    "value": "Configurar"
+  },
+  {
     "key": "settings.google_calendar_credentials_error",
     "value": "Error al actualizar las credenciales de Google Calendar: {{error}}"
   },
@@ -56164,6 +59472,14 @@
     "value": "Credenciales de Google Calendar Actualizadas"
   },
   {
+    "key": "settings.google_calendar_credentials_warning",
+    "value": "Después de actualizar estas credenciales, necesitarás reconectar tu cuenta de Google. Todas las conexiones anteriores a Google Calendar se invalidarán."
+  },
+  {
+    "key": "settings.google_calendar_description",
+    "value": "Introduce las credenciales de OAuth de Google Cloud de tu empresa para habilitar la integración con Google Calendar. Estas credenciales se usarán para todos los usuarios de tu empresa."
+  },
+  {
     "key": "settings.google_calendar_disconnect_error",
     "value": "Error al desconectar Google Calendar: {{error}}"
   },
@@ -56174,6 +59490,34 @@
   {
     "key": "settings.google_calendar_disconnected",
     "value": "Google Calendar Desconectado"
+  },
+  {
+    "key": "settings.google_calendar_important",
+    "value": "Importante"
+  },
+  {
+    "key": "settings.google_calendar_redirect_uri",
+    "value": "URI de Redirección"
+  },
+  {
+    "key": "settings.google_calendar_redirect_uri_help",
+    "value": "Debe coincidir con el URI de redirección autorizado en Google Cloud Console"
+  },
+  {
+    "key": "settings.google_calendar_save_button",
+    "value": "Guardar Credenciales"
+  },
+  {
+    "key": "settings.google_calendar_saving",
+    "value": "Guardando..."
+  },
+  {
+    "key": "settings.google_calendar_update_button",
+    "value": "Actualizar Credenciales"
+  },
+  {
+    "key": "settings.google_calendar_update_credentials",
+    "value": "Actualizar"
   },
   {
     "key": "settings.group_chats_disabled",
@@ -58552,6 +61896,10 @@
     "value": "Configura la creación automática de negocios para contactos nuevos y las notificaciones al cambiar de etapa."
   },
   {
+    "key": "settings.pipeline.notification_message",
+    "value": "Mensaje de notificación"
+  },
+  {
     "key": "settings.pipeline.saved_description",
     "value": "La configuración de auto-agregar, notificaciones de etapa y reglas de automatización se guardó correctamente."
   },
@@ -58562,6 +61910,10 @@
   {
     "key": "settings.pipeline.stage_notification_placeholder",
     "value": "Hola {{contact_name}}, tu negocio \"{{deal_title}}\" está ahora en la etapa {{stage_name}} ({{pipeline_name}}). Teléfono registrado: {{contact_phone}}."
+  },
+  {
+    "key": "settings.pipeline.stage_qualification_notification_title",
+    "value": "Notificación de calificación de etapa"
   },
   {
     "key": "settings.pipeline.title",
@@ -58854,6 +62206,70 @@
   {
     "key": "settings.smtp.validation_sender_email_required",
     "value": "La dirección de correo del remitente es obligatoria"
+  },
+  {
+    "key": "settings.subscription_active_plan_details",
+    "value": "Tus detalles de plan y suscripción activos"
+  },
+  {
+    "key": "settings.subscription_current_status",
+    "value": "Estado actual"
+  },
+  {
+    "key": "settings.subscription_current_subscription",
+    "value": "Suscripción actual"
+  },
+  {
+    "key": "settings.subscription_expires_on",
+    "value": "Expira el"
+  },
+  {
+    "key": "settings.subscription_grace_period_action",
+    "value": "Por favor, actualiza tu método de pago para evitar la interrupción del servicio."
+  },
+  {
+    "key": "settings.subscription_grace_period_active",
+    "value": "Período de gracia activo"
+  },
+  {
+    "key": "settings.subscription_grace_period_message",
+    "value": "Tu suscripción está en un período de gracia hasta"
+  },
+  {
+    "key": "settings.subscription_next_attempt",
+    "value": "Próximo intento"
+  },
+  {
+    "key": "settings.subscription_no_active",
+    "value": "Sin suscripción activa"
+  },
+  {
+    "key": "settings.subscription_payment_retry_message",
+    "value": "Estamos intentando procesar tu pago. Intento"
+  },
+  {
+    "key": "settings.subscription_payment_retry_of",
+    "value": "de"
+  },
+  {
+    "key": "settings.subscription_payment_retry_title",
+    "value": "Reintentos de pago en progreso"
+  },
+  {
+    "key": "settings.subscription_renews_on",
+    "value": "Se renueva el"
+  },
+  {
+    "key": "settings.subscription_select_plan",
+    "value": "Selecciona un plan a continuación para suscribirte"
+  },
+  {
+    "key": "settings.subscription_status_description",
+    "value": "Estado actual y opciones de gestión para tu suscripción"
+  },
+  {
+    "key": "settings.subscription_status_title",
+    "value": "Estado de suscripción"
   },
   {
     "key": "settings.subscription_updated",
@@ -59474,6 +62890,78 @@
   {
     "key": "settings.telegramConnectionForm.webhook.step3",
     "value": "Cree la conexión: el servidor registra el webhook y mantiene el token secreto privado para verificar las actualizaciones entrantes."
+  },
+  {
+    "key": "settings.tiktok.active",
+    "value": "Activo"
+  },
+  {
+    "key": "settings.tiktok.description",
+    "value": "Ver y actualizar tu conexión empresarial de TikTok."
+  },
+  {
+    "key": "settings.tiktok.disconnected",
+    "value": "Desconectado"
+  },
+  {
+    "key": "settings.tiktok.error",
+    "value": "Error"
+  },
+  {
+    "key": "settings.tiktok.expiresIn",
+    "value": "Expira en {{days}} días"
+  },
+  {
+    "key": "settings.tiktok.learn_more",
+    "value": "Más información"
+  },
+  {
+    "key": "settings.tiktok.noData",
+    "value": "No hay datos de conexión disponibles"
+  },
+  {
+    "key": "settings.tiktok.refreshButton",
+    "value": "Actualizar conexión"
+  },
+  {
+    "key": "settings.tiktok.refreshSuccess",
+    "value": "¡Conexión de TikTok actualizada exitosamente!"
+  },
+  {
+    "key": "settings.tiktok.refreshing",
+    "value": "Actualizando..."
+  },
+  {
+    "key": "settings.tiktok.region_restrictions_description",
+    "value": "Tu cuenta de TikTok está en una región restringida ({{region}}). Es posible que las características de mensajería no estén disponibles para esta conexión."
+  },
+  {
+    "key": "settings.tiktok.region_restrictions_title",
+    "value": "Restricciones de región"
+  },
+  {
+    "key": "settings.tiktok.title",
+    "value": "Detalles de conexión de TikTok"
+  },
+  {
+    "key": "settings.tiktok.tokenExpired",
+    "value": "Token expirado"
+  },
+  {
+    "key": "settings.tiktok.tokenExpiredDesc",
+    "value": "Tu token de acceso de TikTok ha expirado. Haz clic en \"Actualizar conexión\" para renovar el acceso."
+  },
+  {
+    "key": "settings.tiktok.tokenExpiredTitle",
+    "value": "Token expirado"
+  },
+  {
+    "key": "settings.tiktok.tokenExpiry",
+    "value": "Expiración del token"
+  },
+  {
+    "key": "settings.tiktok.validFor",
+    "value": "Válido por {{days}} días"
   },
   {
     "key": "settings.tiktok_connection.account_name_label",
@@ -61396,6 +64884,30 @@
     "value": "El mensaje de bienvenida debe tener 500 caracteres o menos"
   },
   {
+    "key": "settings.whatsapp.accountName",
+    "value": "Nombre de cuenta"
+  },
+  {
+    "key": "settings.whatsapp.accountNameHelp",
+    "value": "Un nombre para identificar esta conexión"
+  },
+  {
+    "key": "settings.whatsapp.accountNamePlaceholder",
+    "value": "p. ej. Mi WhatsApp"
+  },
+  {
+    "key": "settings.whatsapp.alert_description",
+    "value": "Estos ajustes se aplican a todos los canales de WhatsApp y entran en vigencia inmediatamente después de guardar. Los indicadores de escritura hacen que las respuestas del bot se vean más naturales, mientras que la división de mensajes mejora la legibilidad para respuestas largas."
+  },
+  {
+    "key": "settings.whatsapp.average",
+    "value": "Promedio"
+  },
+  {
+    "key": "settings.whatsapp.basicConfig",
+    "value": "Configuración básica"
+  },
+  {
     "key": "settings.whatsapp.by_characters",
     "value": "Por Caracteres"
   },
@@ -61416,8 +64928,28 @@
     "value": "{{count}} caracteres"
   },
   {
+    "key": "settings.whatsapp.connected",
+    "value": "Conectado"
+  },
+  {
+    "key": "settings.whatsapp.connectionDetails",
+    "value": "Detalles de conexión"
+  },
+  {
+    "key": "settings.whatsapp.connectionStatus",
+    "value": "Estado de conexión"
+  },
+  {
     "key": "settings.whatsapp.consistent",
     "value": "Consistente"
+  },
+  {
+    "key": "settings.whatsapp.current",
+    "value": "Actual"
+  },
+  {
+    "key": "settings.whatsapp.custom_delimiter",
+    "value": "Delimitador Personalizado"
   },
   {
     "key": "settings.whatsapp.debounce_delay",
@@ -61438,6 +64970,18 @@
   {
     "key": "settings.whatsapp.delay_between_chunks_desc",
     "value": "Tiempo entre fragmentos de mensajes divididos (0.5-10 segundos)"
+  },
+  {
+    "key": "settings.whatsapp.delimiter_help",
+    "value": "Delimitador para dividir mensajes (p.ej., || para conversaciones en mandarín)"
+  },
+  {
+    "key": "settings.whatsapp.disconnected",
+    "value": "Desconectado"
+  },
+  {
+    "key": "settings.whatsapp.editTitle",
+    "value": "Editar conexión WhatsApp no oficial"
   },
   {
     "key": "settings.whatsapp.enable_debouncing",
@@ -61468,6 +65012,30 @@
     "value": "Muestra los indicadores \"Escribiendo...\" y \"Grabando...\" antes de enviar mensajes"
   },
   {
+    "key": "settings.whatsapp.error",
+    "value": "Error"
+  },
+  {
+    "key": "settings.whatsapp.fallback_to_character_splitting",
+    "value": "Recurrir a División por Caracteres"
+  },
+  {
+    "key": "settings.whatsapp.fallback_to_character_splitting_desc",
+    "value": "Usa división basada en caracteres cuando no se encuentren delimitadores"
+  },
+  {
+    "key": "settings.whatsapp.healthMetrics",
+    "value": "Métricas de salud de conexión"
+  },
+  {
+    "key": "settings.whatsapp.healthScore",
+    "value": "Puntuación de salud"
+  },
+  {
+    "key": "settings.whatsapp.healthScoreHelp",
+    "value": "Puntuación general de salud de la conexión"
+  },
+  {
     "key": "settings.whatsapp.history_sync_in_progress",
     "value": "Sincronizando Fase {phase}/3: {progress}% completado"
   },
@@ -61478,6 +65046,34 @@
   {
     "key": "settings.whatsapp.history_sync_tooltip",
     "value": "Importar hasta 6 meses de historial de chat desde tu aplicación de WhatsApp Business. La sincronización puede tardar de 4 a 6 horas dependiendo del volumen de mensajes."
+  },
+  {
+    "key": "settings.whatsapp.id",
+    "value": "ID"
+  },
+  {
+    "key": "settings.whatsapp.lastCheck",
+    "value": "Último chequeo de salud"
+  },
+  {
+    "key": "settings.whatsapp.latencyHelp",
+    "value": "Latencia de conexión en milisegundos"
+  },
+  {
+    "key": "settings.whatsapp.latencyMetrics",
+    "value": "Métricas de latencia"
+  },
+  {
+    "key": "settings.whatsapp.loadingConnection",
+    "value": "Cargando datos de conexión..."
+  },
+  {
+    "key": "settings.whatsapp.logical_message_splitting",
+    "value": "División Lógica de Mensajes"
+  },
+  {
+    "key": "settings.whatsapp.logical_message_splitting_desc",
+    "value": "Divide mensajes usando delimitadores personalizados (p.ej., || para conversaciones en mandarín)"
   },
   {
     "key": "settings.whatsapp.max_debounce_delay",
@@ -61552,6 +65148,14 @@
     "value": "Tiempo mínimo para mostrar el indicador de escritura (0.5-10 segundos)"
   },
   {
+    "key": "settings.whatsapp.minimum_chunk_size",
+    "value": "Tamaño mínimo de fragmento"
+  },
+  {
+    "key": "settings.whatsapp.minimum_chunk_size_desc",
+    "value": "Caracteres mínimos por fragmento para evitar mensajes muy cortos"
+  },
+  {
     "key": "settings.whatsapp.preserve_formatting",
     "value": "Preservar Formato"
   },
@@ -61566,6 +65170,14 @@
   {
     "key": "settings.whatsapp.preview_desc",
     "value": "Mira cómo tu configuración afectará la entrega de mensajes"
+  },
+  {
+    "key": "settings.whatsapp.prioritize_sentence_boundaries",
+    "value": "Priorizar límites de oración"
+  },
+  {
+    "key": "settings.whatsapp.prioritize_sentence_boundaries_desc",
+    "value": "Preferir dividir en terminaciones de oración sobre límites de caracteres"
   },
   {
     "key": "settings.whatsapp.prioritize_sentences",
@@ -61644,6 +65256,14 @@
     "value": "Divide inteligentemente en los límites de oraciones y cláusulas"
   },
   {
+    "key": "settings.whatsapp.smart_boundary_detection",
+    "value": "Detección de límites inteligente"
+  },
+  {
+    "key": "settings.whatsapp.smart_boundary_detection_desc",
+    "value": "Dividir inteligentemente en límites de oración y cláusula"
+  },
+  {
     "key": "settings.whatsapp.split_method",
     "value": "Método de División"
   },
@@ -61666,6 +65286,14 @@
   {
     "key": "settings.whatsapp.typing_time",
     "value": "Escribiendo ~{{time}}s"
+  },
+  {
+    "key": "settings.whatsapp.updateButton",
+    "value": "Actualizar conexión"
+  },
+  {
+    "key": "settings.whatsapp.updating",
+    "value": "Actualizando..."
   },
   {
     "key": "settings.whatsappEmbeddedSignup.agree_privacy",
@@ -61714,6 +65342,10 @@
   {
     "key": "settings.whatsappEmbeddedSignup.how_it_works",
     "value": "Cómo funciona:"
+  },
+  {
+    "key": "settings.whatsappEmbeddedSignup.meta_privacy_link",
+    "value": "Política de privacidad de Meta"
   },
   {
     "key": "settings.whatsappEmbeddedSignup.mode_existing_app",
@@ -61926,6 +65558,10 @@
   {
     "key": "settings.whatsappEmbeddedSignup.toast_terms_required_desc",
     "value": "Acepte los términos y la política de privacidad para continuar."
+  },
+  {
+    "key": "settings.whatsappEmbeddedSignup.whatsapp_terms_link",
+    "value": "Términos de servicio de WhatsApp Business API"
   },
   {
     "key": "settings.whatsappOnboarding.cancel",
@@ -62200,6 +65836,206 @@
     "value": "Expandir barra lateral"
   },
   {
+    "key": "stripe.add_metadata",
+    "value": "Agregar metadatos"
+  },
+  {
+    "key": "stripe.add_metadata_help",
+    "value": "Agrega metadatos personalizados para rastrear información adicional"
+  },
+  {
+    "key": "stripe.amount",
+    "value": "Monto"
+  },
+  {
+    "key": "stripe.amount_format",
+    "value": "Formato del monto"
+  },
+  {
+    "key": "stripe.api_key",
+    "value": "Clave de API de Stripe"
+  },
+  {
+    "key": "stripe.api_key_placeholder",
+    "value": "sk_test_... o sk_live_..."
+  },
+  {
+    "key": "stripe.available_output_variables",
+    "value": "Variables de salida disponibles"
+  },
+  {
+    "key": "stripe.balance_configuration",
+    "value": "Configuración de saldo"
+  },
+  {
+    "key": "stripe.cents_help_text",
+    "value": "Ingresa los montos en centavos (1000 para $10.00). Este es el formato nativo de Stripe."
+  },
+  {
+    "key": "stripe.cents_stripe_native",
+    "value": "Centavos (nativo de Stripe)"
+  },
+  {
+    "key": "stripe.charge_id_or_payment_intent",
+    "value": "ID de cargo o ID de intento de pago"
+  },
+  {
+    "key": "stripe.choose_template",
+    "value": "Elige una plantilla..."
+  },
+  {
+    "key": "stripe.currency",
+    "value": "Moneda"
+  },
+  {
+    "key": "stripe.custom_metadata",
+    "value": "Metadatos personalizados"
+  },
+  {
+    "key": "stripe.customer_configuration",
+    "value": "Configuración del cliente"
+  },
+  {
+    "key": "stripe.customer_id",
+    "value": "ID de cliente"
+  },
+  {
+    "key": "stripe.customer_id_optional",
+    "value": "ID de cliente (opcional)"
+  },
+  {
+    "key": "stripe.decimal_format",
+    "value": "Decimal (ej. 10.00)"
+  },
+  {
+    "key": "stripe.decimal_help_text",
+    "value": "Ingresa los montos en formato decimal (10.00 para $10.00). Se convertirán a centavos automáticamente."
+  },
+  {
+    "key": "stripe.description_optional",
+    "value": "Descripción (opcional)"
+  },
+  {
+    "key": "stripe.email",
+    "value": "Correo electrónico"
+  },
+  {
+    "key": "stripe.enter_cents_format",
+    "value": "Ingresa 1000 para $10.00"
+  },
+  {
+    "key": "stripe.enter_decimal_format",
+    "value": "Ingresa 10.00 para $10.00"
+  },
+  {
+    "key": "stripe.limit",
+    "value": "Límite"
+  },
+  {
+    "key": "stripe.name",
+    "value": "Nombre"
+  },
+  {
+    "key": "stripe.new_price_id_optional",
+    "value": "Nuevo ID de precio (opcional)"
+  },
+  {
+    "key": "stripe.operation",
+    "value": "Operación"
+  },
+  {
+    "key": "stripe.payment_configuration",
+    "value": "Configuración de pago"
+  },
+  {
+    "key": "stripe.payment_description",
+    "value": "Descripción del pago"
+  },
+  {
+    "key": "stripe.payment_method_optional",
+    "value": "Método de pago (opcional)"
+  },
+  {
+    "key": "stripe.phone",
+    "value": "Teléfono"
+  },
+  {
+    "key": "stripe.price_id_or_plan",
+    "value": "ID de precio o plan"
+  },
+  {
+    "key": "stripe.quick_templates",
+    "value": "Plantillas rápidas"
+  },
+  {
+    "key": "stripe.refund_amount_optional",
+    "value": "Monto del reembolso (opcional)"
+  },
+  {
+    "key": "stripe.resource_balance",
+    "value": "Saldo"
+  },
+  {
+    "key": "stripe.resource_customer",
+    "value": "Cliente"
+  },
+  {
+    "key": "stripe.resource_payment",
+    "value": "Pago"
+  },
+  {
+    "key": "stripe.resource_subscription",
+    "value": "Suscripción"
+  },
+  {
+    "key": "stripe.resource_type",
+    "value": "Tipo de recurso"
+  },
+  {
+    "key": "stripe.select_currency",
+    "value": "Selecciona moneda"
+  },
+  {
+    "key": "stripe.select_operation",
+    "value": "Selecciona operación"
+  },
+  {
+    "key": "stripe.select_resource",
+    "value": "Selecciona recurso"
+  },
+  {
+    "key": "stripe.source_token",
+    "value": "Origen/Token de Stripe"
+  },
+  {
+    "key": "stripe.starting_after_optional",
+    "value": "Comenzar después de (opcional)"
+  },
+  {
+    "key": "stripe.subscription_configuration",
+    "value": "Configuración de suscripción"
+  },
+  {
+    "key": "stripe.subscription_id",
+    "value": "ID de suscripción"
+  },
+  {
+    "key": "stripe.supports_test_live_keys",
+    "value": "Admite claves de prueba y en vivo"
+  },
+  {
+    "key": "stripe.terminal_node_info",
+    "value": "Este es un nodo terminal. La ejecución del flujo se detiene después de que se completa la operación de Stripe. Todos los datos de respuesta se almacenan en variables para referencia."
+  },
+  {
+    "key": "stripe.test_configuration",
+    "value": "Probar Configuración"
+  },
+  {
+    "key": "stripe.transaction_id",
+    "value": "ID de transacción"
+  },
+  {
     "key": "subdomain.access_error",
     "value": "Error de Acceso"
   },
@@ -62288,12 +66124,40 @@
     "value": "Activa"
   },
   {
+    "key": "subscription.cancel",
+    "value": "Cancelar"
+  },
+  {
     "key": "subscription.current_plan",
     "value": "Plan Actual"
   },
   {
     "key": "subscription.current_subscription",
     "value": "Suscripción actual"
+  },
+  {
+    "key": "subscription.days_14",
+    "value": "14 días"
+  },
+  {
+    "key": "subscription.days_30",
+    "value": "30 días"
+  },
+  {
+    "key": "subscription.days_60",
+    "value": "60 días"
+  },
+  {
+    "key": "subscription.days_7",
+    "value": "7 días"
+  },
+  {
+    "key": "subscription.days_90",
+    "value": "90 días"
+  },
+  {
+    "key": "subscription.days_remaining",
+    "value": "días restantes."
   },
   {
     "key": "subscription.error_title",
@@ -62320,8 +66184,24 @@
     "value": "Sin suscripción activa"
   },
   {
+    "key": "subscription.pause_dialog_desc",
+    "value": "Pausa temporalmente tu suscripción. Tus datos se conservarán y podrás reanudarla cuando quieras."
+  },
+  {
+    "key": "subscription.pause_duration",
+    "value": "Duración de la pausa"
+  },
+  {
     "key": "subscription.pause_failed",
     "value": "No se pudo pausar la suscripción: {{error}}"
+  },
+  {
+    "key": "subscription.pause_subscription",
+    "value": "Pausar suscripción"
+  },
+  {
+    "key": "subscription.pause_warning",
+    "value": "Durante la pausa no se te cobrará, pero el acceso a las funciones premium estará limitado. Tu suscripción se reanudará automáticamente después del período seleccionado."
   },
   {
     "key": "subscription.paused_badge",
@@ -62336,12 +66216,20 @@
     "value": "Suscripción pausada"
   },
   {
+    "key": "subscription.paused_until",
+    "value": "Tu suscripción está pausada hasta"
+  },
+  {
     "key": "subscription.renewal_badge",
     "value": "Renovando"
   },
   {
     "key": "subscription.resume_failed",
     "value": "No se pudo reanudar la suscripción: {{error}}"
+  },
+  {
+    "key": "subscription.resume_subscription",
+    "value": "Reanudar suscripción"
   },
   {
     "key": "subscription.resumed_desc",
@@ -62354,6 +66242,10 @@
   {
     "key": "subscription.status",
     "value": "Estado de la suscripción"
+  },
+  {
+    "key": "subscription.usage_limits_exceeded",
+    "value": "Límites de uso excedidos"
   },
   {
     "key": "tasks.actions",
@@ -63900,6 +67792,10 @@
     "value": "Subiendo..."
   },
   {
+    "key": "ui.openai_icon",
+    "value": "Ícono de OpenAI"
+  },
+  {
     "key": "variables.category.contact",
     "value": "Información de Contacto"
   },
@@ -64624,6 +68520,10 @@
     "value": "Texto del Botón"
   },
   {
+    "key": "whatsapp_cta_url.fix_errors",
+    "value": "Por favor, corrige los errores a continuación"
+  },
+  {
     "key": "whatsapp_cta_url.node_title",
     "value": "URL CTA de WhatsApp"
   },
@@ -64906,6 +68806,10 @@
   {
     "key": "whatsapp_location_request.body_placeholder",
     "value": "Introduce el texto de tu mensaje..."
+  },
+  {
+    "key": "whatsapp_location_request.fix_errors",
+    "value": "Por favor corrige los errores a continuación"
   },
   {
     "key": "whatsapp_location_request.node_title",

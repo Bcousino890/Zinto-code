@@ -569,8 +569,8 @@ export function ExecutionHistoryModal({ isOpen, onClose, flowId }: ExecutionHist
                                         {(step.errorMessage || step.retryCount != null || step.maxRetries != null) && (
                                           <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
                                             {step.errorMessage && <span className="rounded-full bg-destructive/10 px-1.5 py-0.5 text-destructive">{t('common.error', 'Error')}</span>}
-                                            {step.retryCount != null && <span className="rounded-full bg-muted px-1.5 py-0.5">retry {step.retryCount}</span>}
-                                            {step.maxRetries != null && <span className="rounded-full bg-muted px-1.5 py-0.5">max {step.maxRetries}</span>}
+                                            {step.retryCount != null && <span className="rounded-full bg-muted px-1.5 py-0.5">{t('flow_builder.execution_history_retry', 'retry')} {step.retryCount}</span>}
+                                            {step.maxRetries != null && <span className="rounded-full bg-muted px-1.5 py-0.5">{t('flow_builder.execution_history_max', 'max')} {step.maxRetries}</span>}
                                           </div>
                                         )}
                                       </div>
@@ -650,7 +650,7 @@ export function ExecutionHistoryModal({ isOpen, onClose, flowId }: ExecutionHist
                                           <span className="text-right">{formatExecutionDuration(selectedStep.durationMs)}</span>
                                         </div>
                                         <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-                                          <span className="text-muted-foreground">Retries</span>
+                                          <span className="text-muted-foreground">{t('flow_builder.execution_history_retries', 'Retries')}</span>
                                           <span className="text-right">{selectedStep.retryCount ?? 0}/{selectedStep.maxRetries ?? 0}</span>
                                         </div>
                                       </div>
@@ -690,11 +690,11 @@ export function ExecutionHistoryModal({ isOpen, onClose, flowId }: ExecutionHist
                               <p className="text-xs text-muted-foreground">{t('flow_builder.execution_history_identifiers_subtitle', 'Useful durable references for support and debugging.')}</p>
                             </div>
                             <div className="grid gap-3 text-sm">
-                              <div><span className="text-muted-foreground">Run ID:</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.runId}</code></div>
-                              <div><span className="text-muted-foreground">Execution ID:</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.executionId}</code></div>
-                              <div><span className="text-muted-foreground">Session ID:</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.sessionId ?? '—'}</code></div>
-                              <div><span className="text-muted-foreground">Conversation ID:</span> {detailQuery.data.run.conversationId}</div>
-                              <div><span className="text-muted-foreground">Contact ID:</span> {detailQuery.data.run.contactId}</div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_run_id', 'Run ID:')}</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.runId}</code></div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_execution_id', 'Execution ID:')}</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.executionId}</code></div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_session_id', 'Session ID:')}</span> <code className="break-all rounded bg-muted px-1.5 py-0.5 text-xs">{detailQuery.data.run.sessionId ?? '—'}</code></div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_conversation_id', 'Conversation ID:')}</span> {detailQuery.data.run.conversationId}</div>
+                              <div><span className="text-muted-foreground">{t('flow_builder.execution_history_contact_id', 'Contact ID:')}</span> {detailQuery.data.run.contactId}</div>
                             </div>
                             {selectedPath && (
                               <div className="rounded-xl border bg-muted/10 p-3">

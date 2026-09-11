@@ -213,7 +213,7 @@ const WhatsAppCTAURLNode: React.FC<WhatsAppCTAURLNodeProps> = ({ id, data, isCon
       {hasErrors && (
         <div className="flex items-center gap-2 mb-3 p-2 bg-destructive/10 border border-destructive/20 rounded-md">
           <AlertCircle className="h-4 w-4 text-destructive" />
-          <span className="text-sm text-destructive">Please fix the errors below</span>
+          <span className="text-sm text-destructive">{t('whatsapp_cta_url.fix_errors', 'Please fix the errors below')}</span>
         </div>
       )}
 

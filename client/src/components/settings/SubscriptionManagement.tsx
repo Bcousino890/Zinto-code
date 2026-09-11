@@ -252,10 +252,10 @@ export function SubscriptionManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-foreground" />
-            Current Subscription
+            {t('settings.subscription_current_subscription', 'Current Subscription')}
           </CardTitle>
           <CardDescription>
-            Your active plan and subscription details
+            {t('settings.subscription_active_plan_details', 'Your active plan and subscription details')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -279,8 +279,8 @@ export function SubscriptionManagement() {
             <div className="text-center py-8">
               <div className="bg-secondary/10 border border-secondary/20 rounded-lg p-4">
                 <AlertTriangle className="h-8 w-8 text-secondary mx-auto mb-2" />
-                <h3 className="text-lg font-medium text-secondary mb-1">No Active Subscription</h3>
-                <p className="text-sm text-secondary">Select a plan below to subscribe</p>
+                <h3 className="text-lg font-medium text-secondary mb-1">{t('settings.subscription_no_active', 'No Active Subscription')}</h3>
+                <p className="text-sm text-secondary">{t('settings.subscription_select_plan', 'Select a plan below to subscribe')}</p>
               </div>
             </div>
           )}
@@ -292,17 +292,17 @@ export function SubscriptionManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-foreground" />
-            Subscription Status
+            {t('settings.subscription_status_title', 'Subscription Status')}
           </CardTitle>
           <CardDescription>
-            Current status and management options for your subscription
+            {t('settings.subscription_status_description', 'Current status and management options for your subscription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Current Status</p>
+                <p className="text-sm text-muted-foreground">{t('settings.subscription_current_status', 'Current Status')}</p>
                 <div className="mt-1">
                   {subscriptionStatus && getStatusBadge(subscriptionStatus.status)}
                 </div>
@@ -310,7 +310,7 @@ export function SubscriptionManagement() {
               {subscriptionStatus?.endDate && (
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground">
-                    {subscriptionStatus.status === 'active' ? 'Renews on' : 'Expires on'}
+                    {subscriptionStatus.status === 'active' ? t('settings.subscription_renews_on', 'Renews on') : t('settings.subscription_expires_on', 'Expires on')}
                   </p>
                   <p className="font-medium text-foreground">
                     {new Date(subscriptionStatus.endDate).toLocaleDateString()}
@@ -323,12 +323,12 @@ export function SubscriptionManagement() {
             {subscriptionStatus?.isInGracePeriod && (
               <Alert className="border-secondary/20 bg-secondary/10">
                 <AlertTriangle className="h-4 w-4 text-secondary" />
-                <AlertTitle>Grace Period Active</AlertTitle>
+                <AlertTitle>{t('settings.subscription_grace_period_active', 'Grace Period Active')}</AlertTitle>
                 <AlertDescription>
-                  Your subscription is in a grace period until{' '}
-                  {subscriptionStatus.gracePeriodEndDate && 
+                  {t('settings.subscription_grace_period_message', 'Your subscription is in a grace period until')}{' '}
+                  {subscriptionStatus.gracePeriodEndDate &&
                     new Date(subscriptionStatus.gracePeriodEndDate).toLocaleDateString()
-                  }. Please update your payment method to avoid service interruption.
+                  }. {t('settings.subscription_grace_period_action', 'Please update your payment method to avoid service interruption.')}
                 </AlertDescription>
               </Alert>
             )}
@@ -337,11 +337,11 @@ export function SubscriptionManagement() {
             {dunningStatus?.status === 'active' && (
               <Alert className="border-destructive/20 bg-destructive/10">
                 <XCircle className="h-4 w-4 text-destructive" />
-                <AlertTitle>Payment Retry in Progress</AlertTitle>
+                <AlertTitle>{t('settings.subscription_payment_retry_title', 'Payment Retry in Progress')}</AlertTitle>
                 <AlertDescription>
-                  We're attempting to process your payment. Attempt {dunningStatus.totalAttempts} of {dunningStatus.totalAttempts + dunningStatus.remainingAttempts}.
+                  {t('settings.subscription_payment_retry_message', 'We\'re attempting to process your payment. Attempt')} {dunningStatus.totalAttempts} {t('settings.subscription_payment_retry_of', 'of')} {dunningStatus.totalAttempts + dunningStatus.remainingAttempts}.
                   {dunningStatus.nextAttemptDate && (
-                    <> Next attempt: {new Date(dunningStatus.nextAttemptDate).toLocaleDateString()}</>
+                    <> {t('settings.subscription_next_attempt', 'Next attempt')}: {new Date(dunningStatus.nextAttemptDate).toLocaleDateString()}</>
                   )}
                 </AlertDescription>
               </Alert>
@@ -351,14 +351,14 @@ export function SubscriptionManagement() {
             {pauseStatus?.isPaused && (
               <Alert className="border-primary/20 bg-primary/10">
                 <Pause className="h-4 w-4 text-primary" />
-                <AlertTitle>Subscription Paused</AlertTitle>
+                <AlertTitle>{t('subscription.paused_title', 'Subscription Paused')}</AlertTitle>
                 <AlertDescription>
-                  Your subscription is paused until{' '}
+                  {t('subscription.paused_until', 'Your subscription is paused until')}{' '}
                   {pauseStatus.pauseEndDate && 
                     new Date(pauseStatus.pauseEndDate).toLocaleDateString()
                   }. 
                   {pauseStatus.daysRemaining && (
-                    <> {pauseStatus.daysRemaining} days remaining.</>
+                    <> {pauseStatus.daysRemaining} {t('subscription.days_remaining', 'days remaining.')}</>
                   )}
                 </AlertDescription>
               </Alert>
@@ -377,7 +377,7 @@ export function SubscriptionManagement() {
                   ) : (
                     <Play className="w-4 h-4" />
                   )}
-                  Resume Subscription
+                  {t('subscription.resume_subscription', 'Resume Subscription')}
                 </Button>
               ) : (
                 subscriptionStatus?.status === 'active' && (
@@ -387,7 +387,7 @@ export function SubscriptionManagement() {
                     className="flex items-center gap-2"
                   >
                     <Pause className="w-4 h-4" />
-                    Pause Subscription
+                    {t('subscription.pause_subscription', 'Pause Subscription')}
                   </Button>
                 )
               )}
@@ -411,7 +411,7 @@ export function SubscriptionManagement() {
           {usageStatus?.overallStatus === 'blocked' && (
             <Alert className="border-red-200 bg-red-50 mb-4">
               <XCircle className="h-4 w-4" />
-              <AlertTitle>Usage Limits Exceeded</AlertTitle>
+              <AlertTitle>{t('subscription.usage_limits_exceeded', 'Usage Limits Exceeded')}</AlertTitle>
               <AlertDescription>
                 Some features are currently blocked due to usage limits. 
                 Blocked features: {usageStatus.blockedFeatures.join(', ')}
@@ -464,37 +464,36 @@ export function SubscriptionManagement() {
       <Dialog open={showPauseDialog} onOpenChange={setShowPauseDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Pause Subscription</DialogTitle>
+            <DialogTitle>{t('subscription.pause_subscription', 'Pause Subscription')}</DialogTitle>
             <DialogDescription>
-              Temporarily pause your subscription. Your data will be preserved and you can resume anytime.
+              {t('subscription.pause_dialog_desc', 'Temporarily pause your subscription. Your data will be preserved and you can resume anytime.')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Pause Duration</label>
+              <label className="text-sm font-medium">{t('subscription.pause_duration', 'Pause Duration')}</label>
               <select
                 value={pauseDays}
                 onChange={(e) => setPauseDays(Number(e.target.value))}
                 className="w-full mt-1 p-2 border rounded-md"
               >
-                <option value={7}>7 days</option>
-                <option value={14}>14 days</option>
-                <option value={30}>30 days</option>
-                <option value={60}>60 days</option>
-                <option value={90}>90 days</option>
+                <option value={7}>{t('subscription.days_7', '7 days')}</option>
+                <option value={14}>{t('subscription.days_14', '14 days')}</option>
+                <option value={30}>{t('subscription.days_30', '30 days')}</option>
+                <option value={60}>{t('subscription.days_60', '60 days')}</option>
+                <option value={90}>{t('subscription.days_90', '90 days')}</option>
               </select>
             </div>
             <Alert>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                During the pause, you won't be charged, but access to premium features will be limited.
-                Your subscription will automatically resume after the selected period.
+                {t('subscription.pause_warning', "During the pause, you won't be charged, but access to premium features will be limited. Your subscription will automatically resume after the selected period.")}
               </AlertDescription>
             </Alert>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowPauseDialog(false)}>
-              Cancel
+              {t('subscription.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={() => pauseSubscriptionMutation.mutate(pauseDays)}
@@ -503,7 +502,7 @@ export function SubscriptionManagement() {
               {pauseSubscriptionMutation.isPending && (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               )}
-              Pause Subscription
+              {t('subscription.pause_subscription', 'Pause Subscription')}
             </Button>
           </DialogFooter>
         </DialogContent>

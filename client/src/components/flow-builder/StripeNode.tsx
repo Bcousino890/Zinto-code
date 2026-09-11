@@ -459,10 +459,10 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
     if (resource === 'customer') {
       return (
         <div className="space-y-2 pt-2 border-t">
-          <Label className="block mb-2 font-medium">Customer Configuration</Label>
+          <Label className="block mb-2 font-medium">{t('stripe.customer_configuration', 'Customer Configuration')}</Label>
           {(operation === 'get' || operation === 'update' || operation === 'delete') && (
             <div>
-              <Label className="block mb-1 text-xs">Customer ID</Label>
+              <Label className="block mb-1 text-xs">{t('stripe.customer_id', 'Customer ID')}</Label>
               <EnhancedVariablePicker customVariables={customVariables}
                 value={customerId}
                 onChange={setCustomerId}
@@ -474,7 +474,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
           {(operation === 'create' || operation === 'update') && (
             <>
               <div>
-                <Label className="block mb-1 text-xs">Email</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.email', 'Email')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={email}
                   onChange={setEmail}
@@ -483,7 +483,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                 />
               </div>
               <div>
-                <Label className="block mb-1 text-xs">Name</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.name', 'Name')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={name}
                   onChange={setName}
@@ -492,7 +492,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                 />
               </div>
               <div>
-                <Label className="block mb-1 text-xs">Phone</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.phone', 'Phone')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={phone}
                   onChange={setPhone}
@@ -509,11 +509,11 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
     if (resource === 'payment') {
       return (
         <div className="space-y-2 pt-2 border-t">
-          <Label className="block mb-2 font-medium">Payment Configuration</Label>
+          <Label className="block mb-2 font-medium">{t('stripe.payment_configuration', 'Payment Configuration')}</Label>
           {operation === 'refund' ? (
             <>
               <div>
-                <Label className="block mb-1 text-xs">Charge ID or Payment Intent ID</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.charge_id_or_payment_intent', 'Charge ID or Payment Intent ID')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={charge || paymentIntent}
                   onChange={(value) => {
@@ -532,7 +532,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                 />
               </div>
               <div>
-                <Label className="block mb-1 text-xs">Refund Amount (optional)</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.refund_amount_optional', 'Refund Amount (optional)')}</Label>
                 <div className="flex gap-2">
                   <EnhancedVariablePicker customVariables={customVariables}
                     value={amount}
@@ -552,7 +552,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
           ) : (
             <>
               <div>
-                <Label className="block mb-1 text-xs">Amount</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.amount', 'Amount')}</Label>
                 <div className="flex gap-2">
                   <EnhancedVariablePicker customVariables={customVariables}
                     value={amount}
@@ -561,18 +561,18 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                     className="text-xs h-7 flex-1"
                   />
                   {amountFormat === 'decimal' && (
-                    <span className="text-xs text-muted-foreground self-center">Enter 10.00 for $10.00</span>
+                    <span className="text-xs text-muted-foreground self-center">{t('stripe.enter_decimal_format', 'Enter 10.00 for $10.00')}</span>
                   )}
                   {amountFormat === 'cents' && (
-                    <span className="text-xs text-muted-foreground self-center">Enter 1000 for $10.00</span>
+                    <span className="text-xs text-muted-foreground self-center">{t('stripe.enter_cents_format', 'Enter 1000 for $10.00')}</span>
                   )}
                 </div>
               </div>
               <div>
-                <Label className="block mb-1 text-xs">Currency</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.currency', 'Currency')}</Label>
                 <Select value={currency} onValueChange={setCurrency}>
                   <SelectTrigger className="text-xs h-7">
-                    <SelectValue placeholder="Select currency" />
+                    <SelectValue placeholder={t('stripe.select_currency', 'Select currency')} />
                   </SelectTrigger>
                   <SelectContent>
                     {CURRENCIES.map((curr) => (
@@ -584,7 +584,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                 </Select>
               </div>
               <div>
-                <Label className="block mb-1 text-xs">Customer ID (optional)</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.customer_id_optional', 'Customer ID (optional)')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={customer}
                   onChange={setCustomer}
@@ -594,7 +594,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
               </div>
               {operation === 'createCharge' && (
                 <div>
-                  <Label className="block mb-1 text-xs">Stripe Source/Token</Label>
+                  <Label className="block mb-1 text-xs">{t('stripe.source_token', 'Stripe Source/Token')}</Label>
                   <EnhancedVariablePicker customVariables={customVariables}
                     value={source}
                     onChange={setSource}
@@ -604,7 +604,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                 </div>
               )}
               <div>
-                <Label className="block mb-1 text-xs">Payment Method (optional)</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.payment_method_optional', 'Payment Method (optional)')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={paymentMethod}
                   onChange={setPaymentMethod}
@@ -613,11 +613,11 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                 />
               </div>
               <div>
-                <Label className="block mb-1 text-xs">Description (optional)</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.description_optional', 'Description (optional)')}</Label>
                 <Input
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Payment description"
+                  placeholder={t('stripe.payment_description', 'Payment description')}
                   className="text-xs h-7"
                 />
               </div>
@@ -630,11 +630,11 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
     if (resource === 'subscription') {
       return (
         <div className="space-y-2 pt-2 border-t">
-          <Label className="block mb-2 font-medium">Subscription Configuration</Label>
+          <Label className="block mb-2 font-medium">{t('stripe.subscription_configuration', 'Subscription Configuration')}</Label>
           {operation === 'create' ? (
             <>
               <div>
-                <Label className="block mb-1 text-xs">Customer ID</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.customer_id', 'Customer ID')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={customer}
                   onChange={setCustomer}
@@ -643,7 +643,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                 />
               </div>
               <div>
-                <Label className="block mb-1 text-xs">Price ID or Plan</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.price_id_or_plan', 'Price ID or Plan')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={priceId || plan}
                   onChange={(value) => {
@@ -663,7 +663,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
           ) : (
             <>
               <div>
-                <Label className="block mb-1 text-xs">Subscription ID</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.subscription_id', 'Subscription ID')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={subscriptionId}
                   onChange={setSubscriptionId}
@@ -673,7 +673,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
               </div>
               {operation === 'update' && (
                 <div>
-                  <Label className="block mb-1 text-xs">New Price ID (optional)</Label>
+                  <Label className="block mb-1 text-xs">{t('stripe.new_price_id_optional', 'New Price ID (optional)')}</Label>
                   <EnhancedVariablePicker customVariables={customVariables}
                     value={priceId}
                     onChange={setPriceId}
@@ -691,11 +691,11 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
     if (resource === 'balance') {
       return (
         <div className="space-y-2 pt-2 border-t">
-          <Label className="block mb-2 font-medium">Balance Configuration</Label>
+          <Label className="block mb-2 font-medium">{t('stripe.balance_configuration', 'Balance Configuration')}</Label>
           {operation === 'listTransactions' && (
             <>
               <div>
-                <Label className="block mb-1 text-xs">Limit</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.limit', 'Limit')}</Label>
                 <Input
                   type="number"
                   value={limit}
@@ -705,11 +705,11 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
                 />
               </div>
               <div>
-                <Label className="block mb-1 text-xs">Starting After (optional)</Label>
+                <Label className="block mb-1 text-xs">{t('stripe.starting_after_optional', 'Starting After (optional)')}</Label>
                 <EnhancedVariablePicker customVariables={customVariables}
                   value={startingAfter}
                   onChange={setStartingAfter}
-                  placeholder="Transaction ID"
+                  placeholder={t('stripe.transaction_id', 'Transaction ID')}
                   className="text-xs h-7"
                 />
               </div>
@@ -725,7 +725,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
   const renderAmountFormatToggle = () => {
     return (
       <div className="pt-2 border-t">
-        <Label className="block mb-2 font-medium">Amount Format</Label>
+        <Label className="block mb-2 font-medium">{t('stripe.amount_format', 'Amount Format')}</Label>
         <div className="flex items-center space-x-2">
           <Switch
             id="amount-format"
@@ -733,13 +733,13 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
             onCheckedChange={(checked) => setAmountFormat(checked ? 'decimal' : 'cents')}
           />
           <Label htmlFor="amount-format" className="text-xs">
-            {amountFormat === 'decimal' ? 'Decimal (e.g., 10.00)' : 'Cents (Stripe native)'}
+            {amountFormat === 'decimal' ? t('stripe.decimal_format', 'Decimal (e.g., 10.00)') : t('stripe.cents_stripe_native', 'Cents (Stripe native)')}
           </Label>
         </div>
         <p className="text-[10px] text-muted-foreground mt-1">
-          {amountFormat === 'decimal' 
-            ? 'Enter amounts in decimal format (10.00 for $10.00). Will be converted to cents automatically.'
-            : 'Enter amounts in cents (1000 for $10.00). This is Stripe\'s native format.'}
+          {amountFormat === 'decimal'
+            ? t('stripe.decimal_help_text', 'Enter amounts in decimal format (10.00 for $10.00). Will be converted to cents automatically.')
+            : t('stripe.cents_help_text', 'Enter amounts in cents (1000 for $10.00). This is Stripe\'s native format.')}
         </p>
       </div>
     );
@@ -783,10 +783,10 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
           onClick={addMetadata}
         >
           <Plus className="h-3 w-3 mr-1" />
-          Add Metadata
+          {t('stripe.add_metadata', 'Add Metadata')}
         </Button>
         <p className="text-[10px] text-muted-foreground">
-          Add custom metadata to track additional information
+          {t('stripe.add_metadata_help', 'Add custom metadata to track additional information')}
         </p>
       </div>
     );
@@ -903,7 +903,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Duplicate node</p>
+              <p className="text-xs">{t('flow_builder.duplicate_node', 'Duplicate node')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -921,7 +921,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Delete node</p>
+              <p className="text-xs">{t('flow_builder.delete_node', 'Delete node')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -941,12 +941,12 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
           {isEditing ? (
             <>
               <EyeOff className="h-3 w-3" />
-              Hide
+              {t('common.hide', 'Hide')}
             </>
           ) : (
             <>
               <Eye className="h-3 w-3" />
-              Edit
+              {t('common.edit', 'Edit')}
             </>
           )}
         </button>
@@ -981,10 +981,10 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
       {isEditing && (
         <div className="mt-3 text-xs space-y-3 border rounded p-2">
           <div>
-            <Label className="block mb-1 font-medium">Quick Templates</Label>
+            <Label className="block mb-1 font-medium">{t('stripe.quick_templates', 'Quick Templates')}</Label>
             <Select value="" onValueChange={applyTemplate}>
               <SelectTrigger className="text-xs h-7">
-                <SelectValue placeholder="Choose a template..." />
+                <SelectValue placeholder={t('stripe.choose_template', 'Choose a template...')} />
               </SelectTrigger>
               <SelectContent>
                 {OPERATION_TEMPLATES.map((template) => (
@@ -997,21 +997,21 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
           </div>
 
           <div>
-            <Label className="block mb-1 text-xs">Stripe API Key</Label>
+            <Label className="block mb-1 text-xs">{t('stripe.api_key', 'Stripe API Key')}</Label>
             <Input
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk_test_... or sk_live_..."
+              placeholder={t('stripe.api_key_placeholder', 'sk_test_... or sk_live_...')}
               className="text-xs h-7"
             />
             <p className="text-[10px] text-muted-foreground mt-1">
-              Supports both test and live keys
+              {t('stripe.supports_test_live_keys', 'Supports both test and live keys')}
             </p>
           </div>
 
           <div>
-            <Label className="block mb-1 font-medium">Resource Type</Label>
+            <Label className="block mb-1 font-medium">{t('stripe.resource_type', 'Resource Type')}</Label>
             <Select value={resource} onValueChange={(value) => {
               setResource(value as typeof resource);
               const ops = getOperationsForResource(value);
@@ -1020,22 +1020,22 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
               }
             }}>
               <SelectTrigger className="text-xs h-7">
-                <SelectValue placeholder="Select resource" />
+                <SelectValue placeholder={t('stripe.select_resource', 'Select resource')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="customer">Customer</SelectItem>
-                <SelectItem value="payment">Payment</SelectItem>
-                <SelectItem value="subscription">Subscription</SelectItem>
-                <SelectItem value="balance">Balance</SelectItem>
+                <SelectItem value="customer">{t('stripe.resource_customer', 'Customer')}</SelectItem>
+                <SelectItem value="payment">{t('stripe.resource_payment', 'Payment')}</SelectItem>
+                <SelectItem value="subscription">{t('stripe.resource_subscription', 'Subscription')}</SelectItem>
+                <SelectItem value="balance">{t('stripe.resource_balance', 'Balance')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <Label className="block mb-1 font-medium">Operation</Label>
+            <Label className="block mb-1 font-medium">{t('stripe.operation', 'Operation')}</Label>
             <Select value={operation} onValueChange={setOperation}>
               <SelectTrigger className="text-xs h-7">
-                <SelectValue placeholder="Select operation" />
+                <SelectValue placeholder={t('stripe.select_operation', 'Select operation')} />
               </SelectTrigger>
               <SelectContent>
                 {getOperationsForResource(resource).map((op) => (
@@ -1053,7 +1053,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
 
           <Collapsible open={showMetadata} onOpenChange={setShowMetadata}>
             <CollapsibleTrigger className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 w-full">
-              Custom Metadata
+              {t('stripe.custom_metadata', 'Custom Metadata')}
               {showMetadata ? (
                 <ChevronUp className="h-3 w-3" />
               ) : (
@@ -1077,14 +1077,14 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
             ) : (
               <Play className="h-3 w-3 mr-1" />
             )}
-            Test Configuration
+            {t('stripe.test_configuration', 'Test Configuration')}
           </Button>
 
           {showTestResult && testResult && renderTestResults()}
 
           <Collapsible open={showVariablePreview} onOpenChange={setShowVariablePreview}>
             <CollapsibleTrigger className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 w-full">
-              Available Output Variables
+              {t('stripe.available_output_variables', 'Available Output Variables')}
               {showVariablePreview ? (
                 <ChevronUp className="h-3 w-3" />
               ) : (
@@ -1097,8 +1097,7 @@ export function StripeNode({ id, data, isConnectable }: StripeNodeProps) {
           </Collapsible>
 
           <p className="text-[10px] text-muted-foreground">
-            This is a terminal node. Flow execution stops after Stripe operation completes.
-            All response data is stored in variables for reference.
+            {t('stripe.terminal_node_info', 'This is a terminal node. Flow execution stops after Stripe operation completes. All response data is stored in variables for reference.')}
           </p>
         </div>
       )}

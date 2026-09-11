@@ -483,7 +483,7 @@ export default function ProfilePage() {
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-                <p className="text-muted-foreground">Loading your profile...</p>
+                <p className="text-muted-foreground">{t('profile.loading', 'Loading your profile...')}</p>
               </div>
             </div>
           </main>
@@ -771,7 +771,7 @@ export default function ProfilePage() {
                             name="companyEmail"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Company Email</FormLabel>
+                                <FormLabel>{t('profile.company_email', 'Company Email')}</FormLabel>
                                 <FormControl>
                                   <Input
                                     type="email"
@@ -823,7 +823,7 @@ export default function ProfilePage() {
                             name="contactPerson"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Contact Person</FormLabel>
+                                <FormLabel>{t('profile.contact_person', 'Contact Person')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Felix Zona" {...field} />
                                 </FormControl>
@@ -843,7 +843,7 @@ export default function ProfilePage() {
                             name="registerNumber"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Commercial Registration Number (KSA)</FormLabel>
+                                <FormLabel>{t('profile.commercial_registration_number_ksa', 'Commercial Registration Number (KSA)')}</FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="1234567890"
@@ -876,7 +876,7 @@ export default function ProfilePage() {
 
                               return (
                                 <FormItem>
-                                  <FormLabel>Company IBAN Number (KSA)</FormLabel>
+                                  <FormLabel>{t('admin.companies.iban_label', 'Company IBAN Number (KSA)')}</FormLabel>
                                   <FormControl>
                                     <div className="relative">
                                       <Input
@@ -937,12 +937,12 @@ export default function ProfilePage() {
                           {updateCompanyMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Saving Changes
+                              {t('profile.saving_changes', 'Saving Changes')}
                             </>
                           ) : (
                             <>
                               <Save className="mr-2 h-4 w-4" />
-                              Save Company Information
+                              {t('profile.save_company_info', 'Save Company Information')}
                             </>
                           )}
                         </Button>
@@ -1152,12 +1152,12 @@ export default function ProfilePage() {
                           {updateNotificationsMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Saving Settings
+                              {t('profile.saving_settings', 'Saving Settings')}
                             </>
                           ) : (
                             <>
                               <Save className="mr-2 h-4 w-4" />
-                              Save Notification Settings
+                              {t('profile.save_notification_settings', 'Save Notification Settings')}
                             </>
                           )}
                         </Button>

@@ -7,6 +7,7 @@ import { X } from "lucide-react"
 
 import { dialogCloseButtonClassName } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "@/hooks/use-translation"
 
 const Sheet = SheetPrimitive.Root
 
@@ -57,22 +58,25 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content
-      ref={ref}
-      className={cn(sheetVariants({ side }), className)}
-      {...props}
-    >
-      {children}
-      <SheetPrimitive.Close className={dialogCloseButtonClassName}>
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </SheetPrimitive.Close>
-    </SheetPrimitive.Content>
-  </SheetPortal>
-))
+>(({ side = "right", className, children, ...props }, ref) => {
+  const { t } = useTranslation();
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        ref={ref}
+        className={cn(sheetVariants({ side }), className)}
+        {...props}
+      >
+        {children}
+        <SheetPrimitive.Close className={dialogCloseButtonClassName}>
+          <X className="h-4 w-4" />
+          <span className="sr-only">{t('ui.common.close', 'Close')}</span>
+        </SheetPrimitive.Close>
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  );
+})
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({

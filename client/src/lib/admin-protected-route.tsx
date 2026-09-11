@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { Redirect, Route, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
+import { useTranslation } from "@/hooks/use-translation";
 
 type AdminProtectedRouteProps = {
   path: string;
@@ -10,6 +11,7 @@ type AdminProtectedRouteProps = {
 };
 
 export function AdminProtectedRoute({ path, component: Component }: AdminProtectedRouteProps) {
+  const { t } = useTranslation();
   const { user, isLoading } = useAuth();
   const [_, navigate] = useLocation();
   const [licenseError, setLicenseError] = useState<{ message: string; reason?: string } | null>(null);
@@ -80,14 +82,14 @@ export function AdminProtectedRoute({ path, component: Component }: AdminProtect
           return (
             <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-purple-700">
               <div className="bg-card rounded-lg shadow-xl p-8 max-w-md text-center">
-                <h1 className="text-2xl font-bold text-destructive mb-4">⚠️ License Error</h1>
+                <h1 className="text-2xl font-bold text-destructive mb-4">{t('admin.licenseError', '⚠️ License Error')}</h1>
                 <p className="text-foreground mb-4">{licenseError.message}</p>
                 <div className="bg-muted rounded p-4 mb-4">
                   <p className="text-sm text-muted-foreground">
-                    <strong>Reason:</strong> {licenseError.reason || "License validation failed"}
+                    <strong>{t('admin.licenseErrorReason', 'Reason')}:</strong> {licenseError.reason || t('admin.licenseValidationFailed', 'License validation failed')}
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Please renew your license or contact support for assistance.
+                    {t('admin.licenseRenewHelp', 'Please renew your license or contact support for assistance.')}
                   </p>
                 </div>
               </div>

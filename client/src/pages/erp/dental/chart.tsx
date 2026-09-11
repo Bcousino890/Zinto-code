@@ -385,8 +385,8 @@ export default function DentalChartPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="FDI">FDI</SelectItem>
-                      <SelectItem value="UNIVERSAL">Universal</SelectItem>
-                      <SelectItem value="PALMER">Palmer</SelectItem>
+                      <SelectItem value="UNIVERSAL">{t('erp.dental.universal', 'Universal')}</SelectItem>
+                      <SelectItem value="PALMER">{t('erp.dental.palmer', 'Palmer')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

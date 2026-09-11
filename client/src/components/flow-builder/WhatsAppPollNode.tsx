@@ -258,14 +258,14 @@ export default function WhatsAppPollNode({ data, isConnectable, id }: any) {
                   onChange={(e) => handleEnableGoBackChange(e.target.checked)}
                   className="w-4 h-4 rounded border-input"
                 />
-                <span className="text-muted-foreground">Enable Go Back</span>
+                <span className="text-muted-foreground">{t('flow_builder.poll_enable_go_back', 'Enable Go Back')}</span>
               </label>
             </div>
             
             {enableGoBack && (
               <div className="space-y-2 p-3 border rounded-lg ">
                 <div>
-                  <label className="text-xs text-muted-foreground block mb-1">Display Text:</label>
+                  <label className="text-xs text-muted-foreground block mb-1">{t('flow_builder.poll_display_text', 'Display Text:')}</label>
                   <input
                     className="w-full p-2 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     value={goBackText}
@@ -278,7 +278,7 @@ export default function WhatsAppPollNode({ data, isConnectable, id }: any) {
                 </div>
 
                 <div>
-                  <label className="text-xs text-muted-foreground block mb-1">Response Value:</label>
+                  <label className="text-xs text-muted-foreground block mb-1">{t('flow_builder.poll_response_value', 'Response Value:')}</label>
                   <input
                     className="w-full p-2 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     value={goBackValue}

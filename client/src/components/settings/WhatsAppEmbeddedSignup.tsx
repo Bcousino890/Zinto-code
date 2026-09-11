@@ -610,7 +610,7 @@ export function WhatsAppEmbeddedSignup({ isOpen, onClose, onSuccess }: Props) {
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 {t('settings.whatsappEmbeddedSignup.agree_terms', 'I agree to the ')}
-                <a href="https://www.whatsapp.com/legal/business-terms" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/90">WhatsApp Business API Terms of Service</a>
+                <a href="https://www.whatsapp.com/legal/business-terms" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/90">{t('settings.whatsappEmbeddedSignup.whatsapp_terms_link', 'WhatsApp Business API Terms of Service')}</a>
               </label>
             </div>
             
@@ -625,7 +625,7 @@ export function WhatsAppEmbeddedSignup({ isOpen, onClose, onSuccess }: Props) {
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 {t('settings.whatsappEmbeddedSignup.agree_privacy', 'I agree to the ')}
-                <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/90">Meta Privacy Policy</a>
+                <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/90">{t('settings.whatsappEmbeddedSignup.meta_privacy_link', 'Meta Privacy Policy')}</a>
               </label>
             </div>
           </div>

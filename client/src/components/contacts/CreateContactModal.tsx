@@ -175,10 +175,10 @@ export default function CreateContactModal({ isOpen, onClose, onCreated, initial
                   <SelectValue placeholder={t('contacts.create.channelPlaceholder', 'Select channel')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="whatsapp_official">WhatsApp Official</SelectItem>
-                  <SelectItem value="whatsapp_unofficial">WhatsApp Unofficial</SelectItem>
-                  <SelectItem value="messenger">Facebook Messenger</SelectItem>
-                  <SelectItem value="instagram">Instagram</SelectItem>
+                  <SelectItem value="whatsapp_official">{t('contacts.channels.whatsapp_official', 'WhatsApp Official')}</SelectItem>
+                  <SelectItem value="whatsapp_unofficial">{t('contacts.channels.whatsapp_unofficial', 'WhatsApp Unofficial')}</SelectItem>
+                  <SelectItem value="messenger">{t('contacts.channels.messenger', 'Facebook Messenger')}</SelectItem>
+                  <SelectItem value="instagram">{t('contacts.channels.instagram', 'Instagram')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

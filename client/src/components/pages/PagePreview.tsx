@@ -190,10 +190,10 @@ export function PagePreview({ page, onClose }: PagePreviewProps) {
                   </h1>
                 )}
                 
-                <div 
+                <div
                   className={templateStyles.content}
-                  dangerouslySetInnerHTML={{ 
-                    __html: page.content || '<p>No content available</p>' 
+                  dangerouslySetInnerHTML={{
+                    __html: page.content || `<p>${t('pages.no_content_available', 'No content available')}</p>`
                   }}
                 />
               </div>

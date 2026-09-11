@@ -194,7 +194,7 @@ export default function StageHeader({
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p>Average days since last activity</p>
+                <p>{t('pipeline.average_days_last_activity', 'Average days since last activity')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -232,7 +232,7 @@ export default function StageHeader({
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 <div className="text-xs">
-                  <p>Priority Distribution:</p>
+                  <p>{t('pipeline.priority_distribution', 'Priority Distribution:')}</p>
                   <p>High: {stageStats.highPriority} | Med: {stageStats.mediumPriority} | Low: {stageStats.lowPriority}</p>
                 </div>
               </TooltipContent>

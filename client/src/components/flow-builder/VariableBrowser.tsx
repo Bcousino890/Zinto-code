@@ -852,18 +852,18 @@ export function VariableBrowser({ flowId, sessionId, onVariableSelect, className
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Clear Session Data</AlertDialogTitle>
+                                  <AlertDialogTitle>{t('flow_builder.variable_browser_clear_session_dialog_title', 'Clear Session Data')}</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to clear all variable data for this session? This action cannot be undone.
+                                    {t('flow_builder.variable_browser_clear_session_dialog_desc', 'Are you sure you want to clear all variable data for this session? This action cannot be undone.')}
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={handleClearSessionData}
                                     className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                                   >
-                                    Clear Data
+                                    {t('flow_builder.variable_browser_clear_data', 'Clear Data')}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -1046,6 +1046,7 @@ export function VariableBrowserDialog({
   onVariableSelect,
   trigger
 }: VariableBrowserDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const handleVariableSelect = (variable: FlowVariable) => {
@@ -1061,15 +1062,15 @@ export function VariableBrowserDialog({
         {trigger || (
           <Button variant="outline" size="sm">
             <Variable className="w-4 h-4 mr-2" />
-            Browse Variables
+            {t('flow_builder.variable_browser_browse_variables', 'Browse Variables')}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh]">
         <DialogHeader>
-          <DialogTitle>Variable Browser</DialogTitle>
+          <DialogTitle>{t('flow_builder.variable_browser_title_dialog', 'Variable Browser')}</DialogTitle>
           <DialogDescription>
-            Browse and select variables to use in your flow
+            {t('flow_builder.variable_browser_description_dialog', 'Browse and select variables to use in your flow')}
           </DialogDescription>
         </DialogHeader>
         <VariableBrowser

@@ -48,7 +48,7 @@ export function ProfileLanguageSelector({
     return (
       <Button variant={variant} size="sm" disabled className={cn("gap-2", className)}>
         <Loader2 className="h-4 w-4 animate-spin" />
-        {showLabel && <span className="text-sm">Loading...</span>}
+        {showLabel && <span className="text-sm">{t('common.loading', 'Loading...')}</span>}
       </Button>
     );
   }
@@ -57,7 +57,7 @@ export function ProfileLanguageSelector({
     return (
       <Button variant={variant} size="sm" disabled className={cn("gap-2", className)}>
         <Globe className="h-4 w-4" />
-        {showLabel && <span className="text-sm">No languages</span>}
+        {showLabel && <span className="text-sm">{t('common.language_selector.no_languages', 'No languages')}</span>}
       </Button>
     );
   }

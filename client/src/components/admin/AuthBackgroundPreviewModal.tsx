@@ -51,11 +51,11 @@ export function AuthBackgroundPreviewModal({
   const getPriorityLabel = (priority: string) => {
     switch (priority) {
       case 'image':
-        return 'Image Only';
+        return t('admin.auth.priorityImageOnly', 'Image Only');
       case 'color':
-        return 'Color/Gradient Only';
+        return t('admin.auth.priorityColorGradient', 'Color/Gradient Only');
       case 'layer':
-        return 'Layered';
+        return t('admin.auth.priorityLayered', 'Layered');
       default:
         return priority;
     }
@@ -65,13 +65,13 @@ export function AuthBackgroundPreviewModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-7xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Auth Background Preview</DialogTitle>
+          <DialogTitle>{t('admin.auth.previewTitle', 'Auth Background Preview')}</DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="admin" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="admin">Admin Login Preview</TabsTrigger>
-            <TabsTrigger value="user">User Login Preview</TabsTrigger>
+            <TabsTrigger value="admin">{t('admin.auth.adminLoginPreview', 'Admin Login Preview')}</TabsTrigger>
+            <TabsTrigger value="user">{t('admin.auth.userLoginPreview', 'User Login Preview')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="admin" className="mt-4">
@@ -262,9 +262,9 @@ export function AuthBackgroundPreviewModal({
         <DialogFooter>
           <div className="flex items-center justify-between w-full">
             <p className="text-sm text-muted-foreground">
-              This is a preview. Changes are not saved yet.
+              {t('admin.auth.previewNotice', 'This is a preview. Changes are not saved yet.')}
             </p>
-            <Button onClick={onClose}>Close</Button>
+            <Button onClick={onClose}>{t('common.close', 'Close')}</Button>
           </div>
         </DialogFooter>
       </DialogContent>

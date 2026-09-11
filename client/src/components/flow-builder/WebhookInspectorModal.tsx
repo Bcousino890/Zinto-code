@@ -122,14 +122,14 @@ export function WebhookInspectorModal({ isOpen, onClose, requestId }: WebhookIns
                     <CardTitle className="text-base">{t('flow_builder.webhook_inspector_overview', 'Overview')}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
-                    <p><span className="text-muted-foreground">Request ID:</span> <code className="text-xs">{data.requestId}</code></p>
+                    <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_request_id', 'Request ID:')}</span> <code className="text-xs">{data.requestId}</code></p>
                     <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_timestamp', 'Timestamp')}:</span> {new Date(data.timestamp).toLocaleString()}</p>
                     <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_status', 'Status')}:</span> <Badge variant={statusVariant(data.status)}>{data.status}</Badge></p>
                     {data.status === 'failed' && data.errorMessage && (
                       <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_error_reason', 'Error')}:</span> <span className="text-destructive text-xs">{data.errorMessage}</span></p>
                     )}
-                    {data.ipAddress != null && <p><span className="text-muted-foreground">IP:</span> {data.ipAddress}</p>}
-                    {data.userAgent != null && <p><span className="text-muted-foreground">User-Agent:</span> <span className="text-xs break-all">{data.userAgent}</span></p>}
+                    {data.ipAddress != null && <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_ip', 'IP:')}</span> {data.ipAddress}</p>}
+                    {data.userAgent != null && <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_user_agent', 'User-Agent:')}</span> <span className="text-xs break-all">{data.userAgent}</span></p>}
                     {data.responseTime != null && <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_response_time', 'Response time')}:</span> {data.responseTime} ms</p>}
                   </CardContent>
                 </Card>
@@ -161,8 +161,8 @@ export function WebhookInspectorModal({ isOpen, onClose, requestId }: WebhookIns
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left py-1 font-medium">Key</th>
-                          <th className="text-left py-1 font-medium">Value</th>
+                          <th className="text-left py-1 font-medium">{t('common.key', 'Key')}</th>
+                          <th className="text-left py-1 font-medium">{t('common.value', 'Value')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -214,10 +214,10 @@ export function WebhookInspectorModal({ isOpen, onClose, requestId }: WebhookIns
                   <CardContent className="text-sm space-y-1">
                     {data.contactResolution ? (
                       <>
-                        <p><span className="text-muted-foreground">Strategy:</span> {data.contactResolution.strategy ?? '—'}</p>
-                        <p><span className="text-muted-foreground">Contact ID:</span> {data.contactResolution.contactId ?? '—'}</p>
-                        <p><span className="text-muted-foreground">Contact name:</span> {data.contactResolution.contactName ?? '—'}</p>
-                        <p><span className="text-muted-foreground">Conversation ID:</span> {data.contactResolution.conversationId ?? '—'}</p>
+                        <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_strategy', 'Strategy:')}</span> {data.contactResolution.strategy ?? '—'}</p>
+                        <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_contact_id', 'Contact ID:')}</span> {data.contactResolution.contactId ?? '—'}</p>
+                        <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_contact_name', 'Contact name:')}</span> {data.contactResolution.contactName ?? '—'}</p>
+                        <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_conversation_id', 'Conversation ID:')}</span> {data.contactResolution.conversationId ?? '—'}</p>
                       </>
                     ) : (
                       <p className="text-muted-foreground">{t('flow_builder.webhook_inspector_no_contact', 'No contact resolution data.')}</p>
@@ -233,12 +233,12 @@ export function WebhookInspectorModal({ isOpen, onClose, requestId }: WebhookIns
                   <CardContent>
                     {data.executionPath ? (
                       <div className="space-y-2 text-sm">
-                        <p><span className="text-muted-foreground">Status:</span> <Badge variant={statusVariant(data.executionPath.status)}>{data.executionPath.status}</Badge></p>
+                        <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_status', 'Status:')}</span> <Badge variant={statusVariant(data.executionPath.status)}>{data.executionPath.status}</Badge></p>
                         {data.executionPath.errorMessage && (
                           <p className="text-destructive text-xs">{data.executionPath.errorMessage}</p>
                         )}
                         {Array.isArray(data.executionPath.executionPath) && data.executionPath.executionPath.length > 0 && (
-                          <p><span className="text-muted-foreground">Path:</span> <code className="text-xs">{data.executionPath.executionPath.join(' → ')}</code></p>
+                          <p><span className="text-muted-foreground">{t('flow_builder.webhook_inspector_path', 'Path:')}</span> <code className="text-xs">{data.executionPath.executionPath.join(' → ')}</code></p>
                         )}
                       </div>
                     ) : (

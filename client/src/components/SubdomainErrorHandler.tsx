@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSubdomain } from '@/contexts/subdomain-context';
 import SubdomainErrorPage from '@/pages/subdomain-error';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface SubdomainErrorHandlerProps {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ interface SubdomainErrorHandlerProps {
 
 export function SubdomainErrorHandler({ children }: SubdomainErrorHandlerProps) {
   const { subdomainInfo, isLoading, error } = useSubdomain();
+  const { t } = useTranslation();
 
 
   if (isLoading) {
@@ -15,7 +17,7 @@ export function SubdomainErrorHandler({ children }: SubdomainErrorHandlerProps) 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Verifying access...</p>
+          <p className="text-gray-600">{t('common.verifying_access', 'Verifying access...')}</p>
         </div>
       </div>
     );

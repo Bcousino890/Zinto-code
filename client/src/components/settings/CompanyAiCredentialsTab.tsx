@@ -366,13 +366,13 @@ export default function CompanyAiCredentialsTab() {
   const getStatusBadge = (credential: CompanyAiCredential) => {
     switch (credential.validationStatus) {
       case 'valid':
-        return <Badge variant="default" className="bg-primary/10 text-primary border-primary/20"><CheckCircle className="w-3 h-3 mr-1" />Valid</Badge>;
+        return <Badge variant="default" className="bg-primary/10 text-primary border-primary/20"><CheckCircle className="w-3 h-3 mr-1" />{t('company.ai_credentials.status_valid', 'Valid')}</Badge>;
       case 'invalid':
-        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Invalid</Badge>;
+        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />{t('company.ai_credentials.status_invalid', 'Invalid')}</Badge>;
       case 'expired':
-        return <Badge variant="secondary"><AlertTriangle className="w-3 h-3 mr-1" />Expired</Badge>;
+        return <Badge variant="secondary"><AlertTriangle className="w-3 h-3 mr-1" />{t('company.ai_credentials.status_expired', 'Expired')}</Badge>;
       default:
-        return <Badge variant="outline"><RefreshCw className="w-3 h-3 mr-1" />Pending</Badge>;
+        return <Badge variant="outline"><RefreshCw className="w-3 h-3 mr-1" />{t('company.ai_credentials.status_pending', 'Pending')}</Badge>;
     }
   };
 
@@ -634,7 +634,7 @@ export default function CompanyAiCredentialsTab() {
                       <div className="flex items-center gap-2">
                         <Button variant="outline" size="sm" onClick={() => handleEdit(credential)}>
                           <Edit className="w-3 h-3 mr-1 text-foreground" />
-                          Edit
+                          {t('common.edit', 'Edit')}
                         </Button>
                         <Button
                           variant="outline"
@@ -643,11 +643,11 @@ export default function CompanyAiCredentialsTab() {
                           disabled={isTestingCredential === credential.id}
                         >
                           <RefreshCw className={`w-3 h-3 mr-1 text-foreground ${isTestingCredential === credential.id ? 'animate-spin' : ''}`} />
-                          Test
+                          {t('settings.ai_credentials.test', 'Test')}
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => handleDelete(credential)}>
                           <Trash2 className="w-3 h-3 mr-1 text-foreground" />
-                          Delete
+                          {t('common.delete', 'Delete')}
                         </Button>
                       </div>
                     </div>

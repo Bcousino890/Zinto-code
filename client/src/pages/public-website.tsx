@@ -52,7 +52,7 @@ const PublicWebsite: React.FC = () => {
   const [, rootParams] = useRoute('/:slug');
   const legacyOnly = Boolean(legacyMatch);
   const slug = legacyOnly ? legacyParams?.slug : rootParams?.slug;
-  const { currentLanguage } = useTranslation();
+  const { currentLanguage, t } = useTranslation();
   const { branding, isLoading: brandingLoading } = useBranding();
   const { data: websiteSettings, isLoading: websiteEnabledLoading } = useWebsiteEnabled();
   const lang = currentLanguage?.code;
@@ -312,10 +312,10 @@ const PublicWebsite: React.FC = () => {
   if (legacyError || !legacyWebsite) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
-        <p className="text-gray-600 mb-8">Page Not Found</p>
+        <h1 className="text-4xl font-bold text-gray-800 mb-4">{t('pages.public_website.page_not_found_code', '404')}</h1>
+        <p className="text-gray-600 mb-8">{t('pages.public_website.page_not_found_title', 'Page Not Found')}</p>
         <p className="text-sm text-gray-500">
-          The page you're looking for doesn't exist or has been moved.
+          {t('pages.public_website.page_not_found_description', "The page you're looking for doesn't exist or has been moved.")}
         </p>
       </div>
     );

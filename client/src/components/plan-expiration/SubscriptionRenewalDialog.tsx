@@ -131,8 +131,8 @@ export default function SubscriptionRenewalDialog({
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "Copied to clipboard",
-      description: "The information has been copied to your clipboard.",
+      title: t('plan_expiration.subscription_renewal_dialog.copied_to_clipboard', 'Copied to clipboard'),
+      description: t('plan_expiration.subscription_renewal_dialog.information_copied', 'The information has been copied to your clipboard.'),
     });
   };
 
@@ -141,8 +141,8 @@ export default function SubscriptionRenewalDialog({
     setBankTransferDetails(null);
     onClose();
     toast({
-      title: "Payment Instructions Received",
-      description: "Please complete the bank transfer. Your subscription will be renewed once payment is confirmed.",
+      title: t('plan_expiration.subscription_renewal_dialog.payment_instructions_received', 'Payment Instructions Received'),
+      description: t('plan_expiration.subscription_renewal_dialog.complete_bank_transfer', 'Please complete the bank transfer. Your subscription will be renewed once payment is confirmed.'),
     });
   };
 
@@ -160,34 +160,34 @@ export default function SubscriptionRenewalDialog({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-500" />
-              Bank Transfer Instructions - Subscription Renewal
+              {t('plan_expiration.subscription_renewal_dialog.bank_transfer_instructions_title', 'Bank Transfer Instructions - Subscription Renewal')}
             </DialogTitle>
             <DialogDescription>
-              Please transfer the exact amount to the following bank account. Your subscription will be renewed once we confirm the payment.
+              {t('plan_expiration.subscription_renewal_dialog.bank_transfer_instructions_desc', 'Please transfer the exact amount to the following bank account. Your subscription will be renewed once we confirm the payment.')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Renewal Payment Details</CardTitle>
+                <CardTitle className="text-lg">{t('plan_expiration.subscription_renewal_dialog.renewal_payment_details', 'Renewal Payment Details')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                  <span className="font-semibold">Amount:</span>
+                  <span className="font-semibold">{t('plan_expiration.subscription_renewal_dialog.amount_label', 'Amount:')}</span>
                   <span className="text-lg font-bold">
                     {formatCurrency(selectedPlanId ? Number(plans.find(p => p.id === selectedPlanId)?.price || 0) : planPrice)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                  <span className="font-semibold">Plan:</span>
+                  <span className="font-semibold">{t('plan_expiration.subscription_renewal_dialog.plan_label', 'Plan:')}</span>
                   <span className="font-medium">
                     {selectedPlanId ? plans.find(p => p.id === selectedPlanId)?.name || planName : planName}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Account Name</Label>
+                  <Label className="text-sm font-medium">{t('plan_expiration.subscription_renewal_dialog.account_name_label', 'Account Name')}</Label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 p-2 bg-muted rounded text-sm">
                       {bankTransferDetails.bankDetails?.accountName}
@@ -203,7 +203,7 @@ export default function SubscriptionRenewalDialog({
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Account Number</Label>
+                  <Label className="text-sm font-medium">{t('plan_expiration.subscription_renewal_dialog.account_number_label', 'Account Number')}</Label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 p-2 bg-muted rounded text-sm font-mono">
                       {bankTransferDetails.bankDetails?.accountNumber}
@@ -219,7 +219,7 @@ export default function SubscriptionRenewalDialog({
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Bank Name</Label>
+                  <Label className="text-sm font-medium">{t('plan_expiration.subscription_renewal_dialog.bank_name_label', 'Bank Name')}</Label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 p-2 bg-muted rounded text-sm">
                       {bankTransferDetails.bankDetails?.bankName}
@@ -236,7 +236,7 @@ export default function SubscriptionRenewalDialog({
 
                 {bankTransferDetails.bankDetails?.routingNumber && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Routing Number</Label>
+                    <Label className="text-sm font-medium">{t('plan_expiration.subscription_renewal_dialog.routing_number_label', 'Routing Number')}</Label>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 p-2 bg-muted rounded text-sm font-mono">
                         {bankTransferDetails.bankDetails.routingNumber}
@@ -254,7 +254,7 @@ export default function SubscriptionRenewalDialog({
 
                 {bankTransferDetails.bankDetails?.swiftCode && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">SWIFT Code</Label>
+                    <Label className="text-sm font-medium">{t('plan_expiration.subscription_renewal_dialog.swift_code_label', 'SWIFT Code')}</Label>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 p-2 bg-muted rounded text-sm font-mono">
                         {bankTransferDetails.bankDetails.swiftCode}
@@ -271,7 +271,7 @@ export default function SubscriptionRenewalDialog({
                 )}
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Payment Reference</Label>
+                  <Label className="text-sm font-medium">{t('plan_expiration.subscription_renewal_dialog.payment_reference_label', 'Payment Reference')}</Label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm font-mono">
                       {bankTransferDetails.bankDetails?.reference}
@@ -285,13 +285,13 @@ export default function SubscriptionRenewalDialog({
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    ⚠️ Please include this reference in your transfer to ensure quick processing
+                    {t('plan_expiration.subscription_renewal_dialog.include_reference_note', '⚠️ Please include this reference in your transfer to ensure quick processing')}
                   </p>
                 </div>
 
                 {bankTransferDetails.bankDetails?.instructions && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Additional Instructions</Label>
+                    <Label className="text-sm font-medium">{t('plan_expiration.subscription_renewal_dialog.additional_instructions_label', 'Additional Instructions')}</Label>
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded text-sm">
                       {bankTransferDetails.bankDetails.instructions}
                     </div>
@@ -301,23 +301,23 @@ export default function SubscriptionRenewalDialog({
             </Card>
 
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <h4 className="font-medium text-amber-800 mb-2">Important Notes:</h4>
+              <h4 className="font-medium text-amber-800 mb-2">{t('plan_expiration.subscription_renewal_dialog.important_notes_title', 'Important Notes:')}</h4>
               <ul className="text-sm text-amber-700 space-y-1">
-                <li>• Please transfer the exact amount shown above</li>
-                <li>• Include the payment reference in your transfer</li>
-                <li>• Processing may take 1-3 business days</li>
-                <li>• Your subscription will be renewed once payment is verified</li>
-                <li>• You'll receive an email confirmation once payment is processed</li>
+                <li>{t('plan_expiration.subscription_renewal_dialog.note_transfer_exact_amount', '• Please transfer the exact amount shown above')}</li>
+                <li>{t('plan_expiration.subscription_renewal_dialog.note_include_reference', '• Include the payment reference in your transfer')}</li>
+                <li>{t('plan_expiration.subscription_renewal_dialog.note_processing_time', '• Processing may take 1-3 business days')}</li>
+                <li>{t('plan_expiration.subscription_renewal_dialog.note_renewal_on_verify', '• Your subscription will be renewed once payment is verified')}</li>
+                <li>{t('plan_expiration.subscription_renewal_dialog.note_email_confirmation', '• You\'ll receive an email confirmation once payment is processed')}</li>
               </ul>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={onClose}>
-              Close
+              {t('plan_expiration.subscription_renewal_dialog.close_button', 'Close')}
             </Button>
             <Button onClick={handleBankTransferComplete}>
-              I've Made the Transfer
+              {t('plan_expiration.subscription_renewal_dialog.made_transfer_button', 'I\'ve Made the Transfer')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -333,10 +333,10 @@ export default function SubscriptionRenewalDialog({
             <AlertCircle className={`w-6 h-6 ${isInGracePeriod ? 'text-amber-500' : 'text-red-500'}`} />
             <div>
               <DialogTitle>
-                {isInGracePeriod ? 'Subscription Expired - Grace Period' : 'Subscription Expired'}
+                {isInGracePeriod ? t('plan_expiration.subscription_renewal_dialog.expired_grace_title', 'Subscription Expired - Grace Period') : t('plan_expiration.subscription_renewal_dialog.expired_title', 'Subscription Expired')}
               </DialogTitle>
               <DialogDescription className="mt-1">
-                Renew your subscription to continue using all features
+                {t('plan_expiration.subscription_renewal_dialog.renew_to_continue', 'Renew your subscription to continue using all features')}
               </DialogDescription>
             </div>
           </div>
@@ -346,26 +346,26 @@ export default function SubscriptionRenewalDialog({
           {/* Status Information */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Subscription Status</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('plan_expiration.subscription_renewal_dialog.subscription_status_title', 'Subscription Status')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Company:</span>
+                <span className="text-muted-foreground">{t('plan_expiration.subscription_renewal_dialog.company_label', 'Company:')}</span>
                 <span className="font-medium">{companyName}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Plan:</span>
+                <span className="text-muted-foreground">{t('plan_expiration.subscription_renewal_dialog.plan_label_status', 'Plan:')}</span>
                 <span className="font-medium">{planName}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Expired on:</span>
+                <span className="text-muted-foreground">{t('plan_expiration.subscription_renewal_dialog.expired_on_label', 'Expired on:')}</span>
                 <span className="font-medium">
-                  {expirationDate ? new Date(expirationDate).toLocaleDateString() : 'Recently'}
+                  {expirationDate ? new Date(expirationDate).toLocaleDateString() : t('plan_expiration.subscription_renewal_dialog.recently', 'Recently')}
                 </span>
               </div>
               {isInGracePeriod && gracePeriodEnd && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Grace period ends:</span>
+                  <span className="text-muted-foreground">{t('plan_expiration.subscription_renewal_dialog.grace_period_ends_label', 'Grace period ends:')}</span>
                   <span className="font-medium text-amber-600">
                     {new Date(gracePeriodEnd).toLocaleDateString()}
                   </span>
@@ -378,16 +378,13 @@ export default function SubscriptionRenewalDialog({
           {isInGracePeriod ? (
             <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
               <p className="text-amber-800 text-sm">
-                <strong>Grace Period Active:</strong> You have limited access until{' '}
-                {gracePeriodEnd ? new Date(gracePeriodEnd).toLocaleDateString() : 'soon'}.
-                Renew now to restore full functionality.
+                <strong>{t('plan_expiration.subscription_renewal_dialog.grace_period_active_label', 'Grace Period Active:')}</strong> {t('plan_expiration.subscription_renewal_dialog.grace_period_active_message', 'You have limited access until {{date}}. Renew now to restore full functionality.', { date: gracePeriodEnd ? new Date(gracePeriodEnd).toLocaleDateString() : 'soon' })}
               </p>
             </div>
           ) : (
             <div className="bg-red-50 border border-red-200 rounded-md p-3">
               <p className="text-red-800 text-sm">
-                <strong>Access Restricted:</strong> Most features are currently disabled.
-                Please renew your subscription to restore access.
+                <strong>{t('plan_expiration.subscription_renewal_dialog.access_restricted_label', 'Access Restricted:')}</strong> {t('plan_expiration.subscription_renewal_dialog.access_restricted_message', 'Most features are currently disabled. Please renew your subscription to restore access.')}
               </p>
             </div>
           )}
@@ -395,16 +392,16 @@ export default function SubscriptionRenewalDialog({
           {/* Plan Selection */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Select Subscription Plan</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('plan_expiration.subscription_renewal_dialog.select_plan_title', 'Select Subscription Plan')}</CardTitle>
               <CardDescription className="text-xs">
-                Choose a plan to renew your subscription. You can upgrade, downgrade, or keep your current plan.
+                {t('plan_expiration.subscription_renewal_dialog.select_plan_description', 'Choose a plan to renew your subscription. You can upgrade, downgrade, or keep your current plan.')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {loadingPlans ? (
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  <span className="text-sm text-muted-foreground">Loading plans...</span>
+                  <span className="text-sm text-muted-foreground">{t('plan_expiration.subscription_renewal_dialog.loading_plans', 'Loading plans...')}</span>
                 </div>
               ) : (
                 <RadioGroup
@@ -430,7 +427,7 @@ export default function SubscriptionRenewalDialog({
                                     <h4 className="font-medium">{plan.name}</h4>
                                     {isCurrentPlan && (
                                       <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                        Current Plan
+                                        {t('plan_expiration.subscription_renewal_dialog.current_plan_badge', 'Current Plan')}
                                       </span>
                                     )}
                                     {selectedPlanId === plan.id && (
@@ -470,7 +467,7 @@ export default function SubscriptionRenewalDialog({
                 return selectedPlan ? (
                   <div className="mt-4 p-3 bg-muted rounded-lg">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium">Selected Plan Total:</span>
+                      <span className="font-medium">{t('plan_expiration.subscription_renewal_dialog.selected_plan_total_label', 'Selected Plan Total:')}</span>
                       <div className="text-right">
                         <span className="font-bold">
                           {formatCurrency(Number(selectedPlan.price))}
@@ -488,11 +485,11 @@ export default function SubscriptionRenewalDialog({
 
           {/* Payment Method Selection */}
           <div>
-            <h3 className="text-sm font-medium mb-3">Select Payment Method</h3>
+            <h3 className="text-sm font-medium mb-3">{t('plan_expiration.subscription_renewal_dialog.select_payment_method_title', 'Select Payment Method')}</h3>
             {loadingMethods ? (
               <div className="flex items-center justify-center p-4">
                 <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="ml-2">Loading payment methods...</span>
+                <span className="ml-2">{t('plan_expiration.subscription_renewal_dialog.loading_payment_methods', 'Loading payment methods...')}</span>
               </div>
             ) : (
               <PaymentMethodSelector
@@ -513,23 +510,23 @@ export default function SubscriptionRenewalDialog({
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <label htmlFor="enableAutoRenewal" className="text-sm text-gray-700 cursor-pointer">
-              Enable automatic renewal to prevent future interruptions
+              {t('plan_expiration.subscription_renewal_dialog.auto_renewal_label', 'Enable automatic renewal to prevent future interruptions')}
             </label>
           </div>
         </div>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-2">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleSetupAutoRenewal}
             className="flex items-center gap-2"
           >
             <Calendar className="h-4 w-4" />
-            Setup Auto-Renewal
+            {t('plan_expiration.subscription_renewal_dialog.setup_auto_renewal_button', 'Setup Auto-Renewal')}
           </Button>
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose}>
-              Cancel
+              {t('plan_expiration.subscription_renewal_dialog.cancel_button', 'Cancel')}
             </Button>
             <Button
               onClick={handleRenewal}
@@ -539,12 +536,12 @@ export default function SubscriptionRenewalDialog({
               {renewalMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
+                  {t('plan_expiration.subscription_renewal_dialog.processing', 'Processing...')}
                 </>
               ) : (
                 <>
                   <CreditCard className="mr-2 h-4 w-4" />
-                  Renew Subscription
+                  {t('plan_expiration.subscription_renewal_dialog.renew_subscription_button', 'Renew Subscription')}
                 </>
               )}
             </Button>

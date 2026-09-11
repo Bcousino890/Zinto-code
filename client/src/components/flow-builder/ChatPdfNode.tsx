@@ -354,7 +354,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Delete node</p>
+              <p className="text-xs">{t('flow_builder.chat_pdf.delete_node', 'Delete node')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -371,30 +371,30 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <img 
-                src="https://cdn-icons-png.flaticon.com/128/136/136522.png" 
-                alt="Chat PDF AI" 
+              <img
+                src="https://cdn-icons-png.flaticon.com/128/136/136522.png"
+                alt="Chat PDF AI"
                 className="h-4 w-4"
               />
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="text-xs">Chat PDF AI Integration</p>
+              <p className="text-xs">{t('flow_builder.chat_pdf.ai_integration_tooltip', 'Chat PDF AI Integration')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <span>Chat PDF Integration</span>
+        <span>{t('flow_builder.chat_pdf.integration_title', 'Chat PDF Integration')}</span>
         <button
           className="ml-auto text-xs text-muted-foreground hover:text-foreground"
           onClick={() => setIsEditing(!isEditing)}
         >
-          {isEditing ? 'Done' : 'Edit'}
+          {isEditing ? t('common.done', 'Done') : t('common.edit', 'Edit')}
         </button>
       </div>
 
       {/* Configuration Progress */}
       <div className="mb-3">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-          <span>Configuration</span>
+          <span>{t('flow_builder.chat_pdf.configuration', 'Configuration')}</span>
           <span>{configurationProgress}%</span>
         </div>
         <div className="w-full  rounded-full h-1.5">
@@ -437,15 +437,15 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                     <AlertCircle className="h-3 w-3 text-muted-foreground" />
                   )}
                   <span className="text-xs text-muted-foreground">
-                    {connectionStatus === 'success' && selectedDocument ? 'Ready' : 'Setup Required'}
+                    {connectionStatus === 'success' && selectedDocument ? t('flow_builder.chat_pdf.status_ready', 'Ready') : t('flow_builder.chat_pdf.status_setup_required', 'Setup Required')}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent side="top">
                 <p className="text-xs">
                   {connectionStatus === 'success' && selectedDocument
-                    ? 'Chat PDF is configured and ready to use'
-                    : 'Complete API key and document configuration'}
+                    ? t('flow_builder.chat_pdf.ready_tooltip', 'Chat PDF is configured and ready to use')
+                    : t('flow_builder.chat_pdf.setup_tooltip', 'Complete API key and document configuration')}
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -460,22 +460,22 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground">
               <div className="flex items-center gap-2">
-                <span className="font-medium">Operation:</span>
+                <span className="font-medium">{t('flow_builder.chat_pdf.operation_label', 'Operation')}:</span>
                 <span>{CHAT_PDF_OPERATIONS.find(op => op.id === operation)?.name || 'Ask Question'}</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <span className="font-medium">Model:</span>
+                <span className="font-medium">{t('flow_builder.chat_pdf.model_label', 'Model')}:</span>
                 <span>{selectedModel.name} ({selectedModel.credits} credits)</span>
               </div>
               {selectedDocument && (
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="font-medium">Document:</span>
+                  <span className="font-medium">{t('flow_builder.chat_pdf.document_label', 'Document')}:</span>
                   <span>{documents.find(d => d.id === selectedDocument)?.name || selectedDocument}</span>
                 </div>
               )}
               {documents.length > 0 && (
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="font-medium">Available:</span>
+                  <span className="font-medium">{t('flow_builder.chat_pdf.available_label', 'Available')}:</span>
                   <span>{documents.length} document{documents.length !== 1 ? 's' : ''}</span>
                 </div>
               )}
@@ -487,7 +487,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
             {/* API Key Configuration */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-medium">API Key</Label>
+                <Label className="text-xs font-medium">{t('flow_builder.chat_pdf.api_key_label', 'API Key')}</Label>
                 <Button
                   type="button"
                   variant="outline"
@@ -501,14 +501,14 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                   ) : (
                     <CheckCircle className="h-3 w-3 mr-1" />
                   )}
-                  Test Connection
+                  {t('flow_builder.chat_pdf.test_connection', 'Test Connection')}
                 </Button>
               </div>
               <Input
                 type="password"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your Chat PDF API key"
+                placeholder={t('flow_builder.chat_pdf.api_key_placeholder', 'Enter your Chat PDF API key')}
                 className="text-xs h-7"
               />
               {connectionMessage && (
@@ -529,7 +529,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                 className="h-6 px-2 text-xs text-primary hover:text-primary/80"
               >
                 <ExternalLink className="h-3 w-3 mr-1" />
-                Get API Key
+                {t('flow_builder.chat_pdf.get_api_key', 'Get API Key')}
               </Button>
             </div>
 
@@ -538,7 +538,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                 {/* Document Selection */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-medium">Document</Label>
+                    <Label className="text-xs font-medium">{t('flow_builder.chat_pdf.document_label', 'Document')}</Label>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -554,7 +554,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent side="top">
-                          <p className="text-xs">Refresh document list</p>
+                          <p className="text-xs">{t('flow_builder.chat_pdf.refresh_document_list', 'Refresh document list')}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -567,7 +567,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                       }}
                     >
                       <SelectTrigger className="text-xs h-7 flex-1">
-                        <SelectValue placeholder="Choose a document" />
+                        <SelectValue placeholder={t('flow_builder.chat_pdf.choose_document', 'Choose a document')} />
                       </SelectTrigger>
                       <SelectContent>
                         {documents.map((doc) => (
@@ -587,7 +587,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
 
                 {/* File Upload Section */}
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Upload New Document</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.chat_pdf.upload_new_document', 'Upload New Document')}</Label>
                   <Button
                     type="button"
                     variant="outline"
@@ -612,7 +612,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                     ) : (
                       <Upload className="h-3 w-3 mr-1" />
                     )}
-                    Upload PDF (Max 4.5MB)
+                    {t('flow_builder.chat_pdf.upload_pdf_button', 'Upload PDF (Max 4.5MB)')}
                   </Button>
                   <div className="flex items-center space-x-2">
                     <input
@@ -623,7 +623,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                       className="h-3 w-3"
                     />
                     <Label htmlFor="enableOcr" className="text-xs">
-                      Enable OCR for scanned documents
+                      {t('flow_builder.chat_pdf.enable_ocr', 'Enable OCR for scanned documents')}
                     </Label>
                   </div>
 
@@ -631,7 +631,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                   {documents.length > 0 && (
                     <TooltipProvider>
                       <div className="space-y-1">
-                        <Label className="text-xs font-medium">Available Documents</Label>
+                        <Label className="text-xs font-medium">{t('flow_builder.chat_pdf.available_documents', 'Available Documents')}</Label>
                         {documents.slice(0, 3).map((doc) => (
                           <div key={doc.id} className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 p-1 rounded group">
                             <FileText className="h-3 w-3" />
@@ -664,14 +664,14 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p className="text-xs">Delete document</p>
+                                <p className="text-xs">{t('flow_builder.chat_pdf.delete_document', 'Delete document')}</p>
                               </TooltipContent>
                             </Tooltip>
                           </div>
                         ))}
                         {documents.length > 3 && (
                           <div className="text-xs text-muted-foreground">
-                            +{documents.length - 3} more documents
+                            {t('flow_builder.chat_pdf.more_documents', '+{{count}} more documents', { count: documents.length - 3 })}
                           </div>
                         )}
                       </div>
@@ -681,7 +681,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
 
                 {/* Operation Selection */}
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Operation</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.chat_pdf.operation_select_label', 'Operation')}</Label>
                   <Select
                     value={operation}
                     onValueChange={(value) => setOperation(value)}
@@ -704,7 +704,7 @@ export function ChatPdfNode({ id, data, isConnectable }: ChatPdfNodeProps) {
 
                 {/* GPT Model Selection */}
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">AI Model</Label>
+                  <Label className="text-xs font-medium">{t('flow_builder.chat_pdf.ai_model_label', 'AI Model')}</Label>
                   <Select
                     value={gptModel}
                     onValueChange={(value) => setGptModel(value)}

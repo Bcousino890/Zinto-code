@@ -1936,7 +1936,7 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
                 <TooltipContent side="top">
                   {operation === 'update_row' ? (
                     <>
-                      <p className="text-xs">Test if rows matching your criteria exist</p>
+                      <p className="text-xs">{t('flow_builder.google_sheets.test_match_tooltip', 'Test if rows matching your criteria exist')}</p>
                       <p className="text-xs text-muted-foreground">
                         {!isGoogleSheetsConnected || !spreadsheetId.trim()
                           ? 'Connect your Google account and enter Spreadsheet ID to enable testing'

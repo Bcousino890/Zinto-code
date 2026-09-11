@@ -689,7 +689,7 @@ export default function ERPReportsPage() {
                     {availableReportTypes.includes('pl') ? <SelectItem value="pl">{t('erp.reports.types.pl', 'P&L')}</SelectItem> : null}
                     {availableReportTypes.includes('tax') ? <SelectItem value="tax">{t('erp.reports.types.tax', 'Tax Collected')}</SelectItem> : null}
                     {availableReportTypes.includes('employee') ? <SelectItem value="employee">{t('erp.reports.types.employee', 'Employee Summary')}</SelectItem> : null}
-                    {availableReportTypes.includes('restaurant') ? <SelectItem value="restaurant">Restaurant</SelectItem> : null}
+                    {availableReportTypes.includes('restaurant') ? <SelectItem value="restaurant">{t('erp.reports.types.restaurant', 'Restaurant')}</SelectItem> : null}
                   </SelectContent>
                 </Select>
               </div>
@@ -1078,14 +1078,14 @@ export default function ERPReportsPage() {
                   {canRestaurantSalesReport ? (
                   <>
                   <Card>
-                    <CardHeader><CardTitle>Order mix report</CardTitle></CardHeader>
+                    <CardHeader><CardTitle>{t('erp.reports.restaurant.orderMixReport', 'Order mix report')}</CardTitle></CardHeader>
                     <CardContent>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Service type</TableHead>
-                            <TableHead className="text-right">Count</TableHead>
-                            <TableHead className="text-right">Revenue</TableHead>
+                            <TableHead>{t('erp.reports.restaurant.serviceType', 'Service type')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.restaurant.count', 'Count')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.sales.totalRevenue', 'Revenue')}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1101,14 +1101,14 @@ export default function ERPReportsPage() {
                     </CardContent>
                   </Card>
                   <Card>
-                    <CardHeader><CardTitle>Ticket throughput report</CardTitle></CardHeader>
+                    <CardHeader><CardTitle>{t('erp.reports.restaurant.ticketThroughput', 'Ticket throughput report')}</CardTitle></CardHeader>
                     <CardContent>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Period</TableHead>
-                            <TableHead className="text-right">Tickets completed</TableHead>
-                            <TableHead className="text-right">Avg minutes to ready</TableHead>
+                            <TableHead>{t('erp.reports.common.period', 'Period')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.restaurant.ticketsCompleted', 'Tickets completed')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.restaurant.avgMinutesToReady', 'Avg minutes to ready')}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1124,16 +1124,16 @@ export default function ERPReportsPage() {
                     </CardContent>
                   </Card>
                   <Card>
-                    <CardHeader><CardTitle>Reservation load report</CardTitle></CardHeader>
+                    <CardHeader><CardTitle>{t('erp.reports.restaurant.reservationLoad', 'Reservation load report')}</CardTitle></CardHeader>
                     <CardContent>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead className="text-right">Booked</TableHead>
-                            <TableHead className="text-right">Seated</TableHead>
-                            <TableHead className="text-right">No-show</TableHead>
-                            <TableHead className="text-right">Cancelled</TableHead>
+                            <TableHead>{t('erp.common.date', 'Date')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.restaurant.booked', 'Booked')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.restaurant.seated', 'Seated')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.restaurant.noShow', 'No-show')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.restaurant.cancelled', 'Cancelled')}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1154,15 +1154,15 @@ export default function ERPReportsPage() {
                   ) : null}
                   {canInventoryReport ? (
                   <Card>
-                    <CardHeader><CardTitle>Ingredient risk report</CardTitle></CardHeader>
+                    <CardHeader><CardTitle>{t('erp.reports.restaurant.ingredientRisk', 'Ingredient risk report')}</CardTitle></CardHeader>
                     <CardContent>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Ingredient</TableHead>
-                            <TableHead className="text-right">Current qty</TableHead>
-                            <TableHead className="text-right">Reorder point</TableHead>
-                            <TableHead>Risk level</TableHead>
+                            <TableHead>{t('erp.reports.restaurant.ingredient', 'Ingredient')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.restaurant.currentQty', 'Current qty')}</TableHead>
+                            <TableHead className="text-right">{t('erp.reports.restaurant.reorderPoint', 'Reorder point')}</TableHead>
+                            <TableHead>{t('erp.reports.restaurant.riskLevel', 'Risk level')}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>

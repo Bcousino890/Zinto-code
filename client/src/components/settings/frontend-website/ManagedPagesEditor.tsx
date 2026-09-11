@@ -330,14 +330,14 @@ export function ManagedPagesEditor({
               <TabsContent value="seo" className="mt-4 space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label>Meta title</Label>
+                    <Label>{t('admin.settings.frontend_website.meta_title', 'Meta title')}</Label>
                     <Input
                       value={seo.metaTitle ?? ''}
                       onChange={(e) => updateSeo({ metaTitle: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Meta keywords</Label>
+                    <Label>{t('admin.settings.frontend_website.meta_keywords', 'Meta keywords')}</Label>
                     <Input
                       value={seo.metaKeywords ?? ''}
                       onChange={(e) => updateSeo({ metaKeywords: e.target.value })}
@@ -345,7 +345,7 @@ export function ManagedPagesEditor({
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Meta description</Label>
+                  <Label>{t('admin.settings.frontend_website.meta_description', 'Meta description')}</Label>
                   <Textarea
                     value={seo.metaDescription ?? ''}
                     onChange={(e) => updateSeo({ metaDescription: e.target.value })}
@@ -354,14 +354,14 @@ export function ManagedPagesEditor({
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label>OG title</Label>
+                    <Label>{t('admin.settings.frontend_website.og_title', 'OG title')}</Label>
                     <Input
                       value={seo.ogTitle ?? ''}
                       onChange={(e) => updateSeo({ ogTitle: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>OG description</Label>
+                    <Label>{t('admin.settings.frontend_website.og_description', 'OG description')}</Label>
                     <Input
                       value={seo.ogDescription ?? ''}
                       onChange={(e) => updateSeo({ ogDescription: e.target.value })}
@@ -370,14 +370,14 @@ export function ManagedPagesEditor({
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <AssetPicker
-                    label="OG image"
+                    label={t('admin.settings.frontend_website.og_image', 'OG image')}
                     assetId={seo.ogImageAssetId}
                     mediaLibrary={mediaLibrary}
                     onSelect={(assetId) => updateSeo({ ogImageAssetId: assetId })}
                     onLibraryUpdated={onLibraryUpdated}
                   />
                   <AssetPicker
-                    label="Page favicon"
+                    label={t('admin.settings.frontend_website.page_favicon', 'Page favicon')}
                     assetId={seo.faviconAssetId}
                     mediaLibrary={mediaLibrary}
                     onSelect={(assetId) => updateSeo({ faviconAssetId: assetId })}
@@ -400,13 +400,13 @@ export function ManagedPagesEditor({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="legal">Legal</SelectItem>
-                        <SelectItem value="custom">Custom</SelectItem>
+                        <SelectItem value="legal">{t('admin.settings.frontend_website.page_type_legal', 'Legal')}</SelectItem>
+                        <SelectItem value="custom">{t('admin.settings.frontend_website.page_type_custom', 'Custom')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Sort order</Label>
+                    <Label>{t('admin.settings.frontend_website.sort_order', 'Sort order')}</Label>
                     <Input
                       type="number"
                       value={selectedPage.sortOrder ?? 0}
@@ -424,7 +424,7 @@ export function ManagedPagesEditor({
                   />
                 </div>
                 <div className="flex items-center justify-between rounded-lg border p-4">
-                  <Label>Show in navigation hints</Label>
+                  <Label>{t('admin.settings.frontend_website.show_in_navigation_hints', 'Show in navigation hints')}</Label>
                   <Switch
                     checked={!!selectedPage.showInNav}
                     onCheckedChange={(checked) => updateSelectedPage({ showInNav: checked })}

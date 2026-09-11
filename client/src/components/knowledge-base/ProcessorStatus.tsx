@@ -232,7 +232,7 @@ export function ProcessorStatus({
             <div className="flex items-center justify-between p-2 border rounded">
               <div className="flex items-center gap-2">
                 {getProcessorIcon(capabilities.processors.pdf)}
-                <span className="text-sm">PDF Parser (Basic)</span>
+                <span className="text-sm">{t('knowledge_base.processor.pdf_basic', 'PDF Parser (Basic)')}</span>
               </div>
               {getProcessorBadge(capabilities.processors.pdf, 'pdf-parse')}
             </div>
@@ -240,7 +240,7 @@ export function ProcessorStatus({
             <div className="flex items-center justify-between p-2 border rounded">
               <div className="flex items-center gap-2">
                 {getProcessorIcon(capabilities.processors.pdfAdvanced)}
-                <span className="text-sm">PDF Parser (Advanced)</span>
+                <span className="text-sm">{t('knowledge_base.processor.pdf_advanced', 'PDF Parser (Advanced)')}</span>
               </div>
               {getProcessorBadge(capabilities.processors.pdfAdvanced, 'pdfjs-dist')}
             </div>
@@ -248,7 +248,7 @@ export function ProcessorStatus({
             <div className="flex items-center justify-between p-2 border rounded">
               <div className="flex items-center gap-2">
                 {getProcessorIcon(capabilities.processors.docx)}
-                <span className="text-sm">Word Document Parser</span>
+                <span className="text-sm">{t('knowledge_base.processor.word_document', 'Word Document Parser')}</span>
               </div>
               {getProcessorBadge(capabilities.processors.docx, 'mammoth')}
             </div>
@@ -273,10 +273,10 @@ export function ProcessorStatus({
                   <div>npm install mammoth</div>
                 )}
                 {capabilities.processors.pdf && capabilities.processors.docx && capabilities.processors.pdfAdvanced && (
-                  <div className="text-green-300">✓ All processors available</div>
+                  <div className="text-green-300">✓ {t('knowledge_base.processor.all_available', 'All processors available')}</div>
                 )}
                 {(!capabilities.processors.pdf && !capabilities.processors.pdfAdvanced) || !capabilities.processors.docx ? (
-                  <div className="text-yellow-300 mt-2">Restart server after installing packages</div>
+                  <div className="text-yellow-300 mt-2">{t('knowledge_base.processor.restart_message', 'Restart server after installing packages')}</div>
                 ) : null}
               </div>
             </div>

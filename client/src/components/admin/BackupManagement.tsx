@@ -2084,9 +2084,9 @@ export default function BackupManagement() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium">Automatic Cleanup</h4>
+                    <h4 className="font-medium">{t('admin.backup.automatic_cleanup_title', 'Automatic Cleanup')}</h4>
                     <p className="text-sm text-muted-foreground">
-                      Automatically delete old backups based on retention period
+                      {t('admin.backup.automatic_cleanup_desc', 'Automatically delete old backups based on retention period')}
                     </p>
                   </div>
                   <Switch
@@ -2100,7 +2100,7 @@ export default function BackupManagement() {
 
                 {settingsForm.cleanup.enabled && (
                   <div className="space-y-2">
-                    <Label htmlFor="cleanup-time">Cleanup Time</Label>
+                    <Label htmlFor="cleanup-time">{t('admin.backup.cleanup_time_label', 'Cleanup Time')}</Label>
                     <Input
                       id="cleanup-time"
                       type="time"

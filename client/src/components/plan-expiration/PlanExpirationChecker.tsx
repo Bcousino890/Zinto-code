@@ -249,18 +249,18 @@ export function PlanExpirationChecker() {
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium">Plan:</span>
+                      <span className="font-medium">{t('plan_expiration.plan_label', 'Plan')}:</span>
                       <span>{renewalStatus.plan?.name || 'Unknown'}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-medium">Status:</span>
+                      <span className="font-medium">{t('plan_expiration.status_label', 'Status')}:</span>
                       <Badge variant={renewalStatus.accessAllowed ? 'default' : 'destructive'}>
                         {renewalStatus.expirationStatus.subscriptionStatus}
                       </Badge>
                     </div>
                     {renewalStatus.expirationStatus.nextBillingDate && (
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">Next Billing:</span>
+                        <span className="font-medium">{t('plan_expiration.next_billing_label', 'Next Billing')}:</span>
                         <span>{new Date(renewalStatus.expirationStatus.nextBillingDate).toLocaleDateString()}</span>
                       </div>
                     )}

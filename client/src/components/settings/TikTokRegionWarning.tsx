@@ -1,6 +1,7 @@
 import React from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertTriangle, ExternalLink } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 const TIKTOK_REGION_DOCS_URL = 'https://ads.tiktok.com/help/article/marketing-api?lang=en&redirected=2';
 
@@ -16,15 +17,16 @@ export default function TikTokRegionWarning({
   isRestricted,
   className
 }: TikTokRegionWarningProps) {
+  const { t } = useTranslation();
   if (!isRestricted) return null;
 
   return (
     <Alert variant="destructive" className={className}>
       <AlertTriangle className="h-4 w-4" />
-      <AlertTitle>Region restrictions</AlertTitle>
+      <AlertTitle>{t('settings.tiktok.region_restrictions_title', 'Region restrictions')}</AlertTitle>
       <AlertDescription>
         <p className="mb-2">
-          Your TikTok account is in a restricted region ({regionCode || 'EEA/UK/CH'}). Messaging features may be unavailable for this connection.
+          {t('settings.tiktok.region_restrictions_description', 'Your TikTok account is in a restricted region ({{region}}). Messaging features may be unavailable for this connection.', { region: regionCode || 'EEA/UK/CH' })}
         </p>
         <a
           href={TIKTOK_REGION_DOCS_URL}
@@ -32,7 +34,7 @@ export default function TikTokRegionWarning({
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 mt-2 text-sm font-medium underline"
         >
-          Learn More
+          {t('settings.tiktok.learn_more', 'Learn More')}
           <ExternalLink className="h-3 w-3" />
         </a>
       </AlertDescription>

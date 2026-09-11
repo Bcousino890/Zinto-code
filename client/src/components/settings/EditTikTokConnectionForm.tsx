@@ -84,7 +84,7 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
 
       toast({
         title: t('settings.tiktok_success', 'Success'),
-        description: 'TikTok connection refreshed successfully!'
+        description: t('settings.tiktok.refreshSuccess', 'TikTok connection refreshed successfully!')
       });
 
       await loadConnectionData();
@@ -117,12 +117,12 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
     const daysUntilExpiry = Math.floor((expiresAt - now) / (1000 * 60 * 60 * 24));
 
     if (daysUntilExpiry < 0) {
-      return { status: 'expired', color: 'text-red-600 dark:text-red-400', message: 'Token expired' };
+      return { status: 'expired', color: 'text-red-600 dark:text-red-400', message: t('settings.tiktok.tokenExpired', 'Token expired') };
     }
     if (daysUntilExpiry < 7) {
-      return { status: 'expiring', color: 'text-orange-600 dark:text-orange-400', message: `Expires in ${daysUntilExpiry} days` };
+      return { status: 'expiring', color: 'text-orange-600 dark:text-orange-400', message: t('settings.tiktok.expiresIn', 'Expires in {{days}} days', { days: daysUntilExpiry }) };
     }
-    return { status: 'valid', color: 'text-green-600 dark:text-green-400', message: `Valid for ${daysUntilExpiry} days` };
+    return { status: 'valid', color: 'text-green-600 dark:text-green-400', message: t('settings.tiktok.validFor', 'Valid for {{days}} days', { days: daysUntilExpiry }) };
   };
 
   const tokenStatus = getTokenExpiryStatus();
@@ -134,10 +134,10 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
         : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
   const statusLabel =
     connectionData?.status === 'active'
-      ? 'Active'
+      ? t('settings.tiktok.active', 'Active')
       : connectionData?.status === 'error'
-        ? 'Error'
-        : 'Disconnected';
+        ? t('settings.tiktok.error', 'Error')
+        : t('settings.tiktok.disconnected', 'Disconnected');
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -145,9 +145,9 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <i className="ri-tiktok-line text-2xl"></i>
-            TikTok Connection Details
+            {t('settings.tiktok.title', 'TikTok Connection Details')}
           </DialogTitle>
-          <DialogDescription>View and refresh your TikTok Business connection.</DialogDescription>
+          <DialogDescription>{t('settings.tiktok.description', 'View and refresh your TikTok Business connection.')}</DialogDescription>
         </DialogHeader>
 
         {loadingConnection ? (
@@ -194,7 +194,7 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
                 <div className="flex items-start gap-2">
                   <AlertCircle className={`mt-0.5 h-4 w-4 ${tokenStatus.color}`} />
                   <div className="min-w-0 flex-1">
-                    <Label className="text-xs text-gray-500 dark:text-gray-400">Token Expiry</Label>
+                    <Label className="text-xs text-gray-500 dark:text-gray-400">{t('settings.tiktok.tokenExpiry', 'Token Expiry')}</Label>
                     <p className={`text-sm font-medium ${tokenStatus.color}`}>{tokenStatus.message}</p>
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       Expires at {formatDate(connectionData.tokenExpiresAt)}
@@ -208,9 +208,9 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
               <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-900/20">
                 <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-red-800 dark:text-red-400">Token Expired</p>
+                  <p className="text-sm font-medium text-red-800 dark:text-red-400">{t('settings.tiktok.tokenExpiredTitle', 'Token Expired')}</p>
                   <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                    Your TikTok access token has expired. Click &quot;Refresh Connection&quot; to renew access.
+                    {t('settings.tiktok.tokenExpiredDesc', 'Your TikTok access token has expired. Click "Refresh Connection" to renew access.')}
                   </p>
                 </div>
               </div>
@@ -218,7 +218,7 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
           </div>
         ) : (
           <div className="flex items-center justify-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">No connection data available</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('settings.tiktok.noData', 'No connection data available')}</p>
           </div>
         )}
 
@@ -229,7 +229,7 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
             onClick={handleClose}
             disabled={loading}
           >
-            Close
+            {t('common.close', 'Close')}
           </Button>
           <Button
             type="button"
@@ -240,12 +240,12 @@ export function EditTikTokConnectionForm({ isOpen, onClose, onSuccess, connectio
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Refreshing...
+                {t('settings.tiktok.refreshing', 'Refreshing...')}
               </>
             ) : (
               <>
                 <RefreshCw className="h-4 w-4" />
-                Refresh Connection
+                {t('settings.tiktok.refreshButton', 'Refresh Connection')}
               </>
             )}
           </Button>

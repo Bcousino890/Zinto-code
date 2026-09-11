@@ -652,11 +652,11 @@ export default function KanbanBoard({ onAddDeal, activePipelineId }: KanbanBoard
                 </TooltipTrigger>
                 <TooltipContent>
                   <div className="space-y-1">
-                    <p className="font-semibold">Pipeline Stage Revert Statistics</p>
-                    <p>Scheduled: {revertStats.totalScheduled}</p>
-                    <p>Executed: {revertStats.totalExecuted}</p>
-                    <p>Failed: {revertStats.totalFailed}</p>
-                    <p>Skipped: {revertStats.totalSkipped}</p>
+                    <p className="font-semibold">{t('pipeline.revert_statistics_title', 'Pipeline Stage Revert Statistics')}</p>
+                    <p>{t('pipeline.revert_scheduled', 'Scheduled')}: {revertStats.totalScheduled}</p>
+                    <p>{t('pipeline.revert_executed', 'Executed')}: {revertStats.totalExecuted}</p>
+                    <p>{t('pipeline.revert_failed', 'Failed')}: {revertStats.totalFailed}</p>
+                    <p>{t('pipeline.revert_skipped', 'Skipped')}: {revertStats.totalSkipped}</p>
                   </div>
                 </TooltipContent>
               </Tooltip>
@@ -703,7 +703,7 @@ export default function KanbanBoard({ onAddDeal, activePipelineId }: KanbanBoard
 
       {!activePipelineId ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="text-muted-foreground mb-4">No pipeline selected. Please select a pipeline to view stages and deals.</p>
+          <p className="text-muted-foreground mb-4">{t('pipeline.no_pipeline_selected', 'No pipeline selected. Please select a pipeline to view stages and deals.')}</p>
         </div>
       ) : isLoading ? (
         <PipelineLoadingSkeleton />

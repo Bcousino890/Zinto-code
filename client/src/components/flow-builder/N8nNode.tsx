@@ -444,9 +444,9 @@ export function N8nNode({ id, data, isConnectable }: N8nNodeProps) {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <img 
-                src="https://registry.npmmirror.com/@lobehub/icons-static-png/1.75.0/files/dark/n8n-color.png" 
-                alt="n8n" 
+              <img
+                src="https://registry.npmmirror.com/@lobehub/icons-static-png/1.75.0/files/dark/n8n-color.png"
+                alt="n8n"
                 className="h-4 w-4"
               />
             </TooltipTrigger>
@@ -455,7 +455,7 @@ export function N8nNode({ id, data, isConnectable }: N8nNodeProps) {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <span>n8n Integration</span>
+        <span>{t('flow_builder.n8n_integration', 'n8n Integration')}</span>
 
         {/* Configuration Progress Badge */}
         <TooltipProvider>
@@ -566,11 +566,11 @@ export function N8nNode({ id, data, isConnectable }: N8nNodeProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Badge className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-1 py-0.5 rounded cursor-help">
-                    Webhook Connected
+                    {t('flow_builder.webhook_connected', 'Webhook Connected')}
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p className="text-xs">Webhook URL configured</p>
+                  <p className="text-xs">{t('flow_builder.webhook_url_configured', 'Webhook URL configured')}</p>
                   <p className="text-xs text-muted-foreground">{webhookUrl}</p>
                 </TooltipContent>
               </Tooltip>
@@ -585,12 +585,12 @@ export function N8nNode({ id, data, isConnectable }: N8nNodeProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Badge className="text-[10px] bg-muted text-muted-foreground border border-border px-1 py-0.5 rounded cursor-help">
-                  Timeout: {timeout}s
+                  {t('flow_builder.n8n_timeout_badge', 'Timeout: {{timeout}}s', { timeout })}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p className="text-xs">Request timeout: {timeout} seconds</p>
-                <p className="text-xs text-muted-foreground">Maximum time to wait for n8n response</p>
+                <p className="text-xs">{t('flow_builder.n8n_request_timeout_seconds', 'Request timeout: {{timeout}} seconds', { timeout })}</p>
+                <p className="text-xs text-muted-foreground">{t('flow_builder.n8n_timeout_help_description', 'Maximum time to wait for n8n response')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

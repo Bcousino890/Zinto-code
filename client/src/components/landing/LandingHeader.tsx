@@ -4,6 +4,7 @@ import type { PublicFrontendWebsiteHeader } from '@shared/frontend-website-setti
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import { useTranslation } from '@/hooks/use-translation';
 import { renderIdentifiableLink, resolveFrontendWebsiteNavHref } from './helpers';
 
 interface LandingHeaderProps {
@@ -13,6 +14,7 @@ interface LandingHeaderProps {
 
 export function LandingHeader({ header, managedPageSlugs = [] }: LandingHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <nav className="glass-nav sticky top-0 z-50">
@@ -50,7 +52,7 @@ export function LandingHeader({ header, managedPageSlugs = [] }: LandingHeaderPr
             {header.showThemeToggle && <ThemeToggle variant="compact" />}
             {header.showLanguageSwitcher && <LanguageSwitcher variant="compact" />}
             <Button variant="ghost" asChild>
-              <a href="/auth">Sign In</a>
+              <a href="/auth">{t('landing.sign_in', 'Sign In')}</a>
             </Button>
             {header.ctaButton ? (
               <Button variant="brand" asChild>
@@ -58,7 +60,7 @@ export function LandingHeader({ header, managedPageSlugs = [] }: LandingHeaderPr
               </Button>
             ) : (
               <Button variant="brand" asChild>
-                <a href="/register">Get Started</a>
+                <a href="/register">{t('landing.get_started', 'Get Started')}</a>
               </Button>
             )}
           </div>
@@ -91,7 +93,7 @@ export function LandingHeader({ header, managedPageSlugs = [] }: LandingHeaderPr
               })}
               <div className="flex flex-col space-y-2 pt-4 border-t border-border">
                 <Button variant="ghost" asChild>
-                  <a href="/auth">Sign In</a>
+                  <a href="/auth">{t('landing.sign_in', 'Sign In')}</a>
                 </Button>
                 {header.ctaButton ? (
                   <Button variant="brand" asChild>
@@ -99,7 +101,7 @@ export function LandingHeader({ header, managedPageSlugs = [] }: LandingHeaderPr
                   </Button>
                 ) : (
                   <Button variant="brand" asChild>
-                    <a href="/register">Get Started</a>
+                    <a href="/register">{t('landing.get_started', 'Get Started')}</a>
                   </Button>
                 )}
               </div>

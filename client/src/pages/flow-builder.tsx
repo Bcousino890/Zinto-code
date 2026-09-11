@@ -497,7 +497,7 @@ function MessageNode({ data, isConnectable, id }: any) {
                           <div className="flex-shrink-0 w-6 h-6 rounded-md bg-primary text-white flex items-center justify-center text-xs font-medium">
                             {index + 1}
                           </div>
-                          <div className="flex-1 text-xs font-medium">Keyword {index + 1}</div>
+                          <div className="flex-1 text-xs font-medium">{t('flow_builder.keyword_item', 'Keyword {{index}}', { index: index + 1 })}</div>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -510,12 +510,12 @@ function MessageNode({ data, isConnectable, id }: any) {
 
                         <div className="pl-8 space-y-2">
                           <div>
-                            <label className="text-xs text-muted-foreground block mb-1">Match Value:</label>
+                            <label className="text-xs text-muted-foreground block mb-1">{t('flow_builder.keyword_match_value', 'Match Value:')}</label>
                             <input
                               className="w-full p-1.5 text-xs border rounded"
                               value={keyword.value}
                               onChange={(e) => updateKeyword(keyword.id, 'value', e.target.value)}
-                              placeholder="Text to match"
+                              placeholder={t('flow_builder.keyword_match_placeholder', 'Text to match')}
                             />
                           </div>
 
@@ -528,7 +528,7 @@ function MessageNode({ data, isConnectable, id }: any) {
                               className="w-3 h-3"
                             />
                             <label htmlFor={`case-sensitive-${keyword.id}`} className="text-xs text-muted-foreground">
-                              Case sensitive
+                              {t('flow_builder.case_sensitive', 'Case sensitive')}
                             </label>
                           </div>
                         </div>
@@ -553,7 +553,7 @@ function MessageNode({ data, isConnectable, id }: any) {
                 {enableKeywordTriggers && (
                   <div className="text-[10px] text-muted-foreground space-y-1">
                     <div>{t('flow_builder.keyword_trigger_each_output', 'Each keyword will create its own output connection.')}</div>
-                    <div>A "no match" output will be available for unmatched responses.</div>
+                    <div>{t('flow_builder.no_match_output', 'A "no match" output will be available for unmatched responses.')}</div>
                   </div>
                 )}
               </div>
@@ -1227,7 +1227,7 @@ function TriggerNode({ data, isConnectable, id }: any) {
           {triggerType === 'deal_moves_between_pipelines' && (
             <>
               <div>
-                <label className="block mb-1 font-medium">From Pipeline (Optional)</label>
+                <label className="block mb-1 font-medium">{t('flow_builder.from_pipeline_optional', 'From Pipeline (Optional)')}</label>
                 <select
                   className="w-full p-1 border rounded bg-background text-xs"
                   value={data.fromPipelineId?.toString() || 'any'}
@@ -1240,7 +1240,7 @@ function TriggerNode({ data, isConnectable, id }: any) {
                 </select>
               </div>
               <div>
-                <label className="block mb-1 font-medium">To Pipeline (Optional)</label>
+                <label className="block mb-1 font-medium">{t('flow_builder.to_pipeline_optional', 'To Pipeline (Optional)')}</label>
                 <select
                   className="w-full p-1 border rounded bg-background text-xs"
                   value={data.toPipelineId?.toString() || 'any'}
@@ -1905,7 +1905,7 @@ function WaitNode({ data, isConnectable, id }: any) {
                 <label className="text-xs text-muted-foreground">{t('flow_builder.wait_time_unit', 'Unit')}</label>
                 <Select value={timeUnit} onValueChange={handleTimeUnitChange}>
                   <SelectTrigger className="w-full h-8 text-xs">
-                    <SelectValue placeholder="Select unit" />
+                    <SelectValue placeholder={t('flow_builder.wait_select_unit', 'Select unit')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="seconds">{t('flow_builder.wait_seconds', 'Seconds')}</SelectItem>
@@ -1928,7 +1928,7 @@ function WaitNode({ data, isConnectable, id }: any) {
                       className="w-full justify-start text-left font-normal h-8 text-xs"
                     >
                       <CalendarIcon className="mr-2 h-3 w-3" />
-                      {waitDate ? formatDate(waitDate) : "Select date"}
+                      {waitDate ? formatDate(waitDate) : t('flow_builder.wait_select_date', 'Select date')}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -1954,7 +1954,7 @@ function WaitNode({ data, isConnectable, id }: any) {
                 <label className="text-xs text-muted-foreground">{t('flow_builder.wait_timezone', 'Timezone')}</label>
                 <Select value={timezone} onValueChange={handleTimezoneChange}>
                   <SelectTrigger className="w-full h-8 text-xs">
-                    <SelectValue placeholder="Select timezone" />
+                    <SelectValue placeholder={t('flow_builder.wait_select_timezone', 'Select timezone')} />
                   </SelectTrigger>
                   <SelectContent className="max-h-[160px]">
                     <SelectGroup>
@@ -2328,7 +2328,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
           className="ml-auto text-xs text-muted-foreground hover:text-foreground"
           onClick={() => setIsEditing(!isEditing)}
         >
-          {isEditing ? 'Done' : 'Edit'}
+          {isEditing ? t('common.done', 'Done') : t('common.edit', 'Edit')}
         </button>
       </div>
 
@@ -2342,7 +2342,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                 setMessage(newMessage);
                 updateNodeData({ message: newMessage });
               }}
-              placeholder="Type your message here..."
+              placeholder={t('flow_builder.quick_reply_type_message_placeholder', 'Type your message here...')}
               multiline
               className="w-full p-2 text-sm border rounded min-h-[80px] resize-none"
               flowId={flowContext?.flowId ?? undefined}
@@ -2455,7 +2455,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                     <div className="flex-shrink-0 w-6 h-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
                       {index + 1}
                     </div>
-                    <div className="flex-1 font-medium text-xs">Option {index + 1}</div>
+                    <div className="flex-1 font-medium text-xs">{t('flow_builder.option_item', 'Option {{index}}', { index: index + 1 })}</div>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -2469,25 +2469,25 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
 
                   <div className="pl-8 space-y-2">
                     <div>
-                      <label className="text-xs text-muted-foreground block mb-1">Display Text:</label>
+                      <label className="text-xs text-muted-foreground block mb-1">{t('flow_builder.quick_reply_display_text', 'Display Text:')}</label>
                       <input
                         className="w-full p-2 text-sm border rounded"
                         value={option.text}
                         onChange={(e) => handleOptionTextChange(index, e.target.value)}
-                        placeholder="Text to display"
+                        placeholder={t('flow_builder.quick_reply_text_to_display', 'Text to display')}
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-muted-foreground block mb-1">Response Value:</label>
+                      <label className="text-xs text-muted-foreground block mb-1">{t('flow_builder.quick_reply_response_value', 'Response Value:')}</label>
                       <input
                         className="w-full p-2 text-sm border rounded"
                         value={option.value}
                         onChange={(e) => handleOptionValueChange(index, e.target.value)}
-                        placeholder="Value to match"
+                        placeholder={t('flow_builder.quick_reply_value_to_match', 'Value to match')}
                       />
                       <div className="text-[10px] text-muted-foreground mt-1">
-                        User can respond with this value to select this option
+                        {t('flow_builder.quick_reply_value_help', 'User can respond with this value to select this option')}
                       </div>
                     </div>
                   </div>
@@ -2511,7 +2511,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
               <div>{t('flow_builder.quick_reply_each_output', 'Each option will have its own output connection.')}</div>
               {/* 🔧 NEW: Keyboard shortcuts help */}
               <div className="text-[9px] text-muted-foreground/70">
-                <strong>Shortcuts:</strong> Ctrl+A (select all), Ctrl+D (duplicate), Del (delete), Esc (deselect), Ctrl+Enter (add option)
+                <strong>{t('flow_builder.shortcuts_label', 'Shortcuts:')}</strong> Ctrl+A (select all), Ctrl+D (duplicate), Del (delete), Esc (deselect), Ctrl+Enter (add option)
               </div>
             </div>
           </div>
@@ -2525,7 +2525,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                 setInvalidResponseMessage(newValue);
                 updateNodeData({ invalidResponseMessage: newValue });
               }}
-              placeholder="Message to send when user's response doesn't match any option..."
+              placeholder={t('flow_builder.quick_reply_invalid_response_placeholder', "Message to send when user's response doesn't match any option...")}
               multiline
               className="w-full p-2 text-sm border rounded min-h-[60px] resize-none"
               flowId={flowContext?.flowId ?? undefined}
@@ -2570,28 +2570,28 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
             {enableGoBack && (
               <div className="space-y-2 p-3 border rounded-lg ">
                 <div>
-                  <label className="text-xs text-muted-foreground block mb-1">Display Text:</label>
+                  <label className="text-xs text-muted-foreground block mb-1">{t('flow_builder.quick_reply_display_text', 'Display Text:')}</label>
                   <input
                     className="w-full p-2 text-sm border rounded"
                     value={goBackText}
                     onChange={handleGoBackTextChange}
-                    placeholder="← Go Back"
+                    placeholder={t('flow_builder.quick_reply_go_back_default', '← Go Back')}
                   />
                   <div className="text-[10px] text-muted-foreground mt-1">
-                    Text shown to users for the go back option
+                    {t('flow_builder.quick_reply_go_back_display_help', 'Text shown to users for the go back option')}
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs text-muted-foreground block mb-1">Response Value:</label>
+                  <label className="text-xs text-muted-foreground block mb-1">{t('flow_builder.quick_reply_response_value', 'Response Value:')}</label>
                   <input
                     className="w-full p-2 text-sm border rounded"
                     value={goBackValue}
                     onChange={handleGoBackValueChange}
-                    placeholder="go_back"
+                    placeholder={t('flow_builder.quick_reply_go_back_value_default', 'go_back')}
                   />
                   <div className="text-[10px] text-muted-foreground mt-1">
-                    Value users can type to trigger the go back action
+                    {t('flow_builder.quick_reply_go_back_value_help', 'Value users can type to trigger the go back action')}
                   </div>
                 </div>
               </div>
@@ -2635,13 +2635,13 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
           {/* 🔧 ENHANCED: Message display with validation and preview */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-medium text-muted-foreground">Message</div>
+              <div className="text-xs font-medium text-muted-foreground">{t('flow_builder.message_label', 'Message')}</div>
               <button
                 className="text-xs px-2 py-1 rounded  hover: transition-colors"
                 onClick={() => setShowPreview(!showPreview)}
-                title={showPreview ? "Show variables" : "Show preview values"}
+                title={showPreview ? t('flow_builder.show_variables', 'Show variables') : t('flow_builder.show_preview_values', 'Show preview values')}
               >
-                {showPreview ? "Variables" : "Preview"}
+                {showPreview ? t('flow_builder.variables_button', 'Variables') : t('flow_builder.preview_button', 'Preview')}
               </button>
             </div>
             <div className="text-sm p-2  rounded border border-border">
@@ -2652,7 +2652,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
               const issues = validateVariables(message);
               return issues.length > 0 && (
                 <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">
-                  <div className="font-medium mb-1">Variable Issues:</div>
+                  <div className="font-medium mb-1">{t('flow_builder.variable_issues', 'Variable Issues:')}</div>
                   <ul className="list-disc list-inside space-y-0.5">
                     {issues.map((issue, index) => (
                       <li key={index}>{issue}</li>
@@ -2672,7 +2672,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                 <div className="text-sm flex-1 pr-6">
                   <div>{option.text}</div>
                   <div className="text-xs text-muted-foreground">
-                    Responds to: "{option.value}"
+                    {t('flow_builder.responds_to', 'Responds to:')} "{option.value}"
                   </div>
                 </div>
                 <Handle

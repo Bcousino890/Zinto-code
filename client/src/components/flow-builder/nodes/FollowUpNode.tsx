@@ -327,7 +327,7 @@ export function FollowUpNode({ id, data, isConnectable }: FollowUpNodeProps) {
                   <FollowUpHelpContent />
                   <DialogPrimitive.Close className={dialogCloseButtonClassName}>
                     <X className="h-4 w-4" />
-                    <span className="sr-only">Close</span>
+                    <span className="sr-only">{t('flow_builder.close', 'Close')}</span>
                   </DialogPrimitive.Close>
                 </DialogPrimitive.Content>
               </DialogPrimitive.Portal>

@@ -447,7 +447,7 @@ export default function Analytics() {
                 {t('analytics.title', 'Analytics')}
               </h1>
               <p className="text-muted-foreground text-sm">
-                Track your communication performance and engagement metrics
+                {t('analytics.description', 'Track your communication performance and engagement metrics')}
               </p>
             </div>
           </div>
@@ -496,7 +496,7 @@ export default function Analytics() {
                 </PopoverTrigger>
                 <PopoverContent className="w-auto max-w-[95vw] p-0" align="start">
                   <div className="p-3 border-b max-w-md">
-                    <h4 className="font-medium text-sm mb-3">Quick Presets</h4>
+                    <h4 className="font-medium text-sm mb-3">{t('analytics.quick_presets', 'Quick Presets')}</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {Object.entries(DATE_RANGE_PRESETS).slice(0, -1).map(([key, preset]) => (
                         <Button
@@ -512,7 +512,7 @@ export default function Analytics() {
                     </div>
                   </div>
                   <div className="p-3">
-                    <h4 className="font-medium text-sm mb-2">Custom Range</h4>
+                    <h4 className="font-medium text-sm mb-2">{t('analytics.custom_range', 'Custom Range')}</h4>
                     <div className="overflow-x-auto">
                       <div className="hidden md:block">
                         <Calendar
@@ -551,7 +551,7 @@ export default function Analytics() {
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="ml-2">Loading analytics data...</span>
+              <span className="ml-2">{t('analytics.loading', 'Loading analytics data...')}</span>
             </div>
           ) : loading ? (
             <TooltipProvider>
@@ -593,7 +593,7 @@ export default function Analytics() {
                               <HelpCircle className="h-3 w-3 text-muted-foreground/70 hover:text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-xs">Total number of conversations in the selected period</p>
+                              <p className="text-xs">{t('analytics.tooltip.total_conversations', 'Total number of conversations in the selected period')}</p>
                             </TooltipContent>
                           </UITooltip>
                         </div>
@@ -634,7 +634,7 @@ export default function Analytics() {
                               <HelpCircle className="h-3 w-3 text-muted-foreground/70 hover:text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-xs">Total number of contacts created in the selected period</p>
+                              <p className="text-xs">{t('analytics.tooltip.total_contacts', 'Total number of contacts created in the selected period')}</p>
                             </TooltipContent>
                           </UITooltip>
                         </div>
@@ -675,7 +675,7 @@ export default function Analytics() {
                               <HelpCircle className="h-3 w-3 text-muted-foreground/70 hover:text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-xs">Total number of messages sent and received in the selected period</p>
+                              <p className="text-xs">{t('analytics.tooltip.total_messages', 'Total number of messages sent and received in the selected period')}</p>
                             </TooltipContent>
                           </UITooltip>
                         </div>
@@ -716,7 +716,7 @@ export default function Analytics() {
                               <HelpCircle className="h-3 w-3 text-muted-foreground/70 hover:text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-xs">Percentage of messages that received a response in the selected period</p>
+                              <p className="text-xs">{t('analytics.tooltip.response_rate', 'Percentage of messages that received a response in the selected period')}</p>
                             </TooltipContent>
                           </UITooltip>
                         </div>
@@ -760,7 +760,7 @@ export default function Analytics() {
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="text-xs">Daily conversation trends across different channels</p>
+                            <p className="text-xs">{t('analytics.tooltip.conversations_by_channel', 'Daily conversation trends across different channels')}</p>
                           </TooltipContent>
                         </UITooltip>
                       </div>
@@ -857,7 +857,7 @@ export default function Analytics() {
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="text-xs">Distribution of conversations across different channels</p>
+                            <p className="text-xs">{t('analytics.tooltip.channel_distribution', 'Distribution of conversations across different channels')}</p>
                           </TooltipContent>
                         </UITooltip>
                       </div>

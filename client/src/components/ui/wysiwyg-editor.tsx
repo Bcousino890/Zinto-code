@@ -386,12 +386,12 @@ export function WysiwygEditor({
           disabled={isCodeView}
         >
           <option value="">{t('common.wysiwyg.normal', 'Normal')}</option>
-          <option value="h1">Heading 1</option>
-          <option value="h2">Heading 2</option>
-          <option value="h3">Heading 3</option>
-          <option value="h4">Heading 4</option>
-          <option value="h5">Heading 5</option>
-          <option value="h6">Heading 6</option>
+          <option value="h1">{t('common.wysiwyg.heading_1', 'Heading 1')}</option>
+          <option value="h2">{t('common.wysiwyg.heading_2', 'Heading 2')}</option>
+          <option value="h3">{t('common.wysiwyg.heading_3', 'Heading 3')}</option>
+          <option value="h4">{t('common.wysiwyg.heading_4', 'Heading 4')}</option>
+          <option value="h5">{t('common.wysiwyg.heading_5', 'Heading 5')}</option>
+          <option value="h6">{t('common.wysiwyg.heading_6', 'Heading 6')}</option>
         </select>
 
         <Separator orientation="vertical" className="h-6 mx-1" />
@@ -490,8 +490,8 @@ export function WysiwygEditor({
           defaultValue=""
           disabled={isCodeView}
         >
-          <option value="">Align</option>
-          <option value="justifyLeft">Left</option>
+          <option value="">{t('common.wysiwyg.align_label', 'Align')}</option>
+          <option value="justifyLeft">{t('common.wysiwyg.align_left', 'Left')}</option>
           <option value="justifyCenter">{t('common.wysiwyg.align_center', 'Center')}</option>
           <option value="justifyRight">{t('common.wysiwyg.align_right', 'Right')}</option>
           <option value="justifyFull">{t('common.wysiwyg.align_justify', 'Justify')}</option>
@@ -505,7 +505,7 @@ export function WysiwygEditor({
           size="sm"
           onClick={toggleCodeView}
           className="h-8 w-8 p-0"
-          title={isCodeView ? "Switch to Visual Editor" : "Switch to Code View"}
+          title={isCodeView ? t('common.wysiwyg.switch_visual', 'Switch to Visual Editor') : t('common.wysiwyg.switch_code', 'Switch to Code View')}
         >
           <FileCode className="h-4 w-4" />
         </Button>

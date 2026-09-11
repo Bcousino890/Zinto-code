@@ -239,12 +239,12 @@ export default function PaymentsPage() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'payments'] });
       toast({
         title: t('admin.payments.status_update.success', 'Payment status updated successfully'),
-        description: 'The payment has been marked as received.',
+        description: t('admin.payments.status_update.marked_received', 'The payment has been marked as received.'),
       });
     },
     onError: (error) => {
       toast({
-        title: 'Error',
+        title: t('common.error', 'Error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -266,12 +266,12 @@ export default function PaymentsPage() {
       setSelectedCompanyId(null);
       toast({
         title: t('admin.payments.reminders.success', 'Reminder sent successfully'),
-        description: 'Payment reminder has been sent to the company.',
+        description: t('admin.payments.reminders.sent_to_company', 'Payment reminder has been sent to the company.'),
       });
     },
     onError: (error) => {
       toast({
-        title: 'Error',
+        title: t('common.error', 'Error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -291,12 +291,12 @@ export default function PaymentsPage() {
       setSelectedTransaction(null);
       toast({
         title: t('admin.payments.edit.success', 'Transaction updated successfully'),
-        description: 'The payment transaction has been updated.',
+        description: t('admin.payments.edit.updated_description', 'The payment transaction has been updated.'),
       });
     },
     onError: (error) => {
       toast({
-        title: 'Error',
+        title: t('common.error', 'Error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -369,12 +369,12 @@ export default function PaymentsPage() {
       await navigator.clipboard.writeText(text);
       toast({
         title: t('admin.payments.copied', 'Copied to clipboard'),
-        description: 'The text has been copied to your clipboard.',
+        description: t('admin.payments.copied_description', 'The text has been copied to your clipboard.'),
       });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'Failed to copy to clipboard',
+        title: t('common.error', 'Error'),
+        description: t('admin.payments.copy_error', 'Failed to copy to clipboard'),
         variant: 'destructive',
       });
     }
@@ -601,7 +601,7 @@ export default function PaymentsPage() {
                 <div>
                   <CardTitle className="text-lg sm:text-xl">{t('admin.payments.trends.title', 'Payment Trends')}</CardTitle>
                   <CardDescription className="text-sm">
-                    Revenue and transaction trends over time
+                    {t('admin.payments.trends.description', 'Revenue and transaction trends over time')}
                   </CardDescription>
                 </div>
                 <Select value={trendsPeriod} onValueChange={setTrendsPeriod}>
@@ -671,7 +671,7 @@ export default function PaymentsPage() {
                   </div>
                 ) : (
                   <div className="h-[300px] sm:h-[400px] flex items-center justify-center text-muted-foreground">
-                    No trend data available
+                    {t('admin.payments.trends.empty', 'No trend data available')}
                   </div>
                 )}
               </CardContent>
@@ -727,7 +727,7 @@ export default function PaymentsPage() {
                           <SelectItem value="paystack">Paystack</SelectItem>
                           <SelectItem value="mercadopago">Mercado Pago</SelectItem>
                           <SelectItem value="moyasar">Moyasar</SelectItem>
-                          <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                          <SelectItem value="bank_transfer">{t('admin.payments.methods.bank_transfer', 'Bank Transfer')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1168,12 +1168,12 @@ export default function PaymentsPage() {
                               {method.successRate.toFixed(1)}%
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              Success Rate
+                              {t('admin.payments.performance.success_rate', 'Success Rate')}
                             </p>
                             <div className="mt-2 text-xs sm:text-sm">
                               <div className="font-medium">{formatCurrency(method.totalRevenue)}</div>
                               <div className="text-muted-foreground">
-                                {method.totalTransactions} transactions
+                                {t('admin.payments.performance.transactions_count', '{{count}} transactions', { count: method.totalTransactions })}
                               </div>
                             </div>
                           </CardContent>
@@ -1205,7 +1205,7 @@ export default function PaymentsPage() {
                                 <div>
                                   <div className="font-medium text-sm sm:text-base">{method.totalTransactions}</div>
                                   <div className="text-xs sm:text-sm text-muted-foreground">
-                                    {method.successfulTransactions} successful
+                                    {t('admin.payments.performance.successful', '{{count}} successful', { count: method.successfulTransactions })}
                                   </div>
                                 </div>
                               </TableCell>
@@ -1233,7 +1233,7 @@ export default function PaymentsPage() {
                     </div>
 
                     <div className="mt-6">
-                      <h3 className="text-base sm:text-lg font-medium mb-4">Revenue Distribution</h3>
+                      <h3 className="text-base sm:text-lg font-medium mb-4">{t('admin.payments.performance.revenue_distribution', 'Revenue Distribution')}</h3>
                       <div className="h-[250px] sm:h-[300px]">
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
@@ -1289,7 +1289,7 @@ export default function PaymentsPage() {
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl">{t('admin.payments.edit.title', 'Edit Payment Transaction')}</DialogTitle>
               <DialogDescription className="text-sm">
-                Modify payment transaction details. Be careful when changing completed payments.
+                {t('admin.payments.edit.dialog_description', 'Modify payment transaction details. Be careful when changing completed payments.')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -1320,7 +1320,7 @@ export default function PaymentsPage() {
                     <SelectItem value="paystack">Paystack</SelectItem>
                       <SelectItem value="mercado_pago">Mercado Pago</SelectItem>
                       <SelectItem value="moyasar">Moyasar</SelectItem>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="bank_transfer">{t('admin.payments.methods.bank_transfer', 'Bank Transfer')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1360,7 +1360,7 @@ export default function PaymentsPage() {
             </div>
             <DialogFooter className="flex flex-col sm:flex-row gap-2">
               <Button variant="outline" onClick={() => setEditDialogOpen(false)} className="w-full sm:w-auto">
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 onClick={handleEditSubmit}
@@ -1384,7 +1384,7 @@ export default function PaymentsPage() {
             <DialogHeader>
               <DialogTitle>{t('admin.payments.reminders.title', 'Send Payment Reminder')}</DialogTitle>
               <DialogDescription>
-                Send a payment reminder to the selected company.
+                {t('admin.payments.reminders.dialog_description', 'Send a payment reminder to the selected company.')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -1397,7 +1397,7 @@ export default function PaymentsPage() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setReminderDialogOpen(false)}>
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 onClick={() => {
@@ -1427,7 +1427,7 @@ export default function PaymentsPage() {
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl">{t('admin.payments.view.title', 'Payment Transaction Details')}</DialogTitle>
               <DialogDescription className="text-sm">
-                Complete information for transaction #{selectedTransaction?.id}
+                {t('admin.payments.view.dialog_description', 'Complete information for transaction #{{id}}', { id: selectedTransaction?.id })}
               </DialogDescription>
             </DialogHeader>
             {selectedTransaction && (
@@ -1506,7 +1506,7 @@ export default function PaymentsPage() {
                       {selectedTransaction.paymentIntentId && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">
-                            {selectedTransaction.paymentMethod === 'stripe' ? 'Stripe Payment Intent ID:' : 'Payment Intent ID:'}
+                            {selectedTransaction.paymentMethod === 'stripe' ? t('admin.payments.view.stripe_payment_intent_id', 'Stripe Payment Intent ID:') : t('admin.payments.view.payment_intent_id', 'Payment Intent ID:')}
                           </span>
                           <div className="flex items-center gap-2">
                             <span className="font-mono text-sm">{selectedTransaction.paymentIntentId}</span>
@@ -1518,7 +1518,7 @@ export default function PaymentsPage() {
                       )}
                       {selectedTransaction.externalTransactionId && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">External Transaction ID:</span>
+                          <span className="text-muted-foreground">{t('admin.payments.view.external_transaction_id', 'External Transaction ID:')}</span>
                           <div className="flex items-center gap-2">
                             <span className="font-mono text-sm">{selectedTransaction.externalTransactionId}</span>
                             <Button variant="ghost" size="sm" onClick={() => copyToClipboard(selectedTransaction.externalTransactionId!)}>
@@ -1529,7 +1529,7 @@ export default function PaymentsPage() {
                       )}
                       {selectedTransaction.metadata?.reference && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Reference:</span>
+                          <span className="text-muted-foreground">{t('admin.payments.view.reference', 'Reference:')}</span>
                           <div className="flex items-center gap-2">
                             <span className="font-mono text-sm">{selectedTransaction.metadata.reference}</span>
                             <Button variant="ghost" size="sm" onClick={() => copyToClipboard(selectedTransaction.metadata.reference)}>
@@ -1540,7 +1540,7 @@ export default function PaymentsPage() {
                       )}
                       {selectedTransaction.metadata?.paypalTransactionId && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">PayPal Transaction ID:</span>
+                          <span className="text-muted-foreground">{t('admin.payments.view.paypal_transaction_id', 'PayPal Transaction ID:')}</span>
                           <div className="flex items-center gap-2">
                             <span className="font-mono text-sm">{selectedTransaction.metadata.paypalTransactionId}</span>
                             <Button variant="ghost" size="sm" onClick={() => copyToClipboard(selectedTransaction.metadata.paypalTransactionId)}>
@@ -1570,7 +1570,7 @@ export default function PaymentsPage() {
             )}
             <DialogFooter>
               <Button variant="outline" onClick={() => setViewDialogOpen(false)}>
-                Close
+                {t('common.close', 'Close')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1587,10 +1587,10 @@ export default function PaymentsPage() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setConfirmDialogOpen(false)}>
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </AlertDialogCancel>
               <AlertDialogAction onClick={() => confirmAction && confirmAction()}>
-                Continue
+                {t('common.continue', 'Continue')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -1617,19 +1617,19 @@ export default function PaymentsPage() {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Company Name:</span>
+                        <span className="text-sm font-medium text-muted-foreground">{t('admin.payments.company_view.company_name_label', 'Company Name:')}</span>
                         <p className="text-sm font-semibold">{selectedCompany.name}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Company ID:</span>
+                        <span className="text-sm font-medium text-muted-foreground">{t('admin.payments.company_view.company_id_label', 'Company ID:')}</span>
                         <p className="text-sm font-mono">{selectedCompany.id}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Member Since:</span>
+                        <span className="text-sm font-medium text-muted-foreground">{t('admin.payments.company_view.member_since_label', 'Member Since:')}</span>
                         <p className="text-sm">{formatDate(selectedCompany.createdAt)}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Current Plan:</span>
+                        <span className="text-sm font-medium text-muted-foreground">{t('admin.payments.company_view.current_plan_label', 'Current Plan:')}</span>
                         <p className="text-sm font-semibold">{selectedCompany.planName}</p>
                       </div>
                     </div>
@@ -1644,7 +1644,7 @@ export default function PaymentsPage() {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Status:</span>
+                        <span className="text-sm font-medium text-muted-foreground">{t('admin.payments.company_view.status_label', 'Status:')}</span>
                         <div className="mt-1">
                           <Badge variant={
                             selectedCompany.subscriptionStatus === 'active' ? 'default' :
@@ -1657,11 +1657,11 @@ export default function PaymentsPage() {
                         </div>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Next Renewal:</span>
+                        <span className="text-sm font-medium text-muted-foreground">{t('admin.payments.company_view.next_renewal_label', 'Next Renewal:')}</span>
                         <p className="text-sm">
                           {selectedCompany.subscriptionEndDate
                             ? formatDate(selectedCompany.subscriptionEndDate)
-                            : 'No renewal date set'
+                            : t('admin.payments.company_view.no_renewal_date', 'No renewal date set')
                           }
                         </p>
                       </div>
@@ -1677,16 +1677,16 @@ export default function PaymentsPage() {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Total Paid:</span>
+                        <span className="text-sm font-medium text-muted-foreground">{t('admin.payments.company_view.total_paid_label', 'Total Paid:')}</span>
                         <p className="text-lg font-bold text-green-600">{formatCurrency(selectedCompany.totalPaid)}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Last Payment:</span>
+                        <span className="text-sm font-medium text-muted-foreground">{t('admin.payments.company_view.last_payment_label', 'Last Payment:')}</span>
                         <div className="space-y-1">
                           <p className="text-sm font-semibold">
                             {selectedCompany.lastPaymentAmount > 0
                               ? formatCurrency(selectedCompany.lastPaymentAmount)
-                              : 'No payments yet'
+                              : t('admin.payments.company_view.no_payments_yet', 'No payments yet')
                             }
                           </p>
                           {selectedCompany.lastPaymentDate && (
@@ -1697,11 +1697,11 @@ export default function PaymentsPage() {
                         </div>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Payment Method:</span>
+                        <span className="text-sm font-medium text-muted-foreground">{t('admin.payments.company_view.payment_method_label', 'Payment Method:')}</span>
                         <p className="text-sm">
                           {selectedCompany.lastPaymentMethod
                             ? selectedCompany.lastPaymentMethod.replace('_', ' ').toUpperCase()
-                            : 'No payment method on file'
+                            : t('admin.payments.company_view.no_payment_method', 'No payment method on file')
                           }
                         </p>
                       </div>
@@ -1756,13 +1756,13 @@ export default function PaymentsPage() {
                         ))}
                         {companyTransactions.length > 5 && (
                           <p className="text-xs text-muted-foreground text-center pt-2">
-                            Showing 5 of {companyTransactions.length} transactions
+                            {t('admin.payments.company_view.showing_transactions', 'Showing 5 of {{total}} transactions', { total: companyTransactions.length })}
                           </p>
                         )}
                       </div>
                     ) : (
                       <p className="text-sm text-muted-foreground text-center py-4">
-                        No payment transactions found for this company.
+                        {t('admin.payments.company_view.no_transactions', 'No payment transactions found for this company.')}
                       </p>
                     )}
                   </CardContent>

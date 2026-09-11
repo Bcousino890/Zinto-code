@@ -1605,7 +1605,7 @@ export default function ERPProductsPage() {
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="p-tags-extra">{t('erp.products.form.additionalTags', 'Additional tags (comma-separated)')}</Label>
-                  <Input id="p-tags-extra" value={formTags} onChange={(e) => setFormTags(e.target.value)} placeholder="seasonal, imported" />
+                  <Input id="p-tags-extra" value={formTags} onChange={(e) => setFormTags(e.target.value)} placeholder={t('erp.products.tags_placeholder', 'seasonal, imported')} />
                 </div>
               </div>
             </div>
@@ -1760,22 +1760,22 @@ export default function ERPProductsPage() {
                 <div>
                   <div className="font-medium">{t('erp.products.variants.title', 'Variants / SKUs')}</div>
                   <p className="text-xs text-muted-foreground">
-                    Use variants when one product has multiple sellable SKUs, such as sizes, colors, or packages. Each variant can have its own SKU and stock.
+                    {t('erp.products.variants.description', 'Use variants when one product has multiple sellable SKUs, such as sizes, colors, or packages. Each variant can have its own SKU and stock.')}
                   </p>
                 </div>
                 <div className="w-full max-w-full overflow-x-auto rounded-md border">
                   <Table className="min-w-[1220px]">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="min-w-[220px]">Name</TableHead>
-                      <TableHead className="min-w-[150px]">SKU</TableHead>
-                      <TableHead className="min-w-[150px]">Barcode</TableHead>
-                      <TableHead className="min-w-[120px]">Price</TableHead>
-                      <TableHead className="min-w-[120px]">Cost</TableHead>
-                      <TableHead className="min-w-[130px]">Status</TableHead>
-                      <TableHead className="min-w-[90px]">Sort</TableHead>
-                      <TableHead className="min-w-[330px]">Attributes</TableHead>
-                      <TableHead className="min-w-[150px] text-right">Actions</TableHead>
+                      <TableHead className="min-w-[220px]">{t('erp.products.variants.table.name', 'Name')}</TableHead>
+                      <TableHead className="min-w-[150px]">{t('erp.products.variants.table.sku', 'SKU')}</TableHead>
+                      <TableHead className="min-w-[150px]">{t('erp.products.variants.table.barcode', 'Barcode')}</TableHead>
+                      <TableHead className="min-w-[120px]">{t('erp.products.variants.table.price', 'Price')}</TableHead>
+                      <TableHead className="min-w-[120px]">{t('erp.products.variants.table.cost', 'Cost')}</TableHead>
+                      <TableHead className="min-w-[130px]">{t('erp.products.variants.table.status', 'Status')}</TableHead>
+                      <TableHead className="min-w-[90px]">{t('erp.products.variants.table.sort', 'Sort')}</TableHead>
+                      <TableHead className="min-w-[330px]">{t('erp.products.variants.table.attributes', 'Attributes')}</TableHead>
+                      <TableHead className="min-w-[150px] text-right">{t('erp.products.variants.table.actions', 'Actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1802,8 +1802,8 @@ export default function ERPProductsPage() {
                           }}>
                             <SelectTrigger className="min-w-[120px]"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="active">active</SelectItem>
-                              <SelectItem value="inactive">inactive</SelectItem>
+                              <SelectItem value="active">{t('erp.common.active', 'active')}</SelectItem>
+                              <SelectItem value="inactive">{t('erp.common.inactive', 'inactive')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
@@ -1816,7 +1816,7 @@ export default function ERPProductsPage() {
                               <div key={`${variant.id || 'new'}-attr-${pairIdx}`} className="flex items-center gap-2">
                                   <Input
                                     className="min-w-[120px]"
-                                  placeholder="e.g. Size"
+                                  placeholder={t('erp.products.attribute_key_placeholder', 'e.g. Size')}
                                   value={pair.key}
                                   onChange={(e) => {
                                     const nextPairs = pairs.map((entry, i) =>
@@ -1829,7 +1829,7 @@ export default function ERPProductsPage() {
                                 />
                                   <Input
                                     className="min-w-[120px]"
-                                  placeholder="e.g. M"
+                                  placeholder={t('erp.products.attribute_value_placeholder', 'e.g. M')}
                                   value={pair.value}
                                   onChange={(e) => {
                                     const nextPairs = pairs.map((entry, i) =>
@@ -1873,20 +1873,20 @@ export default function ERPProductsPage() {
                               }}
                             >
                               <Plus className="mr-2 h-4 w-4" />
-                              Add attribute
+                              {t('erp.products.variants.add_attribute', 'Add attribute')}
                             </Button>
                           </div>
                         </TableCell>
                         <TableCell className="text-right space-x-2 whitespace-nowrap">
-                          <Button type="button" size="sm" onClick={() => saveVariantMutation.mutate(variant)}>Save</Button>
+                          <Button type="button" size="sm" onClick={() => saveVariantMutation.mutate(variant)}>{t('common.save', 'Save')}</Button>
                           {variant.id > 0 && (
-                            <Button type="button" variant="ghost" size="sm" onClick={() => deleteVariantMutation.mutate(variant.id)}>Delete</Button>
+                            <Button type="button" variant="ghost" size="sm" onClick={() => deleteVariantMutation.mutate(variant.id)}>{t('common.delete', 'Delete')}</Button>
                           )}
                         </TableCell>
                       </TableRow>
                     ))}
                     {activeVariants.length === 0 && (
-                      <TableRow><TableCell colSpan={9} className="text-muted-foreground text-sm">No variants yet.</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={9} className="text-muted-foreground text-sm">{t('erp.products.variants.empty', 'No variants yet.')}</TableCell></TableRow>
                     )}
                   </TableBody>
                   </Table>
@@ -1914,18 +1914,18 @@ export default function ERPProductsPage() {
                 </Button>
                 {activeVariants.length > 0 && (
                   <div className="space-y-2">
-                    <div className="font-medium text-sm">Variant stock by warehouse</div>
+                    <div className="font-medium text-sm">{t('erp.products.variant_stock_by_warehouse', 'Variant stock by warehouse')}</div>
                     <div className="w-full max-w-full overflow-x-auto rounded-md border">
                       <Table className="min-w-[1120px]">
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="min-w-[120px]">Variant</TableHead>
-                          <TableHead className="min-w-[150px]">SKU</TableHead>
-                          <TableHead className="min-w-[120px]">Warehouse</TableHead>
-                          <TableHead className="min-w-[100px]">On hand</TableHead>
-                          <TableHead className="min-w-[110px]">Reorder pt.</TableHead>
-                          <TableHead className="min-w-[110px]">Reorder qty</TableHead>
-                          <TableHead className="min-w-[170px]">Adjust</TableHead>
+                          <TableHead className="min-w-[120px]">{t('erp.products.variant', 'Variant')}</TableHead>
+                          <TableHead className="min-w-[150px]">{t('erp.common.sku', 'SKU')}</TableHead>
+                          <TableHead className="min-w-[120px]">{t('erp.common.warehouse', 'Warehouse')}</TableHead>
+                          <TableHead className="min-w-[100px]">{t('erp.products.on_hand', 'On hand')}</TableHead>
+                          <TableHead className="min-w-[110px]">{t('erp.products.reorder_pt', 'Reorder pt.')}</TableHead>
+                          <TableHead className="min-w-[110px]">{t('erp.products.reorder_qty', 'Reorder qty')}</TableHead>
+                          <TableHead className="min-w-[170px]">{t('erp.products.adjust', 'Adjust')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1947,7 +1947,7 @@ export default function ERPProductsPage() {
                                     className="w-24 min-w-[96px]"
                                     value={variantAdjustmentQty[String(row.id)] ?? ''}
                                     onChange={(e) => setVariantAdjustmentQty((prev) => ({ ...prev, [String(row.id)]: e.target.value }))}
-                                    placeholder="+/- qty"
+                                    placeholder={t('erp.products.qty_adjustment_placeholder', '+/- qty')}
                                   />
                                   <Button
                                     type="button"
@@ -1998,7 +1998,7 @@ export default function ERPProductsPage() {
                                     className="w-24 min-w-[96px]"
                                     value={variantAdjustmentQty[key] ?? ''}
                                     onChange={(e) => setVariantAdjustmentQty((prev) => ({ ...prev, [key]: e.target.value }))}
-                                    placeholder="+/- qty"
+                                    placeholder={t('erp.products.qty_adjustment_placeholder', '+/- qty')}
                                   />
                                   <Button
                                     type="button"
@@ -2030,7 +2030,7 @@ export default function ERPProductsPage() {
                           !variantStockLevels.some((row) => row.variantId === variant.id) && activeWarehouses.length > 0
                       ) && (
                       <div className="space-y-2 rounded-md border border-dashed p-3">
-                        <div className="text-sm font-medium">Initialize first warehouse stock row</div>
+                        <div className="text-sm font-medium">{t('erp.products.initialize_first_warehouse_stock_row', 'Initialize first warehouse stock row')}</div>
                         <div className="grid gap-2">
                           {activeVariants
                             .filter((variant) => variant.id > 0)
@@ -2054,10 +2054,10 @@ export default function ERPProductsPage() {
                                       }
                                     >
                                       <SelectTrigger>
-                                        <SelectValue placeholder="Select warehouse" />
+                                        <SelectValue placeholder={t('erp.products.select_warehouse', 'Select warehouse')} />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        <SelectItem value="none">Select warehouse</SelectItem>
+                                        <SelectItem value="none">{t('erp.products.select_warehouse', 'Select warehouse')}</SelectItem>
                                         {activeWarehouses.map((warehouse) => (
                                           <SelectItem key={warehouse.id} value={String(warehouse.id)}>
                                             {warehouse.name}
@@ -2070,7 +2070,7 @@ export default function ERPProductsPage() {
                                     <Input
                                       value={variantAdjustmentQty[key] ?? ''}
                                       onChange={(e) => setVariantAdjustmentQty((prev) => ({ ...prev, [key]: e.target.value }))}
-                                      placeholder="Opening qty"
+                                      placeholder={t('erp.products.opening_qty', 'Opening qty')}
                                     />
                                   </div>
                                   <div className="md:col-span-1">
@@ -2090,7 +2090,7 @@ export default function ERPProductsPage() {
                                         });
                                       }}
                                     >
-                                      Create stock row
+                                      {t('erp.products.create_stock_row', 'Create stock row')}
                                     </Button>
                                   </div>
                                 </div>

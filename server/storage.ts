@@ -5049,7 +5049,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCrmIntegrationOperations(companyId: number): Promise<any[]> {
-    const integrations = await db.select({
+    const integrations: Array<{
+      id: number;
+      name: string;
+      status: string;
+      scopes: unknown;
+    }> = await db.select({
       id: crmIntegrations.id,
       name: crmIntegrations.name,
       status: crmIntegrations.status,
@@ -5057,7 +5062,26 @@ export class DatabaseStorage implements IStorage {
     }).from(crmIntegrations).where(eq(crmIntegrations.companyId, companyId));
     if (integrations.length === 0) return [];
 
-    const [events, conflicts] = await Promise.all([
+    const [events, conflicts]: [
+      Array<{
+        id: string;
+        integrationId: number;
+        type: string;
+        status: string;
+        attemptCount: number;
+        createdAt: Date;
+        lastError: string | null;
+        payload: unknown;
+      }>,
+      Array<{
+        id: number;
+        integrationId: number;
+        entityType: string;
+        externalId: string;
+        status: string;
+        createdAt: Date;
+      }>,
+    ] = await Promise.all([
       db.select({
         id: crmWebhookEvents.id, integrationId: crmWebhookEvents.integrationId,
         type: crmWebhookEvents.type, status: crmWebhookEvents.status,

@@ -27,4 +27,6 @@ jobs:
             git reset --hard origin/main
             npm ci
             npm run build
+            npm run db:migrate:validate
+            npm run db:migrate
             pm2 restart zinto

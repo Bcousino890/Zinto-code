@@ -2,13 +2,13 @@
 
 This guide covers the public routes mounted by the current implementation. The API base URL is `https://crm.zinto.app/api/v2`.
 
-## What is available now
+## Rutas disponibles en esta versión
 
 | Area | Public v2 status | Notes |
 | --- | --- | --- |
 | Contacts | Available | Create or update a contact by external ID. |
 | Messages | Available | Send CRM-originated text messages through an existing company channel. |
-| Campaigns | Not mounted | A campaign batch service exists, but no public v2 campaign route is registered. |
+| Campaigns | Not mounted | La sincronización bidireccional de campañas aún no tiene una ruta pública v2. No automatice campañas mediante esta API. |
 | Appointments | Available | Upsert an appointment for an existing tenant contact. |
 | Deals | Available | Upsert a deal for an existing tenant contact and pipeline. |
 | Outbound webhooks | Delivery contract only | The signing/delivery helper exists; no public endpoint configures or receives these webhooks. |
@@ -28,6 +28,16 @@ INTEGRATION_ID='1'
 ```
 
 The included [Postman collection](zinto-crm-integration.postman_collection.json) has equivalent variables.
+
+## Consultar el contrato publicado
+
+`GET /openapi.json` publica el contrato OpenAPI que corresponde a las rutas
+montadas. Úselo como referencia de integración y no infiera rutas a partir de
+permisos o nombres de servicios internos:
+
+```bash
+curl "$BASE_URL/openapi.json"
+```
 
 ## Check availability
 
@@ -121,6 +131,25 @@ Send `Authorization: Bearer <API_KEY>` on every route except `/health`. The auth
 
 The contact route also requires `X-Zinto-Integration-Id` to be a positive integer. It is tenant-scoped through the API key's company; do not send a company ID in the request body or headers.
 
+### Permisos editables
+
+Un administrador de la empresa puede crear, activar, desactivar y editar una
+clave desde **Configuración → Acceso API**. Las operaciones administrativas de
+claves usan la sesión de Zinto (no son parte de la API pública v2):
+
+| Acción de integración | Permiso mínimo de la clave |
+| --- | --- |
+| Consultar capacidades | `integrations:manage` |
+| Crear/actualizar contactos | `contacts:write` |
+| Enviar mensajes desde el CRM | `messages:send` |
+| Crear/actualizar agenda | `appointments:write` |
+| Crear/actualizar negocios | `deals:write` |
+
+Asigne el mínimo necesario. Una clave sin permiso recibe `403`; una clave
+inactiva, expirada o inválida recibe `401`. Cambiar permisos o desactivar una
+clave afecta las solicitudes posteriores; guarde el valor completo de la clave
+solo al crearla, porque no se vuelve a mostrar.
+
 ## Idempotency
 
 Contact, appointment, and deal upserts use their stable CRM `externalId` mappings to identify the existing Zinto record. Appointment and deal routes additionally require `Idempotency-Key`; use a stable key for a retry. Message retries can create a new delivery; `external_message_id` preserves CRM correlation only. Campaign requests are not mounted.
@@ -168,6 +197,17 @@ Errors are JSON objects with `error` and `message` fields. The contact and messa
 
 For network failures and `5xx`, use bounded exponential backoff with jitter. Do not retry validation or authorization errors until the request or key configuration changes. The current v2 router does not mount the API-key rate-limit middleware, so no v2 `429` response contract is documented here.
 
-## Sandbox
+## Sandbox y producción
 
-The current implementation does not expose a separate sandbox hostname, environment switch, test API key type, or mock endpoint. Treat `https://crm.zinto.app/api/v2` as the only documented API base URL. Use a dedicated non-production company, integration, API key, and test contacts when you need an isolated integration test.
+La base pública actual es la misma: `https://crm.zinto.app/api/v2`. El entorno
+de una clave se configura al crearla o editarla en Zinto:
+
+| Entorno | Requisito de URL de webhook |
+| --- | --- |
+| `sandbox` | `localhost`, `127.0.0.1`, `[::1]`, o un dominio `.test` / `.example` |
+| `production` | URL HTTPS y no localhost |
+
+Para sandbox cree una clave independiente, una integración independiente y
+contactos/canales de prueba. No reutilice una clave de producción ni datos de
+clientes para ensayos. El entorno etiqueta y valida la configuración de la
+clave; no crea un host API alternativo ni simula envíos de WhatsApp.

@@ -77,3 +77,27 @@ test('rejects a campaign sync for an integration outside the tenant', async () =
     campaigns: [{ externalId: 'hubspot-campaign-7', name: 'Follow-up', content: 'Hello' }],
   }), /Integration does not belong to this company/);
 });
+
+test('rejects a missing API-key owner before creating a tenant campaign', async () => {
+  let createCalls = 0;
+  const service = new CrmCampaignSyncService({
+    crmIntegrationBelongsToCompany: async () => true,
+    getCrmExternalMapping: async () => undefined,
+    saveCrmExternalMapping: async () => undefined,
+  }, {
+    createCampaign: async () => {
+      createCalls += 1;
+      return { id: 71 };
+    },
+    getCampaignById: async () => { throw new Error('not expected'); },
+    updateCampaign: async () => { throw new Error('not expected'); },
+  });
+
+  await assert.rejects(() => service.syncBatch({
+    companyId: 12,
+    integrationId: 3,
+    campaigns: [{ externalId: 'hubspot-campaign-7', name: 'Follow-up', content: 'Hello' }],
+  }), /A valid API-key owner is required/);
+
+  assert.equal(createCalls, 0);
+});

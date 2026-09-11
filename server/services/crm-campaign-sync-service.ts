@@ -57,7 +57,8 @@ export class CrmCampaignSyncService {
     if (!await this.mappings.crmIntegrationBelongsToCompany(input.companyId, input.integrationId)) {
       throw new Error('Integration does not belong to this company');
     }
-    if (!Number.isSafeInteger(input.actorUserId) || input.actorUserId <= 0) {
+    const actorUserId = input.actorUserId;
+    if (typeof actorUserId !== 'number' || !Number.isSafeInteger(actorUserId) || actorUserId <= 0) {
       throw new Error('A valid API-key owner is required to create campaigns');
     }
 
@@ -82,7 +83,7 @@ export class CrmCampaignSyncService {
         continue;
       }
 
-      const created = await this.campaigns.createCampaign(input.companyId, input.actorUserId, values);
+      const created = await this.campaigns.createCampaign(input.companyId, actorUserId, values);
       await this.mappings.saveCrmExternalMapping(
         input.companyId,
         input.integrationId,

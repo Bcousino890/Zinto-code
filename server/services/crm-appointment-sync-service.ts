@@ -27,7 +27,7 @@ function assertNonEmptyString(value: unknown, field: 'externalId' | 'title' | 's
 }
 
 function assertPositiveInteger(value: unknown, field: 'contactId'): asserts value is number {
-  if (!Number.isSafeInteger(value) || value <= 0) {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value <= 0) {
     throw new Error(`${field} must be a positive integer`);
   }
 }

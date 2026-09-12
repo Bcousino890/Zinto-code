@@ -5,14 +5,14 @@ import express from 'express';
 
 const { registerCrmIntegrationManagementRoutes } = await import('../../server/routes/crm-integration-management-routes');
 
-function createApp(storage: any, user: any = { id: 7, companyId: 41, role: 'admin', isSuperAdmin: false }) {
+function createApp(storage: any, user: any = { id: 7, companyId: 41, role: 'admin', isSuperAdmin: false }, secretOptions: any = {
+  createSecret: () => 'zinto_whsec_test-secret',
+  encryptSecret: (secret: string) => `encrypted:${secret}`,
+}) {
   const app = express();
   app.use(express.json());
   app.use((req: any, _res, next) => { req.user = user; next(); });
-  registerCrmIntegrationManagementRoutes(app, storage, (_req, _res, next) => next(), {
-    createSecret: () => 'zinto_whsec_test-secret',
-    encryptSecret: (secret: string) => `encrypted:${secret}`,
-  });
+  registerCrmIntegrationManagementRoutes(app, storage, (_req, _res, next) => next(), secretOptions);
   return app;
 }
 
@@ -108,6 +108,23 @@ test('rotates a webhook secret and deletes an integration within the authenticat
     assert.equal(remove.status, 204);
     assert.deepEqual(updates, [{ id: 9, companyId: 41, data: { webhookSecretEncrypted: 'encrypted:zinto_whsec_test-secret' } }]);
     assert.deepEqual(deleted, [{ id: 9, companyId: 41 }]);
+  });
+});
+
+test('reports missing encryption configuration instead of hiding the webhook secret failure', async () => {
+  const app = createApp({
+    async getCrmIntegrationByIdAndCompany(id: number, companyId: number) {
+      return { id, companyId, name: 'CRM', provider: 'custom', status: 'active', scopes: [], conflictRules: {}, webhookUrl: null, webhookSecretEncrypted: 'encrypted:old', createdAt: new Date(), updatedAt: new Date() };
+    },
+    async updateCrmIntegration() { throw new Error('ENCRYPTION_KEY is required'); },
+  }, undefined, {
+    createSecret: () => 'zinto_whsec_test-secret',
+    encryptSecret: () => { throw new Error('ENCRYPTION_KEY is required'); },
+  });
+  await withServer(app, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/settings/crm-integrations/9/rotate-secret`, { method: 'POST' });
+    assert.equal(response.status, 503);
+    assert.deepEqual(await response.json(), { error: 'ENCRYPTION_NOT_CONFIGURED', message: 'El servidor no tiene configurada ENCRYPTION_KEY; no se puede generar ni rotar el secreto del webhook.' });
   });
 });
 

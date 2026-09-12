@@ -1,7 +1,7 @@
 export type CrmIntegrationStatus = 'draft' | 'active' | 'inactive' | 'paused';
 
 export interface CrmIntegration {
-  id: number;
+  id: string | number;
   name: string;
   provider: string;
   status: CrmIntegrationStatus;
@@ -25,7 +25,7 @@ export interface CreatedCrmIntegration extends CrmIntegration {
 
 export type CrmIntegrationAction = 'rotate-secret' | 'delete';
 
-export function buildCrmIntegrationAction(id: number, action: CrmIntegrationAction): { method: 'POST' | 'DELETE'; url: string } {
+export function buildCrmIntegrationAction(id: string | number, action: CrmIntegrationAction): { method: 'POST' | 'DELETE'; url: string } {
   const encodedId = encodeURIComponent(String(id));
   return action === 'rotate-secret'
     ? { method: 'POST', url: `/api/settings/crm-integrations/${encodedId}/rotate-secret` }
@@ -60,8 +60,11 @@ export function normalizeCrmIntegrations(payload: unknown): CrmIntegration[] {
 
   return records.flatMap((value) => {
     const record = asRecord(value);
-    const id = Number(record.id ?? record.integration_id);
-    if (!Number.isSafeInteger(id) || id <= 0) return [];
+    const rawId = record.id ?? record.integration_id;
+    const id = typeof rawId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(rawId)
+      ? rawId
+      : Number(rawId);
+    if ((typeof id === 'number' && (!Number.isSafeInteger(id) || id <= 0)) || (typeof id !== 'number' && !id)) return [];
     const scopes = record.scopes ?? record.permissions;
     return [{
       id,

@@ -1147,6 +1147,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }),
     dealPipelineSync: createCrmDealPipelineApiV2Service(createCrmDealStorageAdapter(storage)),
     campaignSync: new CrmCampaignSyncService(storage, new CampaignService()),
+    resolveIntegrationId: async (companyId, publicId) => {
+      const integration = await storage.getCrmIntegrationByPublicIdAndCompany(publicId, companyId);
+      return integration?.id;
+    },
   }));
 
   registerPlanRoutes(app);

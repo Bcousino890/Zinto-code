@@ -879,6 +879,7 @@ export interface IStorage {
   updateCrmIntegration(id: number, companyId: number, data: any): Promise<any | undefined>;
   deleteCrmIntegration(id: number, companyId: number): Promise<boolean>;
   crmIntegrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean>;
+  getCrmIntegrationByPublicIdAndCompany(publicId: string, companyId: number): Promise<any | undefined>;
   getCrmIntegrationOperations(companyId: number): Promise<any[]>;
   saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void>;
   getCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal' | 'campaign', externalId: string): Promise<{ zintoId: string } | undefined>;
@@ -5018,6 +5019,14 @@ export class DatabaseStorage implements IStorage {
   async getCrmIntegrationByIdAndCompany(id: number, companyId: number): Promise<any | undefined> {
     const [integration] = await db.select().from(crmIntegrations).where(and(
       eq(crmIntegrations.id, id),
+      eq(crmIntegrations.companyId, companyId),
+    )).limit(1);
+    return integration;
+  }
+
+  async getCrmIntegrationByPublicIdAndCompany(publicId: string, companyId: number): Promise<any | undefined> {
+    const [integration] = await db.select().from(crmIntegrations).where(and(
+      eq(crmIntegrations.publicId, publicId),
       eq(crmIntegrations.companyId, companyId),
     )).limit(1);
     return integration;

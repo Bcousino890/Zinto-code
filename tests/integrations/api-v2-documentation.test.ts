@@ -29,6 +29,9 @@ test('documentation explains how to obtain the company Integration ID', () => {
   assert.match(document.info.description, /Integration ID/i);
   assert.match(document.info.description, /Configuración.*Acceso API/i);
   assert.match(document.components.securitySchemes.bearerAuth?.description ?? '', /Integration ID/i);
+  const serialized = JSON.stringify(document);
+  assert.match(serialized, /"format":"uuid"/);
+  assert.doesNotMatch(serialized, /Integration ID numérico/);
 });
 
 test('downloadable Postman collection uses header authentication and v2 URLs', () => {

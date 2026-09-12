@@ -7,7 +7,7 @@ const errorResponses = {
   '429': { description: 'Límite de frecuencia excedido', content: json({ $ref: '#/components/schemas/Error' }) },
 };
 
-const integrationHeader = { name: 'X-Zinto-Integration-Id', in: 'header', required: true, schema: { type: 'integer', minimum: 1 }, description: 'Identificador de la integración CRM creada en Zinto.' };
+const integrationHeader = { name: 'X-Zinto-Integration-Id', in: 'header', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Identificador público aleatorio de la integración CRM creada en Zinto.' };
 const idempotencyHeader = { name: 'Idempotency-Key', in: 'header', required: true, schema: { type: 'string', minLength: 8, maxLength: 128 }, description: 'Clave única para reintentos seguros durante 24 horas.' };
 
 export function getApiV2OpenApiDocument() {
@@ -34,7 +34,7 @@ export function getApiV2OpenApiDocument() {
       '/sync-jobs': { post: { tags: ['Sincronización'], summary: 'Planificar sincronización inicial', security: [{ bearerAuth: [] }], parameters: [integrationHeader, idempotencyHeader], requestBody: { required: true, content: json({ $ref: '#/components/schemas/SyncJobInput' }) }, responses: { '202': { description: 'Plan de sincronización creado' }, ...errorResponses } } },
     },
     components: {
-      securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'API key', description: 'Use Authorization: Bearer TU_API_KEY. Nunca envíe la clave en la URL. En las operaciones de recursos incluya también X-Zinto-Integration-Id con el Integration ID numérico que aparece en Configuración → Acceso API → Integraciones CRM.' } },
+      securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'API key', description: 'Use Authorization: Bearer TU_API_KEY. Nunca envíe la clave en la URL. En las operaciones de recursos incluya también X-Zinto-Integration-Id con el Integration ID UUID que aparece en Configuración → Acceso API → Integraciones CRM.' } },
       schemas: {
         Health: { type: 'object', required: ['status', 'version'], properties: { status: { type: 'string', example: 'ok' }, version: { type: 'string', example: 'v2' } } },
         ContactInput: { type: 'object', required: ['name'], properties: { name: { type: 'string' }, phone: { type: 'string' }, email: { type: 'string', format: 'email' }, company: { type: 'string' }, tags: { type: 'array', items: { type: 'string' } }, customFields: { type: 'object', additionalProperties: true } } },

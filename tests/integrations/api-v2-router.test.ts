@@ -53,6 +53,7 @@ async function withServer(
   appointmentSync?: AppointmentSync,
   dealPipelineSync?: DealPipelineSync,
   initialSync?: InitialSync,
+  resolveIntegrationId?: (companyId: number, publicId: string) => Promise<number | undefined>,
 ) {
   const app = express();
   app.use(express.json());
@@ -64,6 +65,7 @@ async function withServer(
     appointmentSync,
     dealPipelineSync,
     initialSync,
+    resolveIntegrationId,
   }));
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -164,6 +166,30 @@ test('upserts a contact from a permitted CRM without exposing another company', 
     companyId: 12, integrationId: 3, externalId: 'hubspot-441',
     contact: { name: 'Andrea Díaz', phone: '+56912345678' },
   }]);
+});
+
+test('resolves an opaque UUID integration ID before dispatching a CRM operation', async () => {
+  const received: unknown[] = [];
+  const contactSync = {
+    upsert: async (input: unknown) => { received.push(input); return { created: false, contact: { id: 91 } }; },
+  } as Pick<CrmContactSyncService, 'upsert'>;
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['contacts:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/contacts/crm-441`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612' },
+      body: JSON.stringify({ name: 'Andrea Díaz' }),
+    });
+    assert.equal(response.status, 200);
+  }, contactSync, undefined, undefined, undefined, undefined, undefined,
+    async (companyId, publicId) => {
+      assert.equal(companyId, 12);
+      assert.equal(publicId, '7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612');
+      return 3;
+    });
+  assert.deepEqual(received, [{ companyId: 12, integrationId: 3, externalId: 'crm-441', contact: { name: 'Andrea Díaz' } }]);
 });
 
 test('queues a normalized CRM message from a permitted integration', async () => {

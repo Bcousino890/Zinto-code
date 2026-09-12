@@ -893,6 +893,8 @@ export const apiWebhooks = pgTable("api_webhooks", {
 // data across tenants.
 export const crmIntegrations = pgTable("crm_integrations", {
   id: serial("id").primaryKey(),
+  // Opaque identifier exposed to CRM clients. Keep the serial ID internal for joins.
+  publicId: uuid("public_id").notNull().defaultRandom().unique(),
   companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
   name: text("name").notNull(),
   provider: text("provider").notNull().default('custom'),

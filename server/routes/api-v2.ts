@@ -14,6 +14,7 @@ import type {
 } from '../services/initial-crm-synchronization-plan';
 
 type AuthenticationMiddleware = (req: Request, res: Response, next: NextFunction) => void;
+type IntegrationIdResolver = (companyId: number, publicId: string) => Promise<number | undefined>;
 type MessageSync = {
   send(input: {
     companyId: number;
@@ -43,6 +44,10 @@ type InitialSync = {
   }): InitialCrmSynchronizationPlan | Promise<InitialCrmSynchronizationPlan>;
 };
 
+function isPositiveIntegrationId(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
+}
+
 export function createApiV2Router({
   authenticate,
   contactSync,
@@ -51,6 +56,7 @@ export function createApiV2Router({
   appointmentSync,
   dealPipelineSync,
   initialSync,
+  resolveIntegrationId,
 }: {
   authenticate: AuthenticationMiddleware;
   contactSync?: Pick<CrmContactSyncService, 'upsert'>;
@@ -59,6 +65,7 @@ export function createApiV2Router({
   appointmentSync?: AppointmentSync;
   dealPipelineSync?: DealPipelineSync;
   initialSync?: InitialSync;
+  resolveIntegrationId?: IntegrationIdResolver;
 }) {
   const router = Router();
 
@@ -86,6 +93,17 @@ export function createApiV2Router({
 
   router.use(authenticate);
 
+  const getIntegrationId = async (req: Request): Promise<number | undefined> => {
+    const raw = req.header('X-Zinto-Integration-Id')?.trim();
+    if (!raw) return undefined;
+    if (/^\d+$/.test(raw)) {
+      const legacyId = Number(raw);
+      return Number.isSafeInteger(legacyId) && legacyId > 0 ? legacyId : undefined;
+    }
+    if (!req.companyId || !resolveIntegrationId) return undefined;
+    return resolveIntegrationId(req.companyId, raw);
+  };
+
   router.get('/capabilities', requireIntegrationScope('integrations:manage'), (_req, res) => {
     res.json(integrationCapabilities());
   });
@@ -93,11 +111,11 @@ export function createApiV2Router({
   if (contactSync) {
     router.put('/contacts/:externalId', requireIntegrationScope('contacts:write'), async (req, res) => {
       const companyId = req.companyId;
-      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const integrationId = await getIntegrationId(req);
       const externalId = req.params.externalId?.trim();
       const contact = req.body;
 
-      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !externalId || typeof contact?.name !== 'string' || !contact.name.trim()) {
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !externalId || typeof contact?.name !== 'string' || !contact.name.trim()) {
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, external ID and contact name are required' });
       }
 
@@ -125,10 +143,10 @@ export function createApiV2Router({
   if (messageSync) {
     router.post('/messages', requireIntegrationScope('messages:send'), async (req, res) => {
       const companyId = req.companyId;
-      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const integrationId = await getIntegrationId(req);
       const { channelId, recipient, text, external_message_id: externalMessageId } = req.body ?? {};
 
-      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !Number.isInteger(channelId) || channelId <= 0 || typeof recipient !== 'string' || !recipient.trim() || typeof text !== 'string' || !text.trim() || (externalMessageId !== undefined && typeof externalMessageId !== 'string')) {
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !Number.isInteger(channelId) || channelId <= 0 || typeof recipient !== 'string' || !recipient.trim() || typeof text !== 'string' || !text.trim() || (externalMessageId !== undefined && typeof externalMessageId !== 'string')) {
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive channel ID, recipient and text are required' });
       }
 
@@ -166,10 +184,10 @@ export function createApiV2Router({
   if (campaignSync) {
     router.post('/campaigns/batch', requireIntegrationScope('campaigns:write'), async (req, res) => {
       const companyId = req.companyId;
-      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const integrationId = await getIntegrationId(req);
       const campaigns = req.body?.campaigns;
 
-      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !Array.isArray(campaigns) || campaigns.some((campaign) => !campaign || typeof campaign.externalId !== 'string' || !campaign.externalId.trim())) {
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !Array.isArray(campaigns) || campaigns.some((campaign) => !campaign || typeof campaign.externalId !== 'string' || !campaign.externalId.trim())) {
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and campaigns with external IDs are required' });
       }
 
@@ -202,11 +220,11 @@ export function createApiV2Router({
   if (appointmentSync) {
     router.put('/appointments/:externalId', requireIntegrationScope('appointments:write'), async (req, res) => {
       const companyId = req.companyId;
-      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const integrationId = await getIntegrationId(req);
       const externalId = req.params.externalId?.trim();
       const idempotencyKey = req.header('Idempotency-Key');
 
-      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !externalId || !idempotencyKey?.trim()) {
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !externalId || !idempotencyKey?.trim()) {
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, external ID, and Idempotency-Key are required' });
       }
 
@@ -231,10 +249,10 @@ export function createApiV2Router({
   if (dealPipelineSync) {
     router.post('/deals', requireIntegrationScope('deals:write'), async (req, res) => {
       const companyId = req.companyId;
-      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const integrationId = await getIntegrationId(req);
       const idempotencyKey = req.header('Idempotency-Key');
 
-      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !idempotencyKey?.trim()) {
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !idempotencyKey?.trim()) {
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and Idempotency-Key are required' });
       }
 
@@ -258,10 +276,10 @@ export function createApiV2Router({
   if (initialSync) {
     router.post('/sync-jobs', requireIntegrationScope('integrations:manage'), async (req, res) => {
       const companyId = req.companyId;
-      const integrationId = Number(req.header('X-Zinto-Integration-Id'));
+      const integrationId = await getIntegrationId(req);
       const idempotencyKey = req.header('Idempotency-Key');
 
-      if (!companyId || !Number.isInteger(integrationId) || integrationId <= 0 || !idempotencyKey?.trim()) {
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !idempotencyKey?.trim()) {
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and Idempotency-Key are required' });
       }
 

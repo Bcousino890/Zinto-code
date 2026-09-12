@@ -5,6 +5,7 @@ import { generateWebhookSecret } from '../utils/webhook-token-generator';
 
 type CrmIntegrationRecord = {
   id: number;
+  publicId?: string | null;
   companyId: number;
   name: string;
   provider: string;
@@ -20,6 +21,7 @@ type CrmIntegrationRecord = {
 type CrmIntegrationManagementStorage = {
   getCrmIntegrationsByCompanyId(companyId: number): Promise<CrmIntegrationRecord[]>;
   getCrmIntegrationByIdAndCompany(id: number, companyId: number): Promise<CrmIntegrationRecord | undefined>;
+  getCrmIntegrationByPublicIdAndCompany?(publicId: string, companyId: number): Promise<CrmIntegrationRecord | undefined>;
   createCrmIntegration(data: Omit<CrmIntegrationRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<CrmIntegrationRecord>;
   updateCrmIntegration(id: number, companyId: number, data: Partial<Omit<CrmIntegrationRecord, 'id' | 'companyId' | 'createdAt' | 'updatedAt'>>): Promise<CrmIntegrationRecord | undefined>;
   deleteCrmIntegration?(id: number, companyId: number): Promise<boolean>;
@@ -54,6 +56,10 @@ function parseId(value: unknown): number | undefined {
   return Number.isSafeInteger(id) && id > 0 ? id : undefined;
 }
 
+function isPublicId(value: unknown): value is string {
+  return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 function parseWebhookUrl(value: unknown): string | null | undefined {
   if (value === null || value === undefined || value === '') return null;
   if (typeof value !== 'string' || value.length > 2048) throw new Error('webhookUrl debe ser una URL HTTPS válida');
@@ -85,7 +91,8 @@ function secret(options: SecretOptions): string {
 
 function publicIntegration(integration: CrmIntegrationRecord) {
   const { webhookSecretEncrypted: _secret, companyId: _company, ...safe } = integration;
-  return { ...safe, id: integration.id, integrationId: integration.id };
+  const externalId = integration.publicId ?? integration.id;
+  return { ...safe, id: externalId, integrationId: externalId };
 }
 
 function publicCreatedIntegration(integration: CrmIntegrationRecord, webhookSecret: string) {
@@ -93,6 +100,9 @@ function publicCreatedIntegration(integration: CrmIntegrationRecord, webhookSecr
 }
 
 function handleError(res: any, error: unknown) {
+  if (error instanceof Error && /ENCRYPTION_KEY/i.test(error.message)) {
+    return res.status(503).json({ error: 'ENCRYPTION_NOT_CONFIGURED', message: 'El servidor no tiene configurada ENCRYPTION_KEY; no se puede generar ni rotar el secreto del webhook.' });
+  }
   if (error instanceof Error && (/(?:obligatorio|inválido|debe |Unknown integration scope)/i.test(error.message))) {
     return res.status(400).json({ error: 'VALIDATION_ERROR', message: error.message });
   }
@@ -109,6 +119,14 @@ export function registerCrmIntegrationManagementRoutes(
 ) {
   app.use('/api/settings/crm-integrations', ensureAuthenticated, requireCompanyAdmin);
 
+  const resolveId = async (value: unknown, companyId: number): Promise<number | undefined> => {
+    const legacyId = parseId(value);
+    if (legacyId) return legacyId;
+    if (!isPublicId(value) || !storage.getCrmIntegrationByPublicIdAndCompany) return undefined;
+    const integration = await storage.getCrmIntegrationByPublicIdAndCompany(value, companyId);
+    return integration?.id;
+  };
+
   app.get('/api/settings/crm-integrations', async (req: any, res) => {
     try {
       const integrations = await storage.getCrmIntegrationsByCompanyId(req.user.companyId);
@@ -118,7 +136,7 @@ export function registerCrmIntegrationManagementRoutes(
 
   app.get('/api/settings/crm-integrations/:id', async (req: any, res) => {
     try {
-      const id = parseId(req.params.id);
+      const id = await resolveId(req.params.id, req.user.companyId);
       if (!id) return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'ID de integración inválido' });
       const integration = await storage.getCrmIntegrationByIdAndCompany(id, req.user.companyId);
       if (!integration) return res.status(404).json({ error: 'CRM_INTEGRATION_NOT_FOUND', message: 'Integración CRM no encontrada' });
@@ -147,7 +165,7 @@ export function registerCrmIntegrationManagementRoutes(
 
   app.patch('/api/settings/crm-integrations/:id', async (req: any, res) => {
     try {
-      const id = parseId(req.params.id);
+      const id = await resolveId(req.params.id, req.user.companyId);
       if (!id) return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'ID de integración inválido' });
       const existing = await storage.getCrmIntegrationByIdAndCompany(id, req.user.companyId);
       if (!existing) return res.status(404).json({ error: 'CRM_INTEGRATION_NOT_FOUND', message: 'Integración CRM no encontrada' });
@@ -167,7 +185,7 @@ export function registerCrmIntegrationManagementRoutes(
   for (const [path, status] of [['activate', 'active'], ['deactivate', 'inactive']] as const) {
     app.post(`/api/settings/crm-integrations/:id/${path}`, async (req: any, res) => {
       try {
-        const id = parseId(req.params.id);
+        const id = await resolveId(req.params.id, req.user.companyId);
         if (!id) return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'ID de integración inválido' });
         const existing = await storage.getCrmIntegrationByIdAndCompany(id, req.user.companyId);
         if (!existing) return res.status(404).json({ error: 'CRM_INTEGRATION_NOT_FOUND', message: 'Integración CRM no encontrada' });
@@ -179,7 +197,7 @@ export function registerCrmIntegrationManagementRoutes(
 
   app.post('/api/settings/crm-integrations/:id/rotate-secret', async (req: any, res) => {
     try {
-      const id = parseId(req.params.id);
+      const id = await resolveId(req.params.id, req.user.companyId);
       if (!id) return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'ID de integración inválido' });
       const existing = await storage.getCrmIntegrationByIdAndCompany(id, req.user.companyId);
       if (!existing) return res.status(404).json({ error: 'CRM_INTEGRATION_NOT_FOUND', message: 'Integración CRM no encontrada' });
@@ -192,7 +210,7 @@ export function registerCrmIntegrationManagementRoutes(
   if (storage.deleteCrmIntegration) {
     app.delete('/api/settings/crm-integrations/:id', async (req: any, res) => {
       try {
-        const id = parseId(req.params.id);
+        const id = await resolveId(req.params.id, req.user.companyId);
         if (!id) return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'ID de integración inválido' });
         const deleted = await storage.deleteCrmIntegration!(id, req.user.companyId);
         return deleted ? res.status(204).send() : res.status(404).json({ error: 'CRM_INTEGRATION_NOT_FOUND', message: 'Integración CRM no encontrada' });

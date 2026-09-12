@@ -22,7 +22,7 @@ La API Key y el Integration ID son credenciales diferentes. El Integration ID id
 1. En Zinto, abra **Configuración → Acceso API → Integraciones CRM**.
 2. Pulse **Crear integración**, indique el nombre y proveedor, configure el webhook HTTPS y seleccione los permisos mínimos.
 3. Active la integración cuando la URL y el receptor del webhook estén listos.
-4. Copie el número mostrado como **Integration ID**. El secreto del webhook se muestra una sola vez; guárdelo en un gestor de secretos.
+4. Copie el identificador UUID aleatorio mostrado como **Integration ID**. El secreto del webhook se muestra una sola vez; guárdelo en un gestor de secretos.
 5. Cree o asocie una API Key para esa empresa y sustituya \`TU_API_KEY\` e \`ID_DE_INTEGRACION\` en su integración.
 
 El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo o un valor ficticio será rechazado; nunca envíe \`companyId\` para intentar cambiar el alcance.

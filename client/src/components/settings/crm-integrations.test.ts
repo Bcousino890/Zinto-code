@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import { buildCrmIntegrationAction, buildCrmIntegrationPayload, normalizeCrmIntegrations } from './crm-integrations';
 
 test('builds safe action requests for rotating secrets and deleting an integration', () => {
-  assert.deepEqual(buildCrmIntegrationAction(12, 'rotate-secret'), {
+  assert.deepEqual(buildCrmIntegrationAction('7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612', 'rotate-secret'), {
     method: 'POST',
-    url: '/api/settings/crm-integrations/12/rotate-secret',
+    url: '/api/settings/crm-integrations/7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612/rotate-secret',
   });
-  assert.deepEqual(buildCrmIntegrationAction(12, 'delete'), {
+  assert.deepEqual(buildCrmIntegrationAction('7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612', 'delete'), {
     method: 'DELETE',
-    url: '/api/settings/crm-integrations/12',
+    url: '/api/settings/crm-integrations/7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612',
   });
 });
 
@@ -45,4 +45,8 @@ test('normalizes API integration records and supports snake_case responses', () 
     scopes: ['contacts:read'],
     createdAt: '2026-09-12T00:00:00.000Z',
   }]);
+});
+
+test('preserves opaque UUID integration IDs for external clients', () => {
+  assert.equal(normalizeCrmIntegrations([{ id: '7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612', name: 'CRM', provider: 'generic', status: 'active', scopes: [] }])[0]?.id, '7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612');
 });

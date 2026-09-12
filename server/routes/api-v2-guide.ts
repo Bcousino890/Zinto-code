@@ -8,12 +8,24 @@ Incluya la clave API en el encabezado de cada petición protegida. Nunca la incl
 
 ~~~http
 Authorization: Bearer TU_API_KEY
-X-Zinto-Integration-Id: 123
+X-Zinto-Integration-Id: ID_DE_INTEGRACION
 Content-Type: application/json
 Idempotency-Key: una-clave-unica-por-operacion
 ~~~
 
 La clave se crea en Configuración → Acceso API → Crear clave API. Seleccione Sandbox para pruebas y Producción para datos reales. Conceda solo los permisos necesarios.
+
+## Obtener el Integration ID
+
+La API Key y el Integration ID son credenciales diferentes. El Integration ID identifica la conexión CRM de una empresa y debe enviarse en la cabecera \`X-Zinto-Integration-Id\`; no se coloca en la URL ni se inventa a partir del ejemplo de esta guía.
+
+1. En Zinto, abra **Configuración → Acceso API → Integraciones CRM**.
+2. Pulse **Crear integración**, indique el nombre y proveedor, configure el webhook HTTPS y seleccione los permisos mínimos.
+3. Active la integración cuando la URL y el receptor del webhook estén listos.
+4. Copie el número mostrado como **Integration ID**. El secreto del webhook se muestra una sola vez; guárdelo en un gestor de secretos.
+5. Cree o asocie una API Key para esa empresa y sustituya \`TU_API_KEY\` e \`ID_DE_INTEGRACION\` en su integración.
+
+El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo o un valor ficticio será rechazado; nunca envíe \`companyId\` para intentar cambiar el alcance.
 
 ## Flujo bidireccional
 
@@ -29,6 +41,8 @@ La clave se crea en Configuración → Acceso API → Crear clave API. Seleccion
 | --- | --- | --- |
 | GET | /health | Público |
 | GET | /openapi.json | Público |
+| GET | /postman.json | Público |
+| GET | /guide.md | Público |
 | GET | /capabilities | integrations:manage |
 | PUT | /contacts/{externalId} | contacts:write |
 | POST | /messages | messages:send |
@@ -42,7 +56,7 @@ La clave se crea en Configuración → Acceso API → Crear clave API. Seleccion
 ~~~bash
 curl -X POST https://crm.zinto.app/api/v2/messages \\
   -H "Authorization: Bearer TU_API_KEY" \\
-  -H "X-Zinto-Integration-Id: 123" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
   -H "Content-Type: application/json" \\
   -d '{"channelId":1,"recipient":"+56912345678","text":"Hola desde el CRM","external_message_id":"crm-msg-8841"}'
 ~~~

@@ -46,13 +46,13 @@ export function getApiV2PostmanCollection() {
     info: {
       _postman_id: '0c8324db-5703-49a0-825c-d3ad14d9b53f',
       name: 'Zinto CRM Integration API v2',
-      description: 'Colección oficial para integrar contactos, mensajes, agenda, pipeline, campañas y sincronización bidireccional con Zinto.',
+      description: 'Colección oficial para integrar contactos, mensajes, agenda, pipeline, campañas y sincronización bidireccional con Zinto. Antes de enviar peticiones protegidas, un administrador debe crear la integración en Configuración → Acceso API → Integraciones CRM y reemplazar apiKey e integrationId por valores reales. El ID de ejemplo no es válido.',
       schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
     },
     variable: [
       { key: 'baseUrl', value: 'https://crm.zinto.app', type: 'string' },
       { key: 'apiKey', value: 'REEMPLAZAR_CON_SU_CLAVE_API', type: 'string' },
-      { key: 'integrationId', value: '1', type: 'string' },
+      { key: 'integrationId', value: 'REEMPLAZAR_CON_ID_DE_INTEGRACION', type: 'string' },
       { key: 'externalContactId', value: 'crm-contact-123', type: 'string' },
       { key: 'externalAppointmentId', value: 'crm-appointment-123', type: 'string' },
     ],

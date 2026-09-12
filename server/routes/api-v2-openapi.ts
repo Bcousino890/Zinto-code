@@ -13,7 +13,11 @@ const idempotencyHeader = { name: 'Idempotency-Key', in: 'header', required: tru
 export function getApiV2OpenApiDocument() {
   return {
     openapi: '3.1.0',
-    info: { title: 'Zinto CRM — API bidireccional', version: '2.0.0', description: 'Contrato oficial para sincronizar contactos, conversaciones, mensajes, agenda, pipeline y campañas entre un CRM y Zinto.' },
+    info: {
+      title: 'Zinto CRM — API bidireccional',
+      version: '2.0.0',
+      description: 'Contrato oficial para sincronizar contactos, conversaciones, mensajes, agenda, pipeline y campañas entre un CRM y Zinto. Antes de realizar peticiones protegidas, un administrador debe crear una integración CRM en Configuración → Acceso API → Integraciones CRM, copiar su Integration ID y asociar una API Key con los permisos mínimos necesarios.',
+    },
     servers: [{ url: 'https://crm.zinto.app/api/v2', description: 'Producción' }, { url: 'https://sandbox.crm.zinto.app/api/v2', description: 'Sandbox (si está habilitado)' }],
     tags: [{ name: 'Disponibilidad' }, { name: 'Administración' }, { name: 'Contactos' }, { name: 'Mensajes' }, { name: 'Campañas' }, { name: 'Agenda' }, { name: 'Pipeline' }, { name: 'Sincronización' }],
     paths: {
@@ -30,7 +34,7 @@ export function getApiV2OpenApiDocument() {
       '/sync-jobs': { post: { tags: ['Sincronización'], summary: 'Planificar sincronización inicial', security: [{ bearerAuth: [] }], parameters: [integrationHeader, idempotencyHeader], requestBody: { required: true, content: json({ $ref: '#/components/schemas/SyncJobInput' }) }, responses: { '202': { description: 'Plan de sincronización creado' }, ...errorResponses } } },
     },
     components: {
-      securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'API key', description: 'Use Authorization: Bearer TU_API_KEY. Nunca envíe la clave en la URL.' } },
+      securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'API key', description: 'Use Authorization: Bearer TU_API_KEY. Nunca envíe la clave en la URL. En las operaciones de recursos incluya también X-Zinto-Integration-Id con el Integration ID numérico que aparece en Configuración → Acceso API → Integraciones CRM.' } },
       schemas: {
         Health: { type: 'object', required: ['status', 'version'], properties: { status: { type: 'string', example: 'ok' }, version: { type: 'string', example: 'v2' } } },
         ContactInput: { type: 'object', required: ['name'], properties: { name: { type: 'string' }, phone: { type: 'string' }, email: { type: 'string', format: 'email' }, company: { type: 'string' }, tags: { type: 'array', items: { type: 'string' } }, customFields: { type: 'object', additionalProperties: true } } },

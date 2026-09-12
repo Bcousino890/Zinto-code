@@ -26,6 +26,10 @@ La API Key y el Integration ID son credenciales diferentes. El Integration ID id
 
 El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo o un valor ficticio será rechazado; nunca envíe \`companyId\` para intentar cambiar el alcance. El secreto del webhook solo sirve para verificar firmas entrantes; no sustituye a la API Key.
 
+### Si /capabilities devuelve 403
+
+\`GET /capabilities\` solo requiere \`Authorization: Bearer TU_API_KEY\` y el permiso \`integrations:manage\`; el encabezado \`X-Zinto-Integration-Id\` es opcional en esta ruta. Las API Keys se vinculan al tenant de la empresa, no a un Integration ID individual: Zinto valida el UUID en las rutas de recursos y comprueba el scope en la API Key. Si recibe \`INSUFFICIENT_PERMISSIONS\`, edite la clave en **Configuración → Acceso API**, añada \`integrations:manage\` y repita la prueba sin activar v2.
+
 ## Flujo bidireccional
 
 1. El CRM envía un mensaje a POST /messages.

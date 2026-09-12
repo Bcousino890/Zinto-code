@@ -42,6 +42,17 @@ en las peticiones API.
 
 Base URL: `https://crm.zinto.app/api/v2`.
 
+### Diagnóstico de `403` en `/capabilities`
+
+`GET /capabilities` solo necesita `Authorization: Bearer $API_KEY` y que la
+clave tenga `integrations:manage`; el header `X-Zinto-Integration-Id` puede
+omitirse en esta ruta. La clave y la integración deben pertenecer a la misma
+empresa (tenant), pero no existe una asociación directa entre ambas. Si la
+respuesta es `INSUFFICIENT_PERMISSIONS`, un administrador debe editar la API
+Key en **Configuración → Acceso API → Claves API**, activar
+`integrations:manage` y repetir la prueba. No active v2 para resolver este
+error: v1 seguirá funcionando mientras se corrige el permiso.
+
 ## Rutas
 
 | Método | Ruta | Permiso |

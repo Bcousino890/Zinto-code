@@ -100,6 +100,20 @@ test('publishes an OpenAPI document for CRM developers', async () => {
   });
 });
 
+test('provides downloadable Postman and Markdown documentation', async () => {
+  await withServer((_req, _res, next) => next(), async (baseUrl) => {
+    const postman = await fetch(`${baseUrl}/api/v2/postman.json`);
+    assert.equal(postman.status, 200);
+    assert.match(postman.headers.get('content-disposition') ?? '', /attachment/);
+    assert.equal((await postman.json() as { info: { name: string } }).info.name, 'Zinto CRM Integration API v2');
+
+    const guide = await fetch(`${baseUrl}/api/v2/guide.md`);
+    assert.equal(guide.status, 200);
+    assert.match(guide.headers.get('content-disposition') ?? '', /zinto-crm-api-v2-guia\.md/);
+    assert.match(await guide.text(), /Flujo bidireccional/);
+  });
+});
+
 test('does not disclose CRM capabilities to a key without integration permission', async () => {
   await withServer((req, _res, next) => {
     req.apiKey = { permissions: ['messages:send'] } as any;

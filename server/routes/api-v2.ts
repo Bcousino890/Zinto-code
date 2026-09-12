@@ -1,6 +1,8 @@
 import { Router, type NextFunction, type Request, type Response } from 'express';
 import { integrationCapabilities, requireIntegrationScope } from '../middleware/integration-scope';
 import { getApiV2OpenApiDocument } from './api-v2-openapi';
+import { getApiV2PostmanCollection } from './api-v2-postman';
+import { API_V2_GUIDE_MARKDOWN } from './api-v2-guide';
 import { validateCampaignBatch, type CampaignBatchItem } from '../services/campaign-batch-validation';
 import type { CrmContactSyncService } from '../services/crm-contact-sync-service';
 import { normalizeOutboundCrmMessageRequest } from '../services/crm-message-sync-service';
@@ -65,7 +67,20 @@ export function createApiV2Router({
   });
 
   router.get('/openapi.json', (_req, res) => {
+    res.type('application/json');
     res.json(getApiV2OpenApiDocument());
+  });
+
+  router.get('/postman.json', (_req, res) => {
+    res.type('application/json');
+    res.set('Content-Disposition', 'attachment; filename="zinto-crm-api-v2.postman_collection.json"');
+    res.json(getApiV2PostmanCollection());
+  });
+
+  router.get('/guide.md', (_req, res) => {
+    res.type('text/markdown; charset=utf-8');
+    res.set('Content-Disposition', 'attachment; filename="zinto-crm-api-v2-guia.md"');
+    res.send(API_V2_GUIDE_MARKDOWN);
   });
 
   router.use(authenticate);

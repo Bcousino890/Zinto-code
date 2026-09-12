@@ -32,7 +32,10 @@ import {
   Calendar,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  Download,
+  FileJson,
+  FileText
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, es } from 'date-fns/locale';
@@ -527,12 +530,43 @@ export function ApiAccessTab() {
         <TabsContent value="docs" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.api_access.docs.title', 'API Documentation')}</CardTitle>
+              <CardTitle>{t('settings.api_access.docs.title', 'Documentación de la API')}</CardTitle>
               <CardDescription>
-                {t('settings.api_access.docs.description', 'Complete guide to integrate WhatsApp messaging into your applications')}
+                {t('settings.api_access.docs.description', 'Guía completa para integrar Zinto con tu CRM y tus aplicaciones')}
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-900/20">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <h4 className="font-semibold text-green-900 dark:text-green-300">API CRM bidireccional v2</h4>
+                    <p className="text-sm text-green-800 dark:text-green-300">
+                      Contactos, mensajes, agenda, pipeline, campañas, sincronización inicial y webhooks.
+                    </p>
+                    <code className="mt-2 block text-xs text-green-900 dark:text-green-200">{window.location.origin}/api/v2</code>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <a href="/api/v2/openapi.json" download="zinto-crm-api-v2.openapi.json">
+                        <FileJson className="mr-2 h-4 w-4" /> OpenAPI JSON
+                      </a>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <a href="/api/v2/postman.json" download="zinto-crm-api-v2.postman_collection.json">
+                        <Download className="mr-2 h-4 w-4" /> Colección Postman
+                      </a>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <a href="/api/v2/guide.md" download="zinto-crm-api-v2-guia.md">
+                        <FileText className="mr-2 h-4 w-4" /> Guía Markdown
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+                <div className="mt-4 rounded border border-green-300 bg-white/70 p-3 text-sm dark:border-green-800 dark:bg-black/10">
+                  <strong>Autenticación:</strong> envía la clave en <code>Authorization: Bearer TU_API_KEY</code>. Nunca la pongas en la URL.
+                </div>
+              </div>
               <Tabs defaultValue="overview" className="space-y-4">
                 <TabsList className="grid w-full grid-cols-10">
                   <TabsTrigger value="overview">{t('settings.api_access.docs.tabs.overview', 'Overview')}</TabsTrigger>
@@ -559,7 +593,7 @@ export function ApiAccessTab() {
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="bg-muted p-4 rounded-lg">
-                        <h4 className="font-medium mb-2">{t('settings.api_access.docs.base_url', 'Base URL')}</h4>
+                        <h4 className="font-medium mb-2">{t('settings.api_access.docs.messaging_v1_base_url', 'URL base — API de mensajería v1')}</h4>
                         <code className="text-sm bg-background px-3 py-2 rounded border block">
                           {window.location.origin}/api/v1
                         </code>

@@ -69180,6 +69180,14 @@
     "value": "Webhook secret"
   },
   {
+    "key": "settings.api_access.integrations.secret_dialog_title",
+    "value": "Webhook credential"
+  },
+  {
+    "key": "settings.api_access.integrations.secret_dialog_description",
+    "value": "Copy this secret and configure it in your CRM. For security, it will not be shown again."
+  },
+  {
     "key": "settings.api_access.integrations.secret_help",
     "value": "Save it now. For security, it will not be shown again."
   },
@@ -69222,6 +69230,26 @@
   {
     "key": "settings.api_access.integrations.saved",
     "value": "Integration updated."
+  },
+  {
+    "key": "settings.api_access.integrations.rotate_secret",
+    "value": "Regenerate secret"
+  },
+  {
+    "key": "settings.api_access.integrations.delete",
+    "value": "Delete"
+  },
+  {
+    "key": "settings.api_access.integrations.delete_title",
+    "value": "Delete this integration?"
+  },
+  {
+    "key": "settings.api_access.integrations.delete_description",
+    "value": "Access will be disabled and this integration configuration will be deleted. This action cannot be undone."
+  },
+  {
+    "key": "settings.api_access.integrations.delete_confirm",
+    "value": "Delete integration"
   },
   {
     "key": "settings.api_access.integrations.invalid_name",

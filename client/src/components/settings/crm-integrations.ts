@@ -23,6 +23,15 @@ export interface CreatedCrmIntegration extends CrmIntegration {
   webhookSecret?: string;
 }
 
+export type CrmIntegrationAction = 'rotate-secret' | 'delete';
+
+export function buildCrmIntegrationAction(id: number, action: CrmIntegrationAction): { method: 'POST' | 'DELETE'; url: string } {
+  const encodedId = encodeURIComponent(String(id));
+  return action === 'rotate-secret'
+    ? { method: 'POST', url: `/api/settings/crm-integrations/${encodedId}/rotate-secret` }
+    : { method: 'DELETE', url: `/api/settings/crm-integrations/${encodedId}` };
+}
+
 export function buildCrmIntegrationPayload(values: CrmIntegrationFormValues): CrmIntegrationFormValues {
   return {
     name: values.name.trim(),

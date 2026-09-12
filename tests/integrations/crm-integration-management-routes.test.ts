@@ -81,6 +81,36 @@ test('updates integration configuration and supports activation/deactivation', a
   });
 });
 
+test('rotates a webhook secret and deletes an integration within the authenticated company', async () => {
+  const updates: any[] = [];
+  const deleted: any[] = [];
+  const app = createApp({
+    async getCrmIntegrationByIdAndCompany(id: number, companyId: number) {
+      return { id, companyId, name: 'CRM', provider: 'custom', status: 'active', scopes: [], conflictRules: {}, webhookUrl: 'https://example.test/hook', webhookSecretEncrypted: 'encrypted:old', createdAt: new Date(), updatedAt: new Date() };
+    },
+    async updateCrmIntegration(id: number, companyId: number, data: any) {
+      updates.push({ id, companyId, data });
+      return { id, companyId, name: 'CRM', provider: 'custom', status: 'active', scopes: [], conflictRules: {}, webhookUrl: 'https://example.test/hook', ...data, createdAt: new Date(), updatedAt: new Date() };
+    },
+    async deleteCrmIntegration(id: number, companyId: number) {
+      deleted.push({ id, companyId });
+      return true;
+    },
+  });
+  await withServer(app, async (baseUrl) => {
+    const rotate = await fetch(`${baseUrl}/api/settings/crm-integrations/9/rotate-secret`, { method: 'POST' });
+    assert.equal(rotate.status, 200);
+    const rotated = await rotate.json();
+    assert.equal(rotated.webhookSecret, 'zinto_whsec_test-secret');
+    assert.equal(rotated.webhookSecretEncrypted, undefined);
+
+    const remove = await fetch(`${baseUrl}/api/settings/crm-integrations/9`, { method: 'DELETE' });
+    assert.equal(remove.status, 204);
+    assert.deepEqual(updates, [{ id: 9, companyId: 41, data: { webhookSecretEncrypted: 'encrypted:zinto_whsec_test-secret' } }]);
+    assert.deepEqual(deleted, [{ id: 9, companyId: 41 }]);
+  });
+});
+
 test('rejects integration management for non-admin users', async () => {
   const app = createApp({}, { id: 8, companyId: 41, role: 'agent', isSuperAdmin: false });
   await withServer(app, async (baseUrl) => {

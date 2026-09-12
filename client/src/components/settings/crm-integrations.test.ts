@@ -1,6 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCrmIntegrationPayload, normalizeCrmIntegrations } from './crm-integrations';
+import { buildCrmIntegrationAction, buildCrmIntegrationPayload, normalizeCrmIntegrations } from './crm-integrations';
+
+test('builds safe action requests for rotating secrets and deleting an integration', () => {
+  assert.deepEqual(buildCrmIntegrationAction(12, 'rotate-secret'), {
+    method: 'POST',
+    url: '/api/settings/crm-integrations/12/rotate-secret',
+  });
+  assert.deepEqual(buildCrmIntegrationAction(12, 'delete'), {
+    method: 'DELETE',
+    url: '/api/settings/crm-integrations/12',
+  });
+});
 
 test('builds a trimmed CRM integration payload with explicit provider and scopes', () => {
   assert.deepEqual(buildCrmIntegrationPayload({

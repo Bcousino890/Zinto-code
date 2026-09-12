@@ -68,6 +68,7 @@ export function createApiV2Router({
 
   router.get('/openapi.json', (_req, res) => {
     res.type('application/json');
+    res.set('Content-Disposition', 'attachment; filename="zinto-crm-api-v2.openapi.json"');
     res.json(getApiV2OpenApiDocument());
   });
 

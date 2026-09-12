@@ -89,6 +89,7 @@ test('publishes an OpenAPI document for CRM developers', async () => {
   await withServer((_req, _res, next) => next(), async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/v2/openapi.json`);
     assert.equal(response.status, 200);
+    assert.match(response.headers.get('content-disposition') ?? '', /zinto-crm-api-v2\.openapi\.json/);
     const body = await response.json() as { openapi: string; paths: Record<string, unknown> };
     assert.equal(body.openapi, '3.1.0');
     assert.ok('/health' in body.paths);

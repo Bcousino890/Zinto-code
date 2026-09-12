@@ -873,6 +873,11 @@ export interface IStorage {
   getOrCreateContactResult(contact: InsertContact): Promise<GetOrCreateContactResult>;
   updateContact(id: number, contact: Partial<InsertContact>): Promise<Contact>;
   getContactByCrmExternalId(companyId: number, integrationId: number, externalId: string): Promise<Contact | undefined>;
+  getCrmIntegrationsByCompanyId(companyId: number): Promise<any[]>;
+  getCrmIntegrationByIdAndCompany(id: number, companyId: number): Promise<any | undefined>;
+  createCrmIntegration(data: any): Promise<any>;
+  updateCrmIntegration(id: number, companyId: number, data: any): Promise<any | undefined>;
+  deleteCrmIntegration(id: number, companyId: number): Promise<boolean>;
   crmIntegrationBelongsToCompany(companyId: number, integrationId: number): Promise<boolean>;
   getCrmIntegrationOperations(companyId: number): Promise<any[]>;
   saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void>;
@@ -5002,6 +5007,40 @@ export class DatabaseStorage implements IStorage {
       eq(crmIntegrations.status, 'active'),
     )).limit(1);
     return Boolean(integration);
+  }
+
+  async getCrmIntegrationsByCompanyId(companyId: number): Promise<any[]> {
+    return db.select().from(crmIntegrations)
+      .where(eq(crmIntegrations.companyId, companyId))
+      .orderBy(asc(crmIntegrations.createdAt));
+  }
+
+  async getCrmIntegrationByIdAndCompany(id: number, companyId: number): Promise<any | undefined> {
+    const [integration] = await db.select().from(crmIntegrations).where(and(
+      eq(crmIntegrations.id, id),
+      eq(crmIntegrations.companyId, companyId),
+    )).limit(1);
+    return integration;
+  }
+
+  async createCrmIntegration(data: any): Promise<any> {
+    const [integration] = await db.insert(crmIntegrations).values(data).returning();
+    return integration;
+  }
+
+  async updateCrmIntegration(id: number, companyId: number, data: any): Promise<any | undefined> {
+    const [integration] = await db.update(crmIntegrations)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(crmIntegrations.id, id), eq(crmIntegrations.companyId, companyId)))
+      .returning();
+    return integration;
+  }
+
+  async deleteCrmIntegration(id: number, companyId: number): Promise<boolean> {
+    const deleted = await db.delete(crmIntegrations)
+      .where(and(eq(crmIntegrations.id, id), eq(crmIntegrations.companyId, companyId)))
+      .returning({ id: crmIntegrations.id });
+    return deleted.length > 0;
   }
 
   async listCandidateScopes(): Promise<DurableWebhookEventScope[]> {

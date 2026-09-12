@@ -283,6 +283,7 @@ import apiV1Routes from "./routes/api-v1";
 import { createApiV2Router } from "./routes/api-v2";
 import { registerApiKeySettingsRoutes } from "./routes/api-key-settings-routes";
 import { registerCrmIntegrationOperationsRoutes } from "./routes/crm-integration-operations-routes";
+import { registerCrmIntegrationManagementRoutes } from "./routes/crm-integration-management-routes";
 import { CrmContactSyncService } from "./services/crm-contact-sync-service";
 import { createCrmContactSyncStorageAdapter } from "./services/crm-contact-sync-storage-adapter";
 import { createCrmApiV2MessageAdapter } from "./services/crm-api-v2-message-adapter";
@@ -3227,6 +3228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   registerApiKeySettingsRoutes(app, storage, ensureAuthenticated);
+  registerCrmIntegrationManagementRoutes(app, storage, ensureAuthenticated);
   registerCrmIntegrationOperationsRoutes(app, storage, ensureAuthenticated);
 
   app.delete('/api/settings/api-keys/:id', ensureAuthenticated, async (req: any, res) => {

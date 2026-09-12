@@ -25,8 +25,13 @@ jobs:
             cd ~/zinto
             git fetch origin main
             git reset --hard origin/main
-            npm ci
+            # Both the application and the odontogram package are built on the VPS.
+            # Install development dependencies explicitly because Vite/React plugins
+            # are required at build time even when NODE_ENV is inherited as production.
+            npm ci --include=dev
+            npm --prefix packages/pointer-odontogram-module ci --include=dev
             npm run build
             npm run db:migrate:pm2 -- validate
             npm run db:migrate:pm2 -- run
-            pm2 restart zinto
+            pm2 restart zinto --update-env
+            pm2 save

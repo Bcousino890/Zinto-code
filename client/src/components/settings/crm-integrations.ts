@@ -87,7 +87,9 @@ export function normalizeCrmIntegrations(payload: unknown): CrmIntegration[] {
 export function normalizeCreatedCrmIntegration(payload: unknown): CreatedCrmIntegration | null {
   const root = asRecord(payload);
   const candidate = root.integration ?? root.data ?? payload;
-  const [integration] = normalizeCrmIntegrations(candidate);
+  // Management mutations return one integration object, while list endpoints
+  // return an array. Normalize both shapes so the one-time secret is not lost.
+  const [integration] = normalizeCrmIntegrations(Array.isArray(candidate) ? candidate : [candidate]);
   if (!integration) return null;
   const secret = root.webhookSecret ?? root.webhook_secret ?? asRecord(candidate).webhookSecret ?? asRecord(candidate).webhook_secret;
   return typeof secret === 'string' && secret ? { ...integration, webhookSecret: secret } : integration;

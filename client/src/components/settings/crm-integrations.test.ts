@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCrmIntegrationAction, buildCrmIntegrationPayload, normalizeCrmIntegrations } from './crm-integrations';
+import { buildCrmIntegrationAction, buildCrmIntegrationPayload, normalizeCreatedCrmIntegration, normalizeCrmIntegrations } from './crm-integrations';
 
 test('builds safe action requests for revealing/rotating secrets and deleting an integration', () => {
   assert.deepEqual(buildCrmIntegrationAction('7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612', 'reveal-secret'), {
@@ -53,4 +53,13 @@ test('normalizes API integration records and supports snake_case responses', () 
 
 test('preserves opaque UUID integration IDs for external clients', () => {
   assert.equal(normalizeCrmIntegrations([{ id: '7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612', name: 'CRM', provider: 'generic', status: 'active', scopes: [] }])[0]?.id, '7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612');
+});
+
+test('normalizes a single mutation response and preserves its webhook secret', () => {
+  const result = normalizeCreatedCrmIntegration({
+    id: '7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612', name: 'CRM', provider: 'generic', status: 'active', scopes: [],
+    webhookSecret: 'zinto_whsec_example',
+  });
+  assert.equal(result?.id, '7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612');
+  assert.equal(result?.webhookSecret, 'zinto_whsec_example');
 });

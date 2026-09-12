@@ -29,6 +29,7 @@
     "db:migrate": "node scripts/migrate.js run",
     "db:migrate:status": "node scripts/migrate.js status",
     "db:migrate:validate": "node scripts/migrate.js validate",
+    "db:migrate:pm2": "node scripts/run-migrations-with-pm2-env.mjs",
     "db:migrate:create": "node scripts/migrate.js create",
     "test:fixes": "node test-all-fixes.js",
     "test:migration": "node test-migration-system.js",

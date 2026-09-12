@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -11,7 +14,25 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  verify-api-docs:
+    name: Verificar contrato y documentación API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci --include=dev
+      - name: Comprobar documentación API
+        run: npm run docs:api:check
+
   deploy:
+    if: github.event_name != 'pull_request'
+    needs: verify-api-docs
     runs-on: ubuntu-latest
     steps:
       - name: Deploy over SSH

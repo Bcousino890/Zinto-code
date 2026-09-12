@@ -31,6 +31,7 @@
     "db:migrate:validate": "node scripts/migrate.js validate",
     "db:migrate:pm2": "node scripts/run-migrations-with-pm2-env.mjs",
     "db:migrate:create": "node scripts/migrate.js create",
+    "docs:api:check": "node --import tsx scripts/verify-api-docs.ts",
     "test:fixes": "node test-all-fixes.js",
     "test:migration": "node test-migration-system.js",
     "test:whatsapp": "node --import tsx --test tests/whatsapp-official-media.test.ts",

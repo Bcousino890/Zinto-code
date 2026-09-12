@@ -69054,5 +69054,25 @@
   {
     "key": "settings.api_access.operations.data_availability",
     "value": "No CRM integration records are available yet. Availability is based on active CRM API keys and their recorded use."
+  },
+  {
+    "key": "settings.api_access.toast.enter_webhook_url",
+    "value": "Please enter a webhook URL for this API key"
+  },
+  {
+    "key": "settings.api_access.toast.permissions_updated",
+    "value": "API key permissions updated"
+  },
+  {
+    "key": "settings.api_access.tabs.operations",
+    "value": "Integration operations"
+  },
+  {
+    "key": "settings.api_access.edit_permissions",
+    "value": "Permissions"
+  },
+  {
+    "key": "settings.api_access.edit_permissions_title",
+    "value": "Edit API key permissions"
   }
 ]

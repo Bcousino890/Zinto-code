@@ -35,7 +35,8 @@ import {
   XCircle,
   Download,
   FileJson,
-  FileText
+  FileText,
+  Link2
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, es } from 'date-fns/locale';
@@ -43,6 +44,7 @@ import { API_KEY_SCOPES, toggleApiKeyScope } from './api-key-permissions';
 import { buildApiKeyCreationPayload, type ApiKeyEnvironment } from './api-key-creation-form';
 import { IntegrationOperationsView } from '@/components/integrations/IntegrationOperationsView';
 import { buildCrmOperationsViewData, buildIntegrationOperationsData, type CrmOperationsSource } from '@/components/integrations/integration-operations-data';
+import { CrmIntegrationsPanel } from './CrmIntegrationsPanel';
 
 interface ApiKey {
   id: number;
@@ -338,6 +340,10 @@ export function ApiAccessTab() {
             <Activity className="w-4 h-4 mr-2" />
             {t('settings.api_access.tabs.operations', 'Integration Operations')}
           </TabsTrigger>
+          <TabsTrigger value="integrations">
+            <Link2 className="w-4 h-4 mr-2" />
+            {t('settings.api_access.tabs.integrations', 'CRM Integrations')}
+          </TabsTrigger>
           <TabsTrigger value="docs">
             <BookOpen className="w-4 h-4 mr-2" />
             {t('settings.api_access.tabs.docs', 'Documentation')}
@@ -525,6 +531,10 @@ export function ApiAccessTab() {
             {...integrationOperations}
             dataAvailabilityMessage={t('settings.api_access.operations.data_availability', 'No CRM integration records are available yet. Availability is based on active CRM API keys and their recorded use.')}
           />}
+        </TabsContent>
+
+        <TabsContent value="integrations" className="space-y-4">
+          <CrmIntegrationsPanel />
         </TabsContent>
 
         <TabsContent value="docs" className="space-y-4">

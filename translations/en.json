@@ -69074,5 +69074,185 @@
   {
     "key": "settings.api_access.edit_permissions_title",
     "value": "Edit API key permissions"
+  },
+  {
+    "key": "settings.api_access.tabs.integrations",
+    "value": "CRM Integrations"
+  },
+  {
+    "key": "settings.api_access.integrations.title",
+    "value": "CRM Integrations"
+  },
+  {
+    "key": "settings.api_access.integrations.description",
+    "value": "Connect your company's CRM with Zinto in both directions."
+  },
+  {
+    "key": "settings.api_access.integrations.create",
+    "value": "Create integration"
+  },
+  {
+    "key": "settings.api_access.integrations.edit",
+    "value": "Edit integration"
+  },
+  {
+    "key": "settings.api_access.integrations.name",
+    "value": "Name"
+  },
+  {
+    "key": "settings.api_access.integrations.provider",
+    "value": "CRM"
+  },
+  {
+    "key": "settings.api_access.integrations.webhook",
+    "value": "CRM webhook URL"
+  },
+  {
+    "key": "settings.api_access.integrations.webhook_help",
+    "value": "Optional in sandbox; always use HTTPS in production."
+  },
+  {
+    "key": "settings.api_access.integrations.active",
+    "value": "Active"
+  },
+  {
+    "key": "settings.api_access.integrations.inactive",
+    "value": "Inactive"
+  },
+  {
+    "key": "settings.api_access.integrations.draft",
+    "value": "Draft"
+  },
+  {
+    "key": "settings.api_access.integrations.activate",
+    "value": "Activate"
+  },
+  {
+    "key": "settings.api_access.integrations.deactivate",
+    "value": "Deactivate"
+  },
+  {
+    "key": "settings.api_access.integrations.id",
+    "value": "Integration ID"
+  },
+  {
+    "key": "settings.api_access.integrations.permissions",
+    "value": "Permissions"
+  },
+  {
+    "key": "settings.api_access.integrations.scopes",
+    "value": "Synchronization permissions"
+  },
+  {
+    "key": "settings.api_access.integrations.created_at",
+    "value": "Created"
+  },
+  {
+    "key": "settings.api_access.integrations.last_sync",
+    "value": "Last synchronization"
+  },
+  {
+    "key": "settings.api_access.integrations.never",
+    "value": "Never"
+  },
+  {
+    "key": "settings.api_access.integrations.no_integrations",
+    "value": "No CRM integrations are configured yet."
+  },
+  {
+    "key": "settings.api_access.integrations.create_first",
+    "value": "Create an integration to generate its Integration ID."
+  },
+  {
+    "key": "settings.api_access.integrations.flow_title",
+    "value": "How it works"
+  },
+  {
+    "key": "settings.api_access.integrations.flow_description",
+    "value": "Create an integration to get a unique ID. Client requests use Authorization: Bearer API_KEY and X-Zinto-Integration-Id: ID."
+  },
+  {
+    "key": "settings.api_access.integrations.form_description",
+    "value": "Configure the external system that will synchronize with Zinto."
+  },
+  {
+    "key": "settings.api_access.integrations.secret",
+    "value": "Webhook secret"
+  },
+  {
+    "key": "settings.api_access.integrations.secret_help",
+    "value": "Save it now. For security, it will not be shown again."
+  },
+  {
+    "key": "settings.api_access.integrations.created",
+    "value": "Integration created"
+  },
+  {
+    "key": "settings.api_access.integrations.created_description",
+    "value": "Use the Integration ID together with your API Key on every API v2 request."
+  },
+  {
+    "key": "settings.api_access.integrations.copy",
+    "value": "Copy"
+  },
+  {
+    "key": "settings.api_access.integrations.copied",
+    "value": "Copied"
+  },
+  {
+    "key": "settings.api_access.integrations.save",
+    "value": "Save changes"
+  },
+  {
+    "key": "settings.api_access.integrations.cancel",
+    "value": "Cancel"
+  },
+  {
+    "key": "settings.api_access.integrations.close",
+    "value": "Close"
+  },
+  {
+    "key": "settings.api_access.integrations.load_failed",
+    "value": "CRM integrations could not be loaded."
+  },
+  {
+    "key": "settings.api_access.integrations.save_failed",
+    "value": "The integration could not be saved."
+  },
+  {
+    "key": "settings.api_access.integrations.saved",
+    "value": "Integration updated."
+  },
+  {
+    "key": "settings.api_access.integrations.invalid_name",
+    "value": "Enter a name for the integration."
+  },
+  {
+    "key": "settings.api_access.integrations.invalid_webhook",
+    "value": "The webhook URL must start with https://."
+  },
+  {
+    "key": "settings.api_access.integrations.request_header",
+    "value": "Client header"
+  },
+  {
+    "key": "settings.api_access.integrations.providers.generic",
+    "value": "Generic connector (API/Webhooks)"
+  },
+  {
+    "key": "settings.api_access.integrations.providers.hubspot",
+    "value": "HubSpot"
+  },
+  {
+    "key": "settings.api_access.integrations.providers.salesforce",
+    "value": "Salesforce"
+  },
+  {
+    "key": "settings.api_access.integrations.providers.zoho",
+    "value": "Zoho"
+  },
+  {
+    "key": "settings.api_access.integrations.providers.pipedrive",
+    "value": "Pipedrive"
   }
 ]

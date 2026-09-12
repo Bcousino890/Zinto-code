@@ -111,6 +111,26 @@ test('rotates a webhook secret and deletes an integration within the authenticat
   });
 });
 
+test('reveals an existing webhook secret only for the authenticated company admin', async () => {
+  const app = createApp({
+    async getCrmIntegrationByIdAndCompany(id: number, companyId: number) {
+      return { id, companyId, name: 'CRM', provider: 'custom', status: 'active', scopes: [], conflictRules: {}, webhookUrl: null, webhookSecretEncrypted: 'encrypted:stored', createdAt: new Date(), updatedAt: new Date() };
+    },
+  }, undefined, {
+    decryptSecret: (encrypted: string) => {
+      assert.equal(encrypted, 'encrypted:stored');
+      return 'zinto_whsec_existing-secret';
+    },
+  });
+  await withServer(app, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/settings/crm-integrations/9/reveal-secret`, { method: 'POST' });
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.webhookSecret, 'zinto_whsec_existing-secret');
+    assert.equal(body.webhookSecretEncrypted, undefined);
+  });
+});
+
 test('reports missing encryption configuration instead of hiding the webhook secret failure', async () => {
   const app = createApp({
     async getCrmIntegrationByIdAndCompany(id: number, companyId: number) {

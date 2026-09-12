@@ -1,6 +1,6 @@
 import type { Express, RequestHandler } from 'express';
 import { assertIntegrationScopes, type IntegrationScope } from '../../shared/integrations/contracts';
-import { encryptValue } from '../utils/crypto';
+import { decryptValue, encryptValue } from '../utils/crypto';
 import { generateWebhookSecret } from '../utils/webhook-token-generator';
 
 type CrmIntegrationRecord = {
@@ -30,6 +30,7 @@ type CrmIntegrationManagementStorage = {
 type SecretOptions = {
   createSecret?: () => string;
   encryptSecret?: (secret: string) => string;
+  decryptSecret?: (encryptedSecret: string) => string;
 };
 
 const PROVIDER_PATTERN = /^[a-z][a-z0-9_-]{1,31}$/;
@@ -204,6 +205,18 @@ export function registerCrmIntegrationManagementRoutes(
       const webhookSecret = secret(options);
       const updated = await storage.updateCrmIntegration(id, req.user.companyId, { webhookSecretEncrypted: (options.encryptSecret ?? encryptValue)(webhookSecret) });
       return res.json({ ...publicIntegration(updated ?? existing), webhookSecret });
+    } catch (error) { return handleError(res, error); }
+  });
+
+  app.post('/api/settings/crm-integrations/:id/reveal-secret', async (req: any, res) => {
+    try {
+      const id = await resolveId(req.params.id, req.user.companyId);
+      if (!id) return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'ID de integración inválido' });
+      const existing = await storage.getCrmIntegrationByIdAndCompany(id, req.user.companyId);
+      if (!existing) return res.status(404).json({ error: 'CRM_INTEGRATION_NOT_FOUND', message: 'Integración CRM no encontrada' });
+      if (!existing.webhookSecretEncrypted) return res.status(404).json({ error: 'WEBHOOK_SECRET_NOT_FOUND', message: 'Esta integración todavía no tiene un secreto de webhook' });
+      const webhookSecret = (options.decryptSecret ?? decryptValue)(existing.webhookSecretEncrypted);
+      return res.json({ ...publicIntegration(existing), webhookSecret });
     } catch (error) { return handleError(res, error); }
   });
 

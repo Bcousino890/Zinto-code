@@ -2,7 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildCrmIntegrationAction, buildCrmIntegrationPayload, normalizeCrmIntegrations } from './crm-integrations';
 
-test('builds safe action requests for rotating secrets and deleting an integration', () => {
+test('builds safe action requests for revealing/rotating secrets and deleting an integration', () => {
+  assert.deepEqual(buildCrmIntegrationAction('7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612', 'reveal-secret'), {
+    method: 'POST',
+    url: '/api/settings/crm-integrations/7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612/reveal-secret',
+  });
   assert.deepEqual(buildCrmIntegrationAction('7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612', 'rotate-secret'), {
     method: 'POST',
     url: '/api/settings/crm-integrations/7f8c2a91-4e1b-4c70-bc3d-91a8e4f0d612/rotate-secret',

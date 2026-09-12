@@ -1,33 +1,35 @@
-# Zinto CRM Integration API v2 quickstart
+# Inicio rápido: integración CRM de Zinto API v2
 
-This guide covers the public routes mounted by the current implementation. The API base URL is `https://crm.zinto.app/api/v2`.
+Esta guía cubre las rutas públicas disponibles en la implementación actual. La
+base de la API es `https://crm.zinto.app/api/v2`.
 
 ## Rutas disponibles en esta versión
 
-| Area | Public v2 status | Notes |
+| Área | Estado público v2 | Notas |
 | --- | --- | --- |
-| Contacts | Available | Create or update a contact by external ID. |
-| Messages | Available | Send CRM-originated text messages through an existing company channel. |
-| Campaigns | Not mounted | La sincronización bidireccional de campañas aún no tiene una ruta pública v2. No automatice campañas mediante esta API. |
-| Appointments | Available | Upsert an appointment for an existing tenant contact. |
-| Deals | Available | Upsert a deal for an existing tenant contact and pipeline. |
-| Outbound webhooks | Delivery contract only | The signing/delivery helper exists; no public endpoint configures or receives these webhooks. |
+| Contactos | Disponible | Crea o actualiza por el identificador externo del CRM. |
+| Mensajes | Disponible | Envía mensajes de texto a través de un canal existente de la empresa. |
+| Campañas | Disponible | Sincronización por lotes mediante `POST /campaigns/batch`. |
+| Agenda | Disponible | Crea o actualiza una cita para un contacto existente. |
+| Negocios/pipeline | Disponible | Crea o actualiza una oportunidad y su etapa. |
+| Webhooks salientes | Contrato de entrega | La URL se configura en la integración CRM; SmartBC recibe los eventos firmados. |
 
-Do not construct requests for the unavailable areas from internal service names or declared scopes. The `campaigns:*` and `webhooks:manage` scopes may be returned by the capabilities route, but scopes do not themselves make routes available.
+Use el contrato OpenAPI publicado como fuente de verdad; no construya solicitudes a partir de nombres de servicios internos o scopes no documentados.
 
-## Prerequisites
+## Requisitos previos
 
-Obtain an active Zinto API key for the target company and ensure it has the permissions required below. API keys have the format `pcp_` followed by 64 lowercase hexadecimal characters. For a contact sync, obtain the numeric integration ID associated with that company.
+Obtenga una API Key activa de Zinto para la empresa objetivo y asígnele los permisos necesarios. Las API Keys tienen el formato `pcp_` seguido de 64 caracteres hexadecimales minúsculos. Obtenga también el `Integration ID` UUID de la integración CRM; es un valor de texto aleatorio, no un número.
 
-Set these values in your client:
+Defina estos valores en SmartBC:
 
 ```bash
 BASE_URL='https://crm.zinto.app/api/v2'
 API_KEY='pcp_replace_with_your_api_key'
-INTEGRATION_ID='1'
+INTEGRATION_ID='UUID_DE_INTEGRACION'
 ```
 
-The included [Postman collection](zinto-crm-integration.postman_collection.json) has equivalent variables.
+La [colección Postman incluida](zinto-crm-integration.postman_collection.json)
+usa variables equivalentes.
 
 ## Consultar el contrato publicado
 
@@ -39,15 +41,15 @@ permisos o nombres de servicios internos:
 curl "$BASE_URL/openapi.json"
 ```
 
-## Check availability
+## Comprobar disponibilidad
 
-`GET /health` is the sole unauthenticated route:
+`GET /health` es la única ruta sin autenticación:
 
 ```bash
 curl "$BASE_URL/health"
 ```
 
-It returns:
+Devuelve:
 
 ```json
 { "status": "ok", "version": "v2" }
@@ -62,11 +64,13 @@ curl "$BASE_URL/capabilities" \
   -H "Authorization: Bearer $API_KEY"
 ```
 
-The response identifies the v2 scope vocabulary and reports the outbound webhook signature format. It is useful for permission discovery, but is not an endpoint catalog.
+La respuesta identifica los scopes v2 y el formato de firma de webhooks. Es útil para descubrir permisos, pero el catálogo de rutas válido es el contrato OpenAPI.
 
-## Create or update a contact
+## Crear o actualizar un contacto
 
-`PUT /contacts/{externalId}` requires `contacts:write`. `externalId` is the stable identifier from the CRM. Repeating the request with the same external ID updates the mapped contact.
+`PUT /contacts/{externalId}` requiere `contacts:write`. `externalId` es el
+identificador estable del CRM. Repetir la solicitud con el mismo identificador
+actualiza el contacto vinculado.
 
 ```bash
 curl --request PUT "$BASE_URL/contacts/crm-contact-123" \
@@ -83,17 +87,19 @@ curl --request PUT "$BASE_URL/contacts/crm-contact-123" \
   }'
 ```
 
-`name` is required and must be nonempty. The route accepts optional string `phone`, `email`, and `company`, optional array `tags`, and optional object `customFields`. It returns `201` when it creates the mapping/contact and `200` when it updates one:
+`name` es obligatorio y no puede estar vacío. La ruta acepta las cadenas
+opcionales `phone`, `email` y `company`, el arreglo opcional `tags` y el objeto
+opcional `customFields`. Devuelve `201` al crear y `200` al actualizar:
 
 ```json
 { "data": { "...": "contact returned by Zinto" }, "created": true }
 ```
 
-## Send a CRM-originated message
+## Enviar un mensaje desde el CRM
 
-`POST /messages` requires `messages:send`. `channelId` identifies an existing
-channel belonging to the API key's company; the message is delivered through
-the established Zinto message service and retained with CRM-origin metadata.
+`POST /messages` requiere `messages:send`. `channelId` identifica un canal
+existente de la empresa de la API Key; el mensaje se entrega mediante el
+servicio de mensajería de Zinto y conserva metadatos de origen CRM.
 
 ```bash
 curl --request POST "$BASE_URL/messages" \
@@ -108,28 +114,31 @@ curl --request POST "$BASE_URL/messages" \
   }'
 ```
 
-`recipient` and `text` must be nonempty strings, and `channelId` must be a
-positive integer. The optional `external_message_id` is returned unchanged in
-the accepted response and stored as CRM metadata; it is not a replay key.
+`recipient` y `text` deben ser cadenas no vacías, y `channelId` debe ser un
+entero positivo. `external_message_id` es opcional, se devuelve sin cambios en
+la respuesta aceptada y sirve para correlación; no es una clave de reintento.
 
-## Upsert appointments and deals
+## Crear o actualizar agenda y oportunidades
 
-`PUT /appointments/{externalId}` requires `appointments:write` and an
-`Idempotency-Key`. Its body must provide an existing tenant `contactId`, a
-nonempty `title`, ISO `startsAt` and `endsAt`, and a Zinto appointment status.
-The external ID maps subsequent requests to the same Zinto appointment.
+`PUT /appointments/{externalId}` requiere `appointments:write` y
+`Idempotency-Key`. El cuerpo debe incluir un `contactId` existente, un `title`
+no vacío, `startsAt` y `endsAt` ISO, y un estado de cita válido en Zinto. El
+identificador externo vincula las solicitudes posteriores con la misma cita.
 
-`POST /deals` requires `deals:write` and an `Idempotency-Key` of 8–128
-characters. Its body must include the CRM `externalId`, plus existing tenant
-`contactId` and `pipelineId`, `title`, supported `stage`, and integer `value`.
-The API verifies every referenced record belongs to the authenticated company
-before creating or updating the mapped deal.
+`POST /deals` requiere `deals:write` y un `Idempotency-Key` de 8–128
+caracteres. El cuerpo debe incluir el `externalId` del CRM, además de
+`contactId` y `pipelineId` existentes, `title`, `stage` compatible y `value`
+entero. La API verifica que cada registro referenciado pertenezca a la empresa
+autenticada antes de crear o actualizar la oportunidad.
 
 ## Authentication and permissions
 
-Send `Authorization: Bearer <API_KEY>` on every route except `/health`. The authenticated v2 router checks API-key validity, active status, expiry, and any configured IP allow-list before handling the route. A missing or invalid key returns `401`; a valid key without the route's permission returns `403`.
+Envíe `Authorization: Bearer <API_KEY>` en todas las rutas salvo `/health`.
+El router v2 comprueba validez, estado activo, expiración y la lista de IP
+permitidas de la API Key antes de procesar la ruta. Una clave ausente o inválida
+devuelve `401`; una clave válida sin el permiso requerido devuelve `403`.
 
-The contact route also requires `X-Zinto-Integration-Id` to be a positive integer. It is tenant-scoped through the API key's company; do not send a company ID in the request body or headers.
+Las rutas de recursos también requieren `X-Zinto-Integration-Id` con el UUID completo de la integración. En SmartBC debe almacenarse como texto para no truncar ni transformar los guiones. Los enteros positivos solo se aceptan por compatibilidad histórica y no deben usarse en integraciones nuevas. El alcance se determina por la empresa de la API Key; no envíe un `companyId` en el cuerpo ni en las cabeceras.
 
 ### Permisos editables
 
@@ -150,24 +159,32 @@ inactiva, expirada o inválida recibe `401`. Cambiar permisos o desactivar una
 clave afecta las solicitudes posteriores; guarde el valor completo de la clave
 solo al crearla, porque no se vuelve a mostrar.
 
-## Idempotency
+## Idempotencia
 
-Contact, appointment, and deal upserts use their stable CRM `externalId` mappings to identify the existing Zinto record. Appointment and deal routes additionally require `Idempotency-Key`; use a stable key for a retry. Message retries can create a new delivery; `external_message_id` preserves CRM correlation only. Campaign requests are not mounted.
+Los upserts de contactos, citas, oportunidades y campañas usan los `externalId`
+estables del CRM para identificar el registro de Zinto. Las rutas de citas,
+oportunidades, campañas y sincronización inicial requieren además
+`Idempotency-Key`; use la misma clave al reintentar una operación. Los
+reintentos de mensajes pueden crear una nueva entrega; `external_message_id`
+conserva únicamente la correlación con SmartBC.
 
-## Outbound webhook signature contract
+## Contrato de firma de webhooks salientes
 
-When the integration webhook delivery helper is used by the application, it emits a JSON body and these headers:
+La entrega de webhooks emite un cuerpo JSON y estas cabeceras:
 
 | Header | Value |
 | --- | --- |
 | `Content-Type` | `application/json` |
-| `X-Zinto-Event-Id` | Event UUID |
-| `X-Zinto-Timestamp` | Event `occurred_at` string |
-| `X-Zinto-Signature` | `v1=` plus an HMAC-SHA256 digest |
+| `X-Zinto-Event-Id` | UUID del evento |
+| `X-Zinto-Timestamp` | Cadena `occurred_at` del evento |
+| `X-Zinto-Signature` | `v1=` seguido del resumen HMAC-SHA256 |
 
-The signed byte sequence is the literal string `timestamp + "." + raw_body`, where `timestamp` is exactly the `X-Zinto-Timestamp` value and `raw_body` is the unmodified JSON request body. The header is `v1=<lowercase hex digest>`.
+La secuencia firmada es literalmente `timestamp + "." + raw_body`, donde
+`timestamp` es exactamente el valor de `X-Zinto-Timestamp` y `raw_body` es el
+cuerpo JSON sin modificar. La cabecera resultante es `v1=<hexadecimal en
+minúsculas>`.
 
-Example verifier (Node.js):
+Ejemplo de verificación (Node.js):
 
 ```js
 import crypto from 'node:crypto';
@@ -182,20 +199,28 @@ const expectedBuffer = Buffer.from(expected);
 const valid = provided.length === expectedBuffer.length && crypto.timingSafeEqual(provided, expectedBuffer);
 ```
 
-Verify against the raw body before parsing JSON, use a timing-safe comparison after checking equal buffer lengths, and reject stale timestamps according to your receiver's replay policy. The current public API has no route for registering a webhook URL or secret, so this is a receiver contract—not a self-service webhook setup flow.
+Verifique el cuerpo crudo antes de analizar el JSON, compare en tiempo
+constante después de comprobar que las longitudes coinciden y rechace marcas de
+tiempo antiguas según la política anti-repetición de SmartBC. La URL y el
+secreto se configuran en la integración CRM de Zinto; esta API pública no los
+registra automáticamente.
 
-## Errors and retries
+## Errores y reintentos
 
-Errors are JSON objects with `error` and `message` fields. The contact and message routes can return:
+Los errores son objetos JSON con los campos `error` y `message`. Las rutas de
+contactos y mensajes pueden devolver:
 
 | Status | Error | Meaning |
 | --- | --- | --- |
-| 400 | `VALIDATION_ERROR` | Missing/invalid company context, integration ID, external ID, or contact name. |
-| 401 | `API_KEY_MISSING`, `API_KEY_INVALID_FORMAT`, `API_KEY_NOT_FOUND`, `API_KEY_INACTIVE`, or `API_KEY_EXPIRED` | Authentication failed. |
-| 403 | `INSUFFICIENT_PERMISSIONS` | The API key lacks the required route permission. |
-| 500 | `CONTACT_SYNC_FAILED` or `MESSAGE_SYNC_FAILED` | Contact or message synchronization failed. Retry only after investigating the returned message. |
+| 400 | `VALIDATION_ERROR` | Contexto de empresa, Integration ID, external ID o nombre de contacto ausente o inválido. |
+| 401 | `API_KEY_MISSING`, `API_KEY_INVALID_FORMAT`, `API_KEY_NOT_FOUND`, `API_KEY_INACTIVE` o `API_KEY_EXPIRED` | Falló la autenticación. |
+| 403 | `INSUFFICIENT_PERMISSIONS` | La API Key no tiene el permiso de la ruta. |
+| 500 | `CONTACT_SYNC_FAILED` o `MESSAGE_SYNC_FAILED` | Falló la sincronización; investigue el mensaje antes de reintentar. |
 
-For network failures and `5xx`, use bounded exponential backoff with jitter. Do not retry validation or authorization errors until the request or key configuration changes. The current v2 router does not mount the API-key rate-limit middleware, so no v2 `429` response contract is documented here.
+Para fallos de red y `5xx`, use backoff exponencial acotado con jitter. No
+reintente errores de validación o autorización hasta cambiar la solicitud o la
+configuración de la clave. Respete `429` y `Retry-After` si el entorno los
+devuelve.
 
 ## Sandbox y producción
 

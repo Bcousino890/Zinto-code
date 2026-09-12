@@ -10,22 +10,21 @@ Incluya la clave API en el encabezado de cada petición protegida. Nunca la incl
 Authorization: Bearer TU_API_KEY
 X-Zinto-Integration-Id: ID_DE_INTEGRACION
 Content-Type: application/json
-Idempotency-Key: una-clave-unica-por-operacion
 ~~~
 
 La clave se crea en Configuración → Acceso API → Crear clave API. Seleccione Sandbox para pruebas y Producción para datos reales. Conceda solo los permisos necesarios.
 
 ## Obtener el Integration ID
 
-La API Key y el Integration ID son credenciales diferentes. El Integration ID identifica la conexión CRM de una empresa y debe enviarse en la cabecera \`X-Zinto-Integration-Id\`; no se coloca en la URL ni se inventa a partir del ejemplo de esta guía.
+La API Key y el Integration ID son credenciales diferentes. El Integration ID identifica la conexión CRM de una empresa, es un UUID aleatorio y debe tratarse siempre como texto. Envíelo en la cabecera \`X-Zinto-Integration-Id\`; no se coloca en la URL ni se inventa a partir del ejemplo de esta guía. En el portal SmartBC, use un campo de texto (nunca \`type=number\`, \`Number()\` ni un selector numérico) para conservar todos los caracteres y guiones.
 
 1. En Zinto, abra **Configuración → Acceso API → Integraciones CRM**.
 2. Pulse **Crear integración**, indique el nombre y proveedor, configure el webhook HTTPS y seleccione los permisos mínimos.
 3. Active la integración cuando la URL y el receptor del webhook estén listos.
-4. Copie el identificador UUID aleatorio mostrado como **Integration ID**. El secreto del webhook se muestra una sola vez; guárdelo en un gestor de secretos.
+4. Copie el identificador UUID aleatorio mostrado como **Integration ID**. En la tarjeta de la integración pulse **Ver secreto** para consultarlo; **Regenerar secreto** invalida el anterior y muestra uno nuevo. Guárdelo en un gestor de secretos.
 5. Cree o asocie una API Key para esa empresa y sustituya \`TU_API_KEY\` e \`ID_DE_INTEGRACION\` en su integración.
 
-El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo o un valor ficticio será rechazado; nunca envíe \`companyId\` para intentar cambiar el alcance.
+El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo o un valor ficticio será rechazado; nunca envíe \`companyId\` para intentar cambiar el alcance. El secreto del webhook solo sirve para verificar firmas entrantes; no sustituye a la API Key.
 
 ## Flujo bidireccional
 
@@ -63,14 +62,14 @@ curl -X POST https://crm.zinto.app/api/v2/messages \\
 
 ## Webhooks y seguridad
 
-Configure una URL HTTPS que responda en menos de 10 segundos. Verifique X-Zinto-Signature con HMAC-SHA256 sobre X-Zinto-Timestamp.raw_request_body, compare en tiempo constante y rechace marcas de tiempo con más de cinco minutos. Deduplique por X-Zinto-Event-Id.
+Configure una URL HTTPS que responda en menos de 10 segundos. Verifique X-Zinto-Signature con HMAC-SHA256 sobre \`X-Zinto-Timestamp + "." + raw_request_body\`, compare en tiempo constante y rechace marcas de tiempo con más de cinco minutos. Deduplique por X-Zinto-Event-Id.
 
 Zinto entrega al menos una vez; responda 2xx después de persistir el evento y use una cola para trabajo lento. Respete 429 y Retry-After con espera exponencial.
 
 ## Errores
 
 ~~~json
-{"error":{"code":"INSUFFICIENT_SCOPE","message":"Missing messages:send","request_id":"req_123"}}
+{"error":"INSUFFICIENT_PERMISSIONS","message":"Missing messages:send"}
 ~~~
 
 Los códigos habituales son API_KEY_MISSING, API_KEY_INVALID, INSUFFICIENT_SCOPE, VALIDATION_ERROR, IDEMPOTENCY_CONFLICT, RATE_LIMITED e INTERNAL_ERROR. Para soporte entregue request_id o event_id, nunca claves ni secretos.

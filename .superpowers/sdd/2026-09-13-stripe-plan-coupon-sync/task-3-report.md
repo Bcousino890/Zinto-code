@@ -48,3 +48,19 @@
 - Relevant Tasks 1–3 suites: 44 passing tests.
 - `NODE_OPTIONS=--max-old-space-size=4096 npm run check`: exit 0.
 - `git diff --check`: exit 0.
+
+## Re-review fixes
+
+### Availability reconciliation contract
+
+- `syncPlan` and `syncCoupon` calculate availability from one captured current time per invocation and include that calculated state in their synchronization fingerprint. A clock-only transition therefore reaches Stripe even when catalog fields are unchanged: a plan-discount coupon is created or archived, and a coupon promotion code is activated or deactivated.
+- `StripeCatalogSyncService.reconcileAvailability(entityType, entityId)` is the reusable entry point for Task 5. Task 5's periodic worker must call it for plans and coupons whose start or end boundary is due (or sweep all eligible catalog entities often enough to cross each boundary). This service intentionally owns no background timer or scheduler.
+
+### Stripe lifecycle and coupon duration
+
+- When an active plan reuses an archived mapped price with the same immutable fingerprint, the service updates that price to `active: true`; a fingerprint mismatch still creates a replacement price and archives the previous one.
+- Plan `discountDuration` is validated and mapped to Stripe coupon semantics: `permanent` and `limited_time` use `forever` (the latter is bounded for redemption by `redeem_by`), `first_month` uses `once`, and `first_year` uses `repeating` with `duration_in_months: 12`. Unknown values fail before a coupon is created.
+
+### Re-review verification
+
+- Focused service/provider suite: 17 passing tests using only the in-memory Stripe fake; no Stripe API calls or credentials.

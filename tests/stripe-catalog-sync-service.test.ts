@@ -31,6 +31,7 @@ function createFakeStripe() {
       },
       update: async (id: string, input: any, options: any) => {
         products.updated.push({ id, input, options });
+        productById.set(id, { ...productById.get(id), ...input });
         return { id };
       },
       list: async (input: any) => paged([...productById.values()], input, calls),
@@ -46,6 +47,7 @@ function createFakeStripe() {
       },
       update: async (id: string, input: any, options: any) => {
         prices.updated.push({ id, input, options });
+        priceById.set(id, { ...priceById.get(id), ...input });
         return { id };
       },
       retrieve: async (id: string) => { calls.retrieve += 1; return priceById.get(id); },
@@ -62,6 +64,7 @@ function createFakeStripe() {
       },
       update: async (id: string, input: any, options: any) => {
         coupons.updated.push({ id, input, options });
+        couponById.set(id, { ...couponById.get(id), ...input });
         return { id };
       },
       retrieve: async (id: string) => { calls.retrieve += 1; return couponById.get(id); },
@@ -78,6 +81,7 @@ function createFakeStripe() {
       },
       update: async (id: string, input: any, options: any) => {
         promotionCodes.updated.push({ id, input, options });
+        promotionCodeById.set(id, { ...promotionCodeById.get(id), ...input });
         return { id };
       },
       list: async (input: any) => paged([...promotionCodeById.values()], input, calls),
@@ -271,6 +275,22 @@ test('desactivar un plan retira simultáneamente su producto y precio', async ()
   assert.equal(fakeStripe.prices.updated.at(-1).input.active, false);
 });
 
+test('reactivar un plan reactiva su precio Stripe archivado cuando conserva la misma configuración', async () => {
+  const { plan, coupon } = fixtures();
+  const fakeStripe = createFakeStripe();
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe });
+  await service.syncPlan(plan.id);
+  plan.isActive = false;
+  await service.syncPlan(plan.id);
+  plan.isActive = true;
+
+  await service.syncPlan(plan.id);
+
+  assert.equal(fakeStripe.prices.created.length, 1);
+  assert.equal(fakeStripe.prices.updated.at(-1).id, 'price_2');
+  assert.deepEqual(fakeStripe.prices.updated.at(-1).input, { active: true });
+});
+
 test('mantiene códigos promocionales no canjeables antes del inicio y tras desactivar el cupón', async () => {
   const { plan, coupon } = fixtures();
   coupon.startDate = new Date('2026-10-01T00:00:00.000Z');
@@ -284,6 +304,56 @@ test('mantiene códigos promocionales no canjeables antes del inicio y tras desa
 
   assert.equal(fakeStripe.promotionCodes.created[0].input.active, false);
   assert.equal(fakeStripe.promotionCodes.updated.at(-1).input.active, false);
+});
+
+test('reconcilia ventanas temporales sin editar el cupón mediante la entrada de reconciliación', async () => {
+  const { plan, coupon } = fixtures();
+  coupon.startDate = new Date('2026-10-01T00:00:00.000Z');
+  let currentTime = new Date('2026-09-13T00:00:00.000Z');
+  const fakeStripe = createFakeStripe();
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe, now: () => currentTime });
+  await service.syncCoupon(coupon.id);
+  currentTime = new Date('2026-10-01T00:00:00.000Z');
+
+  await service.reconcileAvailability('coupon', coupon.id);
+
+  assert.equal(fakeStripe.promotionCodes.updated.at(-1).id, 'promo_2');
+  assert.equal(fakeStripe.promotionCodes.updated.at(-1).input.active, true);
+});
+
+test('reconcilia ventanas temporales sin editar el descuento del plan', async () => {
+  const { plan, coupon } = fixtures();
+  Object.assign(plan, {
+    originalPrice: '40.00', discountType: 'percentage', discountValue: '25',
+    discountDuration: 'first_month', discountStartDate: new Date('2026-10-01T00:00:00.000Z'),
+  });
+  let currentTime = new Date('2026-09-13T00:00:00.000Z');
+  const fakeStripe = createFakeStripe();
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe, now: () => currentTime });
+  await service.syncPlan(plan.id);
+  currentTime = new Date('2026-10-01T00:00:00.000Z');
+
+  await service.reconcileAvailability('plan', plan.id);
+
+  assert.equal(fakeStripe.coupons.created.length, 1);
+  assert.equal(plan.stripePlanCouponId, 'coupon_3');
+});
+
+test('mapea duraciones de descuento de plan a semántica Stripe y rechaza valores desconocidos', async () => {
+  const { plan, coupon } = fixtures();
+  Object.assign(plan, { originalPrice: '40.00', discountType: 'percentage', discountValue: '25', discountDuration: 'first_month' });
+  const fakeStripe = createFakeStripe();
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe });
+  await service.syncPlan(plan.id);
+  plan.discountDuration = 'first_year';
+  await service.syncPlan(plan.id);
+  plan.discountDuration = 'unknown';
+
+  await assert.rejects(service.syncPlan(plan.id), /Unsupported plan discount duration/);
+
+  assert.equal(fakeStripe.coupons.created[0].input.duration, 'once');
+  assert.equal(fakeStripe.coupons.created[1].input.duration, 'repeating');
+  assert.equal(fakeStripe.coupons.created[1].input.duration_in_months, 12);
 });
 
 test('reconcilia producto, precio, cupón y código existentes por metadata a través de páginas', async () => {

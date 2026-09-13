@@ -2746,15 +2746,24 @@ export function registerWebhookRoutes(app: Express): void {
         secretSource = 'global_env';
       }
 
-      if (appSecret && signature) {
+      // Previously: verification only ran `if (appSecret && signature)`, with no
+      // rejection when either was missing — an attacker who simply omitted the
+      // x-hub-signature-256 header (or hit a phone_number_id with no resolvable
+      // secret) sailed straight through to processWebhook with a fully forged
+      // payload. Now: no signature, or a signature we can't verify, is rejected.
+      const bypassAllowed = isMetaWebhookSignatureBypassAllowed();
+      if (!signature) {
+        if (!bypassAllowed) {
+          return res.status(401).send('Unauthorized');
+        }
+      } else if (!appSecret) {
+        return res.status(403).send('Forbidden');
+      } else {
         const isValid = whatsAppOfficialService.verifyWebhookSignature(signature, body, appSecret);
         if (!isValid) {
           return res.status(403).send('Forbidden');
         }
       }
-
-
-      
 
       await whatsAppOfficialService.processWebhook(payload, targetConnection?.companyId || undefined);
 
@@ -3179,37 +3188,46 @@ export function registerWebhookRoutes(app: Express): void {
     express.raw({ type: 'application/json' }),
     async (req, res) => {
     try {
-      const signature = req.headers['x-hub-signature-256'] as string;
+      const signature = req.headers['x-hub-signature-256'] as string | undefined;
       const body = req.body;
-      const isTestReq = signature === 'test_signature' || req.get('user-agent')?.includes('axios');
+      // The old bypass here was `signature === 'test_signature' || User-Agent contains
+      // 'axios'` — both trivially spoofable by an actual attacker, and not gated by
+      // NODE_ENV, so it worked in production. Real dev/test bypass now goes through
+      // the same env-gated helper used by the Instagram/Messenger webhooks.
+      const bypassAllowed = isMetaWebhookSignatureBypassAllowed();
 
       let payload: any;
       if (Buffer.isBuffer(body)) {
         payload = JSON.parse(body.toString());
-      } else if (isTestReq && typeof body === 'object' && body !== null && !Array.isArray(body)) {
-        // Global express.json() may have already parsed the body; accept for test requests so Test Webhook succeeds
+      } else if (bypassAllowed && typeof body === 'object' && body !== null && !Array.isArray(body)) {
         payload = body;
       } else {
         return res.status(400).send('Invalid request body - expected raw body');
       }
 
+      if (!signature && !bypassAllowed) {
+        return res.status(401).send('Unauthorized');
+      }
+
       const partnerConfig = await storage.getPartnerConfiguration('meta');
       let appSecret = null;
-      let secretSource = 'none';
 
       if (partnerConfig) {
         appSecret = partnerConfig.partnerSecret?.trim(); // Trim any whitespace
-        secretSource = 'database';
       }
-
 
       // Environment variable override for testing
       if (!appSecret && process.env.META_WHATSAPP_APP_SECRET) {
         appSecret = process.env.META_WHATSAPP_APP_SECRET;
-        secretSource = 'environment variable';
       }
 
-      if (appSecret && signature && !isTestReq) {
+      if (signature) {
+        if (!appSecret) {
+          return res.status(403).json({
+            error: 'Signature verification unavailable',
+            message: 'No app secret configured to verify this request',
+          });
+        }
         const rawBody = Buffer.isBuffer(body) ? body : Buffer.from(JSON.stringify(body), 'utf8');
         const isValid = whatsAppOfficialService.verifyWebhookSignature(signature, rawBody, appSecret, false);
         if (!isValid) {
@@ -3218,15 +3236,12 @@ export function registerWebhookRoutes(app: Express): void {
             message: 'Check that partnerSecret in database matches Meta App Secret'
           });
         }
-        
-      } else if (!isTestReq) {
+      } else if (!bypassAllowed) {
+        return res.status(401).send('Unauthorized');
       }
-
-
 
       await whatsAppOfficialService.processWebhook(payload);
 
-      
       res.status(200).send('OK');
     } catch (error) {
       res.status(500).send('Internal Server Error');

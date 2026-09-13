@@ -1026,12 +1026,24 @@ router.post('/webhooks/stripe', async (req, res) => {
     }
 
     const stripeConfig = stripeSettings.value as any;
+    // No fallback: a hardcoded/well-known secret here would let anyone
+    // self-sign a forged event the moment the raw-body bug above it is
+    // fixed elsewhere. If the admin hasn't configured a real webhook
+    // secret, we can't verify this webhook at all — reject it.
+    if (!stripeConfig.webhookSecret) {
+      return res.status(400).json({ error: 'Stripe webhook secret not configured' });
+    }
     const webhookHandler = new SubscriptionWebhookHandler({
       stripeSecretKey: stripeConfig.secretKey,
-      webhookSecret: stripeConfig.webhookSecret || 'whsec_test'
+      webhookSecret: stripeConfig.webhookSecret
     });
 
-    const result = await webhookHandler.processWebhook(req.body, signature);
+    const rawBody = (req as any).rawBody as Buffer | undefined;
+    if (!rawBody) {
+      return res.status(400).json({ error: 'Raw body unavailable for signature verification' });
+    }
+
+    const result = await webhookHandler.processWebhook(rawBody, signature);
 
     if (result.success) {
       res.json({ received: true });

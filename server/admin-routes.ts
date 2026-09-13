@@ -3165,8 +3165,10 @@ function registerAdminRoutes(app: Express) {
 
       let event;
       try {
+        const rawBody = (req as any).rawBody as Buffer | undefined;
+        if (!rawBody) throw new Error('Raw body unavailable for signature verification');
         event = stripe.webhooks.constructEvent(
-          req.body,
+          rawBody,
           signature,
           stripeSettings.webhookSecret
         );

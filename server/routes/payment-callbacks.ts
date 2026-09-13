@@ -90,7 +90,11 @@ router.post('/stripe/webhook', async (req, res) => {
       if (!sig) {
         throw new Error('Missing stripe signature');
       }
-      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      const rawBody = (req as any).rawBody as Buffer | undefined;
+      if (!rawBody) {
+        throw new Error('Raw body unavailable for signature verification');
+      }
+      event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
     } catch (err: any) {
       logger.error('payment-callbacks', 'Webhook signature verification failed:', err);
       return res.status(400).send(`Webhook Error: ${err.message}`);

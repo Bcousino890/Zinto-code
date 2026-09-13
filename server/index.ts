@@ -68,7 +68,17 @@ app.use((req, res, next) => {
   if (req.method === 'POST' && req.path === '/api/webhooks/telnyx/voice') {
     return express.raw({ type: 'application/json', limit: '50mb' })(req, res, next);
   }
-  express.json({ limit: '50mb' })(req, res, next);
+  // `verify` stashes the exact raw bytes on req.rawBody alongside the normal
+  // parsed req.body, so webhook handlers that need to HMAC/signature-verify
+  // the request (Stripe, Paystack, etc.) can do so against what was actually
+  // sent instead of re-serializing the parsed object (which can differ
+  // byte-for-byte from the original and make every signature check fail).
+  express.json({
+    limit: '50mb',
+    verify: (req, _res, buf) => {
+      (req as any).rawBody = buf;
+    },
+  })(req, res, next);
 });
 app.use((req, res, next) => {
   if (

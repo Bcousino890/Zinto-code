@@ -1,4 +1,5 @@
 import { Router, type Express, type Request, type Response } from 'express';
+import crypto from 'crypto';
 import Stripe from 'stripe';
 import {
   erpGatewayFromRouteSlug,
@@ -25,9 +26,10 @@ function parseCompanyId(value: string): number | undefined {
 
 async function completeSessionByMetadata(
   checkoutSessionId: number,
-  referenceNumber?: string
+  referenceNumber: string | undefined,
+  expectedCompanyId: number
 ): Promise<void> {
-  await completeInvoiceCheckoutSession(checkoutSessionId, { referenceNumber });
+  await completeInvoiceCheckoutSession(checkoutSessionId, { referenceNumber, expectedCompanyId });
 }
 
 export function registerErpPaymentWebhooks(app: Express): void {
@@ -45,9 +47,11 @@ export function registerErpPaymentWebhooks(app: Express): void {
 
       const stripe = new Stripe(settings.secretKey, { apiVersion: '2025-09-30.clover' as any });
       const signature = req.headers['stripe-signature'] as string;
+      const rawBody = (req as any).rawBody as Buffer | undefined;
       let event;
       try {
-        event = stripe.webhooks.constructEvent(req.body, signature, settings.webhookSecret);
+        if (!rawBody) throw new Error('Raw body unavailable for signature verification');
+        event = stripe.webhooks.constructEvent(rawBody, signature, settings.webhookSecret);
       } catch (err) {
         return res.status(400).send(`Webhook Error: ${err instanceof Error ? err.message : 'Invalid signature'}`);
       }
@@ -56,7 +60,7 @@ export function registerErpPaymentWebhooks(app: Express): void {
         const session = event.data.object as Stripe.Checkout.Session;
         const checkoutSessionId = parseInt(session.metadata?.checkoutSessionId || '', 10);
         if (checkoutSessionId && session.payment_status === 'paid') {
-          await completeSessionByMetadata(checkoutSessionId, (session.payment_intent as string) || session.id);
+          await completeSessionByMetadata(checkoutSessionId, (session.payment_intent as string) || session.id, companyId);
         }
       }
 
@@ -75,10 +79,31 @@ export function registerErpPaymentWebhooks(app: Express): void {
       const settings = (await getErpGatewaySettingsRaw(companyId, 'paystack')) as ErpPaystackSettings | undefined;
       if (!settings?.secretKey) return res.status(400).json({ error: 'Paystack not configured' });
 
+      // Paystack signs every webhook with HMAC-SHA512 of the raw body using the
+      // account's secret key (https://paystack.com/docs/payments/webhooks/).
+      // Previously this route only checked that *a* secret key was configured
+      // for the company in the URL — not that the request actually came from
+      // Paystack — so any caller who knew a checkoutSessionId could mark it paid.
+      const signature = req.headers['x-paystack-signature'] as string | undefined;
+      const rawBody = (req as any).rawBody as Buffer | undefined;
+      if (!signature || !rawBody) {
+        return res.status(401).json({ error: 'Invalid signature' });
+      }
+      const expectedSignature = crypto
+        .createHmac('sha512', settings.secretKey)
+        .update(rawBody)
+        .digest('hex');
+      if (
+        signature.length !== expectedSignature.length ||
+        !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))
+      ) {
+        return res.status(401).json({ error: 'Invalid signature' });
+      }
+
       const body = req.body;
       if (body?.event === 'charge.success' && body?.data?.metadata?.checkoutSessionId) {
         const checkoutSessionId = parseInt(String(body.data.metadata.checkoutSessionId), 10);
-        await completeSessionByMetadata(checkoutSessionId, body.data.reference);
+        await completeSessionByMetadata(checkoutSessionId, body.data.reference, companyId);
       }
 
       res.json({ received: true });
@@ -102,7 +127,7 @@ export function registerErpPaymentWebhooks(app: Express): void {
         if (verified.paid && verified.externalReference) {
           const checkoutSessionId = parseInt(verified.externalReference, 10);
           if (checkoutSessionId) {
-            await completeSessionByMetadata(checkoutSessionId, String(data.id));
+            await completeSessionByMetadata(checkoutSessionId, String(data.id), companyId);
           }
         }
       }
@@ -141,7 +166,7 @@ export function registerErpPaymentWebhooks(app: Express): void {
       if (verificationText === 'VERIFIED' && body.payment_status === 'Completed' && body.custom) {
         const checkoutSessionId = parseInt(String(body.custom), 10);
         if (checkoutSessionId) {
-          await completeSessionByMetadata(checkoutSessionId, body.txn_id);
+          await completeSessionByMetadata(checkoutSessionId, body.txn_id, companyId);
         }
       }
 
@@ -161,7 +186,7 @@ export function registerErpPaymentWebhooks(app: Express): void {
       const metadata = body?.data?.metadata || body?.metadata;
       if (body?.type === 'payment_paid' && metadata?.checkoutSessionId) {
         const checkoutSessionId = parseInt(String(metadata.checkoutSessionId), 10);
-        await completeSessionByMetadata(checkoutSessionId, body.data?.id);
+        await completeSessionByMetadata(checkoutSessionId, body.data?.id, companyId);
       }
 
       res.json({ received: true });
@@ -186,7 +211,7 @@ export function registerErpPaymentWebhooks(app: Express): void {
           const mpesaReceipt = body.CallbackMetadata?.Item?.find(
             (i: { Name: string }) => i.Name === 'MpesaReceiptNumber'
           )?.Value;
-          await completeSessionByMetadata(session.id, mpesaReceipt || body.CheckoutRequestID);
+          await completeSessionByMetadata(session.id, mpesaReceipt || body.CheckoutRequestID, companyId);
         }
       }
 

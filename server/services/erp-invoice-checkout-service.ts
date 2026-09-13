@@ -133,10 +133,22 @@ export async function completeInvoiceCheckoutSession(
     referenceNumber?: string;
     externalSessionId?: string;
     recordedBy?: number | null;
+    // Every webhook caller (Stripe/Paystack/Moyasar/MercadoPago/PayPal/M-Pesa) is
+    // itself scoped to a single company (its own :companyId route param, or the
+    // credentials used to authenticate the payment). Without this check, a
+    // gateway credential or webhook path that authenticates company A still let
+    // the *body's* checkoutSessionId point at any other company's session,
+    // marking a stranger's invoice paid. Pass the caller's own companyId so a
+    // mismatch is rejected instead of silently completed.
+    expectedCompanyId?: number;
   } = {}
 ): Promise<{ invoice: Invoice; alreadyCompleted: boolean }> {
   const session = await storage.getErpInvoiceCheckoutSession(checkoutSessionId);
   if (!session) throw new Error('Checkout session not found');
+
+  if (options.expectedCompanyId !== undefined && session.companyId !== options.expectedCompanyId) {
+    throw new Error('Checkout session does not belong to the expected company');
+  }
 
   if (session.status === 'completed') {
     const invoice = await storage.getInvoice(session.invoiceId);

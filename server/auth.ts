@@ -16,6 +16,8 @@ import { initPipelineStages } from "./init-pipeline-stages";
 import { validatePhoneNumber } from "./utils/phone-validation";
 import { buildSessionCookieSettings } from "./utils/session-cookie";
 import { runRelay } from "./services/relay";
+import { ensureAuthenticated } from "./middleware";
+import { loginRateLimiter, passwordResetRateLimiter } from "./middleware/auth-rate-limit";
 
 declare global {
   namespace Express {
@@ -510,43 +512,15 @@ export async function setupAuth(app: Express) {
   };
 
 
-  app.post("/api/register", async (req, res, next) => {
-    try {
-      const { username, password, fullName, email, companyId } = req.body;
-
-
-      if (!username || !password || !fullName || !email || !companyId) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
-
-
-      const company = await storage.getCompany(companyId);
-      if (!company || !company.active) {
-        return res.status(400).json({ error: "Invalid or inactive company" });
-      }
-
-      const existingUser = await storage.getUserByUsernameCaseInsensitive(username);
-      if (existingUser) {
-        return res.status(400).json({ error: "Username already exists" });
-      }
-
-      const user = await storage.createUser({
-        username,
-        password: await hashPassword(password),
-        fullName,
-        email,
-        companyId,
-        role: "agent",
-        isSuperAdmin: false
-      });
-
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
-      });
-    } catch (error) {
-      next(error);
-    }
+  // Disabled: this endpoint let an unauthenticated caller create an "agent"
+  // account inside ANY existing company by supplying its companyId directly,
+  // with no invitation, token, or authorization check. Adding a user to a
+  // company is only supported via POST /api/team/members, which requires an
+  // authenticated company admin (ensureAuthenticated + ensureAdmin).
+  app.post("/api/register", async (_req, res) => {
+    res.status(410).json({
+      error: "Open self-registration into an existing company is no longer supported. Ask a company admin to add you via team management.",
+    });
   });
 
 
@@ -714,7 +688,7 @@ export async function setupAuth(app: Express) {
   });
 
 
-  app.post("/api/login", requireSubdomainAuth, (req, res, next) => {
+  app.post("/api/login", loginRateLimiter, requireSubdomainAuth, (req, res, next) => {
     passport.authenticate("local", (err: any, user: any, _info: any) => {
       if (err) {
         return next(err);
@@ -881,7 +855,7 @@ export async function setupAuth(app: Express) {
   });
 
 
-  app.post("/api/admin/return-from-impersonation", async (req, res, next) => {
+  app.post("/api/admin/return-from-impersonation", ensureAuthenticated, async (req, res, next) => {
     try {
 
       const impersonationData = (req.session as any).impersonation;
@@ -890,25 +864,19 @@ export async function setupAuth(app: Express) {
 
       let superAdmin: SelectUser | undefined;
 
-
+      // Only ever return to the super admin recorded on THIS session's own
+      // impersonation state. There is no legitimate case for guessing at
+      // "some" super admin account when no impersonation is active — that
+      // previously allowed an unauthenticated request to log in as an
+      // arbitrary super admin found in the database.
       if (impersonationData?.originalUserId) {
         superAdmin = await storage.getUser(impersonationData.originalUserId);
       } else if (originalSuperAdminId && isImpersonating) {
         superAdmin = await storage.getUser(originalSuperAdminId);
-      } else {
-
-        const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || "admin@example.com";
-        superAdmin = await storage.getUserByUsernameOrEmail(superAdminEmail);
-
-
-        if (!superAdmin) {
-          const allUsers = await storage.getAllUsers();
-          superAdmin = allUsers.find(user => user.isSuperAdmin);
-        }
       }
 
       if (!superAdmin || !superAdmin.isSuperAdmin) {
-        return res.status(404).json({ error: "Original super admin user not found" });
+        return res.status(404).json({ error: "No active impersonation session found" });
       }
 
 
@@ -1569,7 +1537,7 @@ export async function setupAuth(app: Express) {
   const { PasswordResetService } = await import('./services/password-reset');
 
 
-  app.post("/api/auth/forgot-password", async (req, res) => {
+  app.post("/api/auth/forgot-password", passwordResetRateLimiter, async (req, res) => {
     try {
       const { email } = req.body;
 
@@ -1630,7 +1598,7 @@ export async function setupAuth(app: Express) {
   });
 
 
-  app.post("/api/auth/reset-password", async (req, res) => {
+  app.post("/api/auth/reset-password", passwordResetRateLimiter, async (req, res) => {
     try {
       const { token, newPassword, confirmPassword } = req.body;
 
@@ -1675,7 +1643,7 @@ export async function setupAuth(app: Express) {
 
 
 
-  app.post("/api/admin/auth/forgot-password", async (req, res) => {
+  app.post("/api/admin/auth/forgot-password", passwordResetRateLimiter, async (req, res) => {
     try {
       const { email } = req.body;
 
@@ -1737,7 +1705,7 @@ export async function setupAuth(app: Express) {
   });
 
 
-  app.post("/api/admin/auth/reset-password", async (req, res) => {
+  app.post("/api/admin/auth/reset-password", passwordResetRateLimiter, async (req, res) => {
     try {
       const { token, newPassword, confirmPassword } = req.body;
 

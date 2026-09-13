@@ -5,9 +5,12 @@ import fs from 'fs-extra';
 import crypto from 'crypto';
 import { CampaignService } from '../services/campaignService.js';
 import { requirePermission, requireAnyPermission } from '../middleware.js';
+import { planLimitsService } from '../services/plan-limits-service.js';
 import { db } from '../db.js';
 import { campaigns, campaignRecipients, campaignQueue, campaignMessages, contacts, channelConnections, whatsappAccounts } from '../../shared/schema.js';
 import { eq, sql, and, desc, inArray } from 'drizzle-orm';
+import { getSesConfig } from '../services/email-providers/ses.js';
+import { getSesCampaignReplyWarning } from '../services/email-reply-monitoring.js';
 import { createObjectCsvWriter } from 'csv-writer';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -21,6 +24,26 @@ const getErrorMessage = (error: unknown): string => {
     return error.message;
   }
   return String(error);
+};
+
+// Non-blocking helper: for email campaigns sent via Amazon SES, warn (without
+// blocking save) when the configured SES "From" address isn't connected to a
+// monitored inbox for this company, since replies would then be invisible in
+// the CRM. Returns undefined when there's nothing to warn about.
+const getEmailReplyWarningForCampaign = async (
+  companyId: number,
+  campaign: { channelType?: string | null; emailProvider?: string | null } | null | undefined
+): Promise<string | undefined> => {
+  if (!campaign || campaign.channelType !== 'email' || campaign.emailProvider !== 'ses') {
+    return undefined;
+  }
+  try {
+    const sesConfig = await getSesConfig();
+    return getSesCampaignReplyWarning(companyId, sesConfig?.fromEmail);
+  } catch (error) {
+    console.error('Error computing email reply warning for campaign:', error);
+    return undefined;
+  }
 };
 
 
@@ -103,6 +126,10 @@ router.post('/', requireAnyPermission(['create_campaigns']), async (req, res) =>
       return res.status(400).json({ success: false, error: 'Company ID and User ID required' });
     }
 
+    const campaignLimit = await planLimitsService.checkPlanLimit(companyId, 'campaigns');
+    if (!campaignLimit.allowed) {
+      return res.status(403).json({ success: false, error: campaignLimit.message || 'Campaign limit reached for your plan' });
+    }
 
     // Forward all body fields including email campaign: emailSubject, emailProvider, contentMode, channelId, channelType
     const campaignData = { ...req.body };
@@ -122,7 +149,8 @@ router.post('/', requireAnyPermission(['create_campaigns']), async (req, res) =>
     }
 
     const campaign = await campaignService.createCampaign(companyId, userId, campaignData);
-    res.json({ success: true, data: campaign });
+    const emailReplyWarning = await getEmailReplyWarningForCampaign(companyId, campaign as any);
+    res.json({ success: true, data: campaign, emailReplyWarning });
   } catch (error) {
     console.error('Error creating campaign:', error);
     const errorMessage = getErrorMessage(error);
@@ -564,7 +592,8 @@ router.put('/:id', requireAnyPermission(['edit_campaigns']), async (req, res) =>
     }
 
     const campaign = await campaignService.updateCampaign(companyId, campaignId, updateData);
-    res.json({ success: true, data: campaign });
+    const emailReplyWarning = await getEmailReplyWarningForCampaign(companyId, campaign as any);
+    res.json({ success: true, data: campaign, emailReplyWarning });
   } catch (error) {
     console.error('Error updating campaign:', error);
     const errorMessage = getErrorMessage(error);

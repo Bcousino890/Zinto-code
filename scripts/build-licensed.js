@@ -5,14 +5,25 @@ import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import readline from 'readline';
-import { createCipheriv, randomBytes as cryptoRandomBytes, createHash } from 'crypto';
+import { createCipheriv, randomBytes as cryptoRandomBytes, createHash, createHmac } from 'crypto';
 import JavaScriptObfuscator from 'javascript-obfuscator';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-const ENCRYPTION_KEY = 'bothive-license-key-2024-secur';
+// Must match server/services/license-validator.ts exactly.
+const LEGACY_ENCRYPTION_KEY = 'bothive-license-key-2024-secur';
+const ENCRYPTION_KEY = process.env.LICENSE_ENCRYPTION_KEY || LEGACY_ENCRYPTION_KEY;
+const LEGACY_SIGNING_SECRET = 'bothive-license-key-2024-secur';
+const SIGNING_SECRET = process.env.LICENSE_SIGNING_SECRET || LEGACY_SIGNING_SECRET;
+if (!process.env.LICENSE_SIGNING_SECRET) {
+  console.warn(
+    '\n⚠️  LICENSE_SIGNING_SECRET is not set — signing with the legacy, ' +
+    'unsalted-sha256 method. Anyone with this repo can forge a license in ' +
+    'that format. Set LICENSE_SIGNING_SECRET (and matching it on the server ' +
+    'that validates licenses) before distributing real licenses.\n'
+  );
+}
 const ALGORITHM = 'aes-256-cbc';
 
 function getEncryptionKey() {
@@ -101,7 +112,11 @@ function validateIps(ipString) {
 }
 
 function createLicenseHash(data) {
-  return createHash('sha256').update(JSON.stringify(data)).digest('hex');
+  const payload = JSON.stringify(data);
+  if (process.env.LICENSE_SIGNING_SECRET) {
+    return createHmac('sha256', SIGNING_SECRET).update(payload).digest('hex');
+  }
+  return createHash('sha256').update(payload).digest('hex');
 }
 
 async function promptUser(question) {

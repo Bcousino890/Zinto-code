@@ -16938,7 +16938,9 @@ ${GAMMA_ASSISTANT_LOGO_ASK}
   }
 
   /**
-   * Helper method to make HTTP requests (internal callers; no SSRF guard — use `performFlowHttpRequest` with ssrfGuard where user URLs are involved).
+   * Helper method to make HTTP requests. Used by nodes whose URL is
+   * customer-configured (generic api_call, Shopify, WooCommerce, etc.),
+   * so ssrfGuard is always on here — do not flip it off per call site.
    */
   private async makeHttpRequest(options: {
     url: string;
@@ -16963,7 +16965,7 @@ ${GAMMA_ASSISTANT_LOGO_ASK}
       followRedirects: true,
       retryCount: 0,
       responseType: 'auto',
-      ssrfGuard: false
+      ssrfGuard: true
     });
 
     return {

@@ -16,6 +16,7 @@ import { eq, and, desc, sql } from 'drizzle-orm';
 import crypto from 'crypto';
 import OpenAI from 'openai';
 import { getEnvironmentKeyForProvider } from './ai-credential-env';
+import { encryptValue, decryptValue } from '../utils/crypto';
 
 
 
@@ -43,26 +44,38 @@ export class AiCredentialsService {
   }
 
   /**
-   * Encrypt API key for secure storage
+   * Encrypt API key for secure storage.
+   * Uses AES-256-CBC with a random IV per call (format "ivHex:cipherHex"),
+   * via the shared crypto util — not the legacy `crypto.createCipher`
+   * (deprecated, no IV, weak key derivation) this used to call.
    */
   private encryptApiKey(apiKey: string): string {
-    const cipher = crypto.createCipher('aes-256-cbc', this.encryptionKey);
-    let encrypted = cipher.update(apiKey, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return encrypted;
+    return encryptValue(apiKey);
   }
 
   /**
-   * Decrypt API key for use
+   * Decrypt API key for use. Accepts both the current "iv:cipher" format
+   * and legacy values encrypted with the old `createCipher`-based method,
+   * so previously stored credentials keep working until they're re-saved
+   * (at which point they're re-encrypted with the secure method).
    */
   private decryptApiKey(encryptedKey: string): string {
+    if (encryptedKey.includes(':')) {
+      try {
+        return decryptValue(encryptedKey);
+      } catch (error) {
+        console.error('Failed to decrypt API key with current method:', error);
+        throw new Error('Invalid encrypted API key');
+      }
+    }
+
     try {
       const decipher = crypto.createDecipher('aes-256-cbc', this.encryptionKey);
       let decrypted = decipher.update(encryptedKey, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
       return decrypted;
     } catch (error) {
-      console.error('Failed to decrypt API key:', error);
+      console.error('Failed to decrypt API key (legacy method):', error);
       throw new Error('Invalid encrypted API key');
     }
   }

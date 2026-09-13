@@ -25,3 +25,26 @@
 - Task 4 must construct `StripeClientProvider(storage)` only in the worker/admin composition root and record sanitized failures through the outbox.
 - Stripe coupons cannot be hard-deleted under this design; obsolete coupon redemption is prevented by deactivating its promotion code. Existing coupon objects remain for historical reference.
 - A live reconciliation remains deliberately out of scope; it must start with the dry-run review described in the plan.
+
+## Round 1 review fixes
+
+### RED / GREEN
+
+- RED: the expanded focused suite failed for the missing plan-discount coupon, inactive plan price, promotion-code lifecycle, metadata reconciliation, JPY conversion, and remote dry-run isolation cases.
+- GREEN: `node --import tsx --test tests/stripe-catalog-sync-service.test.ts` passes 13/13 after the fixes.
+
+### Implemented findings
+
+1. Plan discount fields and dates now participate in the catalog fingerprint. Active discounts create/reuse a Stripe coupon with `zinto_plan_id`, replacement coupons mark their predecessors archived in metadata, and `stripePlanCouponId` is persisted or cleared outside its validity window.
+2. Deactivating a plan archives both the mapped/reconciled price and product before recording the local synchronized state.
+3. Coupon start/end/activity fields participate in its fingerprint. Promotion codes are created inactive outside the window and are updated inactive when a coupon is disabled or expires.
+4. Missing local mappings are recovered by Zinto metadata and immutable fingerprints using bounded cursor pagination. Tests simulate a persistence failure and recover product, price, coupon, and promotion-code mappings without additional creates.
+5. Plan price fingerprints and Stripe price payloads use the normalized configured currency; the suite verifies JPY as a zero-decimal currency.
+6. Dry-run returns a local plan only. It does not call retrieve, list, create, update, or storage persistence, including when Stripe IDs already exist.
+
+### Round 1 verification
+
+- Focused service/provider suite: 13 passing tests.
+- Relevant Tasks 1–3 suites: 44 passing tests.
+- `NODE_OPTIONS=--max-old-space-size=4096 npm run check`: exit 0.
+- `git diff --check`: exit 0.

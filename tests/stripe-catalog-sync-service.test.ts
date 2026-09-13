@@ -12,6 +12,9 @@ function createFakeStripe() {
   const next = (prefix: string) => `${prefix}_${++sequence}`;
   const priceById = new Map<string, any>();
   const couponById = new Map<string, any>();
+  const productById = new Map<string, any>();
+  const promotionCodeById = new Map<string, any>();
+  const calls = { retrieve: 0, list: 0 };
   const products = { created: [] as any[], updated: [] as any[] };
   const prices = { created: [] as any[], updated: [] as any[] };
   const coupons = { created: [] as any[], updated: [] as any[] };
@@ -22,12 +25,15 @@ function createFakeStripe() {
       updated: products.updated,
       create: async (input: any, options: any) => {
         products.created.push({ input, options });
-        return { id: next('prod') };
+        const id = next('prod');
+        productById.set(id, { id, ...input });
+        return { id };
       },
       update: async (id: string, input: any, options: any) => {
         products.updated.push({ id, input, options });
         return { id };
       },
+      list: async (input: any) => paged([...productById.values()], input, calls),
     },
     prices: {
       created: prices.created,
@@ -42,7 +48,8 @@ function createFakeStripe() {
         prices.updated.push({ id, input, options });
         return { id };
       },
-      retrieve: async (id: string) => priceById.get(id),
+      retrieve: async (id: string) => { calls.retrieve += 1; return priceById.get(id); },
+      list: async (input: any) => paged([...priceById.values()], input, calls),
     },
     coupons: {
       created: coupons.created,
@@ -57,21 +64,39 @@ function createFakeStripe() {
         coupons.updated.push({ id, input, options });
         return { id };
       },
-      retrieve: async (id: string) => couponById.get(id),
+      retrieve: async (id: string) => { calls.retrieve += 1; return couponById.get(id); },
+      list: async (input: any) => paged([...couponById.values()], input, calls),
     },
     promotionCodes: {
       created: promotionCodes.created,
       updated: promotionCodes.updated,
       create: async (input: any, options: any) => {
         promotionCodes.created.push({ input, options });
-        return { id: next('promo') };
+        const id = next('promo');
+        promotionCodeById.set(id, { id, ...input });
+        return { id };
       },
       update: async (id: string, input: any, options: any) => {
         promotionCodes.updated.push({ id, input, options });
         return { id };
       },
+      list: async (input: any) => paged([...promotionCodeById.values()], input, calls),
+    },
+    calls,
+    seed: {
+      product: (value: any) => productById.set(value.id, value),
+      price: (value: any) => priceById.set(value.id, value),
+      coupon: (value: any) => couponById.set(value.id, value),
+      promotionCode: (value: any) => promotionCodeById.set(value.id, value),
     },
   };
+}
+
+function paged(values: any[], input: { starting_after?: string; limit?: number }, calls: { list: number }) {
+  calls.list += 1;
+  const start = input.starting_after ? values.findIndex((value) => value.id === input.starting_after) + 1 : 0;
+  const data = values.slice(start, start + (input.limit ?? 100));
+  return Promise.resolve({ data, has_more: start + data.length < values.length });
 }
 
 function createStorage(plan: Plan, coupon: Coupon) {
@@ -211,4 +236,102 @@ test('el proveedor rechaza configuración Stripe incompleta sin exponer secretos
 
   await assert.rejects(provider.getClient(), StripeCatalogConfigurationError);
   assert.equal(sanitizeStripeCatalogError(new Error('Stripe rejected sk_test_example_catalog_key')), 'Stripe rejected [redacted]');
+});
+
+test('sincroniza, reemplaza y retira el cupón propio activo del plan según sus fechas', async () => {
+  const { plan, coupon } = fixtures();
+  Object.assign(plan, { originalPrice: '40.00', discountType: 'percentage', discountValue: '25', discountStartDate: new Date('2026-01-01'), discountEndDate: new Date('2026-12-31') });
+  const fakeStripe = createFakeStripe();
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe, currency: 'EUR', now: () => new Date('2026-09-13') });
+
+  await service.syncPlan(plan.id);
+  const firstCouponId = plan.stripePlanCouponId;
+  plan.discountValue = '30';
+  await service.syncPlan(plan.id);
+  plan.discountEndDate = new Date('2026-09-01');
+  await service.syncPlan(plan.id);
+
+  assert.equal(fakeStripe.coupons.created.length, 2);
+  assert.notEqual(plan.stripePlanCouponId, firstCouponId);
+  assert.equal(plan.stripePlanCouponId, null);
+  assert.equal(fakeStripe.coupons.updated.at(-1).input.metadata.zinto_catalog_archived, 'true');
+  assert.equal(fakeStripe.coupons.created[0].input.metadata.zinto_plan_id, '7');
+});
+
+test('desactivar un plan retira simultáneamente su producto y precio', async () => {
+  const { plan, coupon } = fixtures();
+  const fakeStripe = createFakeStripe();
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe });
+  await service.syncPlan(plan.id);
+  plan.isActive = false;
+
+  await service.syncPlan(plan.id);
+
+  assert.equal(fakeStripe.products.updated.at(-1).input.active, false);
+  assert.equal(fakeStripe.prices.updated.at(-1).input.active, false);
+});
+
+test('mantiene códigos promocionales no canjeables antes del inicio y tras desactivar el cupón', async () => {
+  const { plan, coupon } = fixtures();
+  coupon.startDate = new Date('2026-10-01T00:00:00.000Z');
+  const fakeStripe = createFakeStripe();
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe, now: () => new Date('2026-09-13') });
+  await service.syncCoupon(coupon.id);
+  coupon.startDate = new Date('2026-01-01T00:00:00.000Z');
+  await service.syncCoupon(coupon.id);
+  coupon.isActive = false;
+  await service.syncCoupon(coupon.id);
+
+  assert.equal(fakeStripe.promotionCodes.created[0].input.active, false);
+  assert.equal(fakeStripe.promotionCodes.updated.at(-1).input.active, false);
+});
+
+test('reconcilia producto, precio, cupón y código existentes por metadata a través de páginas', async () => {
+  const { plan, coupon } = fixtures();
+  const fakeStripe = createFakeStripe();
+  for (let index = 0; index < 101; index += 1) fakeStripe.seed.product({ id: `other_${index}`, metadata: {} });
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe });
+  await service.syncPlan(plan.id);
+  await service.syncCoupon(coupon.id);
+  const expectedPlanIds = { product: plan.stripeProductId, price: plan.stripePriceId };
+  const expectedCouponIds = { coupon: coupon.stripeCouponId, promotionCode: coupon.stripePromotionCodeId };
+  Object.assign(plan, { stripeProductId: undefined, stripePriceId: undefined, stripeSyncFingerprint: undefined });
+  Object.assign(coupon, { stripeCouponId: undefined, stripePromotionCodeId: undefined, stripeSyncFingerprint: undefined });
+
+  await service.syncPlan(plan.id);
+  await service.syncCoupon(coupon.id);
+
+  assert.equal(plan.stripeProductId, expectedPlanIds.product);
+  assert.equal(plan.stripePriceId, expectedPlanIds.price);
+  assert.equal(coupon.stripeCouponId, expectedCouponIds.coupon);
+  assert.equal(coupon.stripePromotionCodeId, expectedCouponIds.promotionCode);
+  assert.ok(fakeStripe.calls.list >= 2);
+  assert.equal(fakeStripe.products.created.length, 1);
+});
+
+test('crea precios con la moneda normalizada configurada y unidades sin decimales', async () => {
+  const { plan, coupon } = fixtures();
+  plan.price = '2925';
+  const fakeStripe = createFakeStripe();
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe, currency: 'jpy' });
+
+  await service.syncPlan(plan.id);
+
+  assert.equal(fakeStripe.prices.created[0].input.currency, 'jpy');
+  assert.equal(fakeStripe.prices.created[0].input.unit_amount, 2925);
+});
+
+test('dry-run con mappings existentes no toca ningún método remoto', async () => {
+  const { plan, coupon } = fixtures();
+  Object.assign(plan, { stripeProductId: 'prod_existing', stripePriceId: 'price_existing' });
+  Object.assign(coupon, { stripeCouponId: 'coupon_existing', stripePromotionCodeId: 'promo_existing' });
+  const fakeStripe = createFakeStripe();
+  const service = new StripeCatalogSyncService({ storage: createStorage(plan, coupon), stripe: fakeStripe });
+
+  await service.syncPlan(plan.id, { dryRun: true });
+  await service.syncCoupon(coupon.id, { dryRun: true });
+
+  assert.equal(fakeStripe.calls.retrieve, 0);
+  assert.equal(fakeStripe.calls.list, 0);
+  assert.equal(fakeStripe.products.updated.length + fakeStripe.prices.updated.length + fakeStripe.coupons.updated.length + fakeStripe.promotionCodes.updated.length, 0);
 });

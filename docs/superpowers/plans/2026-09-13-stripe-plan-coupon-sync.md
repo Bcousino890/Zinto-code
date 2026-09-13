@@ -23,7 +23,7 @@
 
 ---
 
-### Tarea 1: Modelo monetario, intervalos y selección de descuentos
+### Task 1: Modelo monetario, intervalos y selección de descuentos
 
 **Archivos:**
 - Crear: `server/services/stripe-catalog-domain.ts`
@@ -83,7 +83,7 @@ git add server/services/stripe-catalog-domain.ts tests/stripe-catalog-domain.tes
 git commit -m "feat: add Stripe catalog domain rules"
 ```
 
-### Tarea 2: Persistencia de correspondencias y bandeja de salida
+### Task 2: Persistencia de correspondencias y bandeja de salida
 
 **Archivos:**
 - Crear: `migrations/234-stripe-catalog-sync.sql`
@@ -136,7 +136,7 @@ git add migrations/234-stripe-catalog-sync.sql shared/schema.ts server/storage.t
 git commit -m "feat: persist Stripe catalog synchronization"
 ```
 
-### Tarea 3: Servicio idempotente de catálogo Stripe
+### Task 3: Servicio idempotente de catálogo Stripe
 
 **Archivos:**
 - Crear: `server/services/stripe-catalog-sync-service.ts`
@@ -182,7 +182,7 @@ git add server/services/stripe-client-provider.ts server/services/stripe-catalog
 git commit -m "feat: synchronize Stripe catalog objects"
 ```
 
-### Tarea 4: Integrar sincronización en CRUD de planes y cupones
+### Task 4: Integrar sincronización en CRUD de planes y cupones
 
 **Archivos:**
 - Modificar: `server/plan-routes.ts`
@@ -225,7 +225,7 @@ git add server/plan-routes.ts server/routes/admin/coupon-routes.ts server/routes
 git commit -m "feat: sync plan and coupon changes with Stripe"
 ```
 
-### Tarea 5: Procesador de trabajos con reintentos y concurrencia
+### Task 5: Procesador de trabajos con reintentos y concurrencia
 
 **Archivos:**
 - Crear: `server/services/stripe-catalog-sync-worker.ts`
@@ -257,7 +257,7 @@ git add server/services/stripe-catalog-sync-worker.ts server/index.ts tests/stri
 git commit -m "feat: process Stripe catalog sync jobs"
 ```
 
-### Tarea 6: Checkout seguro con precios y cupones sincronizados
+### Task 6: Checkout seguro con precios y cupones sincronizados
 
 **Archivos:**
 - Crear: `server/services/stripe-checkout-service.ts`
@@ -299,7 +299,7 @@ git add server/services/stripe-checkout-service.ts server/payment-routes.ts serv
 git commit -m "feat: enforce synchronized Stripe checkout pricing"
 ```
 
-### Tarea 7: Webhooks, activación y uso de cupones
+### Task 7: Webhooks, activación y uso de cupones
 
 **Archivos:**
 - Modificar: `server/admin-routes.ts`
@@ -332,7 +332,7 @@ git add server/admin-routes.ts server/services/subscription-webhooks.ts server/s
 git commit -m "fix: verify Stripe payment outcomes before activation"
 ```
 
-### Tarea 8: Estado y controles en administración
+### Task 8: Estado y controles en administración
 
 **Archivos:**
 - Modificar: `client/src/pages/admin/plans/index.tsx`
@@ -363,7 +363,7 @@ git add client/src/pages/admin/plans/index.tsx client/src/pages/admin/coupons/in
 git commit -m "feat: show Stripe catalog sync controls"
 ```
 
-### Tarea 9: Verificación integral y revisión de seguridad
+### Task 9: Verificación integral y revisión de seguridad
 
 **Archivos:**
 - Modificar si es necesario: únicamente archivos de las tareas anteriores.

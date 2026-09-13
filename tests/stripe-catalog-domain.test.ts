@@ -103,6 +103,23 @@ test('elige un cupón cuando produce un total menor', () => {
   });
 });
 
+test('redondea descuentos porcentuales a céntimos con aritmética decimal', () => {
+  assert.deepEqual(
+    chooseBestDiscount({
+      price: '30.22',
+      originalPrice: '40.30',
+      discountType: 'percentage',
+      discountValue: '25',
+    }),
+    {
+      source: 'plan',
+      originalAmount: 40.3,
+      discountAmount: 10.08,
+      finalAmount: 30.22,
+    },
+  );
+});
+
 test('ignora descuentos inactivos, futuros o vencidos', () => {
   const now = new Date('2026-09-13T00:00:00.000Z');
   const planWithoutActiveDiscount: PlanLike = {
@@ -125,6 +142,61 @@ test('ignora descuentos inactivos, futuros o vencidos', () => {
       startDate: new Date('2026-09-14T00:00:00.000Z'),
     }, now).source,
     'none',
+  );
+});
+
+test('ignora cupones con el límite global agotado', () => {
+  assert.equal(
+    chooseBestDiscount(planWith25Percent, {
+      discountType: 'fixed_amount',
+      discountValue: '90',
+      usageLimit: 5,
+      currentUsageCount: 5,
+    }).source,
+    'plan',
+  );
+});
+
+test('ignora cupones restringidos a otros planes', () => {
+  assert.equal(
+    chooseBestDiscount(planWith25Percent, {
+      discountType: 'fixed_amount',
+      discountValue: '90',
+      applicablePlanIds: [8, 9],
+    }).source,
+    'plan',
+  );
+});
+
+test('ignora cupones cuando el plan no alcanza el importe mínimo', () => {
+  assert.equal(
+    chooseBestDiscount(planWith25Percent, {
+      discountType: 'fixed_amount',
+      discountValue: '90',
+      minimumPlanValue: '100.01',
+    }).source,
+    'plan',
+  );
+});
+
+test('trata la actividad nula del cupón como no desactivada', () => {
+  assert.equal(
+    chooseBestDiscount(planWith25Percent, {
+      discountType: 'fixed_amount',
+      discountValue: '30',
+      isActive: null,
+    }).source,
+    'coupon',
+  );
+});
+
+test('conserva el descuento del plan cuando ambos producen el mismo total', () => {
+  assert.equal(
+    chooseBestDiscount(planWith25Percent, {
+      discountType: 'percentage',
+      discountValue: '25',
+    }).source,
+    'plan',
   );
 });
 
@@ -154,4 +226,16 @@ test('produce la misma huella para objetos equivalentes sin depender del orden d
 
 test('conserva el orden de arrays al calcular la huella', () => {
   assert.notEqual(catalogFingerprint(['monthly', 'annual']), catalogFingerprint(['annual', 'monthly']));
+});
+
+test('distingue fechas de objetos ordinarios con la misma forma', () => {
+  const isoDate = '2026-09-13T00:00:00.000Z';
+
+  assert.notEqual(catalogFingerprint(new Date(isoDate)), catalogFingerprint({ $date: isoDate }));
+});
+
+test('rechaza valores fuera del dominio de catálogo', () => {
+  for (const value of [1n, new Map([['price', '29.25']]), new Set(['monthly'])]) {
+    assert.throws(() => catalogFingerprint(value), /Unsupported catalog fingerprint value/);
+  }
 });

@@ -113,10 +113,11 @@ export function chooseBestDiscount(
   coupon?: CouponLike | null,
   now = new Date(),
 ): DiscountDecision {
-  const price = parseAmount(plan.price);
   const planDiscountActive = isPlanDiscountActive(plan, now);
-  const originalAmount =
-    planDiscountActive && plan.originalPrice != null ? parseAmount(plan.originalPrice) : price;
+  const originalMinorUnits = toCurrencyMinorUnits(
+    planDiscountActive && plan.originalPrice != null ? plan.originalPrice : plan.price,
+  );
+  const originalAmount = fromCurrencyMinorUnits(originalMinorUnits);
   const noDiscount: DiscountDecision = {
     source: 'none',
     originalAmount,
@@ -125,10 +126,10 @@ export function chooseBestDiscount(
   };
 
   const planDecision = planDiscountActive
-    ? decisionFor('plan', originalAmount, plan.discountType!, plan.discountValue!)
+    ? decisionFor('plan', originalMinorUnits, plan.discountType!, plan.discountValue!)
     : noDiscount;
-  const couponDecision = isCouponValid(coupon, plan, originalAmount, now)
-    ? decisionFor('coupon', originalAmount, coupon.discountType, coupon.discountValue)
+  const couponDecision = isCouponValid(coupon, plan, originalMinorUnits, now)
+    ? decisionFor('coupon', originalMinorUnits, coupon.discountType, coupon.discountValue)
     : noDiscount;
 
   return couponDecision.finalAmount < planDecision.finalAmount ? couponDecision : planDecision;
@@ -138,17 +139,34 @@ export function catalogFingerprint(value: unknown): string {
   return createHash('sha256').update(canonicalize(value)).digest('hex');
 }
 
-function parseAmount(amount: MonetaryAmount): number {
+function parseDecimal(amount: MonetaryAmount): { coefficient: bigint; scale: number } {
   const normalized = String(amount).trim();
   if (!/^\d+(\.\d+)?$/.test(normalized)) {
     throw new Error('Invalid monetary amount');
   }
 
-  const parsed = Number(normalized);
-  if (!Number.isFinite(parsed)) {
-    throw new Error('Invalid monetary amount');
+  const [whole, fraction = ''] = normalized.split('.');
+  return {
+    coefficient: BigInt(`${whole}${fraction}`),
+    scale: fraction.length,
+  };
+}
+
+function toCurrencyMinorUnits(amount: MonetaryAmount): bigint {
+  const decimal = parseDecimal(amount);
+  const centsScale = 2;
+  if (decimal.scale <= centsScale) {
+    return decimal.coefficient * 10n ** BigInt(centsScale - decimal.scale);
   }
-  return parsed;
+
+  return divideAndRoundHalfUp(decimal.coefficient, 10n ** BigInt(decimal.scale - centsScale));
+}
+
+function fromCurrencyMinorUnits(amount: bigint): number {
+  if (amount > BigInt(Number.MAX_SAFE_INTEGER)) {
+    throw new Error('Monetary amount exceeds safe range');
+  }
+  return Number(amount) / 100;
 }
 
 function isPlanDiscountActive(
@@ -169,7 +187,7 @@ function isPlanDiscountActive(
 function isCouponValid(
   coupon: CouponLike | null | undefined,
   plan: PlanLike,
-  amount: number,
+  amount: bigint,
   now: Date,
 ): coupon is CouponLike {
   if (!coupon || coupon.isActive === false || !isWithinDateRange(coupon.startDate, coupon.endDate, now)) {
@@ -188,7 +206,7 @@ function isCouponValid(
   ) {
     return false;
   }
-  return coupon.minimumPlanValue == null || amount >= parseAmount(coupon.minimumPlanValue);
+  return coupon.minimumPlanValue == null || amount >= toCurrencyMinorUnits(coupon.minimumPlanValue);
 }
 
 function isWithinDateRange(start: DateLike | null | undefined, end: DateLike | null | undefined, now: Date): boolean {
@@ -205,55 +223,74 @@ function isWithinDateRange(start: DateLike | null | undefined, end: DateLike | n
 
 function decisionFor(
   source: Exclude<DiscountDecision['source'], 'none'>,
-  originalAmount: number,
+  originalMinorUnits: bigint,
   discountType: Exclude<DiscountType, 'none'>,
   discountValue: MonetaryAmount,
 ): DiscountDecision {
-  const value = parseAmount(discountValue);
-  const rawDiscount = discountType === 'percentage' ? originalAmount * (value / 100) : value;
-  const discountAmount = roundMoney(Math.min(originalAmount, rawDiscount));
+  const discountMinorUnits =
+    discountType === 'percentage'
+      ? percentageOf(originalMinorUnits, discountValue)
+      : toCurrencyMinorUnits(discountValue);
+  const appliedDiscountMinorUnits =
+    discountMinorUnits > originalMinorUnits ? originalMinorUnits : discountMinorUnits;
   return {
     source,
-    originalAmount,
-    discountAmount,
-    finalAmount: roundMoney(originalAmount - discountAmount),
+    originalAmount: fromCurrencyMinorUnits(originalMinorUnits),
+    discountAmount: fromCurrencyMinorUnits(appliedDiscountMinorUnits),
+    finalAmount: fromCurrencyMinorUnits(originalMinorUnits - appliedDiscountMinorUnits),
   };
 }
 
-function roundMoney(amount: number): number {
-  return Math.round((amount + Number.EPSILON) * 100) / 100;
+function percentageOf(amount: bigint, percentage: MonetaryAmount): bigint {
+  const decimal = parseDecimal(percentage);
+  const denominator = 100n * 10n ** BigInt(decimal.scale);
+  return divideAndRoundHalfUp(amount * decimal.coefficient, denominator);
+}
+
+function divideAndRoundHalfUp(numerator: bigint, denominator: bigint): bigint {
+  const quotient = numerator / denominator;
+  const remainder = numerator % denominator;
+  return remainder * 2n >= denominator ? quotient + 1n : quotient;
 }
 
 function canonicalize(value: unknown, seen = new Set<object>()): string {
-  if (value === null || typeof value === 'string' || typeof value === 'boolean') {
-    return JSON.stringify(value);
+  if (value === null) {
+    return 'null';
+  }
+  if (typeof value === 'string') {
+    return `string:${JSON.stringify(value)}`;
+  }
+  if (typeof value === 'boolean') {
+    return `boolean:${value}`;
   }
   if (typeof value === 'number') {
     if (!Number.isFinite(value)) throw new Error('Cannot fingerprint non-finite numbers');
-    return JSON.stringify(value);
-  }
-  if (typeof value === 'bigint') {
-    return JSON.stringify({ $bigint: value.toString() });
+    return `number:${JSON.stringify(value)}`;
   }
   if (value instanceof Date) {
     if (!Number.isFinite(value.getTime())) throw new Error('Cannot fingerprint invalid dates');
-    return JSON.stringify({ $date: value.toISOString() });
+    return `date:${JSON.stringify(value.toISOString())}`;
   }
   if (typeof value !== 'object') {
-    throw new Error(`Cannot fingerprint ${typeof value}`);
+    throw new Error(`Unsupported catalog fingerprint value: ${typeof value}`);
   }
   if (seen.has(value)) throw new Error('Cannot fingerprint circular structures');
 
   seen.add(value);
   try {
     if (Array.isArray(value)) {
-      return `[${value.map((entry) => canonicalize(entry, seen)).join(',')}]`;
+      return `array:[${value.map((entry) => canonicalize(entry, seen)).join(',')}]`;
+    }
+
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null) {
+      throw new Error(`Unsupported catalog fingerprint value: ${value.constructor?.name ?? 'object'}`);
     }
 
     const entries = Object.entries(value as Record<string, unknown>)
       .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
       .map(([key, entry]) => `${JSON.stringify(key)}:${canonicalize(entry, seen)}`);
-    return `{${entries.join(',')}}`;
+    return `object:{${entries.join(',')}}`;
   } finally {
     seen.delete(value);
   }

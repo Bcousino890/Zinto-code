@@ -235,6 +235,7 @@ import flowVariablesRoutes from "./routes/flow-variables";
 import capturedDataRoutes from "./routes/captured-data";
 import { setupAffiliateEarningsRoutes } from "./routes/affiliate-earnings-routes";
 import { setupCouponRoutes } from "./routes/admin/coupon-routes";
+import { setupStripeCatalogRoutes } from "./routes/admin/stripe-catalog-routes";
 import emailSignatureRoutes from "./routes/email-signatures";
 import knowledgeBaseRoutes from "./routes/knowledge-base";
 import enhancedSubscriptionRoutes from "./routes/enhanced-subscription";
@@ -1162,6 +1163,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   setupAffiliateEarningsRoutes(app);
 
   setupCouponRoutes(app);
+
+  setupStripeCatalogRoutes(app);
 
   registerPaymentRoutes(app);
 

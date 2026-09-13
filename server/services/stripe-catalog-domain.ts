@@ -279,6 +279,11 @@ function canonicalize(value: unknown, seen = new Set<object>()): string {
   seen.add(value);
   try {
     if (Array.isArray(value)) {
+      for (let index = 0; index < value.length; index += 1) {
+        if (!Object.prototype.hasOwnProperty.call(value, index)) {
+          throw new Error('Sparse arrays are not supported in catalog fingerprints');
+        }
+      }
       return `array:[${value.map((entry) => canonicalize(entry, seen)).join(',')}]`;
     }
 

@@ -239,3 +239,8 @@ test('rechaza valores fuera del dominio de catálogo', () => {
     assert.throws(() => catalogFingerprint(value), /Unsupported catalog fingerprint value/);
   }
 });
+
+test('rechaza arrays dispersos para evitar huellas ambiguas', () => {
+  assert.match(catalogFingerprint([]), /^[a-f0-9]{64}$/);
+  assert.throws(() => catalogFingerprint(Array(1)), /Sparse arrays are not supported/);
+});

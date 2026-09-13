@@ -240,6 +240,7 @@ import {
 } from "./erp-product-scoping";
 import { convertAmount, getEffectiveRate } from "./services/erp/currency-service";
 import { invoiceHeaderDiscountAmount, invoiceLineDiscountAmount } from "./invoice-discount-math";
+import { decideStripeCatalogSyncEnqueue } from "./services/stripe-catalog-sync-job-policy";
 
 
 export interface AppSetting {
@@ -652,9 +653,9 @@ export interface IStorage {
   updatePlan(id: number, updates: Partial<InsertPlan>): Promise<Plan>;
   deletePlan(id: number): Promise<boolean>;
   enqueueStripeCatalogSync(input: EnqueueStripeCatalogSyncInput): Promise<StripeCatalogSyncJob>;
-  claimStripeCatalogSyncJobs(limit?: number, lockedBy?: string, lockTimeoutMs?: number): Promise<StripeCatalogSyncJob[]>;
-  completeStripeCatalogSyncJob(jobId: number, lockedBy: string): Promise<StripeCatalogSyncJob | undefined>;
-  failStripeCatalogSyncJob(jobId: number, lockedBy: string, error: string, nextAttemptAt?: Date): Promise<StripeCatalogSyncJob | undefined>;
+  claimStripeCatalogSyncJobs(limit?: number, workerId?: string, lockTimeoutMs?: number): Promise<StripeCatalogSyncJob[]>;
+  completeStripeCatalogSyncJob(jobId: number, claimToken: string): Promise<StripeCatalogSyncJob | undefined>;
+  failStripeCatalogSyncJob(jobId: number, claimToken: string, error: string, nextAttemptAt?: Date): Promise<StripeCatalogSyncJob | undefined>;
 
   getPlanAiProviderConfigs(planId: number): Promise<PlanAiProviderConfig[]>;
   createPlanAiProviderConfig(config: InsertPlanAiProviderConfig): Promise<PlanAiProviderConfig>;
@@ -2428,160 +2429,145 @@ export class DatabaseStorage implements IStorage {
   }
 
   async enqueueStripeCatalogSync(input: EnqueueStripeCatalogSyncInput): Promise<StripeCatalogSyncJob> {
-    const [job] = await db
-      .insert(stripeCatalogSyncJobs)
-      .values(input)
-      .onConflictDoUpdate({
-        target: [
-          stripeCatalogSyncJobs.entityType,
-          stripeCatalogSyncJobs.entityId,
-          stripeCatalogSyncJobs.fingerprint,
-        ],
-        set: {
-          operation: sql`CASE
-            WHEN stripe_catalog_sync_jobs.status IN ('completed', 'failed')
-              THEN excluded.operation
-            ELSE stripe_catalog_sync_jobs.operation
-          END`,
-          status: sql`CASE
-            WHEN stripe_catalog_sync_jobs.status = 'failed'
-              OR (
-                stripe_catalog_sync_jobs.status = 'completed'
-                AND stripe_catalog_sync_jobs.operation <> excluded.operation
-              )
-              THEN 'pending'
-            ELSE stripe_catalog_sync_jobs.status
-          END`,
-          nextAttemptAt: sql`CASE
-            WHEN stripe_catalog_sync_jobs.status = 'failed'
-              OR (
-                stripe_catalog_sync_jobs.status = 'completed'
-                AND stripe_catalog_sync_jobs.operation <> excluded.operation
-              )
-              THEN NOW()
-            ELSE stripe_catalog_sync_jobs.next_attempt_at
-          END`,
-          lockedAt: sql`CASE
-            WHEN stripe_catalog_sync_jobs.status IN ('completed', 'failed') THEN NULL
-            ELSE stripe_catalog_sync_jobs.locked_at
-          END`,
-          lockedBy: sql`CASE
-            WHEN stripe_catalog_sync_jobs.status IN ('completed', 'failed') THEN NULL
-            ELSE stripe_catalog_sync_jobs.locked_by
-          END`,
-          lastError: sql`CASE
-            WHEN stripe_catalog_sync_jobs.status = 'failed'
-              OR (
-                stripe_catalog_sync_jobs.status = 'completed'
-                AND stripe_catalog_sync_jobs.operation <> excluded.operation
-              )
-              THEN NULL
-            ELSE stripe_catalog_sync_jobs.last_error
-          END`,
-          completedAt: sql`CASE
-            WHEN stripe_catalog_sync_jobs.status = 'failed'
-              OR (
-                stripe_catalog_sync_jobs.status = 'completed'
-                AND stripe_catalog_sync_jobs.operation <> excluded.operation
-              )
-              THEN NULL
-            ELSE stripe_catalog_sync_jobs.completed_at
-          END`,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
+    return await this.db.transaction(async (tx: any) => {
+      await tx.execute(sql`
+        SELECT pg_advisory_xact_lock(hashtext(${input.entityType}), ${input.entityId})
+      `);
 
-    return job;
+      const [latest] = await tx
+        .select()
+        .from(stripeCatalogSyncJobs)
+        .where(and(
+          eq(stripeCatalogSyncJobs.entityType, input.entityType),
+          eq(stripeCatalogSyncJobs.entityId, input.entityId),
+          eq(stripeCatalogSyncJobs.fingerprint, input.fingerprint),
+        ))
+        .orderBy(desc(stripeCatalogSyncJobs.revision))
+        .limit(1)
+        .for('update');
+
+      const decision = decideStripeCatalogSyncEnqueue(latest, input.operation);
+      if (decision.action === 'return') {
+        return latest;
+      }
+      if (decision.action === 'retry') {
+        const [retried] = await tx
+          .update(stripeCatalogSyncJobs)
+          .set({
+            status: 'pending',
+            nextAttemptAt: new Date(),
+            lockedAt: null,
+            lockedBy: null,
+            claimToken: null,
+            lastError: null,
+            completedAt: null,
+            updatedAt: new Date(),
+          })
+          .where(eq(stripeCatalogSyncJobs.id, latest.id))
+          .returning();
+        return retried;
+      }
+
+      const [inserted] = await tx
+        .insert(stripeCatalogSyncJobs)
+        .values({ ...input, revision: decision.revision })
+        .returning();
+      return inserted;
+    });
   }
 
   async claimStripeCatalogSyncJobs(
     limit = 10,
-    lockedBy = randomUUID(),
+    workerId = randomUUID(),
     lockTimeoutMs = 5 * 60 * 1000,
   ): Promise<StripeCatalogSyncJob[]> {
     if (!Number.isInteger(limit) || limit < 1) {
       throw new Error('Stripe catalog sync claim limit must be a positive integer');
     }
-    if (!lockedBy.trim()) {
-      throw new Error('Stripe catalog sync lock owner is required');
+    if (!workerId.trim()) {
+      throw new Error('Stripe catalog sync worker id is required');
     }
     if (!Number.isFinite(lockTimeoutMs) || lockTimeoutMs <= 0) {
       throw new Error('Stripe catalog sync lock timeout must be positive');
     }
 
-    const result = await db.execute(sql`
-      WITH claimable AS (
-        SELECT job.id
-        FROM stripe_catalog_sync_jobs job
-        WHERE job.next_attempt_at <= NOW()
-          AND (
-            job.status = 'pending'
-            OR (
-              job.status = 'processing'
-              AND job.locked_at < NOW() - (${lockTimeoutMs} * interval '1 millisecond')
+    const claimToken = randomUUID();
+    return await this.db.transaction(async (tx: any) => {
+      const result = await tx.execute(sql`
+        WITH claimable AS (
+          SELECT job.id
+          FROM stripe_catalog_sync_jobs job
+          WHERE job.next_attempt_at <= NOW()
+            AND (
+              job.status = 'pending'
+              OR (
+                job.status = 'processing'
+                AND job.locked_at < NOW() - (${lockTimeoutMs} * interval '1 millisecond')
+              )
             )
-          )
-          AND NOT EXISTS (
-            SELECT 1
-            FROM stripe_catalog_sync_jobs earlier
-            WHERE earlier.entity_type = job.entity_type
-              AND earlier.entity_id = job.entity_id
-              AND earlier.id < job.id
-              AND earlier.status IN ('pending', 'processing')
-          )
-        ORDER BY job.next_attempt_at, job.created_at
-        FOR UPDATE SKIP LOCKED
-        LIMIT ${limit}
-      )
-      UPDATE stripe_catalog_sync_jobs job
-      SET
-        status = 'processing',
-        attempts = job.attempts + 1,
-        locked_at = NOW(),
-        locked_by = ${lockedBy},
-        last_error = NULL,
-        updated_at = NOW()
-      FROM claimable
-      WHERE job.id = claimable.id
-      RETURNING
-        job.id,
-        job.entity_type AS "entityType",
-        job.entity_id AS "entityId",
-        job.operation,
-        job.fingerprint,
-        job.status,
-        job.attempts,
-        job.next_attempt_at AS "nextAttemptAt",
-        job.locked_at AS "lockedAt",
-        job.locked_by AS "lockedBy",
-        job.last_error AS "lastError",
-        job.completed_at AS "completedAt",
-        job.created_at AS "createdAt",
-        job.updated_at AS "updatedAt"
-    `);
+            AND NOT EXISTS (
+              SELECT 1
+              FROM stripe_catalog_sync_jobs earlier
+              WHERE earlier.entity_type = job.entity_type
+                AND earlier.entity_id = job.entity_id
+                AND earlier.id < job.id
+                AND earlier.status IN ('pending', 'processing')
+            )
+          ORDER BY job.next_attempt_at, job.created_at
+          FOR UPDATE SKIP LOCKED
+          LIMIT ${limit}
+        )
+        UPDATE stripe_catalog_sync_jobs job
+        SET
+          status = 'processing',
+          attempts = job.attempts + 1,
+          locked_at = NOW(),
+          locked_by = ${workerId},
+          claim_token = ${claimToken},
+          last_error = NULL,
+          updated_at = NOW()
+        FROM claimable
+        WHERE job.id = claimable.id
+        RETURNING job.id
+      `);
+      const ids = ((result as { rows?: Array<{ id: string | number }> }).rows ?? []).map(({ id }) => {
+        const decodedId = Number(id);
+        if (!Number.isSafeInteger(decodedId)) {
+          throw new Error(`Invalid Stripe catalog sync job id returned by PostgreSQL: ${id}`);
+        }
+        return decodedId;
+      });
+      if (ids.length === 0) {
+        return [];
+      }
 
-    return ((result as { rows?: StripeCatalogSyncJob[] }).rows ?? []) as StripeCatalogSyncJob[];
+      return await tx
+        .select()
+        .from(stripeCatalogSyncJobs)
+        .where(inArray(stripeCatalogSyncJobs.id, ids))
+        .orderBy(asc(stripeCatalogSyncJobs.nextAttemptAt), asc(stripeCatalogSyncJobs.createdAt));
+    });
   }
 
   async completeStripeCatalogSyncJob(
     jobId: number,
-    lockedBy: string,
+    claimToken: string,
   ): Promise<StripeCatalogSyncJob | undefined> {
-    const [job] = await db
+    const [job] = await this.db
       .update(stripeCatalogSyncJobs)
       .set({
         status: 'completed',
         completedAt: new Date(),
         lockedAt: null,
         lockedBy: null,
+        claimToken: null,
         lastError: null,
         updatedAt: new Date(),
       })
       .where(and(
         eq(stripeCatalogSyncJobs.id, jobId),
         eq(stripeCatalogSyncJobs.status, 'processing'),
-        eq(stripeCatalogSyncJobs.lockedBy, lockedBy),
+        eq(stripeCatalogSyncJobs.claimToken, claimToken),
       ))
       .returning();
 
@@ -2590,24 +2576,25 @@ export class DatabaseStorage implements IStorage {
 
   async failStripeCatalogSyncJob(
     jobId: number,
-    lockedBy: string,
+    claimToken: string,
     error: string,
     nextAttemptAt?: Date,
   ): Promise<StripeCatalogSyncJob | undefined> {
-    const [job] = await db
+    const [job] = await this.db
       .update(stripeCatalogSyncJobs)
       .set({
         status: nextAttemptAt ? 'pending' : 'failed',
         nextAttemptAt: nextAttemptAt ?? new Date(),
         lockedAt: null,
         lockedBy: null,
+        claimToken: null,
         lastError: error,
         updatedAt: new Date(),
       })
       .where(and(
         eq(stripeCatalogSyncJobs.id, jobId),
         eq(stripeCatalogSyncJobs.status, 'processing'),
-        eq(stripeCatalogSyncJobs.lockedBy, lockedBy),
+        eq(stripeCatalogSyncJobs.claimToken, claimToken),
       ))
       .returning();
 

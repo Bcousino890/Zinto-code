@@ -3105,7 +3105,9 @@ export const plans = pgTable("plans", {
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
-});
+}, (table) => [
+  check("plans_stripe_sync_status_check", sql`${table.stripeSyncStatus} IN ('pending', 'synced', 'failed')`),
+]);
 
 export const planAiProviderConfigs = pgTable("plan_ai_provider_configs", {
   id: serial("id").primaryKey(),
@@ -3926,7 +3928,9 @@ export const couponCodes = pgTable("coupon_codes", {
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
-});
+}, (table) => [
+  check("coupon_codes_stripe_sync_status_check", sql`${table.stripeSyncStatus} IN ('pending', 'synced', 'failed')`),
+]);
 
 export const insertCouponCodeSchema = createInsertSchema(couponCodes).pick({
   companyId: true,
@@ -3955,6 +3959,7 @@ export const stripeCatalogSyncJobs = pgTable("stripe_catalog_sync_jobs", {
   entityId: integer("entity_id").notNull(),
   operation: text("operation", { enum: ['upsert', 'archive'] }).notNull(),
   fingerprint: text("fingerprint").notNull(),
+  revision: integer("revision").notNull().default(1),
   status: text("status", {
     enum: ['pending', 'processing', 'completed', 'failed']
   }).notNull().default('pending'),
@@ -3962,18 +3967,20 @@ export const stripeCatalogSyncJobs = pgTable("stripe_catalog_sync_jobs", {
   nextAttemptAt: timestamp("next_attempt_at").notNull().defaultNow(),
   lockedAt: timestamp("locked_at"),
   lockedBy: text("locked_by"),
+  claimToken: text("claim_token"),
   lastError: text("last_error"),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => [
   unique("stripe_catalog_sync_jobs_entity_fingerprint_unique")
-    .on(table.entityType, table.entityId, table.fingerprint),
+    .on(table.entityType, table.entityId, table.fingerprint, table.revision),
   index("stripe_catalog_sync_jobs_due_idx").on(table.status, table.nextAttemptAt),
   index("stripe_catalog_sync_jobs_entity_idx").on(table.entityType, table.entityId, table.createdAt),
   check("stripe_catalog_sync_jobs_entity_type_check", sql`${table.entityType} IN ('plan', 'coupon')`),
   check("stripe_catalog_sync_jobs_operation_check", sql`${table.operation} IN ('upsert', 'archive')`),
   check("stripe_catalog_sync_jobs_status_check", sql`${table.status} IN ('pending', 'processing', 'completed', 'failed')`),
+  check("stripe_catalog_sync_jobs_revision_check", sql`${table.revision} > 0`),
   check("stripe_catalog_sync_jobs_attempts_check", sql`${table.attempts} >= 0`),
 ]);
 

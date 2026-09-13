@@ -144,7 +144,7 @@ publicRouter.get('/checkout-sessions/:id/moyasar-config', async (req, res) => {
   }
 });
 
-authRouter.post('/payment/verify', async (req: any, res) => {
+authRouter.post('/payment/verify', requireAnyPermission(ERP_INVOICE_CHECKOUT_PERMISSIONS), async (req: any, res) => {
   try {
     const schema = z.object({
       checkoutSessionId: z.coerce.number(),
@@ -157,6 +157,9 @@ authRouter.post('/payment/verify', async (req: any, res) => {
     const body = schema.parse(req.body);
     const session = await storage.getErpInvoiceCheckoutSession(body.checkoutSessionId);
     if (!session) return res.status(404).json({ error: 'Checkout session not found' });
+    if (session.companyId !== req.user.companyId) {
+      return res.status(404).json({ error: 'Checkout session not found' });
+    }
 
     const gateway = (body.gateway || session.gateway) as ErpOnlineGateway;
     const settings = await getErpGatewaySettingsRaw(session.companyId, gateway);
@@ -217,6 +220,7 @@ authRouter.post('/payment/verify', async (req: any, res) => {
       referenceNumber,
       externalSessionId: referenceNumber,
       recordedBy: req.user?.id ?? null,
+      expectedCompanyId: req.user.companyId,
     });
 
     res.json({

@@ -12244,60 +12244,21 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
 
       url = validatedData.url.trim();
 
-      // Security: Prevent SSRF attacks by blocking internal/localhost addresses
+      // Security: Prevent SSRF attacks by blocking internal/localhost addresses.
+      // The previous version of this check had a hostname-string blocklist that
+      // missed the cloud-metadata address (169.254.169.254) and IPv6 loopback,
+      // and its DNS-resolution follow-up check had an empty loop body — it
+      // resolved the hostname but never actually rejected a private/resolved
+      // IP, so DNS-rebinding bypassed it entirely. Reuse the shared, tested
+      // SSRF guard instead of a second hand-rolled one. Note: like that guard,
+      // this only validates the initial destination — a redirect from the
+      // target server to a private address is not re-checked here.
       try {
-        const urlObj = new URL(url);
-        const hostname = urlObj.hostname.toLowerCase();
-
-        // Block localhost and internal IPs by hostname string (first check)
-        if (
-          hostname === 'localhost' ||
-          hostname === '127.0.0.1' ||
-          hostname.startsWith('10.') ||
-          hostname.startsWith('192.168.') ||
-          hostname.startsWith('172.16.') ||
-          hostname.startsWith('172.17.') ||
-          hostname.startsWith('172.18.') ||
-          hostname.startsWith('172.19.') ||
-          hostname.startsWith('172.20.') ||
-          hostname.startsWith('172.21.') ||
-          hostname.startsWith('172.22.') ||
-          hostname.startsWith('172.23.') ||
-          hostname.startsWith('172.24.') ||
-          hostname.startsWith('172.25.') ||
-          hostname.startsWith('172.26.') ||
-          hostname.startsWith('172.27.') ||
-          hostname.startsWith('172.28.') ||
-          hostname.startsWith('172.29.') ||
-          hostname.startsWith('172.30.') ||
-          hostname.startsWith('172.31.') ||
-          hostname === '0.0.0.0' ||
-          hostname.endsWith('.local')
-        ) {
-          return res.status(400).json({
-            success: false,
-            error: 'Invalid URL: Internal addresses are not allowed'
-          });
-        }
-
-        // DNS resolution check: resolve hostname and verify all IPs are public
-        try {
-          const addresses = await dns.promises.lookup(hostname, { all: true });
-
-          for (const addr of addresses) {
-            const ip = addr.address;
-
-          }
-        } catch (dnsError: any) {
-          // If DNS lookup fails, we still allow the request to proceed
-          // as the hostname string check above already blocks obvious private addresses
-          // DNS failures could be legitimate (e.g., unreachable domain)
-          // The actual request will fail later if the domain is invalid
-        }
+        await assertPublicHttpUrl(url);
       } catch (urlError) {
         return res.status(400).json({
           success: false,
-          error: 'Invalid URL format'
+          error: urlError instanceof Error ? urlError.message : 'Invalid URL format'
         });
       }
 

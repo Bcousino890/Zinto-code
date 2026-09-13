@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test, { mock } from "node:test";
 
 import { setupStripeCatalogRoutes } from "../server/routes/admin/stripe-catalog-routes";
+import { issueSessionCsrfToken, requireSessionCsrf } from "../server/middleware/csrf-protection";
 
 type Handler = (req: any, res: any, next?: () => void) => unknown;
 
@@ -76,8 +77,9 @@ test("protects catalog synchronization routes and performs dry-runs without a St
         res.status(403).json({ message: "Super admin access required" });
         return;
       }
-      next();
+      return next();
     },
+    requireCsrf(_req, _res, next) { return next(); },
     storage: {
       getAllPlans: async () => [{ id: 41, stripeSyncStatus: "pending" }],
       getAllCoupons: async () => [{ id: 42, stripeSyncStatus: "failed" }],
@@ -166,6 +168,7 @@ test("reports persisted sync state and retries only a validated catalog entity",
   const retries: Array<{ entityType: string; entityId: number }> = [];
   setupStripeCatalogRoutes(app as any, {
     ensureSuperAdmin(_req, _res, next) { return next(); },
+    requireCsrf(_req, _res, next) { return next(); },
     storage: {
       getAllPlans: async () => [{ id: 51, stripeSyncStatus: "synced" }, { id: 52, stripeSyncStatus: "failed", stripeSyncError: "safe error" }],
       getAllCoupons: async () => [{ id: 53, stripeSyncStatus: "pending" }],
@@ -182,8 +185,11 @@ test("reports persisted sync state and retries only a validated catalog entity",
     }),
   });
 
-  const status = await invoke(app, "GET", "/api/admin/stripe-catalog/status", {});
-  assert.deepEqual(status.body, {
+  const status = await invoke(app, "GET", "/api/admin/stripe-catalog/status", { session: {} });
+  assert.equal(status.statusCode, 200);
+  assert.match((status.body as any).csrfToken, /^[A-Za-z0-9_-]{40,}$/);
+  assert.deepEqual({ ...(status.body as any), csrfToken: undefined }, {
+    csrfToken: undefined,
     plans: { pending: 0, synced: 1, failed: 1 },
     coupons: { pending: 1, synced: 0, failed: 0 },
     failed: [{ entityType: "plan", entityId: 52, error: "safe error" }],
@@ -195,4 +201,55 @@ test("reports persisted sync state and retries only a validated catalog entity",
 
   const invalid = await invoke(app, "POST", "/api/admin/stripe-catalog/retry/:entityType/:entityId", { params: { entityType: "stripe", entityId: "price_from_body" } });
   assert.equal(invalid.statusCode, 400);
+});
+
+test("requires a same-origin session CSRF token before synchronizing or retrying", async () => {
+  const app = new TestApp();
+  const calls: string[] = [];
+  const session: Record<string, unknown> = {};
+  const token = issueSessionCsrfToken({ session } as any);
+  const headers = (values: Record<string, string | undefined>) => (name: string) => values[name.toLowerCase()];
+
+  setupStripeCatalogRoutes(app as any, {
+    ensureSuperAdmin(_req, _res, next) { return next(); },
+    requireCsrf: requireSessionCsrf,
+    storage: {
+      getAllPlans: async () => [{ id: 61 }],
+      getAllCoupons: async () => [],
+    },
+    createSyncService: () => ({
+      syncPlan: async (entityId: number) => {
+        calls.push(`plan:${entityId}`);
+        return { entityType: 'plan' as const, entityId, dryRun: false, actions: ['unchanged' as const], fingerprint: 'csrf' };
+      },
+      syncCoupon: async (entityId: number) => {
+        calls.push(`coupon:${entityId}`);
+        return { entityType: 'coupon' as const, entityId, dryRun: false, actions: ['unchanged' as const], fingerprint: 'csrf' };
+      },
+    }),
+  } as any);
+
+  const crossSite = await invoke(app, 'POST', '/api/admin/stripe-catalog/sync', {
+    session, protocol: 'https', body: { dryRun: false },
+    get: headers({ host: 'admin.zinto.test', origin: 'https://evil.example', 'x-csrf-token': token }),
+  });
+  assert.equal(crossSite.statusCode, 403);
+
+  const missingToken = await invoke(app, 'POST', '/api/admin/stripe-catalog/retry/:entityType/:entityId', {
+    session, protocol: 'https', params: { entityType: 'plan', entityId: '61' },
+    get: headers({ host: 'admin.zinto.test', origin: 'https://admin.zinto.test' }),
+  });
+  assert.equal(missingToken.statusCode, 403);
+  assert.deepEqual(calls, []);
+
+  const sameOrigin = { host: 'admin.zinto.test', origin: 'https://admin.zinto.test', 'x-csrf-token': token };
+  const sync = await invoke(app, 'POST', '/api/admin/stripe-catalog/sync', {
+    session, protocol: 'https', body: { dryRun: false }, get: headers(sameOrigin),
+  });
+  const retry = await invoke(app, 'POST', '/api/admin/stripe-catalog/retry/:entityType/:entityId', {
+    session, protocol: 'https', params: { entityType: 'plan', entityId: '61' }, get: headers(sameOrigin),
+  });
+  assert.equal(sync.statusCode, 200);
+  assert.equal(retry.statusCode, 200);
+  assert.deepEqual(calls, ['plan:61', 'plan:61']);
 });

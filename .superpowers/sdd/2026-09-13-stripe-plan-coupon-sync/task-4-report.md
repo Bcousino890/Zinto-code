@@ -45,3 +45,16 @@ No se efectuó ninguna llamada a Stripe real: las pruebas usan servicios inyecta
 ## Nota operativa
 
 El proyecto no define un script `npm test`; por ello se ejecutaron las suites TypeScript relevantes de las Tareas 1–4 y el chequeo completo de TypeScript.
+
+## Corrección de revisión P2: CSRF
+
+Se añadió `server/middleware/csrf-protection.ts`, un middleware reutilizable de token sincronizador ligado a sesión. El token es aleatorio, se guarda únicamente en la sesión y se compara en tiempo constante con `X-CSRF-Token`. Las solicitudes mutables requieren además un `Origin` o `Referer` cuyo origen sea idéntico al protocolo y host de la petición; valores ausentes, inválidos o cross-site devuelven `403`.
+
+`POST /api/admin/stripe-catalog/sync` y `POST /api/admin/stripe-catalog/retry/:entityType/:entityId` aplican el middleware después de `ensureSuperAdmin`. `GET /api/admin/stripe-catalog/status` sigue sin mutar el catálogo y entrega el token de la sesión al superadministrador autenticado para las llamadas posteriores.
+
+### Evidencia RED/GREEN
+
+- RED: `tests/csrf-protection.test.ts` falló inicialmente por la ausencia del módulo de protección. La regresión de ruta falló con `200 !== 403` para un `Origin` cross-site, demostrando que la ruta aún alcanzaba el handler.
+- GREEN: `tests/csrf-protection.test.ts` y `tests/stripe-catalog-admin-routes.test.ts` pasan con 6 pruebas. Cubren origen cross-site, token ausente, `Referer` del mismo origen, ambos POST protegidos y llamadas legítimas con token de la misma sesión.
+
+No se llamó a Stripe: todos los tests de rutas usan un servicio sincronizador inyectado y las solicitudes CSRF rechazadas verifican que no llega ninguna llamada al servicio.

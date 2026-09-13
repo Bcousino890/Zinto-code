@@ -1,6 +1,7 @@
 import type { Express, NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 
+import { issueSessionCsrfToken, requireSessionCsrf } from '../../middleware/csrf-protection';
 import type { IStorage } from '../../storage';
 import type { StripeCatalogSyncService, SyncResult } from '../../services/stripe-catalog-sync-service';
 
@@ -11,6 +12,7 @@ type CatalogStorage = Pick<IStorage, 'getAllPlans' | 'getAllCoupons' | 'getAppSe
 
 type RouteDependencies = {
   ensureSuperAdmin: (req: Request, res: Response, next: NextFunction) => unknown;
+  requireCsrf: (req: Request, res: Response, next: NextFunction) => unknown;
   storage: CatalogStorage;
   createSyncService: (options?: { dryRun?: boolean }) => Promise<SyncService> | SyncService;
 };
@@ -39,6 +41,7 @@ const defaultDependencies: RouteDependencies = {
     const { ensureSuperAdmin } = await import('../../middleware');
     return ensureSuperAdmin(req, res, next);
   },
+  requireCsrf: requireSessionCsrf,
   storage: new Proxy({}, {
     get(_target, property) {
       return async (...args: unknown[]) => {
@@ -73,7 +76,7 @@ async function synchronize(service: SyncService, entityType: CatalogEntityType, 
 export function setupStripeCatalogRoutes(app: Express, dependencies: Partial<RouteDependencies> = {}) {
   const routes = { ...defaultDependencies, ...dependencies };
 
-  app.post('/api/admin/stripe-catalog/sync', routes.ensureSuperAdmin, async (req, res) => {
+  app.post('/api/admin/stripe-catalog/sync', routes.ensureSuperAdmin, routes.requireCsrf, async (req, res) => {
     const parsed = syncRequestSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: 'dryRun must be a boolean' });
 
@@ -94,6 +97,7 @@ export function setupStripeCatalogRoutes(app: Express, dependencies: Partial<Rou
     try {
       const [plans, coupons] = await Promise.all([routes.storage.getAllPlans(), routes.storage.getAllCoupons()]);
       res.json({
+        csrfToken: issueSessionCsrfToken(_req),
         plans: statusFor(plans),
         coupons: statusFor(coupons),
         failed: [
@@ -106,7 +110,7 @@ export function setupStripeCatalogRoutes(app: Express, dependencies: Partial<Rou
     }
   });
 
-  app.post('/api/admin/stripe-catalog/retry/:entityType/:entityId', routes.ensureSuperAdmin, async (req, res) => {
+  app.post('/api/admin/stripe-catalog/retry/:entityType/:entityId', routes.ensureSuperAdmin, routes.requireCsrf, async (req, res) => {
     const parsed = retryParamsSchema.safeParse(req.params);
     if (!parsed.success) return res.status(400).json({ message: 'Invalid catalog entity' });
 

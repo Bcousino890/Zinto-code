@@ -1,120 +1,120 @@
-# Stripe Plan and Coupon Synchronization Design
+# Diseño de sincronización de planes y cupones con Stripe
 
-## Objective
+## Objetivo
 
-Make Zinto the source of truth for subscription plans and coupon codes while keeping Stripe's live catalog synchronized automatically. Changes made in `/admin/plans` and `/admin/coupons` must propagate safely to Stripe without duplicating products, prices, coupons, promotion codes, subscriptions, or charges.
+Convertir a Zinto en la fuente oficial de información para los planes de suscripción y los códigos de cupón, manteniendo sincronizado automáticamente el catálogo de Stripe en producción. Los cambios realizados en `/admin/plans` y `/admin/coupons` deben propagarse de forma segura a Stripe sin duplicar productos, precios, cupones, códigos promocionales, suscripciones ni cobros.
 
-## Scope
+## Alcance
 
-- Synchronize all existing plans and coupons to Stripe through an explicit initial reconciliation.
-- Automatically synchronize subsequent create, update, deactivate, and delete operations.
-- Use the application's configured Stripe account and its configured live/test mode.
-- Apply synchronized Stripe prices and discounts in both initial checkout and renewal flows.
-- Expose synchronization state and actionable errors to super administrators.
-- Test idempotency, amount calculations, lifecycle transitions, webhook handling, and secret handling.
+- Sincronizar todos los planes y cupones existentes con Stripe mediante una reconciliación inicial explícita.
+- Sincronizar automáticamente las operaciones posteriores de creación, actualización, desactivación y eliminación.
+- Utilizar la cuenta de Stripe configurada en la aplicación y respetar el modo de producción o prueba seleccionado.
+- Aplicar los precios y descuentos sincronizados tanto en el pago inicial como en las renovaciones.
+- Mostrar el estado de sincronización y errores accionables a los superadministradores.
+- Probar la idempotencia, los cálculos de importes, los cambios de estado, el procesamiento de webhooks y la protección de secretos.
 
-## Source of Truth and Pricing Rules
+## Fuente oficial y reglas de precios
 
-Zinto remains authoritative. Stripe object IDs and sync state are stored on the corresponding Zinto records.
+Zinto seguirá siendo la fuente oficial. Los identificadores de Stripe y el estado de sincronización se guardarán en los registros correspondientes de Zinto.
 
-For a discounted plan, `originalPrice` is the Stripe recurring unit amount and the plan-level discount is represented by a Stripe Coupon attached during checkout/subscription creation. When no plan-level discount is active, `price` is the Stripe recurring unit amount. The customer-visible and charged total must equal Zinto's calculated final amount.
+Cuando un plan tenga descuento, `originalPrice` será el importe recurrente base en Stripe y el descuento propio del plan se representará mediante un cupón de Stripe aplicado al crear el pago o la suscripción. Cuando el plan no tenga un descuento activo, `price` será el importe recurrente en Stripe. El total mostrado y cobrado al cliente deberá coincidir con el importe final calculado por Zinto.
 
-Standalone coupon codes in `/admin/coupons` are synchronized as Stripe Coupons plus Promotion Codes. Checkout applies at most one standalone coupon in addition to any plan-level discount only if Zinto currently permits stacking; because the current model has no stacking policy, the initial implementation will not stack discounts. A user-provided coupon overrides the plan-level promotional discount only when it produces a lower final amount; otherwise the plan discount is retained. The server calculates and validates the winner before creating Checkout.
+Los cupones independientes de `/admin/coupons` se sincronizarán como cupones y códigos promocionales de Stripe. El pago aplicará como máximo un descuento: el descuento propio del plan o un cupón introducido por el usuario. Como el modelo actual no define una política de acumulación, los descuentos no se acumularán. Si existe un cupón válido del usuario, el servidor comparará ambos descuentos y aplicará el que produzca el menor importe final para el cliente.
 
-Fixed-amount coupons use the application's configured currency (currently EUR). Percentage coupons are currency-independent. Trial days are stored on the plan metadata and applied when creating a Stripe subscription, not embedded in the Price.
+Los cupones de importe fijo utilizarán la moneda configurada en la aplicación, actualmente EUR. Los cupones porcentuales serán independientes de la moneda. Los días de prueba se conservarán como información del plan y se aplicarán al crear la suscripción en Stripe; no formarán parte del precio.
 
-## Stripe Object Mapping
+## Correspondencia de objetos en Stripe
 
-Each plan stores:
+Cada plan guardará:
 
 - `stripeProductId`
 - `stripePriceId`
-- `stripePlanCouponId` when the plan has a built-in discount
-- `stripeSyncStatus`: `pending`, `synced`, or `failed`
+- `stripePlanCouponId` cuando el plan tenga un descuento incorporado
+- `stripeSyncStatus`: `pending`, `synced` o `failed`
 - `stripeSyncError`
 - `stripeSyncedAt`
-- a deterministic sync fingerprint covering billable fields
+- una huella determinista de sincronización que abarque todos los campos facturables
 
-Each coupon stores:
+Cada cupón guardará:
 
 - `stripeCouponId`
 - `stripePromotionCodeId`
-- the same sync status, error, timestamp, and fingerprint fields
+- los mismos campos de estado, error, fecha y huella de sincronización
 
-Stripe metadata includes `zinto_plan_id` or `zinto_coupon_id`, environment, and schema version. These identifiers support reconciliation if local IDs are missing.
+Los metadatos de Stripe incluirán `zinto_plan_id` o `zinto_coupon_id`, el entorno y la versión del esquema. Estos identificadores permitirán reconciliar los sistemas si faltan identificadores locales.
 
-## Plan Lifecycle
+## Ciclo de vida de los planes
 
-### Create
+### Creación
 
-After the database transaction creates a plan, enqueue an idempotent sync. The worker creates one Stripe Product and one active recurring Price. Supported Zinto intervals map to Stripe interval and interval count. `lifetime` plans use a one-time Price. Unsupported custom durations fail synchronization with a visible error rather than silently choosing a different billing schedule.
+Después de crear un plan en la base de datos, se pondrá en cola una sincronización idempotente. El proceso creará un producto de Stripe y un precio activo. Los intervalos de Zinto compatibles se convertirán al intervalo y multiplicador correspondiente de Stripe. Los planes `lifetime` utilizarán un precio de pago único. Las duraciones personalizadas que Stripe no pueda representar fallarán con un error visible, sin sustituirse silenciosamente por otro periodo.
 
-### Update
+### Actualización
 
-Name, description, and active state update the existing Product. Stripe Prices are immutable: changing amount, currency, or interval creates a new Price, sets it as the Product default, records the new ID, and deactivates the old Price. Existing subscriptions keep their old Price unless an explicit migration is added later; no customer is repriced silently.
+Los cambios de nombre, descripción y estado activo actualizarán el producto existente. Los precios de Stripe son inmutables: cambiar el importe, la moneda o el intervalo creará un precio nuevo, lo establecerá como precio predeterminado, guardará su identificador y desactivará el precio anterior. Las suscripciones existentes conservarán su precio anterior; ningún cliente cambiará de precio silenciosamente.
 
-Changing a built-in discount creates a replacement Stripe Coupon because monetary Coupon fields are immutable, updates future checkout usage, and retires the previous promotion object where applicable.
+Cambiar el descuento incorporado de un plan creará un cupón de Stripe de reemplazo, porque sus campos monetarios son inmutables. Los nuevos pagos usarán el cupón actualizado y el objeto promocional anterior quedará retirado cuando corresponda.
 
-### Deactivate or Delete
+### Desactivación o eliminación
 
-Zinto deactivation makes the Stripe Product and current Price inactive. Deletion performs the same archival operation before removing the local record. Historical Stripe objects are never hard-deleted. If Stripe archival fails, deletion is rejected so the systems cannot diverge silently.
+Desactivar un plan en Zinto desactivará su producto y precio actuales en Stripe. La eliminación realizará primero el mismo archivado y después eliminará el registro local. Los objetos históricos de Stripe nunca se eliminarán definitivamente. Si el archivado en Stripe falla, se rechazará la eliminación para evitar que ambos sistemas queden desincronizados silenciosamente.
 
-## Coupon Lifecycle
+## Ciclo de vida de los cupones
 
-Creating a coupon creates a Stripe Coupon and Promotion Code using the same public code. Updates to immutable discount fields create replacements and deactivate the previous Promotion Code. Changes to activation dates, maximum redemptions, active status, and eligible products update or replace the Promotion Code as Stripe permits.
+Crear un cupón generará un cupón y un código promocional de Stripe con el mismo código público. Los cambios de campos de descuento inmutables crearán objetos de reemplazo y desactivarán el código promocional anterior. Las fechas de activación, límites de uso, estado y productos permitidos se actualizarán o reemplazarán según lo admita Stripe.
 
-`usageLimitPerUser` and `minimumPlanValue` remain enforced by Zinto because Stripe Promotion Codes do not express all current Zinto constraints. Zinto validates the coupon before creating Checkout and passes only the synchronized Stripe discount identifier. Coupon usage is recorded only after a verified successful Stripe webhook, never when Checkout is merely opened.
+`usageLimitPerUser` y `minimumPlanValue` seguirán siendo validados por Zinto porque los códigos promocionales de Stripe no expresan todas las restricciones actuales. Zinto validará el cupón antes de crear el pago y solo enviará a Stripe el identificador de un descuento ya sincronizado. El uso del cupón se registrará únicamente después de recibir un webhook de pago exitoso verificado, nunca al abrir la pantalla de pago.
 
-## Synchronization Architecture
+## Arquitectura de sincronización
 
-A focused `StripeCatalogSyncService` owns Stripe catalog operations and has no HTTP concerns. Plan and coupon routes call an outbox-backed sync coordinator after local validation. An outbox table stores operation type, entity ID, fingerprint, attempt count, last error, and completion time.
+Un servicio específico, `StripeCatalogSyncService`, será responsable de las operaciones del catálogo de Stripe y no contendrá lógica HTTP. Las rutas de planes y cupones llamarán a un coordinador de sincronización respaldado por una bandeja de salida después de validar y guardar los datos locales. Una tabla de trabajos guardará el tipo de operación, el identificador de la entidad, la huella, el número de intentos, el último error y la fecha de finalización.
 
-The initial sync endpoint is restricted to super administrators and reconciles every plan and coupon. It is idempotent and may be rerun. A small status endpoint supplies counts and failed items to the admin UI. A manual “Sync with Stripe” action retries failed or stale records.
+El endpoint de sincronización inicial estará limitado a superadministradores y reconciliará todos los planes y cupones. Será idempotente y podrá ejecutarse varias veces sin crear duplicados. Un endpoint de estado mostrará cantidades y elementos fallidos en la interfaz administrativa. Una acción manual «Sincronizar con Stripe» permitirá reintentar registros fallidos o desactualizados.
 
-Automatic retries use bounded exponential backoff. Stripe idempotency keys are deterministic from entity, operation, and fingerprint. Concurrent edits serialize per entity, and stale jobs re-read the latest record before calling Stripe.
+Los reintentos automáticos usarán espera exponencial limitada. Las claves de idempotencia de Stripe serán deterministas según la entidad, operación y huella. Los cambios simultáneos se serializarán por entidad y los trabajos antiguos volverán a leer el registro más reciente antes de llamar a Stripe.
 
-## Checkout and Payment Integrity
+## Integridad del pago
 
-Checkout uses only the `stripePriceId` stored on the selected plan. The server ignores any client-supplied amount, currency, Stripe Price ID, discount ID, or trial value. It loads the plan and coupon from the database, recalculates the final amount, validates activity and eligibility, and creates the Stripe Checkout Session with deterministic metadata.
+El pago utilizará exclusivamente el `stripePriceId` guardado en el plan seleccionado. El servidor ignorará cualquier importe, moneda, identificador de precio, identificador de descuento o periodo de prueba enviado por el cliente. Cargará el plan y el cupón desde la base de datos, recalculará el importe final, validará su vigencia y elegibilidad, y creará la sesión de Stripe Checkout con metadatos deterministas.
 
-Webhook processing verifies the raw request body and Stripe signature, deduplicates by Stripe event ID, and validates plan/company metadata before changing subscription state. The expected plan, amount, currency, customer, and payment status are compared against server-side records. Mismatches are logged and quarantined rather than activating access.
+El procesamiento de webhooks verificará el cuerpo original de la solicitud y la firma de Stripe, y evitará procesar dos veces el mismo identificador de evento. Antes de modificar una suscripción, validará los metadatos del plan y la empresa. El plan, importe, moneda, cliente y estado de pago recibidos se compararán con los registros calculados por el servidor. Las discrepancias se registrarán y aislarán en lugar de activar el acceso.
 
-Idempotency keys prevent duplicate Checkout/session/subscription creation after retries. Database uniqueness constraints prevent duplicate processing and duplicate active mappings.
+Las claves de idempotencia impedirán crear pagos, sesiones o suscripciones duplicadas durante reintentos. Las restricciones únicas de la base de datos impedirán procesamientos duplicados y correspondencias activas repetidas.
 
-## Secrets and Logging
+## Secretos y registros
 
-Stripe secret keys and webhook secrets remain server-side and are never returned by catalog or checkout APIs. Logs redact API keys, webhook signatures, customer payment details, and full Stripe payloads. Admin responses return Stripe object IDs and sanitized error messages only.
+Las claves secretas y los secretos de webhook de Stripe permanecerán exclusivamente en el servidor y nunca se devolverán mediante los endpoints de catálogo o pago. Los registros ocultarán claves API, firmas de webhook, datos de pago del cliente y cargas completas de Stripe. Las respuestas administrativas solo devolverán identificadores de objetos de Stripe y mensajes de error saneados.
 
-## Failure Behavior
+## Comportamiento ante fallos
 
-Plan or coupon saves remain durable if asynchronous synchronization fails, except deletion, which fails closed when Stripe archival cannot be confirmed. Failed entities show `failed` state and an administrator can retry. Checkout is blocked for a paid plan without a current synchronized Price; it must never fall back to accepting a client amount or creating an ad hoc price.
+Los planes y cupones permanecerán guardados si falla una sincronización asíncrona, excepto durante una eliminación, que fallará de forma segura cuando no pueda confirmarse el archivado en Stripe. Los elementos fallidos mostrarán el estado `failed` y podrán reintentarse. El pago se bloqueará para cualquier plan de pago que no tenga un precio sincronizado vigente; nunca se aceptará un importe enviado por el cliente ni se creará un precio improvisado como alternativa.
 
-## Database and Migration
+## Base de datos y migración
 
-Add nullable Stripe mapping and synchronization columns to `plans` and `coupon_codes`, plus a catalog sync outbox table with unique entity/fingerprint constraints. The migration is additive and reversible. Existing records begin as `pending` and are handled by initial reconciliation.
+Se agregarán columnas opcionales de correspondencia y estado de Stripe a `plans` y `coupon_codes`, además de una tabla de trabajos de sincronización con restricciones únicas por entidad y huella. La migración será aditiva y reversible. Los registros existentes comenzarán en estado `pending` y serán procesados por la reconciliación inicial.
 
-## Admin Experience
+## Experiencia administrativa
 
-The plans and coupons pages display Stripe sync status. A super-admin action starts initial/full reconciliation and reports totals for synchronized, skipped, and failed records. Saving an item shows that the local save succeeded and synchronization is pending; failures include a retry action and a sanitized reason.
+Las páginas de planes y cupones mostrarán el estado de sincronización con Stripe. Una acción exclusiva de superadministradores iniciará la reconciliación inicial o completa y mostrará las cantidades de elementos sincronizados, omitidos y fallidos. Al guardar un elemento se informará que el cambio local se guardó y que la sincronización está pendiente. Los errores incluirán una acción de reintento y una explicación saneada.
 
-## Verification
+## Verificación
 
-- Unit tests for amount-to-minor-unit conversion, interval mapping, fingerprints, discount selection, and lifecycle decisions.
-- Service tests with a fake Stripe client for create/update/archive, idempotency, retry, and stale-job behavior.
-- Route tests proving client-supplied amounts and Stripe IDs are ignored.
-- Checkout tests for plan discounts, coupon discounts, non-stacking selection, trials, fixed EUR discounts, inactive/expired coupons, and unsynchronized plans.
-- Webhook tests for valid signatures, invalid signatures, duplicate events, mismatched amounts, failed payments, successful activation, renewals, refunds, and cancellation.
-- Migration tests and a dry-run reconciliation report before live creation.
-- Typecheck and production build.
-- Security review of the final working-tree diff, focused on secret exposure, authorization, IDOR, replay, duplicate charges, amount tampering, and fail-open behavior.
+- Pruebas unitarias de conversión a unidades monetarias mínimas, intervalos, huellas, selección de descuentos y decisiones del ciclo de vida.
+- Pruebas del servicio con un cliente de Stripe simulado para creación, actualización, archivado, idempotencia, reintentos y trabajos obsoletos.
+- Pruebas de rutas que demuestren que se ignoran los importes e identificadores de Stripe enviados por el cliente.
+- Pruebas de pago para descuentos de planes, cupones, selección sin acumulación, periodos de prueba, descuentos fijos en EUR, cupones inactivos o vencidos y planes no sincronizados.
+- Pruebas de webhooks para firmas válidas e inválidas, eventos duplicados, importes discrepantes, pagos fallidos, activación correcta, renovaciones, reembolsos y cancelaciones.
+- Pruebas de migración y un informe de simulación antes de crear objetos reales.
+- Comprobación de tipos y compilación de producción.
+- Revisión de seguridad del cambio final enfocada en exposición de secretos, autorización, referencias inseguras a objetos, repetición de eventos, cobros duplicados, manipulación de importes y comportamientos permisivos ante fallos.
 
-## Rollout
+## Despliegue
 
-1. Deploy schema and code with automatic sync disabled.
-2. Run dry-run reconciliation and review the exact products, prices, and coupons that would be created.
-3. Run initial live reconciliation once approved.
-4. Verify Stripe objects and execute a low-value end-to-end Checkout test.
-5. Enable automatic synchronization.
-6. Monitor webhook failures and catalog sync errors during the first billing cycle.
+1. Desplegar el esquema y el código con la sincronización automática desactivada.
+2. Ejecutar una simulación de reconciliación y revisar los productos, precios y cupones exactos que se crearían.
+3. Ejecutar la reconciliación inicial en producción después de aprobar el informe.
+4. Verificar los objetos de Stripe y realizar una prueba completa de pago con un importe controlado.
+5. Activar la sincronización automática.
+6. Supervisar errores de webhooks y sincronización durante el primer ciclo de facturación.
 
-No existing subscription is repriced or migrated automatically during this rollout.
+Ninguna suscripción existente cambiará de precio ni se migrará automáticamente durante este despliegue.

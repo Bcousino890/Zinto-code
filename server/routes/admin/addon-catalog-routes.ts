@@ -109,6 +109,16 @@ export function setupAddonCatalogRoutes(app: Express, dependencies: Partial<Rout
       if (bodyParsed.data.unitPriceUsd !== undefined) updates.unitPriceUsd = bodyParsed.data.unitPriceUsd.toFixed(2);
       if (bodyParsed.data.isActive !== undefined) updates.isActive = bodyParsed.data.isActive;
 
+      // A price edit invalidates whatever Stripe sync already ran — until an explicit re-sync
+      // recomputes stripePriceIdEur/Usd for the NEW amount, createPurchaseCheckoutSession refuses
+      // to charge (see its `stripeSyncStatus !== 'synced'` check). Without this, the DB price
+      // shown to a customer and the amount actually charged via the still-'synced'-looking old
+      // Stripe price would silently diverge the moment an admin edits a price and forgets to sync.
+      const priceActuallyChanged =
+        (updates.unitPriceEur !== undefined && updates.unitPriceEur !== existing.unitPriceEur) ||
+        (updates.unitPriceUsd !== undefined && updates.unitPriceUsd !== existing.unitPriceUsd);
+      if (priceActuallyChanged) updates.stripeSyncStatus = 'pending';
+
       const updated = await routes.storage.updateAddon(paramsParsed.data.id, updates);
       res.json({ addon: updated });
     } catch (error) {

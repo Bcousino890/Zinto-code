@@ -111,7 +111,11 @@ router.post('/stripe/webhook', async (req, res) => {
             const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
             logger.info('payment-callbacks', `Add-on checkout.session.completed for session ${session.id}: ${JSON.stringify(result)}`);
           } catch (addonError: any) {
+            // Re-thrown (not swallowed): a transient failure here must surface as a 5xx so Stripe
+            // retries the delivery, instead of leaving an already-charged purchase stuck
+            // 'pending' forever with res.json({received:true}) telling Stripe not to retry.
             logger.error('payment-callbacks', 'Failed to process add-on checkout.session.completed:', addonError);
+            throw addonError;
           }
           break;
         }
@@ -149,10 +153,11 @@ router.post('/stripe/webhook', async (req, res) => {
         const session = event.data.object;
         if (session.metadata?.purchaseId) {
           try {
-            const result = await handleAddonWebhookEvent(event);
+            const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
             logger.info('payment-callbacks', `Add-on checkout.session.expired for session ${session.id}: ${JSON.stringify(result)}`);
           } catch (addonError: any) {
             logger.error('payment-callbacks', 'Failed to process add-on checkout.session.expired:', addonError);
+            throw addonError;
           }
         }
         break;
@@ -162,27 +167,30 @@ router.post('/stripe/webhook', async (req, res) => {
         const paymentIntent = event.data.object;
         logger.warn('payment-callbacks', `Payment failed for intent ${paymentIntent.id}, amount: ${paymentIntent.amount} ${paymentIntent.currency}`);
         try {
-          const result = await handleAddonWebhookEvent(event);
+          const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
           if (result.handled) {
             logger.info('payment-callbacks', `Add-on payment_intent.payment_failed processed: ${JSON.stringify(result)}`);
           }
         } catch (addonError: any) {
           logger.error('payment-callbacks', 'Failed to process add-on payment_intent.payment_failed:', addonError);
+          throw addonError;
         }
         break;
       }
 
       // A refund on an already-`active` add-on purchase revokes it immediately (regardless of the
       // "no voluntary refunds" business policy — a manual refund from the Stripe dashboard must
-      // never leave phantom quota behind).
+      // never leave phantom quota behind). A PARTIAL refund does not revoke — see
+      // addon-billing-webhooks.ts.
       case 'charge.refunded': {
         try {
-          const result = await handleAddonWebhookEvent(event);
+          const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
           if (result.handled) {
             logger.info('payment-callbacks', `Add-on charge.refunded processed: ${JSON.stringify(result)}`);
           }
         } catch (addonError: any) {
           logger.error('payment-callbacks', 'Failed to process add-on charge.refunded:', addonError);
+          throw addonError;
         }
         break;
       }
@@ -191,12 +199,13 @@ router.post('/stripe/webhook', async (req, res) => {
       // dispute to resolve, closing the "dispute the charge, keep the quota" angle.
       case 'charge.dispute.created': {
         try {
-          const result = await handleAddonWebhookEvent(event);
+          const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
           if (result.handled) {
             logger.info('payment-callbacks', `Add-on charge.dispute.created processed: ${JSON.stringify(result)}`);
           }
         } catch (addonError: any) {
           logger.error('payment-callbacks', 'Failed to process add-on charge.dispute.created:', addonError);
+          throw addonError;
         }
         break;
       }

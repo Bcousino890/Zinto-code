@@ -15,7 +15,9 @@ import { addDays, type AddonPurchaseStore } from './addon-purchase-service';
  * | checkout.session.completed (metadata.purchaseId)        | pending -> active (ONLY path that grants) |
  * | checkout.session.expired (metadata.purchaseId)          | pending -> failed, only if still pending  |
  * | payment_intent.payment_failed (metadata or PI lookup)   | pending -> failed                         |
- * | charge.refunded (active purchase)                       | active -> revoked ('refunded')            |
+ * | charge.refunded, fully refunded (active purchase)       | active -> revoked ('refunded')            |
+ * | charge.refunded, partial (active purchase)              | ignored — a partial goodwill refund must  |
+ * |                                                          | not take away 100% of the paid-for quota  |
  * | charge.dispute.created (active purchase)                 | active -> revoked ('disputed')            |
  * | any of the above replayed (same event.id)                | strict no-op                              |
  *
@@ -179,6 +181,18 @@ export async function handleAddonWebhookEvent(
       const paymentIntentId = idOf(charge.payment_intent as any);
       const purchase = paymentIntentId ? await store.getPurchaseByPaymentIntentId(paymentIntentId) : undefined;
       if (!purchase) return { handled: false };
+
+      // Stripe fires `charge.refunded` for PARTIAL refunds too (e.g. a small support goodwill
+      // credit) — `charge.refunded` (the boolean) is true only once the charge is refunded in
+      // full. Revoking the whole purchase over a partial refund would take 100% of the quota away
+      // for a customer who still paid (almost) the full price.
+      if (!charge.refunded) {
+        logger.info(
+          'addon-billing-webhooks',
+          `charge.refunded: partial refund (${charge.amount_refunded}/${charge.amount}) on purchase ${purchase.id} — not revoking`
+        );
+        return { handled: true, event: event.type, purchaseId: purchase.id, outcome: 'partial-refund-ignored' };
+      }
 
       const outcome = await store.claimAndRevoke({
         eventId: event.id,

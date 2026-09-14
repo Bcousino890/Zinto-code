@@ -54,11 +54,15 @@ function createFakeStripe() {
   const sessionsCreated: any[] = [];
   const customersCreated: any[] = [];
   let createImpl: ((params: any) => Promise<any>) | null = null;
+  let customersCreateImpl: ((params: any) => Promise<any>) | null = null;
   return {
     sessionsCreated,
     customersCreated,
     setCreateImpl(fn: (params: any) => Promise<any>) {
       createImpl = fn;
+    },
+    setCustomersCreateImpl(fn: (params: any) => Promise<any>) {
+      customersCreateImpl = fn;
     },
     checkout: {
       sessions: {
@@ -73,6 +77,7 @@ function createFakeStripe() {
     customers: {
       create: async (params: any) => {
         customersCreated.push(params);
+        if (customersCreateImpl) return customersCreateImpl(params);
         customerCounter += 1;
         return { id: `cus_test_${customerCounter}` };
       },
@@ -141,6 +146,32 @@ test('createPurchaseCheckoutSession crea un Stripe Customer y pide guardar la ta
   );
 });
 
+test('si stripe.customers.create falla, la fila pending se marca failed (no queda huérfana bloqueando futuras compras)', async () => {
+  const { extraUser, companyEs } = fixtures();
+  const store = createInMemoryAddonStore({ addons: [extraUser], companies: [companyEs] });
+  const fakeStripe = createFakeStripe();
+  fakeStripe.setCustomersCreateImpl(async () => {
+    throw new Error('Stripe is down');
+  });
+  const service = new AddonPurchaseService({ store, getStripeClient: async () => fakeStripe });
+
+  await assert.rejects(() => service.createPurchaseCheckoutSession(companyEs.id, 'extra_user', 1, false));
+
+  const [purchase] = [...store.purchases.values()];
+  assert.equal(
+    purchase.status,
+    'failed',
+    'sin este arreglo la fila se queda pending para siempre y bloquea toda compra futura vía el índice único'
+  );
+  assert.equal(fakeStripe.sessionsCreated.length, 0, 'nunca debe intentar crear la Checkout Session sin customer');
+
+  // Y ahora sí debe poder comprar de nuevo (la fila failed no cuenta para el índice de "pending único").
+  const fakeStripe2 = createFakeStripe();
+  const service2 = new AddonPurchaseService({ store, getStripeClient: async () => fakeStripe2 });
+  await service2.createPurchaseCheckoutSession(companyEs.id, 'extra_user', 1, false);
+  assert.equal(store.purchases.size, 2);
+});
+
 test('createPurchaseCheckoutSession reutiliza el stripeCustomerId existente en vez de crear uno nuevo cada vez', async () => {
   const { extraUser, companyEs } = fixtures();
   const existingCompany = { ...companyEs, stripeCustomerId: 'cus_existing' };
@@ -190,6 +221,29 @@ test('una segunda compra pendiente para la misma empresa/addon se rechaza sin cr
 
   assert.equal(store.purchases.size, 1, 'no debe haberse creado una segunda fila pending');
   assert.equal(fakeStripe.sessionsCreated.length, 1, 'Stripe no debe haber sido invocado en el segundo intento');
+});
+
+test('rechaza la compra si el addon quedó marcado pending tras editar su precio (aunque el price id antiguo siga presente)', async () => {
+  const { extraUser, companyEs } = fixtures();
+  // Simulates an admin editing the price via PATCH /api/admin/addons/:id: stripePriceIdEur/Usd
+  // are still the OLD synced ids (not yet re-synced), but stripeSyncStatus was reset to 'pending'
+  // — the purchase must be blocked, not silently charge the stale Stripe price.
+  const stalePriceAfterEdit: AddonRow = { ...extraUser, stripeSyncStatus: 'pending' } as unknown as AddonRow;
+  const store = createInMemoryAddonStore({ addons: [stalePriceAfterEdit], companies: [companyEs] });
+  const fakeStripe = createFakeStripe();
+  const service = new AddonPurchaseService({ store, getStripeClient: async () => fakeStripe });
+
+  await assert.rejects(
+    () => service.createPurchaseCheckoutSession(companyEs.id, 'extra_user', 1, false),
+    (error: unknown) => {
+      assert.ok(error instanceof AddonPurchaseError);
+      assert.match((error as AddonPurchaseError).message, /not synced with Stripe/);
+      return true;
+    }
+  );
+
+  assert.equal(store.purchases.size, 0, 'no debe crearse ninguna fila mientras el addon no esté sincronizado');
+  assert.equal(fakeStripe.sessionsCreated.length, 0, 'nunca debe cobrar el precio antiguo mientras no se resincronice');
 });
 
 test('rechaza la compra con un error claro si el addon no tiene precio de Stripe sincronizado para la moneda resuelta', async () => {

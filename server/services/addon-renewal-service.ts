@@ -146,6 +146,14 @@ async function renewOne(
   const purchasedAt = now;
   const expiresAt = addDays(purchasedAt, addon.validityDays);
 
+  // Re-read the source row's CURRENT auto_renew flag right before inserting, rather than
+  // hardcoding true: `purchase` here is a snapshot from `listDueAutoRenewals`, taken before the
+  // (network-latency-bound) Stripe charge above. If the customer called the auto-renew-off
+  // toggle in that window, `setAutoRenewForAddon` only updates rows that are `active` at that
+  // moment — the still-`active` source row does get flipped off, but a hardcoded `true` here
+  // would silently re-arm it on the very row created to replace it, charging one more cycle after
+  // an explicit opt-out.
+  const currentSourceRow = await store.getPurchaseById(purchase.id);
   const inserted = await store.insertRenewalActivePurchase({
     companyId: purchase.companyId,
     addonId: purchase.addonId,
@@ -153,7 +161,7 @@ async function renewOne(
     currency,
     unitAmountMinor: quote.unitAmountMinor,
     totalAmountMinor: quote.totalAmountMinor,
-    autoRenew: true,
+    autoRenew: currentSourceRow?.autoRenew ?? false,
     renewedFromId: purchase.id,
     purchasedAt,
     expiresAt,

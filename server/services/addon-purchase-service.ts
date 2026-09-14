@@ -468,6 +468,18 @@ export class AddonPurchaseService {
       throw new AddonPurchaseError('Add-on not available', 404);
     }
 
+    // An admin price edit resets this to 'pending' (see addon-catalog-routes.ts's PATCH handler)
+    // until an explicit re-sync recomputes the Stripe price for the new amount. Refusing to
+    // charge here is what actually closes that gap — without it, the price shown/quoted to the
+    // customer (read fresh from this row) and the amount Stripe charges (the OLD, still-'synced'
+    // -looking price id) could silently diverge the moment a price is edited but not yet synced.
+    if (addon.stripeSyncStatus !== 'synced') {
+      throw new AddonPurchaseError(
+        `Add-on '${addon.key}' is not synced with Stripe (status: ${addon.stripeSyncStatus}); run the catalog sync first`,
+        422
+      );
+    }
+
     const currency = resolveBillingCurrency(company.country);
     const stripePriceId = currency === 'EUR' ? addon.stripePriceIdEur : addon.stripePriceIdUsd;
     if (!stripePriceId) {
@@ -508,13 +520,23 @@ export class AddonPurchaseService {
     // on every purchase, regardless of whether auto-renew is requested at purchase time.
     let stripeCustomerId = company.stripeCustomerId ?? undefined;
     if (!stripeCustomerId) {
-      const customer = await stripe.customers.create({
-        email: company.companyEmail || undefined,
-        name: company.name || undefined,
-        metadata: { companyId: String(companyId) },
-      });
-      stripeCustomerId = customer.id;
-      await this.store.setCompanyStripeCustomerId(companyId, stripeCustomerId);
+      try {
+        const customer = await stripe.customers.create({
+          email: company.companyEmail || undefined,
+          name: company.name || undefined,
+          metadata: { companyId: String(companyId) },
+        });
+        stripeCustomerId = customer.id;
+        await this.store.setCompanyStripeCustomerId(companyId, stripeCustomerId);
+      } catch (error) {
+        // Same cleanup as the sibling checkout.sessions.create failure below: without this, a
+        // customers.create failure (network blip, Stripe outage) leaves the just-inserted
+        // `pending` row permanently orphaned — no Checkout Session is ever created, so no
+        // checkout.session.expired webhook will ever arrive to fail it — and the partial unique
+        // index then blocks every future purchase attempt for this company+addon with a 409.
+        await this.store.markPendingFailed(purchase.id).catch(() => undefined);
+        throw error;
+      }
     }
 
     const baseUrl = process.env.BASE_URL || 'http://localhost:5000';

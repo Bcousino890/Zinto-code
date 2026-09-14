@@ -3194,7 +3194,12 @@ function registerAdminRoutes(app: Express) {
               console.log('[admin-routes] Add-on checkout.session.completed:', result);
             }
           } catch (addonError) {
+            // Re-thrown (not swallowed): a transient failure here (e.g. a DB blip) must surface
+            // as a 5xx so Stripe retries the delivery. Swallowing it and still returning 200 below
+            // would leave an already-charged purchase permanently stuck 'pending' with no
+            // automatic recovery — Stripe would never know to try again.
             console.error('[admin-routes] Failed to process add-on checkout.session.completed:', addonError);
+            throw addonError;
           }
           break;
         }
@@ -3206,6 +3211,7 @@ function registerAdminRoutes(app: Express) {
             }
           } catch (addonError) {
             console.error('[admin-routes] Failed to process add-on checkout.session.expired:', addonError);
+            throw addonError;
           }
           break;
         }
@@ -3217,6 +3223,7 @@ function registerAdminRoutes(app: Express) {
             }
           } catch (addonError) {
             console.error('[admin-routes] Failed to process add-on charge.refunded:', addonError);
+            throw addonError;
           }
           break;
         }
@@ -3228,6 +3235,7 @@ function registerAdminRoutes(app: Express) {
             }
           } catch (addonError) {
             console.error('[admin-routes] Failed to process add-on charge.dispute.created:', addonError);
+            throw addonError;
           }
           break;
         }
@@ -3301,6 +3309,7 @@ function registerAdminRoutes(app: Express) {
             }
           } catch (addonError) {
             console.error('[admin-routes] Failed to process add-on payment_intent.payment_failed:', addonError);
+            throw addonError;
           }
           break;
         default:

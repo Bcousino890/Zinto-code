@@ -37,6 +37,11 @@ interface AddonStatus {
 
 interface AddonsStatusResponse {
   addons: AddonStatus[];
+  /** Session CSRF token, required as `x-csrf-token` on the two state-changing calls below —
+   * these move real money / enroll the company in recurring off-session charges, so (unlike most
+   * read-only company routes) they're behind the same session CSRF check the admin add-on
+   * catalog routes already use (see server/routes/addon-routes.ts). */
+  csrfToken: string;
 }
 
 const MAX_QUANTITY = 20;
@@ -75,7 +80,9 @@ export function AddonsSection() {
 
   const purchaseMutation = useMutation({
     mutationFn: async (vars: { addonKey: string; quantity: number; autoRenew: boolean }) => {
-      const res = await apiRequest('POST', '/api/addons/purchase', vars);
+      const res = await apiRequest('POST', '/api/addons/purchase', vars, {
+        'x-csrf-token': data?.csrfToken ?? '',
+      });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || t('settings.addons.purchase_error', 'Failed to start checkout'));
@@ -110,9 +117,12 @@ export function AddonsSection() {
   // unambiguously; see server/services/addon-purchase-service.ts's setAddonAutoRenew).
   const autoRenewMutation = useMutation({
     mutationFn: async (vars: { addonKey: string; autoRenew: boolean }) => {
-      const res = await apiRequest('POST', `/api/addons/${vars.addonKey}/auto-renew`, {
-        autoRenew: vars.autoRenew,
-      });
+      const res = await apiRequest(
+        'POST',
+        `/api/addons/${vars.addonKey}/auto-renew`,
+        { autoRenew: vars.autoRenew },
+        { 'x-csrf-token': data?.csrfToken ?? '' }
+      );
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || t('settings.addons.auto_renew_error', 'Failed to update auto-renew'));

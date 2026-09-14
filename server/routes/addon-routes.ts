@@ -12,6 +12,13 @@ export interface AddonRouteApp {
 export interface AddonRoutesDeps {
   ensureAuthenticated: (req: any, res: any, next: () => void) => unknown;
   service: Pick<AddonPurchaseService, 'createPurchaseCheckoutSession' | 'setAddonAutoRenew' | 'getCompanyAddonStatus'>;
+  /** Same session-bound CSRF check `server/routes/admin/addon-catalog-routes.ts` uses — required
+   * here too because, unlike most read-only company routes, these create a real one-time charge
+   * and can enroll the company in recurring off-session charges. Without it, a cross-site
+   * `SameSite=None` session cookie (production config) plus a forged POST would be enough to
+   * trigger a charge or silently flip auto-renew on for a logged-in victim. */
+  requireCsrf: (req: any, res: any, next: () => void) => unknown;
+  issueCsrfToken: (req: any) => string;
 }
 
 // `addonKey`/`quantity`/`autoRenew` only — `.strict()` rejects any other field, including a
@@ -32,10 +39,10 @@ function firstIssueMessage(error: z.ZodError): string {
 }
 
 export function setupAddonRoutes(app: AddonRouteApp, deps: AddonRoutesDeps): void {
-  const { ensureAuthenticated, service } = deps;
+  const { ensureAuthenticated, service, requireCsrf, issueCsrfToken } = deps;
 
   /** POST /api/addons/purchase — always uses the authenticated request's own company id. */
-  app.post('/api/addons/purchase', ensureAuthenticated, async (req: any, res: any) => {
+  app.post('/api/addons/purchase', ensureAuthenticated, requireCsrf, async (req: any, res: any) => {
     try {
       const companyId = req.user?.companyId;
       if (!companyId) {
@@ -68,7 +75,7 @@ export function setupAddonRoutes(app: AddonRouteApp, deps: AddonRoutesDeps): voi
    * status view the client renders is an aggregate (total active quantity across possibly several
    * purchase batches), and "auto-renew this add-on" is the intent a customer actually has, so
    * there is no purchase id for the client to target in the first place. */
-  app.post('/api/addons/:addonKey/auto-renew', ensureAuthenticated, async (req: any, res: any) => {
+  app.post('/api/addons/:addonKey/auto-renew', ensureAuthenticated, requireCsrf, async (req: any, res: any) => {
     try {
       const companyId = req.user?.companyId;
       if (!companyId) {
@@ -96,7 +103,10 @@ export function setupAddonRoutes(app: AddonRouteApp, deps: AddonRoutesDeps): voi
     }
   });
 
-  /** GET /api/addons/status — status for the authenticated company only. */
+  /** GET /api/addons/status — status for the authenticated company only. Also issues (or
+   * returns the existing) session CSRF token, same pattern as
+   * `server/routes/admin/addon-catalog-routes.ts`, so the client has one to attach to the two
+   * state-changing routes above without a separate round trip. */
   app.get('/api/addons/status', ensureAuthenticated, async (req: any, res: any) => {
     try {
       const companyId = req.user?.companyId;
@@ -105,7 +115,7 @@ export function setupAddonRoutes(app: AddonRouteApp, deps: AddonRoutesDeps): voi
       }
 
       const addonsStatus = await service.getCompanyAddonStatus(companyId);
-      return res.json({ addons: addonsStatus });
+      return res.json({ addons: addonsStatus, csrfToken: issueCsrfToken(req) });
     } catch (error) {
       logger.error('addon-routes', 'Unexpected error fetching add-on status', error);
       return res.status(500).json({ error: 'Failed to fetch add-on status' });
@@ -117,9 +127,16 @@ export function setupAddonRoutes(app: AddonRouteApp, deps: AddonRoutesDeps): voi
  * Both are loaded lazily (dynamic `import()`) so this module — and `setupAddonRoutes` above, which
  * is all `tests/addon-routes-authz.test.ts` exercises — never pulls in the real DB connection. */
 export async function registerAddonRoutes(app: AddonRouteApp): Promise<void> {
-  const [{ ensureAuthenticated }, { addonPurchaseService }] = await Promise.all([
-    import('../middleware'),
-    import('../services/addon-purchase-store'),
-  ]);
-  setupAddonRoutes(app, { ensureAuthenticated, service: addonPurchaseService });
+  const [{ ensureAuthenticated }, { addonPurchaseService }, { requireSessionCsrf, issueSessionCsrfToken }] =
+    await Promise.all([
+      import('../middleware'),
+      import('../services/addon-purchase-store'),
+      import('../middleware/csrf-protection'),
+    ]);
+  setupAddonRoutes(app, {
+    ensureAuthenticated,
+    service: addonPurchaseService,
+    requireCsrf: requireSessionCsrf,
+    issueCsrfToken: issueSessionCsrfToken,
+  });
 }

@@ -69,18 +69,12 @@ const ACTION_LABELS: Record<SyncAction, string> = {
   unchanged: "Sin cambios",
 };
 
+// Thin wrapper over the shared `apiRequest` (which already handles credentials, JSON
+// content-type, and rich error parsing via throwIfResNotOk) adding only the one thing it didn't
+// support: an extra header for the CSRF token these admin mutations require.
 async function requestJson(method: string, url: string, csrfToken: string, data?: unknown) {
-  const res = await fetch(url, {
-    method,
-    headers: { "Content-Type": "application/json", "x-csrf-token": csrfToken },
-    body: data !== undefined ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(body.message || `Request failed (${res.status})`);
-  }
-  return body;
+  const res = await apiRequest(method, url, data, { "x-csrf-token": csrfToken });
+  return res.json().catch(() => ({}));
 }
 
 function statusBadgeVariant(status: Addon["stripeSyncStatus"]): "success" | "destructive" | "outline" {

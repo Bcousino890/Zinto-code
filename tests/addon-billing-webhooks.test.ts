@@ -123,11 +123,25 @@ function paymentIntentFailedEvent(id: string, opts: { purchaseId?: number; payme
   } as any;
 }
 
-function chargeRefundedEvent(id: string, paymentIntentId: string, chargeId = 'ch_1') {
+function chargeRefundedEvent(
+  id: string,
+  paymentIntentId: string,
+  chargeId = 'ch_1',
+  opts: { refunded?: boolean; amount?: number; amountRefunded?: number } = {}
+) {
+  const refunded = opts.refunded ?? true;
   return {
     id,
     type: 'charge.refunded',
-    data: { object: { id: chargeId, payment_intent: paymentIntentId } },
+    data: {
+      object: {
+        id: chargeId,
+        payment_intent: paymentIntentId,
+        refunded,
+        amount: opts.amount ?? 2400,
+        amount_refunded: opts.amountRefunded ?? (refunded ? 2400 : 0),
+      },
+    },
   } as any;
 }
 
@@ -350,6 +364,24 @@ test('charge.refunded revoca de inmediato una compra active y dispara la exclusi
 
   const activeQuantity = await store.sumActiveQuantity(row.companyId, row.addonId, fixedNow);
   assert.equal(activeQuantity, 0, 'una fila revoked no debe contar nunca en el cupo vigente');
+});
+
+test('charge.refunded PARCIAL no revoca la compra ni le quita cupo (solo un reembolso total lo hace)', async () => {
+  const addon = baseAddon();
+  const store = createInMemoryAddonStore({ addons: [addon], purchases: [activePurchase({ stripePaymentIntentId: 'pi_refund' })] });
+
+  const result = await handleAddonWebhookEvent(
+    chargeRefundedEvent('evt_7b', 'pi_refund', 'ch_1', { refunded: false, amount: 2400, amountRefunded: 100 }),
+    { store, now: () => fixedNow }
+  );
+
+  assert.equal((result as any).outcome, 'partial-refund-ignored');
+  const row = store.purchases.get(1)!;
+  assert.equal(row.status, 'active', 'un reembolso parcial (goodwill de soporte) no debe revocar el 100% del cupo pagado');
+  assert.equal(row.revokedReason, null);
+
+  const activeQuantity = await store.sumActiveQuantity(row.companyId, row.addonId, fixedNow);
+  assert.equal(activeQuantity, row.quantity, 'el cupo sigue vigente tras un reembolso solo parcial');
 });
 
 test('charge.refunded sobre una compra que no está active no hace nada (not-active)', async () => {

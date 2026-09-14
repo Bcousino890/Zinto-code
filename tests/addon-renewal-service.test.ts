@@ -117,6 +117,34 @@ test('una renovación exitosa crea exactamente una nueva fila active encadenada 
   assert.equal(originalAfter.status, 'active');
 });
 
+test('si el cliente desactiva auto-renovar justo mientras se procesa el cargo, la fila nueva NO hereda autoRenew:true', async () => {
+  const addon = baseAddon();
+  const comp = company();
+  const original = dueActivePurchase(now);
+  const store = createInMemoryAddonStore({ addons: [addon], companies: [comp], purchases: [original] });
+
+  // Simulates the customer calling POST /api/addons/extra_user/auto-renew {autoRenew:false} in
+  // the window between listDueAutoRenewals' snapshot and the Stripe charge completing — mutate
+  // the SAME underlying row the fake store's getPurchaseById will re-read, right as the charge
+  // "goes out over the network".
+  const fakeStripe = createFakeStripe({
+    createPaymentIntent: async (params: any) => {
+      store.purchases.get(original.id)!.autoRenew = false;
+      return { id: 'pi_new', status: 'succeeded', ...params };
+    },
+  });
+
+  const summary = await runDueRenewals(now, { store, getStripeClient: async () => fakeStripe });
+
+  assert.deepEqual(summary, { processed: 1, renewed: 1, skipped: 0, failed: 0 });
+  const newRow = [...store.purchases.values()].find((p) => p.id !== original.id)!;
+  assert.equal(
+    newRow.autoRenew,
+    false,
+    'una fila creada justo tras un opt-out no debe re-armar la renovación automática para el siguiente ciclo'
+  );
+});
+
 test('una renovación rechazada (tarjeta declinada) no crea fila nueva ni extiende expiresAt', async () => {
   const addon = baseAddon();
   const comp = company();

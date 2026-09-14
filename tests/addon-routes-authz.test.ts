@@ -48,6 +48,15 @@ function fakeEnsureAuthenticated(req: any, res: any, next: () => void) {
   return res.status(401).json({ message: 'Unauthorized' });
 }
 
+// A permissive-by-default fake so the ~9 pre-existing tests below (none of which are about CSRF)
+// don't all need updating; the dedicated CSRF tests further down override this per-call.
+function fakeRequireCsrf(_req: any, _res: any, next: () => void) {
+  return next();
+}
+function fakeIssueCsrfToken(_req: any) {
+  return 'fake-csrf-token';
+}
+
 function createFakeService() {
   const purchaseCalls: Array<{ companyId: number; addonKey: string; quantity: number; autoRenew: boolean }> = [];
   const autoRenewCalls: Array<{ companyId: number; addonKey: string; autoRenew: boolean }> = [];
@@ -88,7 +97,12 @@ function authenticatedAs(companyId: number) {
 test('POST /api/addons/purchase usa siempre el companyId de la sesión y rechaza un companyId ajeno en el body', async () => {
   const app = new TestApp();
   const service = createFakeService();
-  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
 
   const malicious = await invoke(app, 'POST', '/api/addons/purchase', {
     ...authenticatedAs(100),
@@ -111,7 +125,12 @@ test('POST /api/addons/purchase usa siempre el companyId de la sesión y rechaza
 test('POST /api/addons/purchase ignora un companyId aunque una empresa DISTINTA intente suplantar la compra', async () => {
   const app = new TestApp();
   const service = createFakeService();
-  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
 
   // Company 200 is authenticated but tries to smuggle companyId=100 (a different, real company)
   // into the body. The request is rejected outright by the strict schema, so company 100 is
@@ -128,7 +147,12 @@ test('POST /api/addons/purchase ignora un companyId aunque una empresa DISTINTA 
 test('POST /api/addons/purchase valida quantity (entero positivo, máximo 50) y addonKey (uno de los 2 conocidos)', async () => {
   const app = new TestApp();
   const service = createFakeService();
-  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
 
   const tooMany = await invoke(app, 'POST', '/api/addons/purchase', { ...authenticatedAs(100), body: { addonKey: 'extra_user', quantity: 51 } });
   assert.equal(tooMany.statusCode, 400);
@@ -145,7 +169,12 @@ test('POST /api/addons/purchase valida quantity (entero positivo, máximo 50) y 
 test('POST /api/addons/purchase requiere autenticación', async () => {
   const app = new TestApp();
   const service = createFakeService();
-  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
 
   const res = await invoke(app, 'POST', '/api/addons/purchase', {
     isAuthenticated: () => false,
@@ -159,7 +188,12 @@ test('POST /api/addons/purchase requiere autenticación', async () => {
 test('POST /api/addons/:addonKey/auto-renew devuelve 404 si la empresa no tiene cupo activo de ese addon', async () => {
   const app = new TestApp();
   const service = createFakeService();
-  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
 
   // 'extra_user' active quota belongs to company 100 (see createFakeService); company 200 has
   // none, so toggling its auto-renew must 404 rather than silently succeed.
@@ -176,7 +210,12 @@ test('POST /api/addons/:addonKey/auto-renew devuelve 404 si la empresa no tiene 
 test('POST /api/addons/:addonKey/auto-renew rechaza una addonKey desconocida', async () => {
   const app = new TestApp();
   const service = createFakeService();
-  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
 
   const res = await invoke(app, 'POST', '/api/addons/:addonKey/auto-renew', {
     ...authenticatedAs(100),
@@ -191,7 +230,12 @@ test('POST /api/addons/:addonKey/auto-renew rechaza una addonKey desconocida', a
 test('POST /api/addons/:addonKey/auto-renew funciona para la empresa con cupo activo', async () => {
   const app = new TestApp();
   const service = createFakeService();
-  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
 
   const res = await invoke(app, 'POST', '/api/addons/:addonKey/auto-renew', {
     ...authenticatedAs(100),
@@ -206,7 +250,12 @@ test('POST /api/addons/:addonKey/auto-renew funciona para la empresa con cupo ac
 test('GET /api/addons/status usa el companyId de la sesión', async () => {
   const app = new TestApp();
   const service = createFakeService();
-  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
 
   const res = await invoke(app, 'GET', '/api/addons/status', authenticatedAs(100));
 
@@ -215,14 +264,71 @@ test('GET /api/addons/status usa el companyId de la sesión', async () => {
     addons: [
       { key: 'extra_user', name: 'Usuario adicional', unitPrice: 12, currency: 'EUR', activeQuantity: 0, nearestExpiresAt: null, autoRenew: false },
     ],
+    csrfToken: 'fake-csrf-token',
   });
 });
 
 test('GET /api/addons/status requiere autenticación', async () => {
   const app = new TestApp();
   const service = createFakeService();
-  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
 
   const res = await invoke(app, 'GET', '/api/addons/status', { isAuthenticated: () => false });
   assert.equal(res.statusCode, 401);
+});
+
+test('GET /api/addons/status devuelve un csrfToken para usarlo en las rutas que sí cambian estado', async () => {
+  const app = new TestApp();
+  const service = createFakeService();
+  setupAddonRoutes(app as any, {
+    ensureAuthenticated: fakeEnsureAuthenticated,
+    service,
+    requireCsrf: fakeRequireCsrf,
+    issueCsrfToken: fakeIssueCsrfToken,
+  });
+
+  const res = await invoke(app, 'GET', '/api/addons/status', authenticatedAs(100));
+  assert.equal((res.body as any).csrfToken, 'fake-csrf-token');
+});
+
+// -----------------------------------------------------------------------
+// CSRF: POST /api/addons/purchase and POST /api/addons/:addonKey/auto-renew move real money /
+// enroll a company in recurring off-session charges, so — unlike most read-only company routes —
+// they must be behind the same session CSRF check the admin add-on catalog routes already use.
+// -----------------------------------------------------------------------
+
+test('POST /api/addons/purchase se bloquea si falla la comprobación CSRF (nunca llega al servicio)', async () => {
+  const app = new TestApp();
+  const service = createFakeService();
+  const requireCsrf = (_req: any, res: any) => res.status(403).json({ message: 'CSRF validation failed' });
+  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service, requireCsrf, issueCsrfToken: fakeIssueCsrfToken });
+
+  const res = await invoke(app, 'POST', '/api/addons/purchase', {
+    ...authenticatedAs(100),
+    body: { addonKey: 'extra_user', quantity: 1 },
+  });
+
+  assert.equal(res.statusCode, 403);
+  assert.equal(service.purchaseCalls.length, 0, 'un fallo de CSRF nunca debe crear una compra');
+});
+
+test('POST /api/addons/:addonKey/auto-renew se bloquea si falla la comprobación CSRF', async () => {
+  const app = new TestApp();
+  const service = createFakeService();
+  const requireCsrf = (_req: any, res: any) => res.status(403).json({ message: 'CSRF validation failed' });
+  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service, requireCsrf, issueCsrfToken: fakeIssueCsrfToken });
+
+  const res = await invoke(app, 'POST', '/api/addons/:addonKey/auto-renew', {
+    ...authenticatedAs(100),
+    params: { addonKey: 'extra_user' },
+    body: { autoRenew: true },
+  });
+
+  assert.equal(res.statusCode, 403);
+  assert.equal(service.autoRenewCalls.length, 0, 'un fallo de CSRF nunca debe cambiar auto-renew');
 });

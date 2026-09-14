@@ -76,6 +76,15 @@ app.use((req, res, next) => {
   if (req.method === 'POST' && req.path === '/api/payment/stripe/webhook') {
     return express.raw({ type: 'application/json', limit: '50mb' })(req, res, next);
   }
+  // Same requirement for the webhook endpoint actually configured in the live Stripe dashboard
+  // (admin-routes.ts's `stripe.webhooks.constructEvent` call) — found missing here while wiring
+  // up add-on billing webhooks: every real Stripe delivery to this path (including the
+  // pre-existing payment_intent.succeeded/payment_failed handling, unrelated to add-ons) has been
+  // failing signature verification with a 400 for as long as this carve-out list existed without
+  // it.
+  if (req.method === 'POST' && req.path === '/api/webhooks/stripe') {
+    return express.raw({ type: 'application/json', limit: '50mb' })(req, res, next);
+  }
   express.json({ limit: '50mb' })(req, res, next);
 });
 app.use((req, res, next) => {
@@ -87,7 +96,8 @@ app.use((req, res, next) => {
       req.path === '/api/webhooks/whatsapp' ||
       req.path === '/api/webhooks/tiktok' ||
       req.path === '/api/webhooks/telnyx/voice' ||
-      req.path === '/api/payment/stripe/webhook')
+      req.path === '/api/payment/stripe/webhook' ||
+      req.path === '/api/webhooks/stripe')
   ) {
     return next();
   }

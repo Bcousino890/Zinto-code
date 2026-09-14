@@ -152,3 +152,52 @@ test('un intento antiguo no puede completar el lease nuevo del mismo worker', as
   assert.equal(await storage.completeStripeCatalogSyncJob(42, 'old-lease-token'), undefined);
   assert.equal(await storage.completeStripeCatalogSyncJob(42, currentClaimToken), completedJob);
 });
+
+test('reactivating a dead-lettered job through the retry path grants a fresh retry budget by resetting attempts to 0', async () => {
+  process.env.NODE_ENV = 'development';
+  process.env.DATABASE_URL = 'postgresql://localhost:5432/stripe_catalog_sync_test';
+  const { DatabaseStorage } = await import('../server/storage');
+  const latestFailedJob = {
+    id: 42,
+    entityType: 'plan' as const,
+    entityId: 7,
+    operation: 'upsert' as const,
+    fingerprint: 'fp-7',
+    revision: 1,
+    status: 'failed' as const,
+    attempts: 5,
+  };
+  let capturedSet: Record<string, unknown> | undefined;
+  const tx = {
+    execute: async () => ({ rows: [] }),
+    select: () => ({
+      from: () => ({
+        where: () => ({
+          orderBy: () => ({
+            limit: () => ({
+              for: async () => [latestFailedJob],
+            }),
+          }),
+        }),
+      }),
+    }),
+    update: () => ({
+      set: (values: Record<string, unknown>) => {
+        capturedSet = values;
+        return { where: () => ({ returning: async () => [{ ...latestFailedJob, ...values }] }) };
+      },
+    }),
+  };
+  const storage = Object.create(DatabaseStorage.prototype) as InstanceType<typeof DatabaseStorage>;
+  storage.db = { transaction: async (run: (transaction: typeof tx) => unknown) => run(tx) } as never;
+
+  const result = await storage.enqueueStripeCatalogSync({
+    entityType: 'plan',
+    entityId: 7,
+    operation: 'upsert',
+    fingerprint: 'fp-7',
+  });
+
+  assert.equal(capturedSet?.attempts, 0, 'a reactivated dead-letter job must get a fresh retry budget, not resume from attempts=5');
+  assert.equal(result.status, 'pending');
+});

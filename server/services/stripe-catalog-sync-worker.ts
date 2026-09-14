@@ -4,7 +4,14 @@ import type { IStorage } from '../storage';
 import type { StripeCatalogSyncJob } from '@shared/schema';
 import type { StripeCatalogSyncService } from './stripe-catalog-sync-service';
 
-type WorkerStorage = Pick<IStorage, 'claimStripeCatalogSyncJobs' | 'completeStripeCatalogSyncJob' | 'failStripeCatalogSyncJob'>;
+type WorkerStorage = Pick<
+  IStorage,
+  | 'claimStripeCatalogSyncJobs'
+  | 'completeStripeCatalogSyncJob'
+  | 'failStripeCatalogSyncJob'
+  | 'updatePlan'
+  | 'updateCoupon'
+>;
 type SyncService = Pick<StripeCatalogSyncService, 'syncPlan' | 'syncCoupon' | 'archivePlan' | 'archiveCoupon'>;
 
 export type StripeCatalogSyncJobOutcome = {
@@ -95,6 +102,49 @@ function emptyBatchResult(): BatchResult {
 }
 
 /**
+ * Once a job dead-letters (exhausts its retry budget), the underlying
+ * `plans`/`coupon_codes` row would otherwise keep showing
+ * `stripeSyncStatus: 'pending'` forever - nothing besides
+ * `stripe_catalog_sync_jobs` itself records that the sync ultimately failed,
+ * and the admin status endpoint reads only the plan/coupon row, never the
+ * jobs table. This mirrors the same status/error-only update
+ * `StripeCatalogSyncService`'s `syncedUpdate` already makes on its own
+ * success path, but deliberately never touches `stripeSyncFingerprint`:
+ * setting it here would make a later sync attempt see a fingerprint "match"
+ * and skip retrying entirely, masking the failure instead of surfacing it.
+ *
+ * `stripeSyncStatus`/`stripeSyncError` are deliberately excluded from
+ * `InsertPlan` (see `insertPlanSchema` in shared/schema.ts - they are
+ * server-managed, not client-writable), so `updatePlan` needs the same `as
+ * any` cast `server/plan-routes.ts` already uses to set `stripeSyncStatus:
+ * 'pending'`; `updateCoupon` is untyped already, so no cast is needed there.
+ *
+ * Best-effort: the job itself is already correctly dead-lettered in
+ * `stripe_catalog_sync_jobs` regardless of whether this secondary update
+ * succeeds, so a failure here is logged rather than thrown - it must not
+ * crash the batch or leave the job stuck.
+ */
+async function markStripeCatalogEntityFailed(
+  storage: WorkerStorage,
+  entityType: StripeCatalogSyncJob['entityType'],
+  entityId: number,
+  sanitizedMessage: string,
+): Promise<void> {
+  try {
+    if (entityType === 'plan') {
+      await storage.updatePlan(entityId, { stripeSyncStatus: 'failed', stripeSyncError: sanitizedMessage } as any);
+    } else {
+      await storage.updateCoupon(entityId, { stripeSyncStatus: 'failed', stripeSyncError: sanitizedMessage });
+    }
+  } catch (error) {
+    logger.error(
+      'stripe-catalog-sync-worker',
+      `Dead-lettered ${entityType} ${entityId} but failed to mark stripeSyncStatus='failed' on its own record: ${sanitizeStripeCatalogError(error)}`,
+    );
+  }
+}
+
+/**
  * Claims up to `limit` due Stripe catalog sync jobs and processes them one at
  * a time, sequentially - never concurrently, even if the outbox happens to
  * contain more than one row for the same entity - so two jobs for the same
@@ -146,8 +196,12 @@ export async function runStripeCatalogSyncBatch(
         continue;
       }
       result.errors.push({ jobId: job.id, entityType: job.entityType, entityId: job.entityId, message });
-      if (nextAttemptAt) result.retried += 1;
-      else result.deadLettered += 1;
+      if (nextAttemptAt) {
+        result.retried += 1;
+      } else {
+        result.deadLettered += 1;
+        await markStripeCatalogEntityFailed(storage, job.entityType, job.entityId, message);
+      }
     }
   }
 

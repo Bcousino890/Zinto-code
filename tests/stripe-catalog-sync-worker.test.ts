@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   decideStripeCatalogSyncJobRetry,
+  resolveStripeCatalogSyncIntervalMs,
   runStripeCatalogSyncBatch,
   startStripeCatalogSyncWorker,
   type BatchResult,
@@ -57,6 +58,9 @@ class FakeStripeCatalogJobStorage {
   private nextId = 1;
   private tokenSeq = 1;
   readonly jobs: FakeJob[] = [];
+  /** Records every call the worker makes to surface a dead-lettered job on its owning entity. */
+  readonly updatedPlans: Array<{ id: number; updates: Record<string, unknown> }> = [];
+  readonly updatedCoupons: Array<{ id: number; updates: Record<string, unknown> }> = [];
 
   constructor(private readonly now: () => Date = () => new Date()) {}
 
@@ -142,6 +146,16 @@ class FakeStripeCatalogJobStorage {
     job.updatedAt = this.now();
     return { ...job };
   }
+
+  async updatePlan(id: number, updates: Record<string, unknown>): Promise<any> {
+    this.updatedPlans.push({ id, updates });
+    return { id, ...updates };
+  }
+
+  async updateCoupon(id: number, updates: Record<string, unknown>): Promise<any> {
+    this.updatedCoupons.push({ id, updates });
+    return { id, ...updates };
+  }
 }
 
 const NOOP_SERVICE = {
@@ -169,6 +183,8 @@ test('dispatches each claimed job to the sync-service method matching its operat
     claimStripeCatalogSyncJobs: async () => jobs,
     completeStripeCatalogSyncJob: async (jobId: number, claimToken: string) => { completed.push({ jobId, claimToken }); return jobs.find((job) => job.id === jobId); },
     failStripeCatalogSyncJob: async () => undefined,
+    updatePlan: async () => { throw new Error('updatePlan should not be called in this test'); },
+    updateCoupon: async () => { throw new Error('updateCoupon should not be called in this test'); },
   };
   const service = {
     syncPlan: async (id: number) => { calls.push({ kind: 'syncPlan', id }); return {} as any; },
@@ -216,6 +232,8 @@ test('never processes two jobs for the same entity concurrently within one batch
     claimStripeCatalogSyncJobs: async () => [jobA, jobB],
     completeStripeCatalogSyncJob: async (jobId: number) => { completed.push(jobId); return jobA; },
     failStripeCatalogSyncJob: async () => undefined,
+    updatePlan: async () => { throw new Error('updatePlan should not be called in this test'); },
+    updateCoupon: async () => { throw new Error('updateCoupon should not be called in this test'); },
   };
 
   const batchPromise = runStripeCatalogSyncBatch(10, {
@@ -304,6 +322,35 @@ test('an expired lease becomes claimable by another worker; the original claiman
   assert.equal(storage.jobs[0].status, 'completed');
 });
 
+test('a stale claim token lost on the failure path is a safe no-op: counted only as a stale lease, never retried or dead-lettered', async () => {
+  const now = new Date('2026-09-14T00:00:00.000Z');
+  const job = {
+    id: 9, entityType: 'plan' as const, entityId: 9, operation: 'upsert' as const, fingerprint: 'fp-9',
+    revision: 1, status: 'processing' as const, attempts: 1, nextAttemptAt: now, lockedAt: now, lockedBy: 'w',
+    claimToken: 'tok-9', lastError: null, completedAt: null, createdAt: now, updatedAt: now,
+  };
+  const updatedPlans: unknown[] = [];
+  const storage = {
+    claimStripeCatalogSyncJobs: async () => [job],
+    completeStripeCatalogSyncJob: async () => { throw new Error('completeStripeCatalogSyncJob should not be called on the failure path'); },
+    // Simulates the lease being expired or stolen between claim and fail: the
+    // real SQL's fencing WHERE clause would not match, so the update returns
+    // no row.
+    failStripeCatalogSyncJob: async () => undefined,
+    updatePlan: async (id: number, updates: Record<string, unknown>) => { updatedPlans.push({ id, updates }); return {} as any; },
+    updateCoupon: async () => { throw new Error('updateCoupon should not be called for a plan job'); },
+  };
+  const service = { ...NOOP_SERVICE, syncPlan: async () => { throw new Error('boom'); } };
+
+  const result = await runStripeCatalogSyncBatch(1, { storage, now: () => now, createSyncService: () => service });
+
+  assert.equal(result.staleLeases, 1);
+  assert.equal(result.retried, 0);
+  assert.equal(result.deadLettered, 0);
+  assert.equal(result.errors.length, 0);
+  assert.equal(updatedPlans.length, 0, 'a stale-lease no-op must never write back to the plan/coupon row');
+});
+
 test('retries a failing job with capped backoff up to the attempt limit, then dead-letters it and stops retrying', async () => {
   const clock = createClock(new Date('2026-09-14T00:00:00.000Z'));
   const storage = new FakeStripeCatalogJobStorage(clock.now);
@@ -338,6 +385,65 @@ test('retries a failing job with capped backoff up to the attempt limit, then de
   assert.equal(noMore.processed, 0, 'a terminal failed job must never be reclaimed - it must not retry forever');
 });
 
+test('dead-lettering a plan sync job marks the plan row stripeSyncStatus=failed with a sanitized, non-empty error, without touching stripeSyncFingerprint', async () => {
+  const clock = createClock(new Date('2026-09-14T00:00:00.000Z'));
+  const storage = new FakeStripeCatalogJobStorage(clock.now);
+  // attempts=4 so the very next claim (attempts becomes 5) dead-letters immediately.
+  storage.seed({ entityType: 'plan', entityId: 55, operation: 'upsert', fingerprint: 'fp-55', attempts: 4 });
+
+  const secretSubstring = 'sk_live_abcdefghijklmnopqrstuvwx';
+  const failingService = {
+    ...NOOP_SERVICE,
+    syncPlan: async () => { throw new Error(`Stripe request failed: ${secretSubstring}`); },
+  };
+
+  const result = await runStripeCatalogSyncBatch(1, { storage, now: clock.now, createSyncService: () => failingService });
+
+  assert.equal(result.deadLettered, 1);
+  assert.equal(storage.jobs[0].status, 'failed');
+  assert.equal(storage.updatedCoupons.length, 0);
+  assert.equal(storage.updatedPlans.length, 1);
+  const [{ id, updates }] = storage.updatedPlans;
+  assert.equal(id, 55);
+  assert.equal(updates.stripeSyncStatus, 'failed');
+  assert.ok(typeof updates.stripeSyncError === 'string' && updates.stripeSyncError.length > 0, 'stripeSyncError must be a non-empty string');
+  assert.ok(!String(updates.stripeSyncError).includes(secretSubstring), 'persisted error must not contain the raw secret');
+  assert.equal('stripeSyncFingerprint' in updates, false, 'must not touch stripeSyncFingerprint - doing so would mask the failure on the next sync attempt');
+});
+
+test('dead-lettering a coupon sync job marks the coupon row stripeSyncStatus=failed the same way', async () => {
+  const clock = createClock(new Date('2026-09-14T00:00:00.000Z'));
+  const storage = new FakeStripeCatalogJobStorage(clock.now);
+  storage.seed({ entityType: 'coupon', entityId: 77, operation: 'upsert', fingerprint: 'fp-77', attempts: 4 });
+
+  const failingService = { ...NOOP_SERVICE, syncCoupon: async () => { throw new Error('Stripe request failed'); } };
+
+  const result = await runStripeCatalogSyncBatch(1, { storage, now: clock.now, createSyncService: () => failingService });
+
+  assert.equal(result.deadLettered, 1);
+  assert.equal(storage.updatedPlans.length, 0);
+  assert.equal(storage.updatedCoupons.length, 1);
+  const [{ id, updates }] = storage.updatedCoupons;
+  assert.equal(id, 77);
+  assert.equal(updates.stripeSyncStatus, 'failed');
+  assert.ok(typeof updates.stripeSyncError === 'string' && updates.stripeSyncError.length > 0);
+});
+
+test('a retried (non-terminal) failure does not touch the plan/coupon row - only a dead-letter does', async () => {
+  const clock = createClock(new Date('2026-09-14T00:00:00.000Z'));
+  const storage = new FakeStripeCatalogJobStorage(clock.now);
+  storage.seed({ entityType: 'plan', entityId: 12, operation: 'upsert', fingerprint: 'fp-12' }); // attempts starts at 0
+
+  const failingService = { ...NOOP_SERVICE, syncPlan: async () => { throw new Error('transient Stripe error'); } };
+
+  const result = await runStripeCatalogSyncBatch(1, { storage, now: clock.now, createSyncService: () => failingService });
+
+  assert.equal(result.retried, 1);
+  assert.equal(result.deadLettered, 0);
+  assert.equal(storage.updatedPlans.length, 0);
+  assert.equal(storage.updatedCoupons.length, 0);
+});
+
 test('decideStripeCatalogSyncJobRetry backs off exponentially and terminates at the attempt limit', () => {
   const now = new Date('2026-09-14T00:00:00.000Z');
   assert.equal(decideStripeCatalogSyncJobRetry(1, now).nextAttemptAt?.getTime(), now.getTime() + 30_000);
@@ -346,6 +452,18 @@ test('decideStripeCatalogSyncJobRetry backs off exponentially and terminates at 
   assert.equal(decideStripeCatalogSyncJobRetry(4, now).nextAttemptAt?.getTime(), now.getTime() + 240_000);
   assert.equal(decideStripeCatalogSyncJobRetry(5, now).nextAttemptAt, null);
   assert.equal(decideStripeCatalogSyncJobRetry(99, now).nextAttemptAt, null);
+});
+
+test('resolveStripeCatalogSyncIntervalMs defends against a missing, non-numeric, zero/negative, or out-of-range configured interval, but accepts a valid one', () => {
+  assert.equal(resolveStripeCatalogSyncIntervalMs(undefined), 30_000);
+  assert.equal(resolveStripeCatalogSyncIntervalMs(''), 30_000);
+  assert.equal(resolveStripeCatalogSyncIntervalMs('not-a-number'), 30_000);
+  assert.equal(resolveStripeCatalogSyncIntervalMs('-5'), 30_000);
+  assert.equal(resolveStripeCatalogSyncIntervalMs('0'), 30_000);
+  assert.equal(resolveStripeCatalogSyncIntervalMs('500'), 30_000, 'below the 1s floor must fall back to the default');
+  assert.equal(resolveStripeCatalogSyncIntervalMs('3600001'), 30_000, 'above the 1h ceiling must fall back to the default');
+  assert.equal(resolveStripeCatalogSyncIntervalMs('5000'), 5_000);
+  assert.equal(resolveStripeCatalogSyncIntervalMs('3600000'), 3_600_000, 'the 1h ceiling itself is inclusive');
 });
 
 test('startStripeCatalogSyncWorker is disabled by default and never schedules a timer or runs a batch', () => {
@@ -371,6 +489,26 @@ test('startStripeCatalogSyncWorker is disabled by default and never schedules a 
     });
     assert.equal(scheduled, 0);
     stop2();
+  } finally {
+    if (originalFlag === undefined) delete process.env.STRIPE_CATALOG_AUTO_SYNC;
+    else process.env.STRIPE_CATALOG_AUTO_SYNC = originalFlag;
+  }
+});
+
+test('the STRIPE_CATALOG_AUTO_SYNC feature flag is exact-match only: "TRUE", "1", and "" must not enable the worker', () => {
+  const originalFlag = process.env.STRIPE_CATALOG_AUTO_SYNC;
+  try {
+    for (const value of ['TRUE', '1', '']) {
+      process.env.STRIPE_CATALOG_AUTO_SYNC = value;
+      let scheduled = 0;
+      const stop = startStripeCatalogSyncWorker({
+        schedule: () => { scheduled += 1; return 0 as unknown as ReturnType<typeof setInterval>; },
+        cancel: () => {},
+        runBatch: async () => emptyResult(),
+      });
+      assert.equal(scheduled, 0, `flag value ${JSON.stringify(value)} must not enable the worker`);
+      stop();
+    }
   } finally {
     if (originalFlag === undefined) delete process.env.STRIPE_CATALOG_AUTO_SYNC;
     else process.env.STRIPE_CATALOG_AUTO_SYNC = originalFlag;

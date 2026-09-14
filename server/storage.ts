@@ -2455,6 +2455,11 @@ export class DatabaseStorage implements IStorage {
           .update(stripeCatalogSyncJobs)
           .set({
             status: 'pending',
+            // A dead-lettered job reactivated here must get a full retry
+            // budget again, exactly like a freshly inserted job does -
+            // otherwise it dead-letters again after a single subsequent
+            // failure instead of walking the full backoff sequence.
+            attempts: 0,
             nextAttemptAt: new Date(),
             lockedAt: null,
             lockedBy: null,

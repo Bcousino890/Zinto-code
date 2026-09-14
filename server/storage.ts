@@ -18876,6 +18876,11 @@ async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string,
         ? eq(stockLevels.variantId, movement.variantId)
         : isNull(stockLevels.variantId);
 
+    // .for('update') closes a lost-update race: without it, two concurrent
+    // movements against the same product+warehouse+variant row (two
+    // adjustments, or a transfer racing a sale) each read the same
+    // currentOnHand, compute independently, and the second UPDATE silently
+    // overwrites the first's change instead of building on it.
     const [existing] = await tx
       .select()
       .from(stockLevels)
@@ -18886,7 +18891,8 @@ async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string,
           eq(stockLevels.warehouseId, movement.warehouseId),
           variantCond
         )
-      );
+      )
+      .for('update');
 
     const currentOnHand = existing ? Number(existing.quantity) : 0;
     const nextOnHand = currentOnHand + delta;
@@ -25845,11 +25851,18 @@ async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string,
     await this.seedDefaultChartOfAccounts(payment.companyId);
 
     const { inserted } = await db.transaction(async (tx: any) => {
+      // .for('update') closes a lost-update race: two payments recorded for
+      // the same invoice at nearly the same time (e.g. a webhook and a
+      // manually-recorded bank transfer) would otherwise both read the same
+      // amountPaid/amountDue and the second write would silently discard the
+      // first payment's effect on the invoice's running totals and status,
+      // even though both invoicePayments detail rows were correctly inserted.
       const [invoice] = await tx
         .select()
         .from(invoices)
         .where(and(eq(invoices.id, payment.invoiceId), eq(invoices.companyId, payment.companyId)))
-        .limit(1);
+        .limit(1)
+        .for('update');
       if (!invoice) throw new Error("Invoice not found");
 
       this.assertInvoiceWorkflowSupported(invoice.type, "payment");
@@ -25948,7 +25961,8 @@ async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string,
         .select()
         .from(invoices)
         .where(and(eq(invoices.id, existingPayment.invoiceId), eq(invoices.companyId, companyId)))
-        .limit(1);
+        .limit(1)
+        .for('update');
       if (!invoice) throw new Error("Invoice not found");
 
       const nextAmount = updates.amount !== undefined ? Number(updates.amount) : Number(existingPayment.amount);

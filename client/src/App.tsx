@@ -146,6 +146,7 @@ const AdminUsersPage = React.lazy(() => import("@/pages/admin/users"));
 const AdminUsersNewPage = React.lazy(() => import("@/pages/admin/users/new"));
 const AdminUserDetailPage = React.lazy(() => import("@/pages/admin/users/[id]"));
 const AdminPlansPage = React.lazy(() => import("@/pages/admin/plans"));
+const AdminAddonsPage = React.lazy(() => import("@/pages/admin/addons"));
 const AdminCouponsPage = React.lazy(() => import("@/pages/admin/coupons"));
 const AdminPaymentsPage = React.lazy(() => import("@/pages/admin/payments"));
 const AdminAnalyticsPage = React.lazy(() => import("@/pages/admin/analytics"));
@@ -487,6 +488,7 @@ function AppRoutesWithLayout() {
         <AdminProtectedRoute path="/admin/users/new" component={AdminUsersNewPage} />
         <AdminProtectedRoute path="/admin/users/:id" component={AdminUserDetailPage} />
         <AdminProtectedRoute path="/admin/plans" component={AdminPlansPage} />
+        <AdminProtectedRoute path="/admin/addons" component={AdminAddonsPage} />
         <AdminProtectedRoute path="/admin/coupons" component={AdminCouponsPage} />
         <AdminProtectedRoute path="/admin/payments" component={AdminPaymentsPage} />
         <AdminProtectedRoute path="/admin/analytics" component={AdminAnalyticsPage} />

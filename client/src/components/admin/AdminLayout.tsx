@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { LogOut, User, Settings, HelpCircle, Home, Building, Users, Package, BarChart, Globe, Menu, X, CreditCard, UserCheck, Layout, Tag } from "lucide-react";
+import { LogOut, User, Settings, HelpCircle, Home, Building, Users, Package, BarChart, Globe, Menu, X, CreditCard, UserCheck, Layout, Tag, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
@@ -280,6 +280,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               >
                 <Tag className="mr-2 h-5 w-5" />
                 {t('admin.nav.coupons', 'Coupons')}
+              </Button>
+            </Link>
+
+            <Link href="/admin/addons">
+              <Button
+                variant="ghost"
+                className={navButtonClass(location.startsWith('/admin/addons'))}
+              >
+                <Layers className="mr-2 h-5 w-5" />
+                {t('admin.nav.addons', 'Add-ons')}
               </Button>
             </Link>
 

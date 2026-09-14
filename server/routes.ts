@@ -241,6 +241,7 @@ import emailSignatureRoutes from "./routes/email-signatures";
 import knowledgeBaseRoutes from "./routes/knowledge-base";
 import enhancedSubscriptionRoutes from "./routes/enhanced-subscription";
 import paymentCallbackRoutes from "./routes/payment-callbacks";
+import { registerAddonRoutes } from "./routes/addon-routes";
 import planRenewalRoutes from "./routes/plan-renewal";
 import companyAiCredentialsRoutes from "./routes/company-ai-credentials";
 import aiAssistRoutes from "./routes/ai-assist";
@@ -1744,6 +1745,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/plan-renewal', planRenewalRoutes);
 
   app.use('/api/payment', paymentCallbackRoutes);
+
+  await registerAddonRoutes(app);
 
   app.use('/api/company/ai-credentials', ensureAuthenticated, companyAiCredentialsRoutes);
 

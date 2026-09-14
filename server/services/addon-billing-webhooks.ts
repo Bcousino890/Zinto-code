@@ -31,6 +31,14 @@ export type AddonWebhookOutcome =
 export interface HandleAddonWebhookDeps {
   store?: AddonPurchaseStore;
   now?: () => Date;
+  getStripeClient?: () => Promise<Stripe>;
+}
+
+/** Lazily loaded so a plain `node:test` run (which always injects its own fake deps) never pulls
+ * in the real DB/Stripe connection — mirrors `addon-renewal-service.ts`'s identical helper. */
+async function getDefaultStripeClient(): Promise<Stripe> {
+  const { getDefaultStripeClient: getClient } = await import('./addon-purchase-store');
+  return getClient();
 }
 
 function parsePurchaseId(value: unknown): number | null {
@@ -91,6 +99,37 @@ export async function handleAddonWebhookEvent(
         paymentIntentId,
       });
       logger.info('addon-billing-webhooks', `checkout.session.completed -> ${outcome} (purchase ${purchaseId})`);
+
+      // Best-effort: persist the card just used as the customer's default payment method, so a
+      // later auto-renewal (this purchase's own `autoRenew`, or the toggle switched on afterwards
+      // for the same company+addon) has a saved method to charge off-session — see
+      // AddonPurchaseService#createPurchaseCheckoutSession, which requested
+      // `setup_future_usage: 'off_session'` and attached a Customer for exactly this. Never
+      // affects whether the outcome above (quota granted) is reported — a payment-method save
+      // failure here must not roll back or mask a successful activation.
+      if (outcome === 'activated') {
+        try {
+          const customerId = idOf(session.customer as any);
+          if (customerId && paymentIntentId) {
+            const getStripeClient = deps.getStripeClient ?? getDefaultStripeClient;
+            const stripe = await getStripeClient();
+            const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+            const paymentMethodId = idOf(intent.payment_method as any);
+            if (paymentMethodId) {
+              await stripe.customers.update(customerId, {
+                invoice_settings: { default_payment_method: paymentMethodId },
+              });
+            }
+          }
+        } catch (error) {
+          logger.error(
+            'addon-billing-webhooks',
+            `Failed to persist default payment method after purchase ${purchaseId} (quota was still granted)`,
+            error
+          );
+        }
+      }
+
       return { handled: true, event: event.type, purchaseId, outcome };
     }
 

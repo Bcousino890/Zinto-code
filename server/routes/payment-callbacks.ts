@@ -108,7 +108,7 @@ router.post('/stripe/webhook', async (req, res) => {
         // addon_purchases row from `pending` to `active`.
         if (session.metadata?.purchaseId) {
           try {
-            const result = await handleAddonWebhookEvent(event);
+            const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
             logger.info('payment-callbacks', `Add-on checkout.session.completed for session ${session.id}: ${JSON.stringify(result)}`);
           } catch (addonError: any) {
             logger.error('payment-callbacks', 'Failed to process add-on checkout.session.completed:', addonError);

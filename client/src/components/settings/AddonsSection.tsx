@@ -1,17 +1,11 @@
 import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { apiRequest } from '@/lib/queryClient';
@@ -29,8 +23,8 @@ import {
 
 // Shape of GET /api/addons/status, per the API contract this component is built against.
 // `autoRenew`/`nearestExpiresAt` are aggregates across whatever addon_purchases rows are
-// currently active for this addon — see the note above the disabled per-addon switch below
-// for why that aggregation matters.
+// currently active for this addon — toggling auto-renew (below) acts on all of them at once,
+// scoped by addonKey rather than by an individual purchase id.
 interface AddonStatus {
   key: string;
   name: string;
@@ -56,6 +50,7 @@ const ADDON_ICONS: Record<string, typeof Users> = {
 export function AddonsSection() {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [autoRenewOnPurchase, setAutoRenewOnPurchase] = useState<Record<string, boolean>>({});
 
@@ -100,6 +95,32 @@ export function AddonsSection() {
           variant: 'destructive',
         });
       }
+    },
+    onError: (err: Error) => {
+      toast({
+        title: t('settings.addons.error_title', 'Error'),
+        description: err.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Scoped by (company, addonKey) — applies to every currently-active purchase batch for that
+  // add-on, not one purchase id (there is no single id the aggregate status view could expose
+  // unambiguously; see server/services/addon-purchase-service.ts's setAddonAutoRenew).
+  const autoRenewMutation = useMutation({
+    mutationFn: async (vars: { addonKey: string; autoRenew: boolean }) => {
+      const res = await apiRequest('POST', `/api/addons/${vars.addonKey}/auto-renew`, {
+        autoRenew: vars.autoRenew,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || t('settings.addons.auto_renew_error', 'Failed to update auto-renew'));
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/addons/status'] });
     },
     onError: (err: Error) => {
       toast({
@@ -266,46 +287,32 @@ export function AddonsSection() {
                     {t('settings.addons.buy_button', 'Comprar')}
                   </Button>
 
-                  {/* Toggle for quota that is ALREADY active. GET /api/addons/status only
-                      returns one aggregate `autoRenew` boolean per addon key (and one
-                      aggregate `nearestExpiresAt`) rather than a purchase id, but the toggle
-                      route is POST /api/addons/:purchaseId/auto-renew. A company can have
-                      more than one active addon_purchases row per addon (e.g. one auto-renewing,
-                      one one-off, each with its own expiresAt/autoRenew) with no single row that
-                      "the" aggregate boolean unambiguously refers to, so there is no safe id to
-                      call this route with here. Kept disabled/informational rather than guessing
-                      one — see this component's integration report. */}
+                  {/* Toggle for quota that is ALREADY active. Scoped by addonKey (not a purchase
+                      id — see setAddonAutoRenew): flips auto-renew on every currently-active
+                      purchase batch for this add-on at once, which matches what a customer means
+                      by "keep renewing my extra users" regardless of how many separate batches
+                      they bought over time. */}
                   {addon.activeQuantity > 0 && (
-                    <div className="flex items-center justify-between rounded-lg border p-3 opacity-70">
+                    <div className="flex items-center justify-between rounded-lg border p-3">
                       <div className="space-y-0.5 pr-2">
                         <div className="text-sm font-medium">
                           {t('settings.addons.existing_auto_renew_label', 'Auto-renew on active quota')}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {addon.autoRenew
-                            ? t('settings.addons.existing_auto_renew_on', 'Currently on.')
-                            : t('settings.addons.existing_auto_renew_off', 'Currently off.')}
+                          {t(
+                            'settings.addons.existing_auto_renew_description',
+                            'Applies to all currently active quota for this add-on.'
+                          )}
                         </div>
                       </div>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span>
-                              <Switch
-                                checked={addon.autoRenew}
-                                disabled
-                                aria-label={t('settings.addons.existing_auto_renew_label', 'Auto-renew on active quota')}
-                              />
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs">
-                            {t(
-                              'settings.addons.existing_auto_renew_disabled_tooltip',
-                              "Changing auto-renew for quota you've already bought isn't available yet. Use the Auto-renovar option above the next time you buy more."
-                            )}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <Switch
+                        checked={addon.autoRenew}
+                        disabled={autoRenewMutation.isPending && autoRenewMutation.variables?.addonKey === addon.key}
+                        onCheckedChange={(checked) =>
+                          autoRenewMutation.mutate({ addonKey: addon.key, autoRenew: checked })
+                        }
+                        aria-label={t('settings.addons.existing_auto_renew_label', 'Auto-renew on active quota')}
+                      />
                     </div>
                   )}
 

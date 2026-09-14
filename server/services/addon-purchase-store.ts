@@ -60,6 +60,10 @@ export function createDrizzleAddonPurchaseStore(): AddonPurchaseStore {
       return row;
     },
 
+    async setCompanyStripeCustomerId(companyId, stripeCustomerId) {
+      await storage.updateCompany(companyId, { stripeCustomerId });
+    },
+
     async insertPendingPurchase(input) {
       try {
         const [row] = await db
@@ -129,11 +133,18 @@ export function createDrizzleAddonPurchaseStore(): AddonPurchaseStore {
         );
     },
 
-    async setAutoRenew(purchaseId, companyId, autoRenew) {
+    async setAutoRenewForAddon(companyId, addonId, autoRenew, now) {
       const rows = await db
         .update(addonPurchases)
         .set({ autoRenew })
-        .where(and(eq(addonPurchases.id, purchaseId), eq(addonPurchases.companyId, companyId)))
+        .where(
+          and(
+            eq(addonPurchases.companyId, companyId),
+            eq(addonPurchases.addonId, addonId),
+            eq(addonPurchases.status, 'active'),
+            gt(addonPurchases.expiresAt, now)
+          )
+        )
         .returning({ id: addonPurchases.id });
       return rows.length > 0;
     },

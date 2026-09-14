@@ -50,10 +50,13 @@ function fixtures() {
 
 function createFakeStripe() {
   let counter = 0;
+  let customerCounter = 0;
   const sessionsCreated: any[] = [];
+  const customersCreated: any[] = [];
   let createImpl: ((params: any) => Promise<any>) | null = null;
   return {
     sessionsCreated,
+    customersCreated,
     setCreateImpl(fn: (params: any) => Promise<any>) {
       createImpl = fn;
     },
@@ -65,6 +68,13 @@ function createFakeStripe() {
           counter += 1;
           return { id: `cs_test_${counter}`, url: `https://checkout.stripe.test/${counter}` };
         },
+      },
+    },
+    customers: {
+      create: async (params: any) => {
+        customersCreated.push(params);
+        customerCounter += 1;
+        return { id: `cus_test_${customerCounter}` };
       },
     },
   } as any;
@@ -106,6 +116,42 @@ test('createPurchaseCheckoutSession calcula el importe únicamente a partir del 
   assert.equal(purchase.totalAmountMinor, 3600);
   assert.equal(purchase.status, 'pending');
   assert.equal(purchase.stripeCheckoutSessionId, 'cs_test_1');
+});
+
+test('createPurchaseCheckoutSession crea un Stripe Customer y pide guardar la tarjeta (setup_future_usage) para poder auto-renovar después', async () => {
+  const { extraUser, companyEs } = fixtures();
+  const store = createInMemoryAddonStore({ addons: [extraUser], companies: [companyEs] });
+  const fakeStripe = createFakeStripe();
+  const service = new AddonPurchaseService({ store, getStripeClient: async () => fakeStripe });
+
+  await service.createPurchaseCheckoutSession(companyEs.id, 'extra_user', 1, false);
+
+  assert.equal(fakeStripe.customersCreated.length, 1, 'la empresa no tenía stripeCustomerId: debe crearse uno');
+  const sessionParams = fakeStripe.sessionsCreated[0];
+  assert.equal(sessionParams.customer, 'cus_test_1');
+  assert.equal(
+    sessionParams.payment_intent_data.setup_future_usage,
+    'off_session',
+    'sin esto, la renovación automática nunca tendría una tarjeta guardada que cobrar'
+  );
+  assert.equal(
+    store.companies.get(companyEs.id)!.stripeCustomerId,
+    'cus_test_1',
+    'el customer id creado debe persistirse en la empresa, no perderse tras esta única compra'
+  );
+});
+
+test('createPurchaseCheckoutSession reutiliza el stripeCustomerId existente en vez de crear uno nuevo cada vez', async () => {
+  const { extraUser, companyEs } = fixtures();
+  const existingCompany = { ...companyEs, stripeCustomerId: 'cus_existing' };
+  const store = createInMemoryAddonStore({ addons: [extraUser], companies: [existingCompany] });
+  const fakeStripe = createFakeStripe();
+  const service = new AddonPurchaseService({ store, getStripeClient: async () => fakeStripe });
+
+  await service.createPurchaseCheckoutSession(existingCompany.id, 'extra_user', 1, false);
+
+  assert.equal(fakeStripe.customersCreated.length, 0, 'ya existe un customer: no debe crearse otro');
+  assert.equal(fakeStripe.sessionsCreated[0].customer, 'cus_existing');
 });
 
 test('createPurchaseCheckoutSession nunca acepta un importe/currency/precio proporcionado por el cliente (no existen esos parámetros)', async () => {
@@ -241,22 +287,30 @@ test('getCompanyAddonStatus devuelve la forma exacta esperada por el cliente par
   assert.equal(wa.autoRenew, false);
 });
 
-test('setAutoRenew está delimitado por companyId', async () => {
+test('setAddonAutoRenew está delimitado por companyId y aplica a TODAS las filas activas de ese addon', async () => {
   const { extraUser, companyEs, companyUs } = fixtures();
   const store = createInMemoryAddonStore({
     addons: [extraUser],
     companies: [companyEs, companyUs],
     purchases: [
+      // Two independent active batches for companyEs (e.g. bought on different days) — both
+      // must flip together, since "auto-renew this add-on" is a per-company-per-addon intent.
       { id: 1, companyId: companyEs.id, addonId: extraUser.id, quantity: 1, status: 'active', expiresAt: new Date('2026-07-01'), currency: 'EUR', unitAmountMinor: 1200, totalAmountMinor: 1200, autoRenew: false, stripeCheckoutSessionId: null, stripePaymentIntentId: null, stripeChargeId: null, renewedFromId: null, purchasedAt: new Date('2026-06-01'), revokedAt: null, revokedReason: null, createdAt: new Date('2026-06-01') } as any,
+      { id: 2, companyId: companyEs.id, addonId: extraUser.id, quantity: 2, status: 'active', expiresAt: new Date('2026-07-15'), currency: 'EUR', unitAmountMinor: 1200, totalAmountMinor: 2400, autoRenew: false, stripeCheckoutSessionId: null, stripePaymentIntentId: 'pi_batch2', stripeChargeId: null, renewedFromId: null, purchasedAt: new Date('2026-06-15'), revokedAt: null, revokedReason: null, createdAt: new Date('2026-06-15') } as any,
     ],
   });
-  const service = new AddonPurchaseService({ store });
+  const service = new AddonPurchaseService({ store, now: () => new Date('2026-06-20') });
 
-  const wrongCompany = await service.setAutoRenew(1, companyUs.id, true);
-  assert.equal(wrongCompany, false);
+  const wrongCompany = await service.setAddonAutoRenew(companyUs.id, 'extra_user', true);
+  assert.equal(wrongCompany, false, 'una empresa sin cupo activo de este addon no tiene nada que alternar');
   assert.equal(store.purchases.get(1)!.autoRenew, false);
+  assert.equal(store.purchases.get(2)!.autoRenew, false);
 
-  const rightCompany = await service.setAutoRenew(1, companyEs.id, true);
+  const rightCompany = await service.setAddonAutoRenew(companyEs.id, 'extra_user', true);
   assert.equal(rightCompany, true);
   assert.equal(store.purchases.get(1)!.autoRenew, true);
+  assert.equal(store.purchases.get(2)!.autoRenew, true);
+
+  const unknownAddon = await service.setAddonAutoRenew(companyEs.id, 'not_a_real_addon', true);
+  assert.equal(unknownAddon, false);
 });

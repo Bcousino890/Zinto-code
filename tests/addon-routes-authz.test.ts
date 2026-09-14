@@ -50,9 +50,9 @@ function fakeEnsureAuthenticated(req: any, res: any, next: () => void) {
 
 function createFakeService() {
   const purchaseCalls: Array<{ companyId: number; addonKey: string; quantity: number; autoRenew: boolean }> = [];
-  const autoRenewCalls: Array<{ purchaseId: number; companyId: number; autoRenew: boolean }> = [];
-  // Fixture: purchase #1 belongs to company 100 only.
-  const purchaseOwners: Record<number, number> = { 1: 100 };
+  const autoRenewCalls: Array<{ companyId: number; addonKey: string; autoRenew: boolean }> = [];
+  // Fixture: only company 100 currently has active quota for 'extra_user'.
+  const activeQuotaOwners: Record<string, number> = { extra_user: 100 };
 
   return {
     purchaseCalls,
@@ -61,9 +61,9 @@ function createFakeService() {
       purchaseCalls.push({ companyId, addonKey, quantity, autoRenew });
       return { url: `https://checkout.stripe.test/${companyId}` };
     },
-    async setAutoRenew(purchaseId: number, companyId: number, autoRenew: boolean) {
-      autoRenewCalls.push({ purchaseId, companyId, autoRenew });
-      return purchaseOwners[purchaseId] === companyId;
+    async setAddonAutoRenew(companyId: number, addonKey: string, autoRenew: boolean) {
+      autoRenewCalls.push({ companyId, addonKey, autoRenew });
+      return activeQuotaOwners[addonKey] === companyId;
     },
     async getCompanyAddonStatus(companyId: number) {
       return [
@@ -156,31 +156,46 @@ test('POST /api/addons/purchase requiere autenticación', async () => {
   assert.equal(service.purchaseCalls.length, 0);
 });
 
-test('POST /api/addons/:purchaseId/auto-renew devuelve 404 si la compra pertenece a otra empresa', async () => {
+test('POST /api/addons/:addonKey/auto-renew devuelve 404 si la empresa no tiene cupo activo de ese addon', async () => {
   const app = new TestApp();
   const service = createFakeService();
   setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
 
-  // Purchase #1 belongs to company 100 (see createFakeService); company 200 tries to toggle it
-  // by guessing the id.
-  const res = await invoke(app, 'POST', '/api/addons/:purchaseId/auto-renew', {
+  // 'extra_user' active quota belongs to company 100 (see createFakeService); company 200 has
+  // none, so toggling its auto-renew must 404 rather than silently succeed.
+  const res = await invoke(app, 'POST', '/api/addons/:addonKey/auto-renew', {
     ...authenticatedAs(200),
-    params: { purchaseId: '1' },
+    params: { addonKey: 'extra_user' },
     body: { autoRenew: true },
   });
 
   assert.equal(res.statusCode, 404);
-  assert.deepEqual(service.autoRenewCalls, [{ purchaseId: 1, companyId: 200, autoRenew: true }]);
+  assert.deepEqual(service.autoRenewCalls, [{ companyId: 200, addonKey: 'extra_user', autoRenew: true }]);
 });
 
-test('POST /api/addons/:purchaseId/auto-renew funciona para el dueño legítimo de la compra', async () => {
+test('POST /api/addons/:addonKey/auto-renew rechaza una addonKey desconocida', async () => {
   const app = new TestApp();
   const service = createFakeService();
   setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
 
-  const res = await invoke(app, 'POST', '/api/addons/:purchaseId/auto-renew', {
+  const res = await invoke(app, 'POST', '/api/addons/:addonKey/auto-renew', {
     ...authenticatedAs(100),
-    params: { purchaseId: '1' },
+    params: { addonKey: 'not_a_real_addon' },
+    body: { autoRenew: true },
+  });
+
+  assert.equal(res.statusCode, 400);
+  assert.equal(service.autoRenewCalls.length, 0, 'una addonKey inválida nunca debe llegar al servicio');
+});
+
+test('POST /api/addons/:addonKey/auto-renew funciona para la empresa con cupo activo', async () => {
+  const app = new TestApp();
+  const service = createFakeService();
+  setupAddonRoutes(app as any, { ensureAuthenticated: fakeEnsureAuthenticated, service });
+
+  const res = await invoke(app, 'POST', '/api/addons/:addonKey/auto-renew', {
+    ...authenticatedAs(100),
+    params: { addonKey: 'extra_user' },
     body: { autoRenew: true },
   });
 

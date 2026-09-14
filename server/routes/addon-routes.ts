@@ -11,7 +11,7 @@ export interface AddonRouteApp {
 
 export interface AddonRoutesDeps {
   ensureAuthenticated: (req: any, res: any, next: () => void) => unknown;
-  service: Pick<AddonPurchaseService, 'createPurchaseCheckoutSession' | 'setAutoRenew' | 'getCompanyAddonStatus'>;
+  service: Pick<AddonPurchaseService, 'createPurchaseCheckoutSession' | 'setAddonAutoRenew' | 'getCompanyAddonStatus'>;
 }
 
 // `addonKey`/`quantity`/`autoRenew` only — `.strict()` rejects any other field, including a
@@ -63,18 +63,21 @@ export function setupAddonRoutes(app: AddonRouteApp, deps: AddonRoutesDeps): voi
     }
   });
 
-  /** POST /api/addons/:purchaseId/auto-renew — scoped to the caller's own company; a purchase
-   * belonging to another company is indistinguishable from one that doesn't exist (404). */
-  app.post('/api/addons/:purchaseId/auto-renew', ensureAuthenticated, async (req: any, res: any) => {
+  /** POST /api/addons/:addonKey/auto-renew — scoped to the caller's own company. Applies to
+   * every currently-active purchase row for that (company, addon) pair, not one purchase id: the
+   * status view the client renders is an aggregate (total active quantity across possibly several
+   * purchase batches), and "auto-renew this add-on" is the intent a customer actually has, so
+   * there is no purchase id for the client to target in the first place. */
+  app.post('/api/addons/:addonKey/auto-renew', ensureAuthenticated, async (req: any, res: any) => {
     try {
       const companyId = req.user?.companyId;
       if (!companyId) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const purchaseId = Number.parseInt(req.params?.purchaseId, 10);
-      if (!Number.isFinite(purchaseId) || purchaseId <= 0) {
-        return res.status(400).json({ error: 'Invalid purchase id' });
+      const addonKeyResult = z.enum(ADDON_KEYS).safeParse(req.params?.addonKey);
+      if (!addonKeyResult.success) {
+        return res.status(400).json({ error: 'Unknown add-on' });
       }
 
       const parsed = autoRenewBodySchema.safeParse(req.body ?? {});
@@ -82,9 +85,9 @@ export function setupAddonRoutes(app: AddonRouteApp, deps: AddonRoutesDeps): voi
         return res.status(400).json({ error: firstIssueMessage(parsed.error) });
       }
 
-      const updated = await service.setAutoRenew(purchaseId, companyId, parsed.data.autoRenew);
+      const updated = await service.setAddonAutoRenew(companyId, addonKeyResult.data, parsed.data.autoRenew);
       if (!updated) {
-        return res.status(404).json({ error: 'Purchase not found' });
+        return res.status(404).json({ error: 'No active quota for this add-on' });
       }
       return res.json({ success: true });
     } catch (error) {

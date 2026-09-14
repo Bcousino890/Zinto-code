@@ -61,12 +61,45 @@ function activePurchase(overrides: Record<string, unknown> = {}) {
   } as any;
 }
 
-function checkoutSessionCompletedEvent(id: string, purchaseId: number, paymentIntentId = 'pi_1') {
+function checkoutSessionCompletedEvent(
+  id: string,
+  purchaseId: number,
+  paymentIntentId = 'pi_1',
+  customerId?: string
+) {
   return {
     id,
     type: 'checkout.session.completed',
-    data: { object: { id: 'cs_1', payment_intent: paymentIntentId, metadata: { purchaseId: String(purchaseId) } } },
+    data: {
+      object: {
+        id: 'cs_1',
+        payment_intent: paymentIntentId,
+        customer: customerId,
+        metadata: { purchaseId: String(purchaseId) },
+      },
+    },
   } as any;
+}
+
+/** Fake Stripe client exposing only what the post-activation default-payment-method save needs. */
+function fakePaymentMethodStripe(paymentMethodId: string | null) {
+  const customerUpdates: Array<{ id: string; params: unknown }> = [];
+  return {
+    customerUpdates,
+    client: {
+      paymentIntents: {
+        async retrieve(id: string) {
+          return { id, payment_method: paymentMethodId };
+        },
+      },
+      customers: {
+        async update(id: string, params: unknown) {
+          customerUpdates.push({ id, params });
+          return { id };
+        },
+      },
+    } as any,
+  };
 }
 
 function checkoutSessionExpiredEvent(id: string, purchaseId: number) {
@@ -124,6 +157,58 @@ test('checkout.session.completed activa una compra pending, fija purchasedAt/exp
   assert.equal(row.purchasedAt!.toISOString(), fixedNow.toISOString());
   assert.equal(row.expiresAt!.toISOString(), new Date(fixedNow.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString());
   assert.equal(row.stripePaymentIntentId, 'pi_1');
+});
+
+test('checkout.session.completed persiste el método de pago usado como default del customer (para poder auto-renovar después)', async () => {
+  const addon = baseAddon();
+  const store = createInMemoryAddonStore({ addons: [addon], purchases: [pendingPurchase()] });
+  const { client: stripe, customerUpdates } = fakePaymentMethodStripe('pm_saved_card');
+
+  const result = await handleAddonWebhookEvent(
+    checkoutSessionCompletedEvent('evt_1', 1, 'pi_1', 'cus_123'),
+    { store, now: () => fixedNow, getStripeClient: async () => stripe }
+  );
+
+  assert.equal(result.handled && (result as any).outcome, 'activated');
+  assert.deepEqual(customerUpdates, [
+    { id: 'cus_123', params: { invoice_settings: { default_payment_method: 'pm_saved_card' } } },
+  ]);
+});
+
+test('checkout.session.completed sin session.customer no intenta guardar ningún método de pago (nunca llama a Stripe)', async () => {
+  const addon = baseAddon();
+  const store = createInMemoryAddonStore({ addons: [addon], purchases: [pendingPurchase()] });
+  let stripeWasCalled = false;
+  const getStripeClient = async () => {
+    stripeWasCalled = true;
+    throw new Error('should never be reached when session.customer is absent');
+  };
+
+  const result = await handleAddonWebhookEvent(checkoutSessionCompletedEvent('evt_1', 1), {
+    store,
+    now: () => fixedNow,
+    getStripeClient,
+  });
+
+  assert.equal(result.handled && (result as any).outcome, 'activated', 'la activación del cupo no depende de tener un customer');
+  assert.equal(stripeWasCalled, false);
+});
+
+test('checkout.session.completed: un fallo al guardar el método de pago no revierte ni oculta el cupo ya otorgado', async () => {
+  const addon = baseAddon();
+  const store = createInMemoryAddonStore({ addons: [addon], purchases: [pendingPurchase()] });
+  const getStripeClient = async () => ({
+    paymentIntents: { async retrieve() { throw new Error('Stripe is down'); } },
+    customers: { async update() { throw new Error('unreachable'); } },
+  } as any);
+
+  const result = await handleAddonWebhookEvent(
+    checkoutSessionCompletedEvent('evt_1', 1, 'pi_1', 'cus_123'),
+    { store, now: () => fixedNow, getStripeClient }
+  );
+
+  assert.deepEqual(result, { handled: true, event: 'checkout.session.completed', purchaseId: 1, outcome: 'activated' });
+  assert.equal(store.purchases.get(1)!.status, 'active', 'el cupo sigue concedido pese al fallo al guardar la tarjeta');
 });
 
 test('checkout.session.completed es un no-op si la fila ya está active (replay idempotente)', async () => {

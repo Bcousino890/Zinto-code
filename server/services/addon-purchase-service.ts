@@ -115,6 +115,8 @@ export interface AddonPurchaseStore {
   getAddonById(id: number): Promise<AddonRow | undefined>;
   listAddons(): Promise<AddonRow[]>;
   getCompanyById(id: number): Promise<CompanyRow | undefined>;
+  /** Persists a newly-created Stripe customer id for a company that didn't have one yet. */
+  setCompanyStripeCustomerId(companyId: number, stripeCustomerId: string): Promise<void>;
 
   /** Throws `DuplicatePendingPurchaseError` if a pending row already exists for this pair. */
   insertPendingPurchase(input: NewPendingPurchase): Promise<AddonPurchaseRow>;
@@ -126,9 +128,14 @@ export interface AddonPurchaseStore {
    * query. Always computed fresh; never cached. */
   sumActiveQuantity(companyId: number, addonId: number, now: Date): Promise<number>;
   listActivePurchases(companyId: number, addonId: number, now: Date): Promise<AddonPurchaseRow[]>;
-  /** Updates auto_renew, scoped to `companyId` so a company can never touch another company's
-   * row by guessing an id. Returns whether a row actually matched. */
-  setAutoRenew(purchaseId: number, companyId: number, autoRenew: boolean): Promise<boolean>;
+  /** Sets auto_renew on every currently-active row for this (companyId, addonId) pair — not a
+   * single purchase id. A company can buy the same add-on in several batches over time (e.g. 2
+   * extra users on day 1, 3 more on day 15, each with its own 30-day window); "auto-renew this
+   * add-on" is a per-company-per-addon intent, not something tied to one purchase id the client
+   * would otherwise have no reliable way to obtain from the aggregate status view. Returns
+   * whether at least one active row matched (false if the company has no active quota for this
+   * addon at all — nothing to toggle). */
+  setAutoRenewForAddon(companyId: number, addonId: number, autoRenew: boolean, now: Date): Promise<boolean>;
 
   getPurchaseById(id: number): Promise<AddonPurchaseRow | undefined>;
   getPurchaseByPaymentIntentId(paymentIntentId: string): Promise<AddonPurchaseRow | undefined>;
@@ -199,6 +206,7 @@ export interface InMemoryAddonStoreSeed {
 
 export function createInMemoryAddonStore(seed: InMemoryAddonStoreSeed = {}): AddonPurchaseStore & {
   purchases: Map<number, AddonPurchaseRow>;
+  companies: Map<number, CompanyRow>;
   claimedEvents: Set<string>;
 } {
   const addonsById = new Map<number, AddonRow>((seed.addons ?? []).map((a) => [a.id, a]));
@@ -217,6 +225,7 @@ export function createInMemoryAddonStore(seed: InMemoryAddonStoreSeed = {}): Add
 
   return {
     purchases,
+    companies: companiesById,
     claimedEvents,
 
     async getAddonByKey(key) {
@@ -230,6 +239,10 @@ export function createInMemoryAddonStore(seed: InMemoryAddonStoreSeed = {}): Add
     },
     async getCompanyById(id) {
       return clone(companiesById.get(id));
+    },
+    async setCompanyStripeCustomerId(companyId, stripeCustomerId) {
+      const company = companiesById.get(companyId);
+      if (company) company.stripeCustomerId = stripeCustomerId;
     },
 
     async insertPendingPurchase(input) {
@@ -298,11 +311,17 @@ export function createInMemoryAddonStore(seed: InMemoryAddonStoreSeed = {}): Add
         .map(clone);
     },
 
-    async setAutoRenew(purchaseId, companyId, autoRenew) {
-      const row = purchases.get(purchaseId);
-      if (!row || row.companyId !== companyId) return false;
-      row.autoRenew = autoRenew;
-      return true;
+    async setAutoRenewForAddon(companyId, addonId, autoRenew, now) {
+      const matches = [...purchases.values()].filter(
+        (p) =>
+          p.companyId === companyId &&
+          p.addonId === addonId &&
+          p.status === 'active' &&
+          p.expiresAt != null &&
+          p.expiresAt.getTime() > now.getTime()
+      );
+      for (const row of matches) row.autoRenew = autoRenew;
+      return matches.length > 0;
     },
 
     async getPurchaseById(id) {
@@ -480,6 +499,24 @@ export class AddonPurchaseService {
     }
 
     const stripe = await this.getStripeClient();
+
+    // A one-time Checkout Session normally has no lasting relationship with a Stripe Customer,
+    // which would leave auto-renewal (this purchase's own, or toggled on later for the same
+    // company+addon) with no saved card to ever charge off-session — there is no separate
+    // card-collection UI anywhere in this app to fall back on. Attaching a Customer plus
+    // `setup_future_usage: 'off_session'` below saves the card used here for that purpose,
+    // on every purchase, regardless of whether auto-renew is requested at purchase time.
+    let stripeCustomerId = company.stripeCustomerId ?? undefined;
+    if (!stripeCustomerId) {
+      const customer = await stripe.customers.create({
+        email: company.companyEmail || undefined,
+        name: company.name || undefined,
+        metadata: { companyId: String(companyId) },
+      });
+      stripeCustomerId = customer.id;
+      await this.store.setCompanyStripeCustomerId(companyId, stripeCustomerId);
+    }
+
     const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
     const metadata = {
       purchaseId: String(purchase.id),
@@ -492,13 +529,15 @@ export class AddonPurchaseService {
     try {
       session = await stripe.checkout.sessions.create({
         mode: 'payment',
+        customer: stripeCustomerId,
         line_items: [{ price: stripePriceId, quantity }],
         success_url: `${baseUrl}/payment/success?type=addon&purchaseId=${purchase.id}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/payment/cancelled?type=addon&purchaseId=${purchase.id}`,
         metadata,
         // Copied onto the auto-created PaymentIntent too, so payment_intent.* webhooks (e.g. a
         // declined retry inside the same Checkout Session) can also be linked back to this row.
-        payment_intent_data: { metadata },
+        // `setup_future_usage` is what actually saves the payment method to the customer above.
+        payment_intent_data: { metadata, setup_future_usage: 'off_session' },
       });
     } catch (error) {
       // Never leave an unrecoverable `pending` row behind (it would permanently block this
@@ -553,9 +592,12 @@ export class AddonPurchaseService {
     return entries;
   }
 
-  /** Scoped to `companyId` so a company can never toggle another company's purchase by guessing
-   * an id. Returns false when no matching row exists for this company. */
-  async setAutoRenew(purchaseId: number, companyId: number, autoRenew: boolean): Promise<boolean> {
-    return this.store.setAutoRenew(purchaseId, companyId, autoRenew);
+  /** Scoped to `companyId` + `addonKey` (never a raw purchase id from the client) — applies to
+   * every currently-active purchase row for that pair. Returns false if the addon key is unknown
+   * or the company has no active quota for it right now. */
+  async setAddonAutoRenew(companyId: number, addonKey: string, autoRenew: boolean): Promise<boolean> {
+    const addon = await this.store.getAddonByKey(addonKey);
+    if (!addon) return false;
+    return this.store.setAutoRenewForAddon(companyId, addon.id, autoRenew, this.now());
   }
 }

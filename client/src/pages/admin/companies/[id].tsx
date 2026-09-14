@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/select";
 import { getPlanBillingPeriod } from "@/utils/plan-duration";
 import { useCurrency } from "@/contexts/currency-context";
+import { CountrySelector } from "@/components/ui/CountrySelector";
 
 interface Company {
   id: number;
@@ -64,6 +65,8 @@ interface Company {
   contactPerson?: string;
   registerNumber?: string;
   iban?: string;
+  /** ISO 3166-1 alpha-2 country code. Drives billing currency (EU -> EUR, else USD) for add-ons. */
+  country?: string | null;
 }
 
 function getCompanyInitials(name: string): string {
@@ -154,6 +157,7 @@ export default function CompanyDetailPage() {
     maxUsers: z.number().int().min(1, t('admin.companies.detail.validation.max_users_required', 'Must have at least 1 user')),
     whatsappImportMode: z.enum(['disabled', 'contacts_only', 'full_chat']),
     whatsappGroupsEnabled: z.boolean(),
+    country: z.string().optional(),
   });
 
   type CompanyFormValues = z.infer<typeof companySchema>;
@@ -208,6 +212,7 @@ export default function CompanyDetailPage() {
       maxUsers: 5,
       whatsappImportMode: 'contacts_only',
       whatsappGroupsEnabled: false,
+      country: "",
     }
   });
 
@@ -225,6 +230,7 @@ export default function CompanyDetailPage() {
         maxUsers: company.maxUsers,
         whatsappImportMode: (company as any).whatsappImportMode || 'contacts_only',
         whatsappGroupsEnabled: (company as any).whatsappGroupsEnabled ?? false,
+        country: company.country || "",
 
       });
     }
@@ -646,6 +652,27 @@ export default function CompanyDetailPage() {
                                   onChange={(e) => field.onChange(parseInt(e.target.value))}
                                 />
                               </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                              <FormLabel>{t('admin.companies.detail.form.country', 'Country')}</FormLabel>
+                              <FormControl>
+                                <CountrySelector
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  className="w-full"
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t('admin.companies.detail.form.country_description', 'Drives which currency (EUR/USD) this company is billed in for add-ons.')}
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}

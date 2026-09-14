@@ -128,6 +128,7 @@ import {
   companyCustomRoles, type CompanyCustomRole, type InsertCompanyCustomRole,
   companyPages, type CompanyPage, type InsertCompanyPage,
   plans, type Plan, type InsertPlan,
+  addons,
   stripeCatalogSyncJobs, type StripeCatalogSyncJob,
   planAiProviderConfigs, type PlanAiProviderConfig, type InsertPlanAiProviderConfig,
   planAiUsageTracking, type PlanAiUsageTracking, type InsertPlanAiUsageTracking,
@@ -626,6 +627,10 @@ export type EnqueueStripeCatalogSyncInput = {
   fingerprint: string;
 };
 
+// `addons` doesn't export a dedicated Plan-style type from shared/schema.ts (that schema is
+// intentionally minimal — see AddonCatalogSyncService); derive it locally instead of editing schema.ts.
+type Addon = typeof addons.$inferSelect;
+
 export interface IStorage {
   getAllCompanies(): Promise<Company[]>;
   getCompany(id: number): Promise<Company | undefined>;
@@ -652,6 +657,11 @@ export interface IStorage {
   createPlan(plan: InsertPlan): Promise<Plan>;
   updatePlan(id: number, updates: Partial<InsertPlan>): Promise<Plan>;
   deletePlan(id: number): Promise<boolean>;
+
+  getAllAddons(): Promise<Addon[]>;
+  getAddonById(id: number): Promise<Addon | undefined>;
+  updateAddon(id: number, updates: Partial<Omit<Addon, 'id' | 'createdAt'>>): Promise<Addon>;
+
   enqueueStripeCatalogSync(input: EnqueueStripeCatalogSyncInput): Promise<StripeCatalogSyncJob>;
   claimStripeCatalogSyncJobs(limit?: number, workerId?: string, lockTimeoutMs?: number): Promise<StripeCatalogSyncJob[]>;
   completeStripeCatalogSyncJob(jobId: number, claimToken: string): Promise<StripeCatalogSyncJob | undefined>;
@@ -2425,6 +2435,54 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error(`Error deleting plan with ID ${id}:`, error);
       return false;
+    }
+  }
+
+  async getAllAddons(): Promise<Addon[]> {
+    try {
+      return await db
+        .select()
+        .from(addons)
+        .orderBy(addons.id);
+    } catch (error) {
+      console.error("Error getting all addons:", error);
+      return [];
+    }
+  }
+
+  async getAddonById(id: number): Promise<Addon | undefined> {
+    try {
+      const [addon] = await db
+        .select()
+        .from(addons)
+        .where(eq(addons.id, id));
+
+      return addon || undefined;
+    } catch (error) {
+      console.error(`Error getting addon with ID ${id}:`, error);
+      return undefined;
+    }
+  }
+
+  async updateAddon(id: number, updates: Partial<Omit<Addon, 'id' | 'createdAt'>>): Promise<Addon> {
+    try {
+      const [updatedAddon] = await db
+        .update(addons)
+        .set({
+          ...updates,
+          updatedAt: new Date()
+        })
+        .where(eq(addons.id, id))
+        .returning();
+
+      if (!updatedAddon) {
+        throw new Error(`Addon with ID ${id} not found`);
+      }
+
+      return updatedAddon;
+    } catch (error) {
+      console.error(`Error updating addon with ID ${id}:`, error);
+      throw error;
     }
   }
 

@@ -3771,8 +3771,58 @@ export async function connectToWhatsApp(connectionId: number, userId: number): P
       });
 
       (sock.ev as any).on('messages.update', async (updates: any[]) => {
+        // Previously empty: this is Baileys' delivery/read-receipt event, and
+        // with no handler here every outbound message stayed at status
+        // "sent" forever — the inbox never showed delivered/read ticks for
+        // any WhatsApp connection.
+        const STATUS_RANK: Record<string, number> = { sending: 0, sent: 1, delivered: 2, read: 3 };
+        const STATUS_MAP: Record<number, 'failed' | 'sending' | 'sent' | 'delivered' | 'read'> = {
+          [proto.WebMessageInfo.Status.ERROR]: 'failed',
+          [proto.WebMessageInfo.Status.PENDING]: 'sending',
+          [proto.WebMessageInfo.Status.SERVER_ACK]: 'sent',
+          [proto.WebMessageInfo.Status.DELIVERY_ACK]: 'delivered',
+          [proto.WebMessageInfo.Status.READ]: 'read',
+          [proto.WebMessageInfo.Status.PLAYED]: 'read',
+        };
 
+        for (const { key, update } of updates) {
+          try {
+            if (!key?.id || !key.fromMe || update?.status === undefined || update?.status === null) {
+              continue;
+            }
+            const nextStatus = STATUS_MAP[update.status as number];
+            if (!nextStatus) continue;
 
+            const connection = await storage.getChannelConnection(connectionId);
+            if (!connection?.companyId) continue;
+
+            const message = await storage.getMessageByExternalId(key.id, connection.companyId);
+            if (!message) continue;
+
+            const currentRank = STATUS_RANK[message.status ?? 'sending'] ?? 0;
+            const nextRank = STATUS_RANK[nextStatus];
+            const isForwardProgress = nextRank !== undefined && nextRank > currentRank;
+            const isFailureOfUndelivered = nextStatus === 'failed' && currentRank <= STATUS_RANK.sent;
+            if (!isForwardProgress && !isFailureOfUndelivered) continue;
+
+            await storage.updateMessage(message.id, {
+              status: nextStatus,
+              ...(nextStatus === 'read' ? { readAt: new Date() } : {}),
+            });
+
+            broadcastWhatsAppEvent('messageStatusUpdate', {
+              messageId: message.id,
+              conversationId: message.conversationId,
+              status: nextStatus,
+            }, {
+              companyId: connection.companyId,
+              conversationId: message.conversationId,
+              priority: 'low',
+            });
+          } catch (error) {
+            console.error('Error processing WhatsApp message status update:', error);
+          }
+        }
       });
 
       (sock.ev as any).on('messages.reaction', async (reactions: any[]) => {

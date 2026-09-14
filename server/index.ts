@@ -68,6 +68,14 @@ app.use((req, res, next) => {
   if (req.method === 'POST' && req.path === '/api/webhooks/telnyx/voice') {
     return express.raw({ type: 'application/json', limit: '50mb' })(req, res, next);
   }
+  // Stripe webhook signature verification (`stripe.webhooks.constructEvent`) requires the exact
+  // raw request bytes — parsing this path as JSON first (like every other POST route) would make
+  // every real Stripe delivery here fail signature verification with a 400. This carve-out is
+  // required for the add-on billing webhook handling in `routes/payment-callbacks.ts` to ever
+  // receive a real event from Stripe.
+  if (req.method === 'POST' && req.path === '/api/payment/stripe/webhook') {
+    return express.raw({ type: 'application/json', limit: '50mb' })(req, res, next);
+  }
   express.json({ limit: '50mb' })(req, res, next);
 });
 app.use((req, res, next) => {
@@ -78,7 +86,8 @@ app.use((req, res, next) => {
       req.path === '/api/webhooks/messenger' ||
       req.path === '/api/webhooks/whatsapp' ||
       req.path === '/api/webhooks/tiktok' ||
-      req.path === '/api/webhooks/telnyx/voice')
+      req.path === '/api/webhooks/telnyx/voice' ||
+      req.path === '/api/payment/stripe/webhook')
   ) {
     return next();
   }
@@ -588,6 +597,15 @@ app.use((req, res, next) => {
           logger.info('subscription', '✅ Subscription Scheduler started successfully');
         } catch (error) {
           logger.error('subscription', '❌ Subscription Scheduler failed to start:', error);
+        }
+
+        logger.info('addon-renewal', 'Starting Add-on Renewal Scheduler...');
+        try {
+          const { startAddonRenewalScheduler } = await import('./services/addon-renewal-service');
+          startAddonRenewalScheduler();
+          logger.info('addon-renewal', '✅ Add-on Renewal Scheduler started successfully');
+        } catch (error) {
+          logger.error('addon-renewal', '❌ Add-on Renewal Scheduler failed to start:', error);
         }
 
         logger.info('template-status-sync', 'Starting WhatsApp Template Status Sync...');

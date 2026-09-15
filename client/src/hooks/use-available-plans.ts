@@ -50,8 +50,12 @@ export function useAvailablePlans() {
     enabled: !!user, // Only run when user is authenticated
   });
 
+  const sortedPlans = plans
+    ? [...plans].sort((a, b) => Number(b.price) - Number(a.price))
+    : [];
+
   return {
-    plans: plans || [],
+    plans: sortedPlans,
     isLoading,
     error
   };

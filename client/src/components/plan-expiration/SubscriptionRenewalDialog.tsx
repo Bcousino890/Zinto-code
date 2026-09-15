@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { AlertCircle, CreditCard, Calendar, Loader2, CheckCircle, Copy, Check } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertCircle, CreditCard, Calendar, Loader2, CheckCircle, Copy, Users, Contact, Radio, Workflow } from 'lucide-react';
 import { PaymentMethodSelector } from '../settings/PaymentMethodSelector';
 import { usePaymentMethods } from '@/hooks/use-payment-methods';
 
@@ -411,52 +413,51 @@ export default function SubscriptionRenewalDialog({
                 >
                   {plans.map((plan) => {
                     const isCurrentPlan = plan.id === currentPlanId;
+                    const isSelected = selectedPlanId === plan.id;
 
                     return (
-                      <div key={plan.id} className="flex items-center space-x-3">
-                        <RadioGroupItem value={plan.id.toString()} id={`plan-${plan.id}`} />
-                        <Label
-                          htmlFor={`plan-${plan.id}`}
-                          className="flex-1 cursor-pointer"
+                      <Label key={plan.id} htmlFor={`plan-${plan.id}`} className="block cursor-pointer">
+                        <Card
+                          className={`transition-all border-l-4 ${
+                            isSelected
+                              ? 'border-l-primary ring-1 ring-primary bg-primary/[0.03]'
+                              : 'border-l-transparent hover:border-l-muted-foreground/30 hover:bg-muted/40'
+                          }`}
                         >
-                          <Card className={`transition-all ${selectedPlanId === plan.id ? 'ring-2 ring-primary' : 'hover:bg-muted/50'}`}>
-                            <CardContent className="p-4">
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <h4 className="font-medium">{plan.name}</h4>
-                                    {isCurrentPlan && (
-                                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                        {t('plan_expiration.subscription_renewal_dialog.current_plan_badge', 'Current Plan')}
-                                      </span>
-                                    )}
-                                    {selectedPlanId === plan.id && (
-                                      <Check className="h-4 w-4 text-primary" />
-                                    )}
-                                  </div>
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    {plan.description}
-                                  </p>
-                                  <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                                    <span>{plan.maxUsers} users</span>
-                                    <span>{plan.maxContacts.toLocaleString()} contacts</span>
-                                    <span>{plan.maxChannels} channels</span>
-                                    <span>{plan.maxFlows} flows</span>
-                                  </div>
+                          <CardContent className="p-4 flex items-start gap-3">
+                            <RadioGroupItem value={plan.id.toString()} id={`plan-${plan.id}`} className="mt-1" />
+                            <div className="flex-1 min-w-0 flex justify-between items-start gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h4 className="font-semibold">{plan.name}</h4>
+                                  {isCurrentPlan && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      {t('plan_expiration.subscription_renewal_dialog.current_plan_badge', 'Current Plan')}
+                                    </Badge>
+                                  )}
                                 </div>
-                                <div className="text-right">
-                                  <div className="text-xl font-bold">
-                                    {formatCurrency(Number(plan.price))}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {getPlanBillingPeriod(plan)}
-                                  </div>
+                                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                  {plan.description}
+                                </p>
+                                <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mt-2 text-xs text-muted-foreground">
+                                  <span className="inline-flex items-center gap-1"><Users className="h-3 w-3" />{plan.maxUsers}</span>
+                                  <span className="inline-flex items-center gap-1"><Contact className="h-3 w-3" />{plan.maxContacts.toLocaleString()}</span>
+                                  <span className="inline-flex items-center gap-1"><Radio className="h-3 w-3" />{plan.maxChannels}</span>
+                                  <span className="inline-flex items-center gap-1"><Workflow className="h-3 w-3" />{plan.maxFlows}</span>
                                 </div>
                               </div>
-                            </CardContent>
-                          </Card>
-                        </Label>
-                      </div>
+                              <div className="text-right shrink-0">
+                                <div className="text-xl font-bold whitespace-nowrap">
+                                  {formatCurrency(Number(plan.price))}
+                                </div>
+                                <div className="text-xs text-muted-foreground whitespace-nowrap">
+                                  {getPlanBillingPeriod(plan)}
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Label>
                     );
                   })}
                 </RadioGroup>
@@ -502,14 +503,12 @@ export default function SubscriptionRenewalDialog({
 
           {/* Auto-renewal option */}
           <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
+            <Checkbox
               id="enableAutoRenewal"
               checked={enableAutoRenewal}
-              onChange={(e) => setEnableAutoRenewal(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              onCheckedChange={(checked) => setEnableAutoRenewal(checked === true)}
             />
-            <label htmlFor="enableAutoRenewal" className="text-sm text-gray-700 cursor-pointer">
+            <label htmlFor="enableAutoRenewal" className="text-sm text-muted-foreground cursor-pointer">
               {t('plan_expiration.subscription_renewal_dialog.auto_renewal_label', 'Enable automatic renewal to prevent future interruptions')}
             </label>
           </div>

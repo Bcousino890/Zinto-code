@@ -44,7 +44,7 @@ export default function SubscriptionRenewalDialog({
 }: SubscriptionRenewalDialogProps) {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
-  const [enableAutoRenewal, setEnableAutoRenewal] = useState(false);
+  const [enableAutoRenewal, setEnableAutoRenewal] = useState(true);
   const [showBankTransferInstructions, setShowBankTransferInstructions] = useState(false);
   const [bankTransferDetails, setBankTransferDetails] = useState<any>(null);
   const { paymentMethods, isLoading: loadingMethods } = usePaymentMethods();

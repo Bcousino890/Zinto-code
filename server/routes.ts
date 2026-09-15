@@ -296,6 +296,8 @@ import { createCrmDealPipelineApiV2Service } from "./services/crm-deal-pipeline-
 import { CrmCampaignSyncService } from "./services/crm-campaign-sync-service";
 import { CampaignService } from "./services/campaignService";
 import apiMessageService from "./services/api-message-service";
+import { apiMediaUpload, processUploadedApiMedia } from "./services/api-media-upload-service";
+import { findMessageMediaOwnerCompanyId, resolveMediaFilePath } from "./services/crm-media-access";
 import channelManager from "./services/channel-manager";
 import {
   sendTeamInvitation,
@@ -1133,6 +1135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       getMessageById: storage.getMessageById.bind(storage),
       updateMessage: storage.updateMessage.bind(storage),
       sendMessage: apiMessageService.sendMessage.bind(apiMessageService),
+      sendMedia: apiMessageService.sendMedia.bind(apiMessageService),
     }),
     appointmentSync: new AppointmentV2Service<CrmAppointmentPayload>({
       port: createCrmAppointmentStorageAdapter(storage),
@@ -1150,6 +1153,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }),
     dealPipelineSync: createCrmDealPipelineApiV2Service(createCrmDealStorageAdapter(storage)),
     campaignSync: new CrmCampaignSyncService(storage, new CampaignService()),
+    mediaAccess: {
+      upload: apiMediaUpload.single('file'),
+      processUpload: processUploadedApiMedia,
+      findOwnerCompanyId: findMessageMediaOwnerCompanyId,
+      resolveFilePath: resolveMediaFilePath,
+    },
     resolveIntegrationId: async (companyId, publicId) => {
       const integration = await storage.getCrmIntegrationByPublicIdAndCompany(publicId, companyId);
       return integration?.id;

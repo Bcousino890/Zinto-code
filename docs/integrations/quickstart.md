@@ -8,7 +8,8 @@ base de la API es `https://crm.zinto.app/api/v2`.
 | Área | Estado público v2 | Notas |
 | --- | --- | --- |
 | Contactos | Disponible | Crea o actualiza por el identificador externo del CRM. |
-| Mensajes | Disponible | Envía mensajes de texto a través de un canal existente de la empresa. |
+| Mensajes | Disponible | Envía mensajes de texto (y, opcionalmente, media) a través de un canal existente de la empresa. |
+| Media | Disponible | Sube un archivo (`POST /media/upload`), adjúntelo a un mensaje (`POST /messages`) y descargue lo recibido (`GET /media`). |
 | Campañas | Disponible | Sincronización por lotes mediante `POST /campaigns/batch`. |
 | Agenda | Disponible | Crea o actualiza una cita para un contacto existente. |
 | Negocios/pipeline | Disponible | Crea o actualiza una oportunidad y su etapa. |
@@ -118,6 +119,54 @@ curl --request POST "$BASE_URL/messages" \
 entero positivo. `external_message_id` es opcional, se devuelve sin cambios en
 la respuesta aceptada y sirve para correlación; no es una clave de reintento.
 
+## Enviar y recibir media (imagen, vídeo, audio, documento)
+
+Para enviar un adjunto, primero súbalo (si aún no tiene una URL http(s)
+pública) y luego inclúyalo en `POST /messages`:
+
+```bash
+curl --request POST "$BASE_URL/media/upload" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -F "file=@photo.jpg"
+# { "data": { "url": "https://crm.zinto.app/media/image/abc123.jpg", "type": "image", "filename": "photo.jpg", "size": 48213, "mimeType": "image/jpeg" } }
+
+curl --request POST "$BASE_URL/messages" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "channelId": 42,
+    "recipient": "+15551234567",
+    "text": "Here is the property you asked about",
+    "media": { "url": "https://crm.zinto.app/media/image/abc123.jpg", "type": "image" },
+    "external_message_id": "crm-message-124"
+  }'
+```
+
+`POST /media/upload` requiere `media:upload` (`multipart/form-data`, campo
+`file`, máx. 10 MB, tipos imagen/vídeo/audio/documento comunes). En
+`POST /messages`, `media.url` debe ser http(s) y `media.type` uno de
+`image`/`video`/`audio`/`document`; `text` pasa a ser opcional y, si está
+presente junto con `media`, se usa como caption. Adjuntar `media` requiere
+además el permiso `media:upload`, no solo `messages:send`.
+
+Cuando el cliente responde con un adjunto por WhatsApp, `message.received`
+incluye `data.media` (`url`, `type`, `mime_type`); no hay campo de caption
+aparte, viaja en `content` como en cualquier otro mensaje. Descargue el
+archivo con `GET /media`, pasando el `type` y `filename` tal como llegan en
+`data.media.url`:
+
+```bash
+curl "$BASE_URL/media?type=image&filename=xyz789.jpg" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -o received-photo.jpg
+```
+
+Requiere `media:read`; devuelve `404` si el archivo no existe o pertenece a
+otra empresa.
+
 ## Crear o actualizar agenda y oportunidades
 
 `PUT /appointments/{externalId}` requiere `appointments:write` y
@@ -151,6 +200,8 @@ claves usan la sesión de Zinto (no son parte de la API pública v2):
 | Consultar capacidades | `integrations:manage` |
 | Crear/actualizar contactos | `contacts:write` |
 | Enviar mensajes desde el CRM | `messages:send` |
+| Adjuntar media a un mensaje / subir archivo | `media:upload` |
+| Descargar media recibida | `media:read` |
 | Crear/actualizar agenda | `appointments:write` |
 | Crear/actualizar negocios | `deals:write` |
 
@@ -215,7 +266,8 @@ contactos y mensajes pueden devolver:
 | 400 | `VALIDATION_ERROR` | Contexto de empresa, Integration ID, external ID o nombre de contacto ausente o inválido. |
 | 401 | `API_KEY_MISSING`, `API_KEY_INVALID_FORMAT`, `API_KEY_NOT_FOUND`, `API_KEY_INACTIVE` o `API_KEY_EXPIRED` | Falló la autenticación. |
 | 403 | `INSUFFICIENT_PERMISSIONS` | La API Key no tiene el permiso de la ruta. |
-| 500 | `CONTACT_SYNC_FAILED` o `MESSAGE_SYNC_FAILED` | Falló la sincronización; investigue el mensaje antes de reintentar. |
+| 404 | `NOT_FOUND` | `GET /media` no encontró el archivo o pertenece a otra empresa. |
+| 500 | `CONTACT_SYNC_FAILED`, `MESSAGE_SYNC_FAILED` o `MEDIA_UPLOAD_FAILED` | Falló la sincronización o la subida; investigue antes de reintentar. |
 
 Para fallos de red y `5xx`, use backoff exponencial acotado con jitter. No
 reintente errores de validación o autorización hasta cambiar la solicitud o la

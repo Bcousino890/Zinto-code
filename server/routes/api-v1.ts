@@ -2,14 +2,13 @@ import { Router } from 'express';
 import { authenticateApiKey, requirePermission, rateLimitMiddleware, logApiUsage } from '../middleware/api-auth';
 import apiMessageService from '../services/api-message-service';
 import { storage } from '../storage';
-import { dataUsageTracker } from '../services/data-usage-tracker';
 import { z } from 'zod';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs-extra';
 import crypto from 'crypto';
 import { getPublicBaseUrlFromRequest } from '../utils/twilio-public-url';
-import { recordMediaFileOwnership } from '../services/media-ownership';
+import { processUploadedApiMedia } from '../services/api-media-upload-service';
 
 const router = Router();
 
@@ -470,85 +469,22 @@ router.post('/media/upload', requirePermission('media:upload'), upload.single('f
       });
     }
 
-    let finalUrl = `${getPublicBaseUrlFromRequest(req)}/uploads/api/${path.basename(req.file.path)}`;
-    let finalMimeType = req.file.mimetype;
-    let finalSize = req.file.size;
+    const uploaded = await processUploadedApiMedia({
+      file: req.file,
+      companyId: req.companyId,
+      baseUrl: getPublicBaseUrlFromRequest(req)
+    });
 
-    let mediaType: string;
-    if (req.file.mimetype.startsWith('image/')) mediaType = 'image';
-    else if (req.file.mimetype.startsWith('video/')) mediaType = 'video';
-    else if (req.file.mimetype.startsWith('audio/')) mediaType = 'audio';
-    else mediaType = 'document';
-
-
-    if (mediaType === 'audio') {
-      try {
-        const { convertAudioForWhatsAppWithFallback, getWhatsAppMimeType } = await import('../utils/audio-converter');
-        const tempDir = path.join(process.cwd(), 'temp', 'api-audio');
-        await fs.ensureDir(tempDir);
-
-        const conversionResult = await convertAudioForWhatsAppWithFallback(
-          req.file.path,
-          tempDir,
-          req.file.originalname
-        );
-
-        // Validate conversion was successful
-        if (!conversionResult || !conversionResult.outputPath) {
-          throw new Error('Audio conversion failed: no output path');
-        }
-
-        const mediaDir = path.join(process.cwd(), 'public', 'media', 'audio');
-        await fs.ensureDir(mediaDir);
-
-        const convertedFileName = path.basename(conversionResult.outputPath);
-        const publicMediaPath = path.join(mediaDir, convertedFileName);
-
-        await fs.move(conversionResult.outputPath, publicMediaPath);
-
-        // Strip codec parameters from MIME type for WhatsApp compatibility
-        let cleanMimeType = conversionResult.mimeType;
-        if (cleanMimeType.includes(';')) {
-          cleanMimeType = cleanMimeType.split(';')[0].trim();
-        }
-
-        finalUrl = `${getPublicBaseUrlFromRequest(req)}/media/audio/${convertedFileName}`;
-        finalMimeType = cleanMimeType;
-        finalSize = conversionResult.metadata.size || req.file.size;
-
-      } catch (conversionError) {
-        console.warn('API audio conversion failed, using original file:', conversionError);
-        // Keep original file if conversion fails
-      }
-    }
-
-    const responseData = {
+    res.json({
       success: true,
       data: {
-        url: finalUrl,
-        mediaType,
-        filename: req.file.originalname,
-        size: finalSize,
-        mimetype: finalMimeType
+        url: uploaded.url,
+        mediaType: uploaded.mediaType,
+        filename: uploaded.filename,
+        size: uploaded.size,
+        mimetype: uploaded.mimetype
       }
-    };
-
-    // Track storage usage (non-blocking)
-    if (req.companyId && req.file) {
-      dataUsageTracker.trackFileUpload(req.companyId, finalSize).catch(err => {
-        console.error('Failed to track API v1 media upload:', err);
-      });
-      recordMediaFileOwnership({
-        companyId: req.companyId,
-        publicUrl: finalUrl,
-        bucket: finalUrl.includes('/uploads/api/') ? 'uploads/api' : 'media/audio',
-        fileSize: finalSize
-      }).catch(err => {
-        console.error('Failed to record API v1 media ownership:', err);
-      });
-    }
-
-    res.json(responseData);
+    });
   } catch (error: any) {
     console.error('Error uploading media:', error);
 

@@ -1,5 +1,21 @@
 /** TikTok channel/partner secrets: encrypted via `tiktok-secret-storage` — rotation script `server/scripts/reencrypt-tiktok-at-rest-secrets.ts`. */
 import { randomUUID } from "crypto";
+import mimeTypes from "mime-types";
+import { buildCrmMediaDownloadUrl } from "./services/crm-media-access";
+
+/** Media fields for the CRM v2 `message.*` webhook `data` payload — omitted entirely for plain-text messages. */
+function crmWebhookMediaPayload(message: { mediaUrl: string | null; type: string | null }): { media?: { url: string; type: string | null; mime_type: string | null } } {
+  if (!message.mediaUrl) return {};
+  const url = buildCrmMediaDownloadUrl(message.mediaUrl);
+  if (!url) return {};
+  return {
+    media: {
+      url,
+      type: message.type,
+      mime_type: mimeTypes.lookup(message.mediaUrl) || null,
+    },
+  };
+}
 import {
   encryptTikTokChannelConnectionForWrite,
   encryptTikTokPartnerConfigurationForWrite,
@@ -6488,6 +6504,7 @@ export class DatabaseStorage implements IStorage {
                   phone: conversation.contactPhone,
                   email: conversation.contactEmail,
                 } : null,
+                ...crmWebhookMediaPayload(newMessage),
               },
             ));
         })
@@ -6585,6 +6602,7 @@ export class DatabaseStorage implements IStorage {
                 phone: conversation.contactPhone,
                 email: conversation.contactEmail,
               } : null,
+              ...crmWebhookMediaPayload(updatedMessage),
             }));
         })
         .catch(e => console.error('[crm-webhook] updateMessage event publish failed:', e));

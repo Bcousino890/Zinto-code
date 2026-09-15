@@ -553,6 +553,7 @@ export class AddonPurchaseService {
         mode: 'payment',
         customer: stripeCustomerId,
         line_items: [{ price: stripePriceId, quantity }],
+        allow_promotion_codes: true,
         success_url: `${baseUrl}/payment/success?type=addon&purchaseId=${purchase.id}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/payment/cancelled?type=addon&purchaseId=${purchase.id}`,
         metadata,

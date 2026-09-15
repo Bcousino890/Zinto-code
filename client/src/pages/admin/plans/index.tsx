@@ -1,17 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, Check, Edit, Trash2, Bot, Zap, DollarSign, AlertTriangle, Settings, HardDrive, Search } from "lucide-react";
+import { Loader2, Plus, Check, Minus, Edit, Trash2, Bot, Zap, DollarSign, AlertTriangle, Settings, HardDrive, Search, LayoutGrid, Table2 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/use-translation";
-import { PriceDisplay } from "@/components/ui/price-display";
+import { PriceDisplay, CompactPriceDisplay } from "@/components/ui/price-display";
 import { PlanFormFields, type AdminPlanFormData } from "./PlanFormFields";
 import { formatPlanDurationShort } from "./planDuration";
+import { buildFeatureComparisonRows, sortPlansByPriceDescending } from "./planComparison";
 import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -85,6 +88,188 @@ interface Plan {
   updatedAt: string;
 }
 
+/**
+ * Side-by-side comparison table for the "Compare" view. Columns are the
+ * plans (already sorted highest-to-lowest price by the caller), rows are the
+ * union of every numeric limit plus every distinct feature/campaign-feature
+ * line item across all plans, so admins can scan what each plan includes
+ * without opening each card individually.
+ */
+function PlanComparisonTable({ plans }: { plans: Plan[] }) {
+  const { t } = useTranslation();
+
+  const featureRows = useMemo(() => buildFeatureComparisonRows(plans, "features"), [plans]);
+  const campaignFeatureRows = useMemo(
+    () => buildFeatureComparisonRows(plans, "campaignFeatures"),
+    [plans]
+  );
+
+  const limitRows: Array<{ id: string; label: string; getValue: (plan: Plan) => string }> = [
+    { id: "users", label: t("admin.plans.stat.users", "Users"), getValue: (p) => String(p.maxUsers) },
+    {
+      id: "contacts",
+      label: t("admin.plans.stat.contacts", "Contacts"),
+      getValue: (p) => p.maxContacts.toLocaleString(),
+    },
+    { id: "channels", label: t("admin.plans.stat.channels", "Channels"), getValue: (p) => String(p.maxChannels) },
+    { id: "flows", label: t("admin.plans.stat.flows", "Flows"), getValue: (p) => String(p.maxFlows) },
+    {
+      id: "campaigns",
+      label: t("admin.plans.stat.campaigns", "Campaigns"),
+      getValue: (p) => String(p.maxCampaigns || 0),
+    },
+    {
+      id: "recipients",
+      label: t("admin.plans.stat.recipients", "Recipients"),
+      getValue: (p) => (p.maxCampaignRecipients || 0).toLocaleString(),
+    },
+    {
+      id: "storage",
+      label: t("admin.plans.card.storage", "Storage"),
+      getValue: (p) => (p.storageLimit ? `${(p.storageLimit / 1024).toFixed(1)} GB` : "1 GB"),
+    },
+    {
+      id: "bandwidth",
+      label: t("admin.plans.card.bandwidth_month", "Bandwidth/Month"),
+      getValue: (p) => (p.bandwidthLimit ? `${(p.bandwidthLimit / 1024).toFixed(1)} GB` : "10 GB"),
+    },
+    {
+      id: "fileUpload",
+      label: t("admin.plans.card.max_file_size", "Max File Size"),
+      getValue: (p) => `${p.fileUploadLimit || 25} MB`,
+    },
+    {
+      id: "totalFiles",
+      label: t("admin.plans.card.total_files", "Total Files"),
+      getValue: (p) => (p.totalFilesLimit || 1000).toLocaleString(),
+    },
+    {
+      id: "aiIncluded",
+      label: t("admin.plans.card.included_tokens", "Included Tokens"),
+      getValue: (p) => (p.aiBillingEnabled ? p.aiTokensIncluded?.toLocaleString() || "0" : "—"),
+    },
+    {
+      id: "aiMonthly",
+      label: t("admin.plans.card.monthly_limit", "Monthly Limit"),
+      getValue: (p) =>
+        p.aiBillingEnabled ? (p.aiTokensMonthlyLimit ? p.aiTokensMonthlyLimit.toLocaleString() : "∞") : "—",
+    },
+  ];
+
+  const columnCount = plans.length + 1;
+
+  return (
+    <div className="overflow-x-auto rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="min-w-[160px]">
+              {t("admin.plans.compare.column_feature", "Feature")}
+            </TableHead>
+            {plans.map((plan) => (
+              <TableHead key={plan.id} className="min-w-[180px] text-center align-top">
+                <div className="flex flex-col items-center gap-1 py-1">
+                  <span className="text-sm font-semibold text-foreground">{plan.name}</span>
+                  <CompactPriceDisplay plan={plan} />
+                  <span
+                    className={
+                      plan.isActive
+                        ? "bg-primary/10 text-primary text-xs font-medium py-0.5 px-2 rounded-full"
+                        : "bg-muted/80 text-muted-foreground text-xs font-medium py-0.5 px-2 rounded-full"
+                    }
+                  >
+                    {plan.isActive
+                      ? t("admin.plans.badge.active", "Active")
+                      : t("admin.plans.inactive_badge", "Inactive Plan")}
+                  </span>
+                </div>
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell
+              colSpan={columnCount}
+              className="bg-muted/30 text-xs font-medium uppercase tracking-wide text-muted-foreground"
+            >
+              {t("admin.plans.compare.section_limits", "Limits")}
+            </TableCell>
+          </TableRow>
+          {limitRows.map((row) => (
+            <TableRow key={`limit-${row.id}`}>
+              <TableCell className="font-medium text-muted-foreground">{row.label}</TableCell>
+              {plans.map((plan) => (
+                <TableCell key={plan.id} className="text-center">
+                  {row.getValue(plan)}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+
+          <TableRow>
+            <TableCell
+              colSpan={columnCount}
+              className="bg-muted/30 text-xs font-medium uppercase tracking-wide text-muted-foreground"
+            >
+              {t("admin.plans.field.features", "Features")}
+            </TableCell>
+          </TableRow>
+          {featureRows.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={columnCount} className="text-center text-sm text-muted-foreground">
+                {t("admin.plans.compare.no_features", "No features listed yet")}
+              </TableCell>
+            </TableRow>
+          ) : (
+            featureRows.map((row) => (
+              <TableRow key={`feature-${row.label}`}>
+                <TableCell>{row.label}</TableCell>
+                {plans.map((plan) => (
+                  <TableCell key={plan.id} className="text-center">
+                    {row.includedByPlanId[plan.id] ? (
+                      <Check className="h-4 w-4 text-primary mx-auto" />
+                    ) : (
+                      <Minus className="h-4 w-4 text-muted-foreground/40 mx-auto" />
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          )}
+
+          {campaignFeatureRows.length > 0 && (
+            <>
+              <TableRow>
+                <TableCell
+                  colSpan={columnCount}
+                  className="bg-muted/30 text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                >
+                  {t("admin.plans.field.campaign_features", "Campaign Features")}
+                </TableCell>
+              </TableRow>
+              {campaignFeatureRows.map((row) => (
+                <TableRow key={`campaign-${row.label}`}>
+                  <TableCell className="capitalize">{row.label.replace(/_/g, " ")}</TableCell>
+                  {plans.map((plan) => (
+                    <TableCell key={plan.id} className="text-center">
+                      {row.includedByPlanId[plan.id] ? (
+                        <Check className="h-4 w-4 text-primary mx-auto" />
+                      ) : (
+                        <Minus className="h-4 w-4 text-muted-foreground/40 mx-auto" />
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
 export default function PlansPage() {
   const { user, isLoading } = useAuth();
   const { t } = useTranslation();
@@ -94,6 +279,7 @@ export default function PlansPage() {
   const [isAiConfigDialogOpen, setIsAiConfigDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [planView, setPlanView] = useState<"list" | "compare">("list");
 
   const [formData, setFormData] = useState<AdminPlanFormData>({
     name: "",
@@ -158,6 +344,13 @@ export default function PlansPage() {
   const filteredPlans = plans?.filter(plan =>
     plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     plan.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Highest price to lowest, matching the ordering `useAvailablePlans` uses
+  // on the customer-facing plan list, so the comparison table stays consistent.
+  const comparisonPlans = useMemo(
+    () => sortPlansByPriceDescending(filteredPlans ?? []),
+    [filteredPlans]
   );
 
   const createPlanMutation = useMutation({
@@ -483,6 +676,19 @@ export default function PlansPage() {
                   : t("admin.plans.empty_state", "No plans found. Create your first plan to get started.")}
               </div>
             ) : (
+              <Tabs value={planView} onValueChange={(value) => setPlanView(value as "list" | "compare")}>
+                <TabsList className="mb-6">
+                  <TabsTrigger value="list" className="gap-2">
+                    <LayoutGrid className="h-4 w-4" />
+                    {t("admin.plans.view.list", "List")}
+                  </TabsTrigger>
+                  <TabsTrigger value="compare" className="gap-2">
+                    <Table2 className="h-4 w-4" />
+                    {t("admin.plans.view.compare", "Compare")}
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="list" className="mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredPlans?.map((plan) => (
                   <Card
@@ -748,6 +954,12 @@ export default function PlansPage() {
               </Card>
             ))}
               </div>
+                </TabsContent>
+
+                <TabsContent value="compare" className="mt-0">
+                  <PlanComparisonTable plans={comparisonPlans} />
+                </TabsContent>
+              </Tabs>
             )}
           </CardContent>
         </Card>

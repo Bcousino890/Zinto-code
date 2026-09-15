@@ -286,6 +286,7 @@ export function registerPaymentRoutes(app: Express) {
           }
         ],
         mode: 'payment',
+        allow_promotion_codes: true,
         success_url: `${req.protocol}://${req.get('host')}/payment/success?session_id={CHECKOUT_SESSION_ID}&transaction_id=${transaction.id}&source=stripe`,
         cancel_url: `${req.protocol}://${req.get('host')}/payment/cancel`,
         metadata: {

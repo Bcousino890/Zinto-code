@@ -1430,6 +1430,7 @@ async function createStripePaymentSession(company: any, plan: any, enableAutoRen
       quantity: 1,
     }],
     mode: 'payment',
+    allow_promotion_codes: true,
     customer_email: company.companyEmail,
     success_url: `${process.env.BASE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}&renewal=true`,
     cancel_url: `${process.env.BASE_URL}/payment/cancelled`,

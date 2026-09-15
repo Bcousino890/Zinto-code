@@ -196,17 +196,17 @@ export async function rateLimitMiddleware(req: Request, res: Response, next: Nex
     const checks = [
       { 
         window: 'minute', 
-        limit: apiKey.rateLimitPerMinute || 60,
+        limit: apiKey.rateLimitPerMinute || 300,
         windowStart: new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes())
       },
       { 
         window: 'hour', 
-        limit: apiKey.rateLimitPerHour || 1000,
+        limit: apiKey.rateLimitPerHour || 5000,
         windowStart: new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours())
       },
       { 
         window: 'day', 
-        limit: apiKey.rateLimitPerDay || 10000,
+        limit: apiKey.rateLimitPerDay || 50000,
         windowStart: new Date(now.getFullYear(), now.getMonth(), now.getDate())
       }
     ];

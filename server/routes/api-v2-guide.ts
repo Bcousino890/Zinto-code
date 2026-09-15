@@ -54,6 +54,8 @@ El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo 
 | POST | /deals | deals:write |
 | POST | /sync-jobs | integrations:manage |
 
+El payload de \`PUT /contacts/{externalId}\` admite \`name\`, \`phone\`, \`email\`, \`company\`, \`tags\` (arreglo de strings) y \`notes\` (texto libre). No existen los scopes \`notes:*\` ni \`tags:write\` de v1: ambos campos se escriben con el permiso \`contacts:write\` y se devuelven junto al resto de datos del contacto cuando se consulta con \`contacts:read\`.
+
 ## Ejemplo: enviar desde el CRM
 
 ~~~bash

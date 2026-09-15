@@ -18,6 +18,14 @@ export interface IntegrationOperationsData {
   pendingEvents: IntegrationOperationEvent[];
   failedEvents: IntegrationOperationEvent[];
   conflicts: IntegrationConflict[];
+  /**
+   * True totals, independent of how many rows the lists above carry. The
+   * lists are capped for display, so their .length understates the total
+   * once a company passes that cap — these counts must be used for metrics.
+   */
+  pendingEventCount: number;
+  failedEventCount: number;
+  conflictCount: number;
 }
 
 export interface CrmOperationsSource {
@@ -27,7 +35,10 @@ export interface CrmOperationsSource {
   scopes: unknown;
   pendingEvents: Array<{ id: string; type: string; status: string; attemptCount: number; createdAt: string; lastError: string | null }>;
   failedEvents: Array<{ id: string; type: string; status: string; attemptCount: number; createdAt: string; lastError: string | null }>;
+  pendingEventCount: number;
+  failedEventCount: number;
   conflicts: Array<{ id: number; entityType: string; externalId: string; status: string; createdAt: string }>;
+  conflictCount: number;
 }
 
 export function buildCrmOperationsViewData(source: CrmOperationsSource): IntegrationOperationsData {
@@ -39,6 +50,9 @@ export function buildCrmOperationsViewData(source: CrmOperationsSource): Integra
     health: source.status === 'active' ? 'healthy' : 'down',
     pendingEvents: source.pendingEvents.map(event),
     failedEvents: source.failedEvents.map(event),
+    pendingEventCount: source.pendingEventCount,
+    failedEventCount: source.failedEventCount,
+    conflictCount: source.conflictCount,
     conflicts: source.conflicts.map((conflict) => ({
       id: String(conflict.id),
       label: `${conflict.entityType} · ${conflict.externalId}`,
@@ -66,6 +80,9 @@ export function buildIntegrationOperationsData(apiKeys: ApiKeyIntegrationSource[
         : 'degraded',
     pendingEvents: [],
     failedEvents: [],
+    pendingEventCount: 0,
+    failedEventCount: 0,
     conflicts: [],
+    conflictCount: 0,
   };
 }

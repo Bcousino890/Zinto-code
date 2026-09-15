@@ -86,6 +86,30 @@ test('does not permit a stale lease to record an outcome', async () => {
   );
 });
 
+test('records the HTTP status as lastError on a terminal rejection like a signature mismatch', async () => {
+  const updates: unknown[] = [];
+  const persistence: DurableWebhookDeliveryPersistence = {
+    listCandidateScopes: async () => [scope],
+    claimPending: async (input) => ({ ...claimedEvent, claimToken: input.claimToken }),
+    getDeliveryTarget: async () => ({ url: 'https://crm.example.test/hooks/zinto', secretEncrypted: 'stored-secret' }),
+    updateDelivery: async (input) => { updates.push(input); return true; },
+  };
+  const worker = new DurableWebhookDeliveryWorker(persistence, {
+    decryptSecret: () => 'webhook-secret',
+    deliver: async () => ({ statusCode: 401 }),
+  });
+
+  assert.equal(await worker.processNext(new Date('2026-09-10T08:01:00.000Z')), true);
+  assert.deepEqual(updates, [{
+    ...scope,
+    eventId: claimedEvent.eventId,
+    claimToken: (updates[0] as { claimToken: string }).claimToken,
+    status: 'failed',
+    nextAttemptAt: null,
+    lastError: 'Webhook endpoint responded with HTTP 401',
+  }]);
+});
+
 test('records a retry when the transport reports a network failure', async () => {
   const updates: unknown[] = [];
   const persistence: DurableWebhookDeliveryPersistence = {

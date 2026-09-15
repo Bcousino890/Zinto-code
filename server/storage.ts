@@ -888,6 +888,7 @@ export interface IStorage {
   updateDelivery(input: DurableWebhookDeliveryUpdate): Promise<boolean>;
   listCandidateScopes(): Promise<DurableWebhookEventScope[]>;
   getDeliveryTarget(scope: DurableWebhookEventScope): Promise<DurableWebhookDeliveryTarget | undefined>;
+  enqueueCrmWebhookEvent(input: { companyId: number; integrationId: number; type: string; origin: 'crm' | 'zinto' | 'system'; payload: Record<string, unknown> }): Promise<void>;
   deleteContact(id: number): Promise<{ success: boolean; mediaFiles?: string[]; error?: string }>;
 
   getConversations(options?: { companyId?: number; page?: number; limit?: number; search?: string; assignedToUserId?: number }): Promise<{ conversations: Conversation[]; total: number }>;
@@ -5096,6 +5097,21 @@ export class DatabaseStorage implements IStorage {
     return target;
   }
 
+  /**
+   * Enqueues a CRM v2 webhook event. This is the producer side of the
+   * durable outbox: without a row here, claimPending/getDeliveryTarget have
+   * nothing to deliver, no matter how "active" an integration looks.
+   */
+  async enqueueCrmWebhookEvent(input: { companyId: number; integrationId: number; type: string; origin: 'crm' | 'zinto' | 'system'; payload: Record<string, unknown> }): Promise<void> {
+    await db.insert(crmWebhookEvents).values({
+      companyId: input.companyId,
+      integrationId: input.integrationId,
+      type: input.type,
+      origin: input.origin,
+      payload: input.payload,
+    });
+  }
+
   async getCrmIntegrationOperations(companyId: number): Promise<any[]> {
     const integrations: Array<{
       id: number;
@@ -5110,7 +5126,7 @@ export class DatabaseStorage implements IStorage {
     }).from(crmIntegrations).where(eq(crmIntegrations.companyId, companyId));
     if (integrations.length === 0) return [];
 
-    const [events, conflicts]: [
+    const [events, conflicts, eventStatusCounts, conflictCounts]: [
       Array<{
         id: string;
         integrationId: number;
@@ -5129,6 +5145,8 @@ export class DatabaseStorage implements IStorage {
         status: string;
         createdAt: Date;
       }>,
+      Array<{ integrationId: number; status: string; count: number }>,
+      Array<{ integrationId: number; count: number }>,
     ] = await Promise.all([
       db.select({
         id: crmWebhookEvents.id, integrationId: crmWebhookEvents.integrationId,
@@ -5141,13 +5159,35 @@ export class DatabaseStorage implements IStorage {
         entityType: crmSyncConflicts.entityType, externalId: crmSyncConflicts.externalId,
         status: crmSyncConflicts.status, createdAt: crmSyncConflicts.createdAt,
       }).from(crmSyncConflicts).where(eq(crmSyncConflicts.companyId, companyId)).orderBy(desc(crmSyncConflicts.createdAt)).limit(100),
+      // Unbounded counts: the two lists above are capped at 100 rows for display,
+      // so their .length must never be used as the true total (it silently stops
+      // moving once a company passes 100 events, no matter how many really exist).
+      db.select({
+        integrationId: crmWebhookEvents.integrationId,
+        status: crmWebhookEvents.status,
+        count: sql<number>`COUNT(*)::int`,
+      }).from(crmWebhookEvents).where(eq(crmWebhookEvents.companyId, companyId))
+        .groupBy(crmWebhookEvents.integrationId, crmWebhookEvents.status),
+      db.select({
+        integrationId: crmSyncConflicts.integrationId,
+        count: sql<number>`COUNT(*)::int`,
+      }).from(crmSyncConflicts).where(and(eq(crmSyncConflicts.companyId, companyId), eq(crmSyncConflicts.status, 'pending')))
+        .groupBy(crmSyncConflicts.integrationId),
     ]);
+
+    const countFor = (integrationId: number, statuses: string[]) =>
+      eventStatusCounts
+        .filter((row) => row.integrationId === integrationId && statuses.includes(row.status))
+        .reduce((sum, row) => sum + row.count, 0);
 
     return integrations.map((integration) => ({
       ...integration,
       pendingEvents: events.filter((event) => event.integrationId === integration.id && ['pending', 'processing'].includes(event.status)),
       failedEvents: events.filter((event) => event.integrationId === integration.id && ['failed', 'dead_letter'].includes(event.status)),
+      pendingEventCount: countFor(integration.id, ['pending', 'processing']),
+      failedEventCount: countFor(integration.id, ['failed', 'dead_letter']),
       conflicts: conflicts.filter((conflict) => conflict.integrationId === integration.id && conflict.status === 'pending'),
+      conflictCount: conflictCounts.find((row) => row.integrationId === integration.id)?.count ?? 0,
     }));
   }
 
@@ -6403,6 +6443,32 @@ export class DatabaseStorage implements IStorage {
         ).catch(e => console.error('[metrics] incrementMessageCounts failed:', e))
       );
 
+      // Notify subscribed CRM v2 integrations. Best-effort and non-blocking:
+      // a webhook failure must never affect message delivery.
+      db.select({ companyId: conversations.companyId })
+        .from(conversations)
+        .where(eq(conversations.id, newMessage.conversationId))
+        .limit(1)
+        .then(([conversation]) => {
+          if (!conversation?.companyId) return;
+          return import('./services/crm-webhook-event-producer').then(m =>
+            m.publishCrmEvent(
+              this,
+              conversation.companyId!,
+              newMessage.direction === 'inbound' ? 'message.received' : 'message.sent',
+              {
+                message_id: newMessage.id,
+                conversation_id: newMessage.conversationId,
+                direction: newMessage.direction,
+                type: newMessage.type,
+                content: newMessage.content,
+                status: newMessage.status,
+                created_at: newMessage.createdAt,
+              },
+            ));
+        })
+        .catch(e => console.error('[crm-webhook] createMessage event publish failed:', e));
+
       // Auto-pause bot replies when an owner/agent replies to a contact.
       if (newMessage.direction === 'outbound' && newMessage.isFromBot === false && newMessage.senderType === 'user') {
         try {
@@ -6457,6 +6523,27 @@ export class DatabaseStorage implements IStorage {
       .set(updates)
       .where(eq(messages.id, id))
       .returning();
+
+    const statusEvent = updates.status === 'delivered' || updates.status === 'read' || updates.status === 'failed'
+      ? `message.${updates.status}`
+      : undefined;
+    if (updatedMessage && statusEvent) {
+      db.select({ companyId: conversations.companyId })
+        .from(conversations)
+        .where(eq(conversations.id, updatedMessage.conversationId))
+        .limit(1)
+        .then(([conversation]) => {
+          if (!conversation?.companyId) return;
+          return import('./services/crm-webhook-event-producer').then(m =>
+            m.publishCrmEvent(this, conversation.companyId!, statusEvent, {
+              message_id: updatedMessage.id,
+              conversation_id: updatedMessage.conversationId,
+              status: updatedMessage.status,
+            }));
+        })
+        .catch(e => console.error('[crm-webhook] updateMessage event publish failed:', e));
+    }
+
     return updatedMessage;
   }
 

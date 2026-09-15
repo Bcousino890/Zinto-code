@@ -18,7 +18,10 @@ type IntegrationOperationsStorage = {
     scopes: unknown;
     pendingEvents: WebhookEvent[];
     failedEvents: WebhookEvent[];
+    pendingEventCount: number;
+    failedEventCount: number;
     conflicts: unknown[];
+    conflictCount: number;
   }>>;
 };
 

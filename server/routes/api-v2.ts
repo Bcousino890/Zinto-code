@@ -130,6 +130,7 @@ export function createApiV2Router({
             ...(typeof contact.email === 'string' ? { email: contact.email } : {}),
             ...(typeof contact.company === 'string' ? { company: contact.company } : {}),
             ...(Array.isArray(contact.tags) ? { tags: contact.tags } : {}),
+            ...(typeof contact.notes === 'string' ? { notes: contact.notes } : {}),
             ...(contact.customFields && typeof contact.customFields === 'object' ? { customFields: contact.customFields } : {}),
           },
         });

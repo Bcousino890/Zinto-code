@@ -30,6 +30,9 @@ export interface IntegrationOperationsViewProps {
   pendingEvents: IntegrationOperationEvent[];
   failedEvents: IntegrationOperationEvent[];
   conflicts: IntegrationConflict[];
+  pendingEventCount?: number;
+  failedEventCount?: number;
+  conflictCount?: number;
   onRetryFailedEvent?: (eventId: string) => void;
   isRetryingEventId?: string | null;
   dataAvailabilityMessage?: string;
@@ -75,16 +78,22 @@ export function IntegrationOperationsView({
   pendingEvents,
   failedEvents,
   conflicts,
+  pendingEventCount,
+  failedEventCount,
+  conflictCount,
   onRetryFailedEvent,
   isRetryingEventId = null,
   dataAvailabilityMessage,
 }: IntegrationOperationsViewProps) {
   const { t } = useTranslation();
+  const resolvedPendingCount = pendingEventCount ?? pendingEvents.length;
+  const resolvedFailedCount = failedEventCount ?? failedEvents.length;
+  const resolvedConflictCount = conflictCount ?? conflicts.length;
   const status = getIntegrationOperationsStatus({
     health,
-    pendingEventCount: pendingEvents.length,
-    failedEventCount: failedEvents.length,
-    conflictCount: conflicts.length,
+    pendingEventCount: resolvedPendingCount,
+    failedEventCount: resolvedFailedCount,
+    conflictCount: resolvedConflictCount,
   });
 
   return (
@@ -104,9 +113,9 @@ export function IntegrationOperationsView({
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard icon={CheckCircle2} label={t('integrations.operations.health', 'Integration health')} value={t(healthLabelKeys[health].key, healthLabelKeys[health].fallback)} />
-        <MetricCard icon={Clock3} label={t('integrations.operations.pending_events', 'Pending events')} value={pendingEvents.length} />
-        <MetricCard icon={AlertCircle} label={t('integrations.operations.failed_events', 'Failed events')} value={failedEvents.length} />
-        <MetricCard icon={ShieldAlert} label={t('integrations.operations.conflicts', 'Conflicts')} value={conflicts.length} />
+        <MetricCard icon={Clock3} label={t('integrations.operations.pending_events', 'Pending events')} value={resolvedPendingCount} />
+        <MetricCard icon={AlertCircle} label={t('integrations.operations.failed_events', 'Failed events')} value={resolvedFailedCount} />
+        <MetricCard icon={ShieldAlert} label={t('integrations.operations.conflicts', 'Conflicts')} value={resolvedConflictCount} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">

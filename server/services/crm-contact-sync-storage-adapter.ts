@@ -14,6 +14,7 @@ function normalizeContact(contact: Contact): StoredContact {
     email: contact.email ?? undefined,
     company: contact.company ?? undefined,
     tags: contact.tags ?? undefined,
+    notes: contact.notes ?? undefined,
     customFields: customFields && typeof customFields === 'object' && !Array.isArray(customFields)
       ? customFields as Record<string, unknown>
       : undefined,

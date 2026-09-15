@@ -25,6 +25,9 @@ test('derives CRM API health from active integration-management keys without inv
   assert.deepEqual(data.pendingEvents, []);
   assert.deepEqual(data.failedEvents, []);
   assert.deepEqual(data.conflicts, []);
+  assert.equal(data.pendingEventCount, 0);
+  assert.equal(data.failedEventCount, 0);
+  assert.equal(data.conflictCount, 0);
 });
 
 test('reports an unavailable CRM API integration when no active management key exists', () => {
@@ -58,7 +61,10 @@ test('renders server-provided webhook and conflict records without using their p
     id: 9, name: 'HubSpot', status: 'active', scopes: [],
     pendingEvents: [{ id: 'evt-1', type: 'contact.updated', status: 'pending', attemptCount: 2, createdAt: '2026-09-10T08:00:00.000Z', lastError: null }],
     failedEvents: [{ id: 'evt-2', type: 'deal.updated', status: 'failed', attemptCount: 4, createdAt: '2026-09-10T07:00:00.000Z', lastError: 'Timeout' }],
+    pendingEventCount: 1,
+    failedEventCount: 1,
     conflicts: [{ id: 3, entityType: 'contact', externalId: 'crm-4', status: 'pending', createdAt: '2026-09-10T06:00:00.000Z' }],
+    conflictCount: 1,
   });
   assert.equal(data.health, 'healthy');
   assert.deepEqual(data.failedEvents[0], { id: 'evt-2', label: 'deal.updated', detail: 'Timeout', occurredAt: '2026-09-10T07:00:00.000Z' });
@@ -68,4 +74,22 @@ test('renders server-provided webhook and conflict records without using their p
     detail: 'Pending review',
     detailTranslationKey: 'integrations.operations.pending_review',
   });
+});
+
+test('exposes the true event count even when the displayed list is capped below it', () => {
+  // Regression guard: the backend caps the detail list at 100 rows for display,
+  // so a company with more events than that must still see the real total
+  // instead of the metric silently freezing at the list's length.
+  const data = buildCrmOperationsViewData({
+    id: 9, name: 'smartbc2', status: 'active', scopes: [],
+    pendingEvents: [],
+    failedEvents: [{ id: 'evt-1', type: 'message.received', status: 'failed', attemptCount: 1, createdAt: '2026-09-15T01:31:15.000Z', lastError: 'Webhook endpoint responded with HTTP 401' }],
+    pendingEventCount: 0,
+    failedEventCount: 342,
+    conflicts: [],
+    conflictCount: 0,
+  });
+
+  assert.equal(data.failedEvents.length, 1);
+  assert.equal(data.failedEventCount, 342);
 });

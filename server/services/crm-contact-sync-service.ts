@@ -4,6 +4,7 @@ export interface CrmContactInput {
   email?: string;
   company?: string;
   tags?: string[];
+  notes?: string;
   customFields?: Record<string, unknown>;
 }
 

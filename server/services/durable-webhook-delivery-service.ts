@@ -110,6 +110,11 @@ export class DurableWebhookDeliveryWorker implements DurableWebhookWorker {
           retryAfterSeconds: result.retryAfterSeconds,
           now,
         });
+        if (plan.status !== 'delivered') {
+          lastError = result.networkError
+            ? 'Webhook delivery transport failed'
+            : `Webhook endpoint responded with HTTP ${result.statusCode ?? 'unknown status'}`;
+        }
       } catch (error) {
         lastError = error instanceof Error ? error.message : 'Webhook delivery transport failed';
         plan = planWebhookDelivery({

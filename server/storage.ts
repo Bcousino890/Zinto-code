@@ -6444,9 +6444,20 @@ export class DatabaseStorage implements IStorage {
       );
 
       // Notify subscribed CRM v2 integrations. Best-effort and non-blocking:
-      // a webhook failure must never affect message delivery.
-      db.select({ companyId: conversations.companyId })
+      // a webhook failure must never affect message delivery. Joins the
+      // contact so the CRM can identify who this is about — v2 has no GET
+      // endpoint to resolve conversation_id back to a phone number itself.
+      db.select({
+          companyId: conversations.companyId,
+          channelType: conversations.channelType,
+          channelId: conversations.channelId,
+          contactId: contacts.id,
+          contactName: contacts.name,
+          contactPhone: contacts.phone,
+          contactEmail: contacts.email,
+        })
         .from(conversations)
+        .leftJoin(contacts, eq(contacts.id, conversations.contactId))
         .where(eq(conversations.id, newMessage.conversationId))
         .limit(1)
         .then(([conversation]) => {
@@ -6464,6 +6475,14 @@ export class DatabaseStorage implements IStorage {
                 content: newMessage.content,
                 status: newMessage.status,
                 created_at: newMessage.createdAt,
+                channel_type: conversation.channelType,
+                channel_id: conversation.channelId,
+                contact: conversation.contactId ? {
+                  id: conversation.contactId,
+                  name: conversation.contactName,
+                  phone: conversation.contactPhone,
+                  email: conversation.contactEmail,
+                } : null,
               },
             ));
         })
@@ -6528,8 +6547,17 @@ export class DatabaseStorage implements IStorage {
       ? `message.${updates.status}`
       : undefined;
     if (updatedMessage && statusEvent) {
-      db.select({ companyId: conversations.companyId })
+      db.select({
+          companyId: conversations.companyId,
+          channelType: conversations.channelType,
+          channelId: conversations.channelId,
+          contactId: contacts.id,
+          contactName: contacts.name,
+          contactPhone: contacts.phone,
+          contactEmail: contacts.email,
+        })
         .from(conversations)
+        .leftJoin(contacts, eq(contacts.id, conversations.contactId))
         .where(eq(conversations.id, updatedMessage.conversationId))
         .limit(1)
         .then(([conversation]) => {
@@ -6539,6 +6567,14 @@ export class DatabaseStorage implements IStorage {
               message_id: updatedMessage.id,
               conversation_id: updatedMessage.conversationId,
               status: updatedMessage.status,
+              channel_type: conversation.channelType,
+              channel_id: conversation.channelId,
+              contact: conversation.contactId ? {
+                id: conversation.contactId,
+                name: conversation.contactName,
+                phone: conversation.contactPhone,
+                email: conversation.contactEmail,
+              } : null,
             }));
         })
         .catch(e => console.error('[crm-webhook] updateMessage event publish failed:', e));

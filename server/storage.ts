@@ -6451,6 +6451,8 @@ export class DatabaseStorage implements IStorage {
           companyId: conversations.companyId,
           channelType: conversations.channelType,
           channelId: conversations.channelId,
+          channelName: channelConnections.accountName,
+          channelAccountId: channelConnections.accountId,
           contactId: contacts.id,
           contactName: contacts.name,
           contactPhone: contacts.phone,
@@ -6458,6 +6460,7 @@ export class DatabaseStorage implements IStorage {
         })
         .from(conversations)
         .leftJoin(contacts, eq(contacts.id, conversations.contactId))
+        .leftJoin(channelConnections, eq(channelConnections.id, conversations.channelId))
         .where(eq(conversations.id, newMessage.conversationId))
         .limit(1)
         .then(([conversation]) => {
@@ -6477,6 +6480,8 @@ export class DatabaseStorage implements IStorage {
                 created_at: newMessage.createdAt,
                 channel_type: conversation.channelType,
                 channel_id: conversation.channelId,
+                channel_name: conversation.channelName,
+                channel_account_id: conversation.channelAccountId,
                 contact: conversation.contactId ? {
                   id: conversation.contactId,
                   name: conversation.contactName,
@@ -6551,6 +6556,8 @@ export class DatabaseStorage implements IStorage {
           companyId: conversations.companyId,
           channelType: conversations.channelType,
           channelId: conversations.channelId,
+          channelName: channelConnections.accountName,
+          channelAccountId: channelConnections.accountId,
           contactId: contacts.id,
           contactName: contacts.name,
           contactPhone: contacts.phone,
@@ -6558,6 +6565,7 @@ export class DatabaseStorage implements IStorage {
         })
         .from(conversations)
         .leftJoin(contacts, eq(contacts.id, conversations.contactId))
+        .leftJoin(channelConnections, eq(channelConnections.id, conversations.channelId))
         .where(eq(conversations.id, updatedMessage.conversationId))
         .limit(1)
         .then(([conversation]) => {
@@ -6569,6 +6577,8 @@ export class DatabaseStorage implements IStorage {
               status: updatedMessage.status,
               channel_type: conversation.channelType,
               channel_id: conversation.channelId,
+              channel_name: conversation.channelName,
+              channel_account_id: conversation.channelAccountId,
               contact: conversation.contactId ? {
                 id: conversation.contactId,
                 name: conversation.contactName,

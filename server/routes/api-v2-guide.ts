@@ -70,6 +70,8 @@ curl -X POST https://crm.zinto.app/api/v2/messages \\
 
 Configure una URL HTTPS que responda en menos de 10 segundos. Verifique X-Zinto-Signature con HMAC-SHA256 sobre \`X-Zinto-Timestamp + "." + raw_request_body\`, compare en tiempo constante y rechace marcas de tiempo con más de cinco minutos. Deduplique por X-Zinto-Event-Id.
 
+El campo \`data\` de los eventos \`message.*\` incluye \`conversation_id\`, \`channel_type\`, \`channel_id\`, \`channel_name\` (el nombre visible del canal, p. ej. "WhatsApp Chile"), \`channel_account_id\` (identificador de la cuenta/número en el proveedor) y \`contact\` (\`id\`, \`name\`, \`phone\`, \`email\`) — v2 no tiene un GET para resolver estos IDs por su cuenta, así que se entregan resueltos en cada evento.
+
 Zinto entrega al menos una vez; responda 2xx después de persistir el evento y use una cola para trabajo lento. Respete 429 y Retry-After con espera exponencial.
 
 ## Errores

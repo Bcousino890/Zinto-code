@@ -1,8 +1,10 @@
 type PostmanRequest = {
   method: string;
   header?: Array<{ key: string; value: string; type: 'text' }>;
-  body?: { mode: 'raw'; raw: string; options: { raw: { language: 'json' } } };
-  url: { raw: string; host: string[]; path: string[] };
+  body?:
+    | { mode: 'raw'; raw: string; options: { raw: { language: 'json' } } }
+    | { mode: 'formdata'; formdata: Array<{ key: string; type: 'file' | 'text'; src?: string; value?: string }> };
+  url: { raw: string; host: string[]; path: string[]; query?: Array<{ key: string; value: string }> };
   description?: string;
 };
 
@@ -18,6 +20,12 @@ const url = (path: string) => ({
   raw: `{{baseUrl}}/api/v2${path}`,
   host: ['{{baseUrl}}'],
   path: ['api', 'v2', ...path.split('/').filter(Boolean)],
+});
+
+const queryUrl = (path: string, query: Record<string, string>) => ({
+  ...url(path),
+  raw: `{{baseUrl}}/api/v2${path}?${new URLSearchParams(query).toString()}`,
+  query: Object.entries(query).map(([key, value]) => ({ key, value })),
 });
 
 const authenticatedHeaders = (integration = true) => [
@@ -78,6 +86,34 @@ export function getApiV2PostmanCollection() {
           body: jsonBody({ channelId: 1, recipient: '+56912345678', text: 'Hola desde mi CRM', external_message_id: 'crm-msg-8841' }),
           description: 'Requiere messages:send. Zinto devuelve 202 y entrega estados por webhook.',
         })],
+      },
+      {
+        name: 'Media',
+        item: [
+          {
+            name: 'Subir archivo',
+            request: {
+              method: 'POST',
+              header: authenticatedHeaders(true).filter((header) => header.key !== 'Content-Type'),
+              url: url('/media/upload'),
+              body: { mode: 'formdata', formdata: [{ key: 'file', type: 'file', src: '' }] },
+              description: 'Requiere media:upload. multipart/form-data, campo file (máx. 10 MB). Devuelve una url para usar como media.url en POST /messages.',
+            },
+          },
+          item('Enviar mensaje con media', 'POST', '/messages', {
+            body: jsonBody({ channelId: 1, recipient: '+56912345678', text: 'Esta es la propiedad que consultó', media: { url: 'https://crm.zinto.app/media/image/abc123.jpg', type: 'image' }, external_message_id: 'crm-msg-8842' }),
+            description: 'Requiere messages:send y media:upload. text es opcional junto con media y se usa como caption.',
+          }),
+          {
+            name: 'Descargar archivo recibido',
+            request: {
+              method: 'GET',
+              header: authenticatedHeaders(true).filter((header) => header.key !== 'Content-Type'),
+              url: queryUrl('/media', { type: 'image', filename: 'xyz789.jpg' }),
+              description: 'Requiere media:read. type y filename llegan resueltos en data.media.url del evento message.received.',
+            },
+          },
+        ],
       },
       {
         name: 'Campañas',

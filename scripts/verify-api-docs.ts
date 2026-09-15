@@ -53,7 +53,7 @@ export function verifyApiDocumentation(): ApiDocumentationCheck {
   const postmanCollection = getApiV2PostmanCollection();
   const postman = JSON.stringify(postmanCollection);
   const postmanPaths = postmanRawUrls(postmanCollection)
-    .map((raw) => raw.replace(/^\{\{baseUrl\}\}/, '').replace(/^\/api\/v2/, '').replace(/\{\{[^}]+\}\}/g, '{externalId}'));
+    .map((raw) => raw.replace(/^\{\{baseUrl\}\}/, '').replace(/^\/api\/v2/, '').replace(/\?.*$/, '').replace(/\{\{[^}]+\}\}/g, '{externalId}'));
 
   for (const route of routerPaths) {
     const normalizedRoute = normalizeRoutePath(route);

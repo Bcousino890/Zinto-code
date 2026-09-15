@@ -8,6 +8,15 @@ type CrmMessageInput = {
   origin: 'crm';
 };
 
+type CrmMediaMessageInput = Omit<CrmMessageInput, 'content'> & {
+  caption?: string;
+  media: {
+    url: string;
+    type: 'image' | 'video' | 'audio' | 'document';
+    filename?: string;
+  };
+};
+
 type StoredMessage = {
   metadata?: unknown;
 };
@@ -22,6 +31,14 @@ type MessageSender = {
     message: string;
     messageType: 'text';
   }): Promise<{ id: string | number }>;
+  sendMedia(companyId: number, request: {
+    channelId: number;
+    to: string;
+    mediaType: 'image' | 'video' | 'audio' | 'document';
+    mediaUrl: string;
+    caption?: string;
+    filename?: string;
+  }): Promise<{ id: string | number }>;
 };
 
 type MessageStorage = {
@@ -32,6 +49,7 @@ type MessageStorage = {
 
 export type CrmApiV2MessageAdapter = {
   send(input: CrmMessageInput): Promise<{ id: string | number }>;
+  sendMedia(input: CrmMediaMessageInput): Promise<{ id: string | number }>;
 };
 
 function jsonValue(value: unknown): JsonValue | undefined {
@@ -58,7 +76,7 @@ function jsonObject(value: unknown): JsonObject {
   return normalized && !Array.isArray(normalized) && typeof normalized === 'object' ? normalized : {};
 }
 
-function crmMetadata(existingMetadata: unknown, input: CrmMessageInput): JsonObject {
+function crmMetadata(existingMetadata: unknown, input: CrmMessageInput | CrmMediaMessageInput): JsonObject {
   const existing = jsonObject(existingMetadata);
   const existingCrm = jsonObject(existing.crm);
   const legacyMetadata = jsonValue(existingMetadata);
@@ -94,6 +112,32 @@ export function createCrmApiV2MessageAdapter(
         to: input.to,
         message: input.content,
         messageType: 'text',
+      });
+
+      if (typeof result.id === 'number') {
+        const message = await dependencies.getMessageById(result.id);
+        if (message) {
+          await dependencies.updateMessage(result.id, {
+            metadata: crmMetadata(message.metadata, input),
+          });
+        }
+      }
+
+      return { id: result.id };
+    },
+
+    async sendMedia(input) {
+      if (!await dependencies.crmIntegrationBelongsToCompany(input.companyId, input.integrationId)) {
+        throw new Error('Integration does not belong to this company');
+      }
+
+      const result = await dependencies.sendMedia(input.companyId, {
+        channelId: input.channelId,
+        to: input.to,
+        mediaType: input.media.type,
+        mediaUrl: input.media.url,
+        ...(input.caption ? { caption: input.caption } : {}),
+        ...(input.media.filename ? { filename: input.media.filename } : {}),
       });
 
       if (typeof result.id === 'number') {

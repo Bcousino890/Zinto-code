@@ -24,6 +24,29 @@ type MessageSync = {
     externalMessageId?: string;
     origin: 'crm';
   }): Promise<{ id: string | number }>;
+  sendMedia?(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    caption?: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    media: { url: string; type: 'image' | 'video' | 'audio' | 'document'; filename?: string };
+  }): Promise<{ id: string | number }>;
+};
+
+type MediaAccess = {
+  upload: (req: Request, res: Response, next: NextFunction) => void;
+  processUpload(input: { file: Express.Multer.File; companyId: number; baseUrl: string }): Promise<{
+    url: string;
+    mediaType: 'image' | 'video' | 'audio' | 'document';
+    filename: string;
+    size: number;
+    mimetype: string;
+  }>;
+  findOwnerCompanyId(mediaPath: string): Promise<number | null>;
+  resolveFilePath(mediaPath: string): string | null;
 };
 
 type CampaignSync = {
@@ -54,18 +77,20 @@ async function withServer(
   dealPipelineSync?: DealPipelineSync,
   initialSync?: InitialSync,
   resolveIntegrationId?: (companyId: number, publicId: string) => Promise<number | undefined>,
+  mediaAccess?: MediaAccess,
 ) {
   const app = express();
   app.use(express.json());
   app.use('/api/v2', createApiV2Router({
     authenticate: middleware,
     contactSync,
-    messageSync,
+    messageSync: messageSync as any,
     campaignSync,
     appointmentSync,
     dealPipelineSync,
     initialSync,
     resolveIntegrationId,
+    mediaAccess,
   }));
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -232,6 +257,235 @@ test('queues a normalized CRM message from a permitted integration', async () =>
     externalMessageId: 'crm-message-441',
     origin: 'crm',
   }]);
+});
+
+test('queues a CRM media message, using the optional text as caption, from a permitted integration', async () => {
+  const received: unknown[] = [];
+  const messageSync: MessageSync = {
+    send: async () => {
+      throw new Error('send should not be called for a media message');
+    },
+    sendMedia: async (input) => {
+      received.push(input);
+      return { id: 'message-742' };
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send', 'media:upload'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({
+        channelId: 44,
+        recipient: '+56912345678',
+        text: 'Photo of the property',
+        media: { url: 'https://smartbc.example.com/photo.jpg', type: 'image' },
+        external_message_id: 'crm-message-442',
+      }),
+    });
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await response.json(), {
+      data: { id: 'message-742', origin: 'crm', external_message_id: 'crm-message-442' },
+    });
+  }, undefined, messageSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12,
+    integrationId: 3,
+    channelId: 44,
+    to: '+56912345678',
+    caption: 'Photo of the property',
+    externalMessageId: 'crm-message-442',
+    origin: 'crm',
+    media: { url: 'https://smartbc.example.com/photo.jpg', type: 'image' },
+  }]);
+});
+
+test('does not send CRM media without media:upload permission, even with messages:send', async () => {
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({
+        channelId: 44,
+        recipient: '+56912345678',
+        media: { url: 'https://smartbc.example.com/photo.jpg', type: 'image' },
+      }),
+    });
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).error, 'INSUFFICIENT_PERMISSIONS');
+  }, undefined, {
+    send: async () => ({ id: 1 }),
+    sendMedia: async () => {
+      throw new Error('sendMedia should not be called without media:upload');
+    },
+  });
+});
+
+test('rejects a CRM message with an invalid media object and no text', async () => {
+  const messageSync: MessageSync = {
+    send: async () => ({ id: 1 }),
+    sendMedia: async () => {
+      throw new Error('sendMedia should not be called for invalid media');
+    },
+  };
+  for (const media of [
+    { url: 'not-a-url', type: 'image' },
+    { url: 'https://smartbc.example.com/photo.jpg', type: 'spreadsheet' },
+    {},
+  ]) {
+    await withServer((req, _res, next) => {
+      req.companyId = 12;
+      req.apiKey = { permissions: ['messages:send', 'media:upload'] } as any;
+      next();
+    }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/v2/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+        body: JSON.stringify({ channelId: 44, recipient: '+56912345678', media }),
+      });
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+    }, undefined, messageSync);
+  }
+});
+
+test('does not expose media upload or download when no media access dependency is supplied', async () => {
+  await withServer((_req, _res, next) => next(), async (baseUrl) => {
+    const upload = await fetch(`${baseUrl}/api/v2/media/upload`, { method: 'POST' });
+    assert.equal(upload.status, 404);
+    const download = await fetch(`${baseUrl}/api/v2/media?type=image&filename=x.jpg`);
+    assert.equal(download.status, 404);
+  });
+});
+
+test('uploads a file through media:upload and returns its resolved URL', async () => {
+  const processed: unknown[] = [];
+  const mediaAccess: MediaAccess = {
+    upload: (req, _res, next) => {
+      (req as any).file = { originalname: 'photo.jpg', mimetype: 'image/jpeg', size: 123, path: '/tmp/fake' };
+      next();
+    },
+    processUpload: async (input) => {
+      processed.push(input);
+      return { url: 'https://crm.zinto.app/media/image/abc123.jpg', mediaType: 'image', filename: 'photo.jpg', size: 123, mimetype: 'image/jpeg' };
+    },
+    findOwnerCompanyId: async () => null,
+    resolveFilePath: () => null,
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['media:upload'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/media/upload`, {
+      method: 'POST',
+      headers: { 'X-Zinto-Integration-Id': '3' },
+      body: new Uint8Array(),
+    });
+    assert.equal(response.status, 201);
+    assert.deepEqual(await response.json(), {
+      data: { url: 'https://crm.zinto.app/media/image/abc123.jpg', type: 'image', filename: 'photo.jpg', size: 123, mimeType: 'image/jpeg' },
+    });
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, mediaAccess);
+
+  assert.equal(processed.length, 1);
+  assert.equal((processed[0] as { companyId: number }).companyId, 12);
+});
+
+test('does not upload media without media:upload permission', async () => {
+  const mediaAccess: MediaAccess = {
+    upload: (req, _res, next) => {
+      (req as any).file = { originalname: 'photo.jpg', mimetype: 'image/jpeg', size: 123, path: '/tmp/fake' };
+      next();
+    },
+    processUpload: async () => {
+      throw new Error('processUpload should not be called without media:upload');
+    },
+    findOwnerCompanyId: async () => null,
+    resolveFilePath: () => null,
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/media/upload`, {
+      method: 'POST',
+      headers: { 'X-Zinto-Integration-Id': '3' },
+      body: new Uint8Array(),
+    });
+    assert.equal(response.status, 403);
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, mediaAccess);
+});
+
+test('downloads media owned by the requesting company', async () => {
+  const fs = await import('node:fs/promises');
+  const os = await import('node:os');
+  const path = await import('node:path');
+  const tmpFile = path.join(os.tmpdir(), `api-v2-media-test-${Date.now()}.jpg`);
+  await fs.writeFile(tmpFile, 'fake-jpeg-bytes');
+
+  try {
+    const mediaAccess: MediaAccess = {
+      upload: (_req, _res, next) => next(),
+      processUpload: async () => {
+        throw new Error('processUpload should not be called in this test');
+      },
+      findOwnerCompanyId: async (mediaPath) => (mediaPath === '/media/image/xyz789.jpg' ? 12 : null),
+      resolveFilePath: (mediaPath) => (mediaPath === '/media/image/xyz789.jpg' ? tmpFile : null),
+    };
+
+    await withServer((req, _res, next) => {
+      req.companyId = 12;
+      req.apiKey = { permissions: ['media:read'] } as any;
+      next();
+    }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/v2/media?type=image&filename=xyz789.jpg`, {
+        headers: { 'X-Zinto-Integration-Id': '3' },
+      });
+      assert.equal(response.status, 200);
+      assert.equal(await response.text(), 'fake-jpeg-bytes');
+    }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, mediaAccess);
+  } finally {
+    await fs.unlink(tmpFile).catch(() => {});
+  }
+});
+
+test('refuses to download media owned by another company', async () => {
+  const mediaAccess: MediaAccess = {
+    upload: (_req, _res, next) => next(),
+    processUpload: async () => {
+      throw new Error('processUpload should not be called in this test');
+    },
+    findOwnerCompanyId: async () => 999,
+    resolveFilePath: () => {
+      throw new Error('resolveFilePath should not be called when the owner does not match');
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['media:read'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/media?type=image&filename=xyz789.jpg`, {
+      headers: { 'X-Zinto-Integration-Id': '3' },
+    });
+    assert.equal(response.status, 404);
+    assert.equal((await response.json()).error, 'NOT_FOUND');
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, mediaAccess);
 });
 
 test('does not expose message dispatch when no message sync dependency is supplied', async () => {

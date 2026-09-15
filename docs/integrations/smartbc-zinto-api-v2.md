@@ -63,7 +63,9 @@ error: v1 seguirá funcionando mientras se corrige el permiso.
 | GET | `/guide.md` | Público |
 | GET | `/capabilities` | `integrations:manage` |
 | PUT | `/contacts/{externalId}` | `contacts:write` |
-| POST | `/messages` | `messages:send` |
+| POST | `/messages` | `messages:send` (+ `media:upload` si incluye `media`) |
+| POST | `/media/upload` | `media:upload` |
+| GET | `/media` | `media:read` |
 | POST | `/campaigns/batch` | `campaigns:write` |
 | PUT | `/appointments/{externalId}` | `appointments:write` |
 | POST | `/deals` | `deals:write` |
@@ -108,6 +110,38 @@ curl -X POST "$BASE_URL/messages" \
 
 La respuesta es `202` y contiene el ID de Zinto. `channelId` debe pertenecer a
 la empresa de la API Key.
+
+### Foto de una propiedad → WhatsApp (media)
+
+Si el archivo no tiene ya una URL http(s) pública, súbalo primero:
+
+```bash
+curl -X POST "$BASE_URL/media/upload" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -F "file=@casa-las-condes.jpg"
+# {"data":{"url":"https://crm.zinto.app/media/image/abc123.jpg","type":"image","filename":"casa-las-condes.jpg","size":184320,"mimeType":"image/jpeg"}}
+
+curl -X POST "$BASE_URL/messages" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  -d '{"channelId":42,"recipient":"+56912345678","text":"Esta es la propiedad que consultó","media":{"url":"https://crm.zinto.app/media/image/abc123.jpg","type":"image"},"external_message_id":"smartbc-msg-8842"}'
+```
+
+`media.type` es `image`, `video`, `audio` o `document`. Con `media`, `text` es
+opcional y se usa como caption. Enviar `media` requiere además el permiso
+`media:upload` (no solo `messages:send`).
+
+Cuando el cliente responde con una foto/vídeo/audio/documento por WhatsApp,
+`message.received` trae un campo `data.media` adicional — vea la sección de
+webhooks más abajo. Descárguelo con:
+
+```bash
+curl "$BASE_URL/media?type=image&filename=xyz789.jpg" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -o foto-recibida.jpg
+```
+
+Requiere `media:read`; solo la empresa dueña del mensaje puede descargarlo.
 
 ### Cita y oportunidad
 
@@ -163,6 +197,13 @@ Eventos: `message.received`, `message.sent`, `message.delivered`,
 `message.read`, `message.failed`, `contact.created`, `contact.updated`,
 `appointment.created`, `appointment.updated`, `deal.created`,
 `deal.stage_changed`, `campaign.updated`, `sync.failed` y `conflict.created`.
+
+Cuando el mensaje tiene un adjunto, los eventos `message.*` incluyen además
+`data.media`: `{"url": "https://crm.zinto.app/api/v2/media?type=image&filename=xyz789.jpg", "type": "image", "mime_type": "image/jpeg"}`.
+`media.type` coincide con el `type` general del mensaje
+(`image`/`video`/`audio`/`document`); no hay un campo de caption aparte — si
+el cliente escribió uno, viaja en `content`. `media` se omite en mensajes de
+solo texto.
 
 ## Permisos recomendados
 

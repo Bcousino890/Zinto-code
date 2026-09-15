@@ -25,6 +25,20 @@ type MessageSync = {
     externalMessageId?: string;
     origin: 'crm';
   }): Promise<{ id: string | number }>;
+  sendMedia(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    caption?: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    media: {
+      url: string;
+      type: 'image' | 'video' | 'audio' | 'document';
+      filename?: string;
+    };
+  }): Promise<{ id: string | number }>;
 };
 type CampaignSync = {
   syncBatch(input: {
@@ -43,6 +57,20 @@ type InitialSync = {
     idempotencyKey: string;
   }): InitialCrmSynchronizationPlan | Promise<InitialCrmSynchronizationPlan>;
 };
+type UploadedMedia = {
+  url: string;
+  mediaType: 'image' | 'video' | 'audio' | 'document';
+  filename: string;
+  size: number;
+  mimetype: string;
+};
+type MediaAccess = {
+  /** multer `.single('file')` middleware — populates `req.file`. */
+  upload: AuthenticationMiddleware;
+  processUpload(input: { file: Express.Multer.File; companyId: number; baseUrl: string }): Promise<UploadedMedia>;
+  findOwnerCompanyId(mediaPath: string): Promise<number | null>;
+  resolveFilePath(mediaPath: string): string | null;
+};
 
 function isPositiveIntegrationId(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
@@ -56,6 +84,7 @@ export function createApiV2Router({
   appointmentSync,
   dealPipelineSync,
   initialSync,
+  mediaAccess,
   resolveIntegrationId,
 }: {
   authenticate: AuthenticationMiddleware;
@@ -65,6 +94,7 @@ export function createApiV2Router({
   appointmentSync?: AppointmentSync;
   dealPipelineSync?: DealPipelineSync;
   initialSync?: InitialSync;
+  mediaAccess?: MediaAccess;
   resolveIntegrationId?: IntegrationIdResolver;
 }) {
   const router = Router();
@@ -142,33 +172,70 @@ export function createApiV2Router({
   }
 
   if (messageSync) {
+    const MEDIA_TYPES = ['image', 'video', 'audio', 'document'] as const;
+
     router.post('/messages', requireIntegrationScope('messages:send'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
-      const { channelId, recipient, text, external_message_id: externalMessageId } = req.body ?? {};
+      const { channelId, recipient, text, external_message_id: externalMessageId, media } = req.body ?? {};
 
-      if (!companyId || !isPositiveIntegrationId(integrationId) || !Number.isInteger(channelId) || channelId <= 0 || typeof recipient !== 'string' || !recipient.trim() || typeof text !== 'string' || !text.trim() || (externalMessageId !== undefined && typeof externalMessageId !== 'string')) {
-        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive channel ID, recipient and text are required' });
+      const hasMedia = media !== undefined;
+      const isMediaObject = hasMedia && typeof media === 'object' && media !== null;
+      const mediaUrl = isMediaObject ? media.url : undefined;
+      const mediaType = isMediaObject ? media.type : undefined;
+      const mediaFilename = isMediaObject ? media.filename : undefined;
+      const isValidMedia = !hasMedia || (
+        isMediaObject
+        && typeof mediaUrl === 'string' && /^https?:\/\//i.test(mediaUrl)
+        && MEDIA_TYPES.includes(mediaType)
+        && (mediaFilename === undefined || typeof mediaFilename === 'string')
+      );
+      const hasText = typeof text === 'string' && text.trim().length > 0;
+
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !Number.isInteger(channelId) || channelId <= 0 || typeof recipient !== 'string' || !recipient.trim() || !isValidMedia || (!hasMedia && !hasText) || (text !== undefined && typeof text !== 'string') || (externalMessageId !== undefined && typeof externalMessageId !== 'string')) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive channel ID, recipient and either text or a valid media object ({url, type, filename?}) are required' });
+      }
+
+      if (hasMedia) {
+        const permissions = (req.apiKey?.permissions as string[] | undefined) ?? [];
+        if (!permissions.includes('*') && !permissions.includes('media:upload')) {
+          return res.status(403).json({ error: 'INSUFFICIENT_PERMISSIONS', message: "Permission 'media:upload' is required to send media" });
+        }
       }
 
       const normalizedMessage = normalizeOutboundCrmMessageRequest({
         companyId,
         integrationId,
         conversationId: channelId,
-        content: text.trim(),
+        content: hasText ? text.trim() : '',
         externalMessageId: externalMessageId?.trim() ?? '',
       });
 
       try {
-        const result = await messageSync.send({
-          companyId: normalizedMessage.companyId,
-          integrationId: normalizedMessage.integrationId,
-          channelId: normalizedMessage.conversationId,
-          to: recipient.trim(),
-          content: normalizedMessage.content,
-          ...(normalizedMessage.externalMessageId ? { externalMessageId: normalizedMessage.externalMessageId } : {}),
-          origin: 'crm',
-        });
+        const result = hasMedia
+          ? await messageSync.sendMedia({
+              companyId: normalizedMessage.companyId,
+              integrationId: normalizedMessage.integrationId,
+              channelId: normalizedMessage.conversationId,
+              to: recipient.trim(),
+              ...(hasText ? { caption: normalizedMessage.content } : {}),
+              ...(normalizedMessage.externalMessageId ? { externalMessageId: normalizedMessage.externalMessageId } : {}),
+              origin: 'crm',
+              media: {
+                url: mediaUrl,
+                type: mediaType as typeof MEDIA_TYPES[number],
+                ...(mediaFilename ? { filename: mediaFilename } : {}),
+              },
+            })
+          : await messageSync.send({
+              companyId: normalizedMessage.companyId,
+              integrationId: normalizedMessage.integrationId,
+              channelId: normalizedMessage.conversationId,
+              to: recipient.trim(),
+              content: normalizedMessage.content,
+              ...(normalizedMessage.externalMessageId ? { externalMessageId: normalizedMessage.externalMessageId } : {}),
+              origin: 'crm',
+            });
         return res.status(202).json({
           data: {
             id: result.id,
@@ -179,6 +246,68 @@ export function createApiV2Router({
       } catch (error) {
         return res.status(500).json({ error: 'MESSAGE_SYNC_FAILED', message: error instanceof Error ? error.message : 'Message synchronization failed' });
       }
+    });
+  }
+
+  if (mediaAccess) {
+    router.post('/media/upload', requireIntegrationScope('media:upload'), mediaAccess.upload, async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+
+      if (!companyId || !isPositiveIntegrationId(integrationId)) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company and integration ID are required' });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'No file was uploaded (multipart field name: file)' });
+      }
+
+      try {
+        const uploaded = await mediaAccess.processUpload({
+          file: req.file,
+          companyId,
+          baseUrl: process.env.BASE_URL || `${req.protocol}://${req.get('host')}`,
+        });
+        return res.status(201).json({
+          data: {
+            url: uploaded.url,
+            type: uploaded.mediaType,
+            filename: uploaded.filename,
+            size: uploaded.size,
+            mimeType: uploaded.mimetype,
+          },
+        });
+      } catch (error) {
+        return res.status(500).json({ error: 'MEDIA_UPLOAD_FAILED', message: error instanceof Error ? error.message : 'Media upload failed' });
+      }
+    });
+
+    router.get('/media', requireIntegrationScope('media:read'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+      const { type, filename } = req.query;
+
+      if (!companyId || !isPositiveIntegrationId(integrationId) || typeof type !== 'string' || !type.trim() || typeof filename !== 'string' || !filename.trim()) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and the type and filename query params (from data.media.url) are required' });
+      }
+
+      const mediaPath = `/media/${type}/${filename}`;
+      const ownerCompanyId = await mediaAccess.findOwnerCompanyId(mediaPath);
+      if (!ownerCompanyId || ownerCompanyId !== companyId) {
+        return res.status(404).json({ error: 'NOT_FOUND', message: 'Media not found' });
+      }
+
+      const filePath = mediaAccess.resolveFilePath(mediaPath);
+      if (!filePath) {
+        return res.status(404).json({ error: 'NOT_FOUND', message: 'Media not found' });
+      }
+
+      res.setHeader('Cache-Control', 'private, no-store');
+      res.sendFile(filePath, (error) => {
+        if (error && !res.headersSent) {
+          res.status(404).json({ error: 'NOT_FOUND', message: 'Media not found' });
+        }
+      });
     });
   }
 

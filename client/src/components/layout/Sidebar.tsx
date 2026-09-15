@@ -407,21 +407,25 @@ export default function Sidebar() {
     }
 
     if (daysUntilExpiry !== undefined) {
-      if (daysUntilExpiry <= 7) {
+      // Defensive clamp: an account should already be caught by the !isActive
+      // branch above once it's truly expired, but never render a negative
+      // day count here if some other data path lets a stale number through.
+      const safeDaysUntilExpiry = Math.max(0, daysUntilExpiry);
+      if (safeDaysUntilExpiry <= 7) {
         return {
-          text: `${t('nav.expires_in', 'Expires in')}: ${daysUntilExpiry} ${daysUntilExpiry === 1 ? 'day' : 'days'}`,
+          text: `${t('nav.expires_in', 'Expires in')}: ${safeDaysUntilExpiry} ${safeDaysUntilExpiry === 1 ? 'day' : 'days'}`,
           color: 'text-red-400',
           icon: 'ri-alarm-warning-line'
         };
-      } else if (daysUntilExpiry <= 30) {
+      } else if (safeDaysUntilExpiry <= 30) {
         return {
-          text: `${t('nav.expires_in', 'Expires in')}: ${daysUntilExpiry} ${daysUntilExpiry === 1 ? 'day' : 'days'}`,
+          text: `${t('nav.expires_in', 'Expires in')}: ${safeDaysUntilExpiry} ${safeDaysUntilExpiry === 1 ? 'day' : 'days'}`,
           color: 'text-amber-400',
           icon: 'ri-time-line'
         };
       } else {
         return {
-          text: `${t('nav.renews_in', 'Renews in')}: ${daysUntilExpiry} ${daysUntilExpiry === 1 ? 'day' : 'days'}`,
+          text: `${t('nav.renews_in', 'Renews in')}: ${safeDaysUntilExpiry} ${safeDaysUntilExpiry === 1 ? 'day' : 'days'}`,
           color: 'text-green-400',
           icon: 'ri-refresh-line'
         };

@@ -6,7 +6,7 @@ import {
   companies,
   subscriptionNotifications
 } from '@shared/schema';
-import { eq, and, lte, isNull } from 'drizzle-orm';
+import { eq, and, lte, isNotNull } from 'drizzle-orm';
 import { subscriptionManager } from './subscription-manager';
 import { gracePeriodService } from './grace-period-service';
 import { usageTrackingService } from './usage-tracking-service';
@@ -165,6 +165,14 @@ export class SubscriptionScheduler extends EventEmitter {
       const renewalWindow = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Next 24 hours
 
 
+      // processAutomaticRenewal only knows how to charge a Stripe subscription
+      // (server/services/subscription-manager.ts:305) — it immediately bails
+      // with "Automatic renewal not enabled" for anything else. Selecting
+      // Stripe-less companies here guaranteed that failure for every row,
+      // forever, without ever changing their status. Manually-billed
+      // companies past their end date are instead caught by the expiration/
+      // grace-period check (plan-limits-service.checkSubscriptionExpiration),
+      // which a human resolves by extending subscriptionEndDate after payment.
       const companiesNeedingRenewal = await db
         .select()
         .from(companies)
@@ -173,7 +181,7 @@ export class SubscriptionScheduler extends EventEmitter {
             eq(companies.autoRenewal, true),
             eq(companies.subscriptionStatus, 'active'),
             lte(companies.subscriptionEndDate, renewalWindow),
-            isNull(companies.stripeSubscriptionId) // Manual renewals only
+            isNotNull(companies.stripeSubscriptionId)
           )
         );
 

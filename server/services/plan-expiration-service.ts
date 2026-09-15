@@ -356,23 +356,13 @@ export class PlanExpirationService {
    * Determine if access should be allowed based on expiration status
    */
   private shouldAllowAccess(expirationStatus: PlanExpirationStatus): boolean {
-
-    if (expirationStatus.canAccess) {
-      return true;
-    }
-
-
-    if (['active', 'trial'].includes(expirationStatus.subscriptionStatus)) {
-      return true;
-    }
-
-
-    if (expirationStatus.isInGracePeriod) {
-      return true;
-    }
-
-
-    return false;
+    // `canAccess` already accounts for grace periods, cancellation, and the
+    // active-and-not-expired case. Do not add a raw subscriptionStatus
+    // shortcut here: a company's status column can read 'active' long after
+    // subscriptionEndDate has passed (nothing else ever flips it), which
+    // used to let this function wave through any account past its
+    // expiration and grace period as long as that stale string said so.
+    return expirationStatus.canAccess;
   }
 
   /**

@@ -543,7 +543,7 @@ export class SubscriptionManager extends EventEmitter {
       let nextBillingDate: Date | undefined;
 
       if (company.subscriptionEndDate) {
-        daysUntilExpiry = Math.ceil((company.subscriptionEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        daysUntilExpiry = Math.max(0, Math.ceil((company.subscriptionEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
       }
 
       if (company.gracePeriodEnd) {
@@ -560,12 +560,16 @@ export class SubscriptionManager extends EventEmitter {
       }
 
 
-      const isActive = ['active', 'trial'].includes(company.subscriptionStatus || '');
+      // A stale `subscriptionStatus` column ('active'/'trial') never flips on
+      // its own once subscriptionEndDate passes, so it can't be trusted alone
+      // — it let expired accounts read as active indefinitely.
+      const isExpiredByDate = company.subscriptionEndDate ? now > company.subscriptionEndDate : false;
+      const isActive = ['active', 'trial'].includes(company.subscriptionStatus || '') && !isExpiredByDate;
       const gracePeriodActive = company.subscriptionStatus === 'grace_period';
 
       return {
         isActive,
-        status: company.subscriptionStatus || 'inactive',
+        status: isExpiredByDate && company.subscriptionStatus === 'active' ? 'expired' : (company.subscriptionStatus || 'inactive'),
         daysUntilExpiry,
         gracePeriodActive,
         gracePeriodDaysRemaining,

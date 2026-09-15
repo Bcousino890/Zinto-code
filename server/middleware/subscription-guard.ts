@@ -37,16 +37,14 @@ export const ensureActiveSubscription = async (req: Request, res: Response, next
       return next();
     }
 
-
-
-
     const accessCheck = await planLimitsService.checkApplicationAccess(user.companyId);
 
-
-    
-
-
-
+    if (!accessCheck.allowed && accessCheck.limitType === 'subscription_expired') {
+      return res.status(402).json({
+        error: 'SUBSCRIPTION_EXPIRED',
+        message: accessCheck.message || 'Subscription has expired. Please renew to continue using Zinto.',
+      });
+    }
 
 
 
@@ -101,11 +99,12 @@ export const apiSubscriptionGuard = async (req: Request, res: Response, next: Ne
 
     const expirationCheck = await planLimitsService.checkSubscriptionExpiration(user.companyId);
 
-
-
-
-
-
+    if (expirationCheck.isExpired) {
+      return res.status(402).json({
+        error: 'SUBSCRIPTION_EXPIRED',
+        message: expirationCheck.message || 'Subscription has expired. Please renew to continue using Zinto.',
+      });
+    }
 
 
 

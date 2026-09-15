@@ -98,6 +98,14 @@ curl -X PUT "$BASE_URL/contacts/smartbc-contact-123" \
 El mismo `externalId` actualiza el vínculo. Devuelve `201` al crear y `200` al
 actualizar.
 
+La respuesta puede incluir además `avatarUrl` (URL absoluta) con la foto de
+perfil de WhatsApp del contacto — es un campo de solo salida, nunca se envía
+en el payload. Se omite si Zinto no tiene la foto. Es un dato best-effort:
+solo existe para contactos del canal WhatsApp no oficial (QR), se obtiene una
+única vez al crear el contacto (si WhatsApp la entregó en ese momento) y no
+se actualiza después; en el canal oficial de WhatsApp Cloud API nunca está
+presente.
+
 ### Mensaje SmartBC → WhatsApp
 
 ```bash
@@ -204,6 +212,16 @@ Cuando el mensaje tiene un adjunto, los eventos `message.*` incluyen además
 (`image`/`video`/`audio`/`document`); no hay un campo de caption aparte — si
 el cliente escribió uno, viaja en `content`. `media` se omite en mensajes de
 solo texto.
+
+El objeto `data.contact` de estos mismos eventos puede incluir además
+`avatar_url` con la foto de perfil de WhatsApp del contacto, descargable con
+el mismo mecanismo de `GET /media` que los adjuntos de mensajes
+(`type=profile_pictures`). Es un dato best-effort: solo se completa para
+contactos del canal WhatsApp no oficial (QR), se obtiene una única vez al
+crear el contacto y solo si WhatsApp la entregó en ese momento; no se
+actualiza si el contacto cambia su foto después. En el canal oficial de
+WhatsApp Cloud API nunca está presente, y se omite por completo cuando Zinto
+no tiene la foto.
 
 ## Permisos recomendados
 

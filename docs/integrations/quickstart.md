@@ -96,6 +96,13 @@ opcional `customFields`. Devuelve `201` al crear y `200` al actualizar:
 { "data": { "...": "contact returned by Zinto" }, "created": true }
 ```
 
+La respuesta puede incluir además el campo opcional `avatarUrl` (URL
+absoluta) con la foto de perfil de WhatsApp del contacto: es de solo lectura,
+se omite cuando Zinto no dispone de la foto, y es un dato best-effort — solo
+se completa para contactos del canal WhatsApp no oficial (QR), con la foto
+obtenida una única vez al crear el contacto, y nunca para el canal oficial de
+WhatsApp Cloud API.
+
 ## Enviar un mensaje desde el CRM
 
 `POST /messages` requiere `messages:send`. `channelId` identifica un canal
@@ -166,6 +173,15 @@ curl "$BASE_URL/media?type=image&filename=xyz789.jpg" \
 
 Requiere `media:read`; devuelve `404` si el archivo no existe o pertenece a
 otra empresa.
+
+Los eventos `message.*` también pueden incluir en `data.contact` un campo
+opcional `avatar_url` con la foto de perfil de WhatsApp del contacto,
+descargable con el mismo mecanismo de `GET /media` (`type=profile_pictures`).
+Es un dato best-effort: solo se completa para contactos del canal WhatsApp no
+oficial (QR), se obtiene una única vez al crear el contacto y solo si
+WhatsApp la entregó en ese momento; no se sincroniza si el contacto cambia su
+foto después, y nunca está presente en el canal oficial de WhatsApp Cloud
+API. Se omite por completo cuando Zinto no tiene la foto.
 
 ## Crear o actualizar agenda y oportunidades
 

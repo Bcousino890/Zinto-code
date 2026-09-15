@@ -1,7 +1,7 @@
 /** TikTok channel/partner secrets: encrypted via `tiktok-secret-storage` — rotation script `server/scripts/reencrypt-tiktok-at-rest-secrets.ts`. */
 import { randomUUID } from "crypto";
 import mimeTypes from "mime-types";
-import { buildCrmMediaDownloadUrl } from "./services/crm-media-access";
+import { buildCrmMediaDownloadUrl } from "./services/crm-media-url";
 
 /** Media fields for the CRM v2 `message.*` webhook `data` payload — omitted entirely for plain-text messages. */
 function crmWebhookMediaPayload(message: { mediaUrl: string | null; type: string | null }): { media?: { url: string; type: string | null; mime_type: string | null } } {
@@ -15,6 +15,13 @@ function crmWebhookMediaPayload(message: { mediaUrl: string | null; type: string
       mime_type: mimeTypes.lookup(message.mediaUrl) || null,
     },
   };
+}
+
+/** `avatar_url` for the CRM v2 webhook `data.contact` object — omitted when Zinto has no photo on file (most contacts). */
+function crmWebhookContactAvatarField(avatarUrl: string | null | undefined): { avatar_url?: string } {
+  if (!avatarUrl) return {};
+  const url = buildCrmMediaDownloadUrl(avatarUrl);
+  return url ? { avatar_url: url } : {};
 }
 import {
   encryptTikTokChannelConnectionForWrite,
@@ -6473,6 +6480,7 @@ export class DatabaseStorage implements IStorage {
           contactName: contacts.name,
           contactPhone: contacts.phone,
           contactEmail: contacts.email,
+          contactAvatarUrl: contacts.avatarUrl,
         })
         .from(conversations)
         .leftJoin(contacts, eq(contacts.id, conversations.contactId))
@@ -6503,6 +6511,7 @@ export class DatabaseStorage implements IStorage {
                   name: conversation.contactName,
                   phone: conversation.contactPhone,
                   email: conversation.contactEmail,
+                  ...crmWebhookContactAvatarField(conversation.contactAvatarUrl),
                 } : null,
                 ...crmWebhookMediaPayload(newMessage),
               },
@@ -6579,6 +6588,7 @@ export class DatabaseStorage implements IStorage {
           contactName: contacts.name,
           contactPhone: contacts.phone,
           contactEmail: contacts.email,
+          contactAvatarUrl: contacts.avatarUrl,
         })
         .from(conversations)
         .leftJoin(contacts, eq(contacts.id, conversations.contactId))
@@ -6601,6 +6611,7 @@ export class DatabaseStorage implements IStorage {
                 name: conversation.contactName,
                 phone: conversation.contactPhone,
                 email: conversation.contactEmail,
+                ...crmWebhookContactAvatarField(conversation.contactAvatarUrl),
               } : null,
               ...crmWebhookMediaPayload(updatedMessage),
             }));

@@ -58,6 +58,8 @@ El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo 
 
 El payload de \`PUT /contacts/{externalId}\` admite \`name\`, \`phone\`, \`email\`, \`company\`, \`tags\` (arreglo de strings) y \`notes\` (texto libre). No existen los scopes \`notes:*\` ni \`tags:write\` de v1: ambos campos se escriben con el permiso \`contacts:write\` y se devuelven junto al resto de datos del contacto cuando se consulta con \`contacts:read\`.
 
+La respuesta de \`PUT /contacts/{externalId}\` puede incluir además \`avatarUrl\` (URL absoluta) con la foto de perfil de WhatsApp del contacto: es un campo de solo salida — nunca se envía en el payload de entrada — y se omite cuando Zinto no dispone de la foto. Es un dato best-effort: solo se completa para contactos del canal WhatsApp no oficial (QR), se obtiene una única vez al crear el contacto y solo si WhatsApp la entregó en ese momento (muchos usuarios tienen la foto oculta por privacidad); no se actualiza si el contacto cambia su foto después. En el canal oficial de WhatsApp Cloud API nunca está presente.
+
 ## Ejemplo: enviar desde el CRM
 
 ~~~bash
@@ -102,6 +104,8 @@ Configure una URL HTTPS que responda en menos de 10 segundos. Verifique X-Zinto-
 El campo \`data\` de los eventos \`message.*\` incluye \`conversation_id\`, \`channel_type\`, \`channel_id\`, \`channel_name\` (el nombre visible del canal, p. ej. "WhatsApp Chile"), \`channel_account_id\` (identificador de la cuenta/número en el proveedor) y \`contact\` (\`id\`, \`name\`, \`phone\`, \`email\`) — v2 no tiene un GET para resolver estos IDs por su cuenta, así que se entregan resueltos en cada evento.
 
 Cuando el mensaje tiene un adjunto, \`data\` además trae \`media\`: \`{"url": "https://crm.zinto.app/api/v2/media?type=image&filename=xyz789.jpg", "type": "image", "mime_type": "image/jpeg"}\`. \`media.type\` coincide con el \`type\` general del mensaje (\`image\`/\`video\`/\`audio\`/\`document\`); no hay un campo de caption aparte — si el cliente escribió uno, viaja en \`content\` (con fallback al nombre del archivo en documentos, o a un texto fijo en audio, que WhatsApp no permite subtitular). \`media\` se omite por completo en mensajes de solo texto.
+
+El objeto \`contact\` de estos mismos eventos puede incluir además \`avatar_url\` (URL absoluta) con la foto de perfil de WhatsApp, descargable con el mismo mecanismo de \`GET /media\` que los adjuntos de mensajes (\`type=profile_pictures\`). Es un dato best-effort: solo se completa para contactos del canal WhatsApp no oficial (QR), se obtiene una única vez al crear el contacto y solo si WhatsApp la entregó en ese momento; no se actualiza si el contacto cambia su foto después, y nunca está presente en el canal oficial de WhatsApp Cloud API. \`avatar_url\` se omite por completo cuando Zinto no tiene la foto.
 
 Zinto entrega al menos una vez; responda 2xx después de persistir el evento y use una cola para trabajo lento. Respete 429 y Retry-After con espera exponencial.
 

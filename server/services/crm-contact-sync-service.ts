@@ -10,6 +10,8 @@ export interface CrmContactInput {
 
 interface StoredContact extends CrmContactInput {
   id: number;
+  /** WhatsApp profile photo, when Zinto has one for this contact. Read-only — never accepted as input. */
+  avatarUrl?: string;
 }
 
 export interface CrmContactSyncPort {

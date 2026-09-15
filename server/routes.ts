@@ -297,7 +297,8 @@ import { CrmCampaignSyncService } from "./services/crm-campaign-sync-service";
 import { CampaignService } from "./services/campaignService";
 import apiMessageService from "./services/api-message-service";
 import { apiMediaUpload, processUploadedApiMedia } from "./services/api-media-upload-service";
-import { findMessageMediaOwnerCompanyId, resolveMediaFilePath } from "./services/crm-media-access";
+import { findMediaOwnerCompanyId } from "./services/crm-media-access";
+import { resolveMediaFilePath } from "./services/crm-media-url";
 import channelManager from "./services/channel-manager";
 import {
   sendTeamInvitation,
@@ -1156,7 +1157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     mediaAccess: {
       upload: apiMediaUpload.single('file'),
       processUpload: processUploadedApiMedia,
-      findOwnerCompanyId: findMessageMediaOwnerCompanyId,
+      findOwnerCompanyId: findMediaOwnerCompanyId,
       resolveFilePath: resolveMediaFilePath,
     },
     resolveIntegrationId: async (companyId, publicId) => {

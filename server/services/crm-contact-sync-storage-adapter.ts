@@ -1,6 +1,7 @@
 import type { IStorage } from '../storage';
 import type { CrmContactSyncPort } from './crm-contact-sync-service';
 import type { Contact } from '../../shared/schema';
+import { buildCrmMediaDownloadUrl } from './crm-media-url';
 
 type StoredContact = NonNullable<Awaited<ReturnType<CrmContactSyncPort['findByExternalId']>>>;
 
@@ -18,6 +19,7 @@ function normalizeContact(contact: Contact): StoredContact {
     customFields: customFields && typeof customFields === 'object' && !Array.isArray(customFields)
       ? customFields as Record<string, unknown>
       : undefined,
+    avatarUrl: contact.avatarUrl ? buildCrmMediaDownloadUrl(contact.avatarUrl) ?? undefined : undefined,
   };
 }
 

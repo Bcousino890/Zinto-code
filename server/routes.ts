@@ -26205,6 +26205,16 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         return res.status(401).json({ message: 'Unauthorized' });
       }
 
+      const message = await storage.getMessageById(parseInt(messageId));
+      if (!message) {
+        return res.status(404).json({ message: 'Message not found' });
+      }
+
+      const conversation = await storage.getConversation(message.conversationId);
+      if (!conversation || conversation.companyId !== user.companyId) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
       const attachments = await storage.getEmailAttachmentsByMessageId(parseInt(messageId));
       res.json(attachments);
     } catch (error: any) {

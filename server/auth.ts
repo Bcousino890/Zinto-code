@@ -9,7 +9,8 @@ import os from "os";
 import { storage } from "./storage";
 import { User as SelectUser, Company } from "@shared/schema";
 import connectPg from "connect-pg-simple";
-import { getPool } from "./db";
+import { getPool, db } from "./db";
+import { companies as companiesTable, users as usersTable } from "@shared/schema";
 import { createAffiliateReferral } from "./middleware/affiliate-tracking";
 import { subdomainMiddleware, requireSubdomainAuth } from "./middleware/subdomain";
 import { initPipelineStages } from "./init-pipeline-stages";
@@ -243,20 +244,45 @@ async function completeCompanyRegistration(
     subscriptionStatus = "active";
   }
 
-  const company = await storage.createCompany({
-    name: registrationData.companyName,
-    slug: registrationData.companySlug,
-    active: !options.requireApproval,
-    plan: planName,
-    planId:
-      registrationData.planId == null || registrationData.planId === ''
-        ? null
-        : Number(registrationData.planId),
-    maxUsers: planMaxUsers,
-    primaryColor: '#333235',
-    subscriptionStatus,
-    subscriptionStartDate: subscriptionStatus === "active" ? new Date() : undefined,
-    whatsappNumber: registrationData.whatsappNumber
+  // Company + admin user must succeed or fail together: previously these were
+  // two independent storage.createCompany()/createUser() calls, so a failure
+  // creating the admin user (transient DB error, a race past the earlier
+  // uniqueness pre-checks, etc.) left a company row committed with no user
+  // able to log into it — permanently occupying that slug (getCompanyBySlug
+  // would keep rejecting re-registration as "already taken") with no
+  // automatic recovery.
+  const hashedPassword = await hashPassword(registrationData.adminPassword);
+  const { company, adminUser } = await db.transaction(async (tx) => {
+    const [company] = await tx.insert(companiesTable).values({
+      name: registrationData.companyName,
+      slug: registrationData.companySlug,
+      active: !options.requireApproval,
+      plan: planName,
+      planId:
+        registrationData.planId == null || registrationData.planId === ''
+          ? null
+          : Number(registrationData.planId),
+      maxUsers: planMaxUsers,
+      primaryColor: '#333235',
+      subscriptionStatus,
+      subscriptionStartDate: subscriptionStatus === "active" ? new Date() : undefined,
+      whatsappNumber: registrationData.whatsappNumber,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }).returning();
+
+    const [adminUser] = await tx.insert(usersTable).values({
+      username: registrationData.adminUsername,
+      password: hashedPassword,
+      fullName: registrationData.adminFullName,
+      email: registrationData.adminEmail,
+      companyId: company.id,
+      role: "admin",
+      isSuperAdmin: false,
+      updatedAt: new Date()
+    }).returning();
+
+    return { company, adminUser };
   });
 
   if (company.id) {
@@ -274,16 +300,6 @@ async function completeCompanyRegistration(
       console.error('Error starting trial during registration:', trialError);
     }
   }
-
-  const adminUser = await storage.createUser({
-    username: registrationData.adminUsername,
-    password: await hashPassword(registrationData.adminPassword),
-    fullName: registrationData.adminFullName,
-    email: registrationData.adminEmail,
-    companyId: company.id,
-    role: "admin",
-    isSuperAdmin: false
-  });
 
   if (registrationData.affiliateTracking) {
     try {

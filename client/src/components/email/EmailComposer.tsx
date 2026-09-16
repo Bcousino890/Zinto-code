@@ -34,7 +34,31 @@ interface EmailComposerProps {
   onEmailSent: () => void;
   onCancel: () => void;
   replyTo?: any;
+  replyAll?: boolean;
   forwardFrom?: any;
+}
+
+function parseAddressList(value: unknown): string[] {
+  if (!value || typeof value !== 'string') return [];
+  return value
+    .split(',')
+    .map((addr) => addr.trim())
+    .filter((addr) => addr.length > 0);
+}
+
+/** "to" + "cc" for Reply All: every original recipient except the sender we're
+ * already replying to in the "to" field, deduped case-insensitively. */
+function computeReplyAllRecipients(replyTo: any): { to: string; cc: string[] } {
+  const from = String(replyTo?.from || '').trim();
+  const seen = new Set<string>(from ? [from.toLowerCase()] : []);
+  const cc: string[] = [];
+  for (const addr of [...parseAddressList(replyTo?.to), ...parseAddressList(replyTo?.metadata?.emailCc)]) {
+    const key = addr.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    cc.push(addr);
+  }
+  return { to: from, cc };
 }
 
 interface EmailFormData {
@@ -47,11 +71,12 @@ interface EmailFormData {
   attachments: File[];
 }
 
-export default function EmailComposer({ 
-  channelId, 
-  onEmailSent, 
+export default function EmailComposer({
+  channelId,
+  onEmailSent,
   onCancel,
   replyTo,
+  replyAll,
   forwardFrom
 }: EmailComposerProps) {
   const { t } = useTranslation();
@@ -59,9 +84,11 @@ export default function EmailComposer({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
+  const replyAllRecipients = replyTo && replyAll ? computeReplyAllRecipients(replyTo) : null;
+
   const [formData, setFormData] = useState<EmailFormData>({
-    to: replyTo?.from || '',
-    cc: [],
+    to: replyAllRecipients?.to ?? replyTo?.from ?? '',
+    cc: replyAllRecipients?.cc ?? [],
     bcc: [],
     subject: replyTo ? `Re: ${replyTo.subject}` : forwardFrom ? `Fwd: ${forwardFrom.subject}` : '',
     content: '',
@@ -69,7 +96,7 @@ export default function EmailComposer({
     attachments: []
   });
 
-  const [showCc, setShowCc] = useState(false);
+  const [showCc, setShowCc] = useState(!!replyAllRecipients?.cc.length);
   const [showBcc, setShowBcc] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [newCc, setNewCc] = useState('');
@@ -233,7 +260,9 @@ export default function EmailComposer({
       <div className="border-b border-border p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
-            {replyTo ? t('email.reply', 'Reply') : forwardFrom ? t('email.forward', 'Forward') : t('email.compose', 'Compose')}
+            {replyTo
+              ? (replyAll ? t('email.reply_all', 'Reply All') : t('email.reply', 'Reply'))
+              : forwardFrom ? t('email.forward', 'Forward') : t('email.compose', 'Compose')}
           </h2>
           <Button variant="ghost" size="sm" onClick={onCancel}>
             <X className="h-4 w-4" />

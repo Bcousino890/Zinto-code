@@ -55,6 +55,7 @@ export default function EmailInterface() {
 
   const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);
   const [isComposing, setIsComposing] = useState(false);
+  const [composeMode, setComposeMode] = useState<'reply' | 'replyAll' | 'forward' | 'new'>('new');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -566,6 +567,7 @@ export default function EmailInterface() {
   };
 
   const handleCompose = () => {
+    setComposeMode('new');
     setIsComposing(true);
     setSelectedEmail(null);
 
@@ -597,13 +599,18 @@ export default function EmailInterface() {
   };
 
   const handleReply = () => {
+    setComposeMode('reply');
     setIsComposing(true);
+  };
 
+  const handleReplyAll = () => {
+    setComposeMode('replyAll');
+    setIsComposing(true);
   };
 
   const handleForward = () => {
+    setComposeMode('forward');
     setIsComposing(true);
-
   };
 
 
@@ -1056,14 +1063,16 @@ export default function EmailInterface() {
               channelId={parseInt(channelId || '0')}
               onEmailSent={handleEmailSent}
               onCancel={() => setIsComposing(false)}
-              replyTo={selectedEmail}
-              forwardFrom={selectedEmail}
+              replyTo={composeMode === 'reply' || composeMode === 'replyAll' ? selectedEmail : undefined}
+              replyAll={composeMode === 'replyAll'}
+              forwardFrom={composeMode === 'forward' ? selectedEmail : undefined}
             />
           ) : selectedEmail ? (
             <EmailViewer
               email={selectedEmail}
               channelId={parseInt(channelId || '0')}
               onReply={handleReply}
+              onReplyAll={handleReplyAll}
               onForward={handleForward}
               onMarkAsRead={handleMarkAsRead}
               onStarEmail={handleStarEmail}

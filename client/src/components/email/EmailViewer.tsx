@@ -58,6 +58,7 @@ interface EmailViewerProps {
   email: EmailMessage;
   channelId: number;
   onReply: () => void;
+  onReplyAll: () => void;
   onForward: () => void;
   onMarkAsRead?: (emailId: number, isRead: boolean) => Promise<void>;
   onStarEmail?: (emailId: number, starred: boolean) => Promise<void>;
@@ -69,6 +70,7 @@ export default function EmailViewer({
   email,
   channelId,
   onReply,
+  onReplyAll,
   onForward,
   onMarkAsRead,
   onStarEmail,
@@ -177,7 +179,7 @@ export default function EmailViewer({
                 <Reply className="h-4 w-4 mr-2" />
                 {t('email.reply', 'Reply')}
               </Button>
-              <Button variant="brandOutline" size="sm" onClick={() => {/* TODO: Reply All */}}>
+              <Button variant="brandOutline" size="sm" onClick={onReplyAll}>
                 <ReplyAll className="h-4 w-4 mr-2" />
                 {t('email.reply_all', 'Reply All')}
               </Button>

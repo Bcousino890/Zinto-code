@@ -5583,7 +5583,9 @@ function registerAdminRoutes(app: Express) {
         channelConnectionsData,
         usersData,
         templatesData,
-        campaignsData
+        campaignsCount,
+        mediaCount,
+        analyticsCount
       ] = await Promise.all([
         storage.getContacts({ companyId }),
         storage.getConversationsCountByCompany(companyId),
@@ -5591,14 +5593,15 @@ function registerAdminRoutes(app: Express) {
         storage.getChannelConnectionsByCompany(companyId),
         storage.getUsersByCompany(companyId),
         storage.getFollowUpTemplatesByCompany(companyId),
-        Promise.resolve([]) // Campaigns - placeholder for now
+        storage.getCampaignsCountByCompany(companyId),
+        storage.getMediaMessagesCountByCompany(companyId),
+        storage.getCampaignAnalyticsCountByCompany(companyId)
       ]);
 
       const contactsCount = contactsData.total;
       const channelConnectionsCount = channelConnectionsData.length;
       const usersCount = usersData.length;
       const templatesCount = templatesData.length;
-      const campaignsCount = campaignsData.length;
 
       const dataCategories = [
         {
@@ -5606,8 +5609,7 @@ function registerAdminRoutes(app: Express) {
           name: 'Media Files',
           description: 'Images, documents, videos, and other uploaded files',
           icon: 'Files',
-          count: 0, // TODO: Implement media count
-          estimatedSize: '0 MB',
+          count: mediaCount,
           color: 'text-blue-600',
           canClear: true,
           warning: 'This will permanently delete all uploaded media files'
@@ -5666,7 +5668,7 @@ function registerAdminRoutes(app: Express) {
           name: 'Analytics Data',
           description: 'Performance metrics, reports, and statistical data',
           icon: 'BarChart3',
-          count: 0, // TODO: Implement analytics count
+          count: analyticsCount,
           color: 'text-cyan-600',
           canClear: true,
           warning: 'This will clear all historical analytics and reports'
@@ -5700,7 +5702,12 @@ function registerAdminRoutes(app: Express) {
         'Billing and subscription information will not be affected'
       ];
 
-      const totalEstimatedSize = '0 MB'; // TODO: Calculate total data size
+      // File sizes for uploaded media aren't tracked anywhere (messages.mediaUrl
+      // has no accompanying size column), so this can't be computed honestly
+      // without stat-ing every file on disk/object storage. Not currently
+      // rendered by CompanyDataClearDialog.tsx, but keep it truthful rather
+      // than a fake "0 MB" in case a future caller starts showing it.
+      const totalEstimatedSize = 'Not tracked';
 
       res.json({
         companyId,

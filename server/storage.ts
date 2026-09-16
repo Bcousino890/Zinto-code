@@ -43,6 +43,7 @@ import {
   conversationMetrics, type ConversationMetric, type InsertConversationMetric,
   groupParticipants, type GroupParticipant, type InsertGroupParticipant,
   messages, type Message, type InsertMessage,
+  campaigns, campaignAnalytics,
   notes, type Note, type InsertNote,
   channelConnections, type ChannelConnection, type InsertChannelConnection,
   whatsappAuthState,
@@ -8153,6 +8154,47 @@ export class DatabaseStorage implements IStorage {
       return parseInt(String(result[0].count));
     } catch (error) {
       console.error('Error getting messages count by company:', error);
+      return 0;
+    }
+  }
+
+  async getMediaMessagesCountByCompany(companyId: number): Promise<number> {
+    try {
+      const result = await db
+        .select({ count: sql`count(*)` })
+        .from(messages)
+        .innerJoin(conversations, eq(messages.conversationId, conversations.id))
+        .where(and(eq(conversations.companyId, companyId), isNotNull(messages.mediaUrl)));
+      return parseInt(String(result[0].count));
+    } catch (error) {
+      console.error('Error getting media messages count by company:', error);
+      return 0;
+    }
+  }
+
+  async getCampaignsCountByCompany(companyId: number): Promise<number> {
+    try {
+      const result = await db
+        .select({ count: sql`count(*)` })
+        .from(campaigns)
+        .where(eq(campaigns.companyId, companyId));
+      return parseInt(String(result[0].count));
+    } catch (error) {
+      console.error('Error getting campaigns count by company:', error);
+      return 0;
+    }
+  }
+
+  async getCampaignAnalyticsCountByCompany(companyId: number): Promise<number> {
+    try {
+      const result = await db
+        .select({ count: sql`count(*)` })
+        .from(campaignAnalytics)
+        .innerJoin(campaigns, eq(campaignAnalytics.campaignId, campaigns.id))
+        .where(eq(campaigns.companyId, companyId));
+      return parseInt(String(result[0].count));
+    } catch (error) {
+      console.error('Error getting campaign analytics count by company:', error);
       return 0;
     }
   }

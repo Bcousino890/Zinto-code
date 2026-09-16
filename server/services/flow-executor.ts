@@ -9644,44 +9644,6 @@ class FlowExecutor extends EventEmitter {
   }
 
   /**
-   * Decrypt poll vote to determine which option was selected
-   * This is a simplified implementation - for now it returns a random option
-   * TODO: Implement proper poll vote decryption using the encryption data
-   */
-  private async decryptPollVote(pollVoteData: any, options: any[]): Promise<number> {
-    try {
-
-      let encPayload = pollVoteData.encPayload;
-
-
-      if (typeof encPayload === 'object' && encPayload !== null) {
-
-        const bufferArray = Object.values(encPayload) as number[];
-        const buffer = Buffer.from(bufferArray);
-        encPayload = buffer.toString('base64');
-      } else if (typeof encPayload !== 'string') {
-        encPayload = String(encPayload || '');
-      }
-
-
-
-      const hash = encPayload.slice(-4); 
-      let hashValue = 0;
-
-
-      for (let i = 0; i < hash.length; i++) {
-        hashValue += hash.charCodeAt(i);
-      }
-
-      const selectedIndex = hashValue % options.length;
-
-      return selectedIndex;
-    } catch (error) {
-      console.error('Error in poll vote decryption:', error);
-      return 0; 
-    }
-  }
-  /**
    * Handle WhatsApp Interactive Buttons input matching
    */
   private handleWhatsAppInteractiveButtonsInput(node: any, message: Message, context: FlowExecutionContext): boolean {

@@ -1349,17 +1349,22 @@ router.post('/admin/scheduler/stop', ensureSuperAdmin, async (_req, res) => {
  */
 async function checkOutstandingBalance(companyId: number): Promise<number> {
   try {
-
     const company = await storage.getCompany(companyId);
-    
+    if (!company) return 0;
 
+    // dunningService.getDunningStatus is the authoritative source for whether
+    // a prior payment for this company is still unresolved ('completed' means
+    // either nothing ever failed, or a failed payment was already recovered —
+    // see subscription-manager.ts, which always inserts a fresh 'completed'
+    // transaction on a successful retry rather than mutating the old failed
+    // row, so summing every historical 'failed' transaction would overcount
+    // debts that were already paid off).
+    const dunningStatus = await dunningService.getDunningStatus(companyId);
+    if (dunningStatus.status === 'completed') return 0;
 
-
-
-
-
-    
-    return 0; // TODO: Implement actual balance calculation
+    const transactions = await storage.getPaymentTransactionsByCompany(companyId);
+    const lastFailed = transactions.find(t => t.status === 'failed');
+    return lastFailed ? Number(lastFailed.amount) || 0 : 0;
   } catch (error: any) {
     logger.error('enhanced-subscription', 'Error checking outstanding balance:', error);
     return 0;

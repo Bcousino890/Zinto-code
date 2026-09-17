@@ -173,6 +173,45 @@ content, purely environmental.
 
 Running total this session: 11 distinct CRITICAL findings closed.
 
+## 2e. activateSubscriptionAfterPayment idempotency (commit `e71304a`)
+
+Closed the last purely-technical CRITICAL finding — the "still open" list in §3 is now
+down to one item that genuinely needs a product decision first, not a bug fix.
+
+`server/routes/enhanced-subscription.ts`'s `activateSubscriptionAfterPayment` is shared
+by 12+ call sites across every payment provider's verification path, with zero
+deduplication: a Stripe webhook redelivery, or simply replaying the unauthenticated
+`GET /stripe/success?session_id=...` URL from browser history, re-extended
+`subscriptionEndDate` every time for one single payment. Added a guard: before
+extending, check whether a `subscription_renewed` event already exists in
+`subscriptionEvents` for this exact `paymentId` (JSONB lookup on `eventData->>'paymentId'`,
+scoped by `companyId`); if so, skip and return the existing end date unchanged.
+`paymentId === 'unknown'` (the fallback some callers use when they have no real payment
+id) is deliberately excluded from the check — treating it as a dedup key would risk
+silently skipping a real, distinct renewal, which is worse than the bug being fixed.
+
+Still dormant today (no `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` configured, verified
+via `grep` on `.env` immediately before deploying), but now safe for whenever the
+addon-billing launch turns Stripe on for real.
+
+Built, tested (216/216 — 213 from `tests/integrations/*.test.ts` plus 3/3 from
+`tests/subscription-expiration.test.ts`, which needs
+`node --require dotenv/config --import tsx --test ...` to run standalone), deployed,
+verified 3/3 HTTP 200 + stable `pm2 list`. **This build needed 8 attempts** — the host
+was unusually memory-constrained this stretch of the session (confirmed genuine OOM via
+`Killed` from a direct `vite build` invocation, not a code issue; zero swap is configured
+on this host, so any other session's transient memory spike during the ~3-5 minute
+"rendering chunks" step can hard-kill the build with no warning, regardless of how clear
+memory looks right before starting). If you hit this, there's no real fix beyond
+retrying — `NODE_OPTIONS --max-old-space-size` doesn't help since the kill is
+OS-level RSS exhaustion, not a V8 heap limit. Given this fix wasn't live-exposed either
+way, it was committed and pushed before the build succeeded, rather than leaving tested,
+correct, security-relevant code sitting uncommitted in this shared working tree.
+
+Running total this session: 12 distinct CRITICAL findings closed. Only "Downgrade
+enforces nothing" (§3) remains open, and it needs a product decision before it can be
+coded — flag it to the user rather than guessing at the intended behavior.
+
 ## 3. Found but NOT yet fixed — full audit results
 
 Four parallel agents audited: (1) signup/first purchase, (2) renewal/grace
@@ -190,22 +229,22 @@ the complete reasoning/file:line trail; below is the actionable summary.
   resource, but it also isn't forced back into compliance or charged for the excess —
   it just sits over-limit indefinitely. Still needs a product decision (hard block
   downgrade until under limits? soft-deactivate excess resources? grace period?) before
-  it can be coded.
-- **`activateSubscriptionAfterPayment` has no idempotency guard at all**
-  (`server/routes/enhanced-subscription.ts:1959-2014`). Currently dormant only because
-  `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` are unset in `.env` (so
-  `payment-callbacks.ts`'s webhook and its unauthenticated `GET /stripe/success` replay
-  path both fail closed today) — **this will start misbehaving the moment those env vars
-  get configured**, which is likely imminent given the in-flight addon-billing work. Fix
-  before enabling Stripe fully: make this function idempotent, e.g. by checking
-  `subscriptionEvents` for a prior `subscription_renewed` row with the same `paymentId`
-  before extending again (no schema migration needed — that table already exists and is
-  already queried the same way elsewhere in this file).
+  it can be coded. **This is the only CRITICAL item left open**, and it's a product
+  question, not a bug — surface it to the user rather than guessing.
 
 ### CRITICAL — fixed this session
 
 Kept in full detail (rather than deleted) so whoever picks this up can verify the fix
-against the original problem description. See §2/2b/2c/2d for exactly what changed.
+against the original problem description. See §2/2b/2c/2d/2e for exactly what changed.
+
+- ~~**`activateSubscriptionAfterPayment` has no idempotency guard at all.**~~ **FIXED,
+  commit `e71304a` (§2e).** Was: `server/routes/enhanced-subscription.ts` — this
+  shared function (12+ call sites) had no deduplication; a Stripe webhook redelivery, or
+  replaying the unauthenticated `GET /stripe/success` URL, re-extended
+  `subscriptionEndDate` every time for one payment. Now skips re-processing if a
+  `subscription_renewed` event already exists for the same `paymentId`. Still dormant
+  today (`STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` unset in `.env`), but ready for
+  when addon-billing turns Stripe on.
 
 - ~~**Plan resource limits don't exist.**~~ **FIXED, commit `1ae0c68` (§2c).** Was:
   `server/services/plan-limits-service.ts:571-599` —
@@ -320,18 +359,22 @@ does, via `StripeClientProvider` — confirmed safe on that specific point).
 
 ## 5. Suggested order for whoever picks this up
 
-1. ~~Get `feature/crm-v2-security-hardening` (§2) built and deployed~~ — done. 7 of 9
-   original CRITICAL findings are now fixed and live (§2/2b/2c/2d).
+1. ~~Get `feature/crm-v2-security-hardening` (§2) built and deployed~~ — done. 8 of 9
+   original CRITICAL findings are now fixed and live (§2/2b/2c/2d/2e).
 2. ~~Read `a8ca343`'s commit message and finish wiring whatever it left
    partially-done~~ — done by another session in `cfab0ad` (see §0).
-3. The 2 remaining CRITICAL items (§3 "still open"): the downgrade one needs a product
-   decision before it can be coded — surface that to the user rather than guessing.
-   The `activateSubscriptionAfterPayment` idempotency gap is a pure bug fix, same
-   pattern as the Stripe webhook fix in §2b — do that one first since it's actionable
-   immediately and gets more dangerous the moment Stripe env vars are configured for
-   the addon-billing launch.
+3. ~~Fix `activateSubscriptionAfterPayment`'s idempotency gap~~ — done, §2e. The
+   **only** CRITICAL item left is "Downgrade enforces nothing" (§3), and it needs a
+   product decision before it can be coded — surface that to the user rather than
+   guessing at hard-block vs. soft-deactivate vs. grace-period.
 4. Merge PR A, then PR B (§4), after combining them per the user's request; merge
-   `feature/crm-v2-security-hardening` itself too (§2/2b/2c/2d, plus the other
+   `feature/crm-v2-security-hardening` itself too (§2/2b/2c/2d/2e, plus the other
    session's `cfab0ad`) — all pushed, none merged, all blocked only on the PR-creation
    403 (§0) needing a human to click the compare link.
 5. Anything in MODERATE (§3) as time allows.
+6. If `npm run build` starts failing at "rendering chunks..." with no error message,
+   see §2e's note before assuming it's a code problem — this host has zero swap, so a
+   build can get OOM-killed by another session's transient memory spike partway through,
+   even when memory looked clear at the start. Just retry; there's no real fix beyond
+   that (confirmed `NODE_OPTIONS --max-old-space-size` doesn't help, since it's an
+   OS-level RSS kill, not a V8 heap limit).

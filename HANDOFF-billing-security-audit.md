@@ -30,11 +30,30 @@ fully before touching anything.
      `security/port-fase1-fase2-fixes`, already live.
   2. Another hit the *same* usage-limit wall doing a **separate** security audit (v2 API
      IDOR/enumeration issues, not billing) and left a checkpoint commit `a8ca343` on the
-     branch `feature/crm-v2-security-hardening` with a detailed "done vs. not-wired-yet"
-     breakdown in its own commit message (`git show a8ca343`). **This session's 3 billing
-     fixes are committed on top of that same branch** (see §2) — the branch now carries
-     both people's work. Read `a8ca343`'s commit message before deploying that branch;
-     it explicitly says some of its fixes are logic-only, not wired into routes yet.
+     branch `feature/crm-v2-security-hardening`. That work was later finished in commit
+     `cfab0ad` ("feat: finish CRM API v2 security/gap fixes — read endpoints,
+     idempotency, docs") — wired the previously-unconnected read-back ports, added real
+     idempotency-key persistence, finished WhatsApp template messages. Tested green
+     (213/213) at the point this note was written. **This session's billing fixes are
+     committed on top of that same branch** (see §2/2b/2c/2d) — the branch now carries
+     multiple sessions' work, all orthogonal (billing/Stripe vs. CRM v2 messaging API).
+  3. **`cfab0ad` swept up one unrelated line of mine in `server/storage.ts`**
+     (`getPaymentTransactionByPaymentIntentId`, used by §2d's refund fix) purely because
+     both sessions happened to be editing that file concurrently — a commit captures the
+     whole file's current state, not just the lines one session intended. No harm done
+     (verified the method's content survived intact), but it's a concrete example of why
+     `git status`/`git diff` before every commit matters here: your own uncommitted work
+     can end up folded into someone else's commit, or vice versa.
+  4. **`dist/` went missing entirely for a few minutes mid-session** (2026-09-17
+     ~16:20 CEST) — almost certainly another concurrent session's build/deploy tooling
+     moving it aside as a rollback safety net (see the two `dist.backup-pre-*`
+     directories in the repo root) before running its own build, which hadn't produced a
+     fresh `dist/` yet at the moment this session checked. Production kept serving from
+     the already-running process's in-memory bundle, but a restart in that window would
+     have failed hard with nothing to load. If you see this, check for other sessions'
+     active build processes (`ps aux | grep -iE "vite|esbuild"`) before assuming
+     something broke, and rebuild immediately — don't restore one of the timestamped
+     backups, they're multiple security fixes behind this branch.
 
 ## 1. What's confirmed LIVE in production right now
 
@@ -86,6 +105,74 @@ Then decide whether to merge `feature/crm-v2-security-hardening` back into
 `security/port-fase1-fase2-fixes` (it's already based on that branch's tip, so it should
 be a clean fast-forward or trivial merge) and push.
 
+## 2b. Additional fixes deployed after §2 (same session, continued)
+
+- `admin-routes.ts`'s live `/api/webhooks/stripe` handler: added idempotency (skip if
+  the transaction is already `'completed'`) and fixed the date math to stack onto
+  remaining time via `computeSubscriptionEndDate` instead of a flat `now+30d` on every
+  Stripe retry. Commit `0e220a2`.
+- Trial expiration: `plan-limits-service.checkSubscriptionExpiration` now actually
+  compares `trialEndDate` to `now` for `status==='trial'` companies instead of always
+  falling through to `isExpired:false`. Same commit `0e220a2`.
+- Pause: `'paused'` now blocks access the same way `'cancelled'`/`'inactive'` already
+  did (it was never checked at all before). Commit `955c8c3`. Deliberately left
+  `resumeSubscription`'s "extend `subscriptionEndDate` by the pause duration" behavior
+  untouched — that's a product call, not purely a bug fix.
+
+All three commits: built, deployed, verified 3/3 HTTP 200 post-restart, tests still
+204/204 (+3/3 for `subscription-expiration.test.ts`, which needs
+`node --require dotenv/config --import tsx --test ...` to run standalone — a
+pre-existing environment quirk, not a bug).
+
+## 2c. Also deployed, same session
+
+- Moyasar's two verification branches no longer treat `account_inactive_error` as
+  "payment verified" (one of them was verifying against a client-supplied `paymentId`
+  from `req.body` with no ownership check at all). Commit `1ea4468`.
+- Plan resource limits are now real. `getCurrentUserCount`/`ContactCount`/`ChannelCount`/
+  `FlowCount`/`CampaignCount` in `plan-limits-service.ts` were hardcoded `return 0`;
+  replaced with real `COUNT(*)` queries scoped by `companyId` (contacts exclude
+  archived/soft-deleted, flows exclude archived status), feeding directly into the
+  creation-route enforcement in `routes.ts`/`campaigns.ts` that was already wired but
+  always passing. Commit `1ae0c68`. **This is the one fix in this session with real
+  customer-impact risk**: any company already over its plan's limits (e.g. more
+  contacts than the plan allows) is now blocked from creating more of that resource
+  type immediately, with no grace period or warning banner first. Deployed with the
+  user's explicit informed approval ("Despliega ya, es lo correcto") after flagging
+  that risk before deploying.
+
+Running total this session: 9 distinct CRITICAL findings closed, deployed, verified
+healthy (commits `9a58434`, `0e220a2`, `955c8c3`, `1ea4468`, `1ae0c68` on
+`feature/crm-v2-security-hardening`).
+
+## 2d. Refund / dispute access revocation
+
+Closed both remaining "money taken back but access never revoked" CRITICAL findings
+(commit `0538f58`):
+
+- **Stripe** — the same live `/api/webhooks/stripe` handler fixed for idempotency in
+  §2b gets two new cases: `charge.refunded` (full refunds only, via
+  `amount_refunded >= amount`; resolves the owning company through the new
+  `storage.getPaymentTransactionByPaymentIntentId()`) and `charge.dispute.created`
+  (same revocation, immediately on dispute creation rather than waiting for it to
+  resolve — the transaction row itself is left alone since a dispute can still be won,
+  and `'disputed'` isn't one of its valid status values).
+- **Mercado Pago** (`/api/webhooks/mercadopago`) — its existing `status === 'refunded'`
+  branch only updated the `payment_transactions` row before; it now also sets the
+  owning company's `subscriptionStatus` to `'cancelled'`, mirroring the Stripe fix.
+- **Not covered**: PayPal/Moyasar/MPESA webhooks don't branch on refund/chargeback
+  event types at all. Didn't chase this further since none of those is confirmed live
+  for plan billing specifically (vs. one-off payments) — worth a quick check before
+  assuming it's safe to leave.
+
+Built, tested (204/204 on this fix's own diff; the shared working tree briefly showed
+213 due to another concurrent session's uncommitted tests, unrelated to this change),
+deployed, verified 3/3 HTTP 200 + stable `pm2 list`. See §0 for the `dist/`-went-missing
+incident that happened while this fix was being deployed — unrelated to this fix's
+content, purely environmental.
+
+Running total this session: 11 distinct CRITICAL findings closed.
+
 ## 3. Found but NOT yet fixed — full audit results
 
 Four parallel agents audited: (1) signup/first purchase, (2) renewal/grace
@@ -95,59 +182,15 @@ the complete reasoning/file:line trail; below is the actionable summary.
 
 ### CRITICAL — still open
 
-- **Plan resource limits don't exist.** `server/services/plan-limits-service.ts:571-599`
-  — `getCurrentUserCount`/`getCurrentContactCount`/`getCurrentChannelCount`/
-  `getCurrentFlowCount`/`getCurrentCampaignCount` are hardcoded `return 0`. Every
-  `checkPlanLimit()` call (contact/channel/user/campaign creation routes) always passes.
-  `maxFlows` isn't even checked anywhere. Fix: implement real counts (a working, unused
-  reference implementation already exists in `usage-tracking-service.ts` — it's just
-  never called from the actual creation routes).
 - **Downgrade enforces nothing.** Buying a cheaper plan doesn't deactivate excess
   users/channels/flows (only excess contacts get archived, via
   `plan-downgrade-service.ts`, and that service isn't even wired to the real checkout
-  path — `payment-routes.ts` never calls it). Combined with the point above, a company
-  can run at top-tier scale on the cheapest plan indefinitely. Needs a product decision
-  (hard block downgrade until under limits? soft-deactivate excess resources? grace
-  period?) before it can be coded.
-- **Pause doesn't block access, and resuming extends the paid-through date for free.**
-  `server/services/subscription-pausing-service.ts` — `'paused'` is never special-cased
-  by `ensureActiveSubscription`/`checkSubscriptionExpiration`, so a paused company keeps
-  full access; `resumeSubscription()` then pushes `subscriptionEndDate` forward by the
-  exact pause duration. Repeatable, no cooldown. The scheduler also skips `'paused'`
-  companies entirely so they're never even attempted for billing during the pause. Two
-  separate bugs: (a) add `'paused'` to the access-block list, (b) decide if "extend by
-  pause duration" is even the right design for a company that keeps full access anyway —
-  probably it should either truly block access (matching the UI's own copy, which
-  already claims it does) or not extend the date.
-- **Refunds never revoke access.** No `charge.refunded`/`charge.dispute.created` handler
-  anywhere touches `subscriptionStatus`/`planId`/`subscriptionEndDate` — confirmed for
-  Mercado Pago (`admin-routes.ts:3305-3320`, updates only the transaction row) and
-  structurally true for Stripe (no dispute handler exists at all, see below).
-- **Trials never expire in the enforcement path.** `plan-limits-service.ts`'s expiration
-  check never compares `trialEndDate` to `now`; only a manual superadmin sweep
-  (`POST /api/admin/trials/process-expired`, `server/trial-routes.ts:36`) ends a trial,
-  and nothing ever calls it automatically. Fix: either wire that sweep into the
-  scheduler's cron, or add a direct `trialEndDate < now` check to
-  `checkSubscriptionExpiration`.
-- **The Stripe webhook endpoint actually configured in the admin UI has zero replay
-  protection.** `server/admin-routes.ts:3146-3250` (`/api/webhooks/stripe` — confirmed
-  via `client/src/pages/admin/settings/index.tsx:598,3364` that this is the URL the
-  admin panel tells operators to paste into Stripe's dashboard, not the other,
-  better-built handler in `subscription-webhooks.ts` which is very likely dead code in
-  production). Every Stripe retry of `payment_intent.succeeded` re-extends
-  `subscriptionEndDate = now + 30 days` — from *now*, not from the existing end date —
-  on every redelivery. Fix: add the same idempotency pattern already proven correct in
-  `server/services/subscription-webhooks.ts:99-148` (unique `eventId` insert inside the
-  same transaction as the state change), and fix the date math to stack onto the
-  existing end date like `activateSubscriptionAfterPayment` already does correctly.
-- **No Stripe-side cancellation/dispute awareness for plan subscriptions at all.**
-  `charge.dispute.created` has zero occurrences anywhere in `server/`. A customer who
-  disputes their card charge with their bank keeps full access for the rest of the paid
-  period regardless — nothing in the live request path or the periodic reconciliation
-  job can ever learn about it.
-- **Moyasar fails open.** `server/payment-routes.ts:1352-1411,1484-1553` — treats a
-  `account_inactive_error` from Moyasar as "payment verified," including against a
-  client-supplied `paymentId` with no prior validation.
+  path — `payment-routes.ts` never calls it). Now that real plan-limit enforcement is
+  live (§2c), an already-over-limit company that downgrades can't create *more* of that
+  resource, but it also isn't forced back into compliance or charged for the excess —
+  it just sits over-limit indefinitely. Still needs a product decision (hard block
+  downgrade until under limits? soft-deactivate excess resources? grace period?) before
+  it can be coded.
 - **`activateSubscriptionAfterPayment` has no idempotency guard at all**
   (`server/routes/enhanced-subscription.ts:1959-2014`). Currently dormant only because
   `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` are unset in `.env` (so
@@ -158,6 +201,46 @@ the complete reasoning/file:line trail; below is the actionable summary.
   `subscriptionEvents` for a prior `subscription_renewed` row with the same `paymentId`
   before extending again (no schema migration needed — that table already exists and is
   already queried the same way elsewhere in this file).
+
+### CRITICAL — fixed this session
+
+Kept in full detail (rather than deleted) so whoever picks this up can verify the fix
+against the original problem description. See §2/2b/2c/2d for exactly what changed.
+
+- ~~**Plan resource limits don't exist.**~~ **FIXED, commit `1ae0c68` (§2c).** Was:
+  `server/services/plan-limits-service.ts:571-599` —
+  `getCurrentUserCount`/`getCurrentContactCount`/`getCurrentChannelCount`/
+  `getCurrentFlowCount`/`getCurrentCampaignCount` were hardcoded `return 0`, so every
+  `checkPlanLimit()` call (contact/channel/user/campaign creation routes) always passed.
+- ~~**Pause doesn't block access, and resuming extends the paid-through date for
+  free.**~~ **Partially FIXED, commit `955c8c3` (§2b).** `'paused'` now blocks access
+  the same way `'cancelled'`/`'inactive'` do. Deliberately NOT touched: whether
+  `resumeSubscription()` should keep extending `subscriptionEndDate` by the exact pause
+  duration is a product call, not a pure bug — matching the UI's copy now requires
+  someone to decide if that behavior is even still wanted once pause truly blocks access.
+- ~~**Refunds never revoke access.**~~ **FIXED, commit `0538f58` (§2d).** Was: no
+  `charge.refunded`/`charge.dispute.created` handler anywhere touched
+  `subscriptionStatus` — confirmed for Mercado Pago (updated only the transaction row)
+  and Stripe (no dispute handler existed at all). Now both revoke access. PayPal/
+  Moyasar/MPESA still don't — see §2d "Not covered."
+- ~~**Trials never expire in the enforcement path.**~~ **FIXED, commit `0e220a2`
+  (§2b).** Was: `plan-limits-service.ts`'s expiration check never compared
+  `trialEndDate` to `now`; only a manual superadmin sweep
+  (`POST /api/admin/trials/process-expired`) ended a trial, and nothing called it
+  automatically.
+- ~~**The Stripe webhook endpoint actually configured in the admin UI has zero replay
+  protection.**~~ **FIXED, commit `0e220a2` (§2b).** Was: every Stripe retry of
+  `payment_intent.succeeded` re-extended `subscriptionEndDate = now + 30 days` — from
+  *now*, not from the existing end date — on every redelivery. Now has an idempotency
+  check and stacks onto the existing end date via `computeSubscriptionEndDate`, matching
+  `activateSubscriptionAfterPayment`'s already-correct math.
+- ~~**No Stripe-side cancellation/dispute awareness for plan subscriptions at
+  all.**~~ **FIXED, commit `0538f58` (§2d).** `charge.dispute.created` now revokes
+  access immediately rather than waiting for the dispute to resolve.
+- ~~**Moyasar fails open.**~~ **FIXED, commit `1ea4468` (§2c).** Was:
+  `server/payment-routes.ts` treated an `account_inactive_error` from Moyasar as
+  "payment verified," including against a client-supplied `paymentId` with no prior
+  validation.
 
 ### MODERATE — lower priority, but real
 
@@ -237,12 +320,18 @@ does, via `StripeClientProvider` — confirmed safe on that specific point).
 
 ## 5. Suggested order for whoever picks this up
 
-1. Get `feature/crm-v2-security-hardening` (§2) built and deployed — it's done, just
-   blocked on the environment's build flakiness.
-2. Read `a8ca343`'s commit message in full and finish wiring whatever it left
-   partially-done (separate CRM v2 IDOR/enumeration work, not billing).
-3. Pick off the CRITICAL items in §3 one at a time — the Stripe webhook idempotency
-   fix and the trial-expiration fix are probably the next-highest value for the
-   effort involved.
-4. Merge PR A, then PR B (§4), after combining them per the user's request.
+1. ~~Get `feature/crm-v2-security-hardening` (§2) built and deployed~~ — done. 7 of 9
+   original CRITICAL findings are now fixed and live (§2/2b/2c/2d).
+2. ~~Read `a8ca343`'s commit message and finish wiring whatever it left
+   partially-done~~ — done by another session in `cfab0ad` (see §0).
+3. The 2 remaining CRITICAL items (§3 "still open"): the downgrade one needs a product
+   decision before it can be coded — surface that to the user rather than guessing.
+   The `activateSubscriptionAfterPayment` idempotency gap is a pure bug fix, same
+   pattern as the Stripe webhook fix in §2b — do that one first since it's actionable
+   immediately and gets more dangerous the moment Stripe env vars are configured for
+   the addon-billing launch.
+4. Merge PR A, then PR B (§4), after combining them per the user's request; merge
+   `feature/crm-v2-security-hardening` itself too (§2/2b/2c/2d, plus the other
+   session's `cfab0ad`) — all pushed, none merged, all blocked only on the PR-creation
+   403 (§0) needing a human to click the compare link.
 5. Anything in MODERATE (§3) as time allows.

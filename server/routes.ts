@@ -282,6 +282,8 @@ import {
 } from "./utils/meta-webhook-security";
 import { authenticateApiKey, rateLimitMiddleware } from "./middleware/api-auth";
 import { planInitialCrmSynchronization } from "./services/initial-crm-synchronization-plan";
+import { CrmChannelsReadService, CrmConversationsReadService, CrmMessageStatusReadService } from "./services/crm-read-service";
+import { createCrmChannelsReadAdapter, createCrmConversationsReadAdapter, createCrmMessageStatusReadAdapter } from "./services/crm-read-storage-adapter";
 import apiV1Routes from "./routes/api-v1";
 import { createApiV2Router } from "./routes/api-v2";
 import { registerApiKeySettingsRoutes } from "./routes/api-key-settings-routes";
@@ -1163,6 +1165,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     dealPipelineSync: createCrmDealPipelineApiV2Service(createCrmDealStorageAdapter(storage)),
     campaignSync: new CrmCampaignSyncService(storage, new CampaignService()),
     initialSync: { plan: planInitialCrmSynchronization },
+    channelsRead: new CrmChannelsReadService(createCrmChannelsReadAdapter({
+      getChannels: apiMessageService.getChannels.bind(apiMessageService),
+    })),
+    conversationsRead: new CrmConversationsReadService(createCrmConversationsReadAdapter({
+      getConversations: apiMessageService.getConversations.bind(apiMessageService),
+    })),
+    messageStatusRead: new CrmMessageStatusReadService(createCrmMessageStatusReadAdapter({
+      getMessageStatus: apiMessageService.getMessageStatus.bind(apiMessageService),
+    })),
+    idempotency: {
+      find: ({ companyId, key }) => storage.findCrmIdempotencyRecord(companyId, key).then((record) => record ?? null),
+      save: (input) => storage.saveCrmIdempotencyRecord(input),
+    },
     mediaAccess: {
       upload: apiMediaUpload.single('file'),
       processUpload: processUploadedApiMedia,

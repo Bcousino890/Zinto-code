@@ -55,7 +55,7 @@ import {
   apiUsage, type ApiUsage, type InsertApiUsage,
   apiRateLimits, type ApiRateLimit, type InsertApiRateLimit,
   apiWebhooks, type ApiWebhook, type InsertApiWebhook,
-  crmExternalMappings, crmIntegrations, crmWebhookEvents, crmSyncConflicts,
+  crmExternalMappings, crmIntegrations, crmWebhookEvents, crmSyncConflicts, crmIdempotencyKeys,
   flows, type Flow, type InsertFlow,
   flowTemplates, type FlowTemplate, type InsertFlowTemplate,
   flowAssignments, type FlowAssignment, type InsertFlowAssignment,
@@ -695,6 +695,7 @@ export interface IStorage {
   getAllPaymentTransactions(): Promise<PaymentTransaction[]>;
   getPaymentTransactionsByCompany(companyId: number): Promise<PaymentTransaction[]>;
   getPaymentTransaction(id: number): Promise<PaymentTransaction | undefined>;
+  getPaymentTransactionByPaymentIntentId(paymentIntentId: string): Promise<PaymentTransaction | undefined>;
   createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction>;
   updatePaymentTransaction(id: number, updates: Partial<InsertPaymentTransaction>): Promise<PaymentTransaction>;
 
@@ -908,6 +909,17 @@ export interface IStorage {
   saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void>;
   getCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal' | 'campaign', externalId: string): Promise<{ zintoId: string } | undefined>;
   saveCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal' | 'campaign', externalId: string, zintoId: number): Promise<void>;
+  findCrmIdempotencyRecord(companyId: number, key: string): Promise<{ method: string; path: string; requestHash: string; responseStatus: number; responseBody: unknown } | undefined>;
+  saveCrmIdempotencyRecord(input: {
+    companyId: number;
+    integrationId: number;
+    key: string;
+    method: string;
+    path: string;
+    requestHash: string;
+    responseStatus: number;
+    responseBody: unknown;
+  }): Promise<void>;
   claimPending(input: DurableWebhookClaimPendingInput): Promise<ClaimedDurableWebhookEvent | undefined>;
   updateDelivery(input: DurableWebhookDeliveryUpdate): Promise<boolean>;
   listCandidateScopes(): Promise<DurableWebhookEventScope[]>;
@@ -5389,6 +5401,47 @@ export class DatabaseStorage implements IStorage {
       target: [crmExternalMappings.companyId, crmExternalMappings.integrationId, crmExternalMappings.entityType, crmExternalMappings.externalId],
       set: { zintoId: String(zintoId), version: sql`${crmExternalMappings.version} + 1`, updatedAt: new Date() },
     });
+  }
+
+  async findCrmIdempotencyRecord(companyId: number, key: string): Promise<{ method: string; path: string; requestHash: string; responseStatus: number; responseBody: unknown } | undefined> {
+    const [record] = await db.select({
+      method: crmIdempotencyKeys.method,
+      path: crmIdempotencyKeys.path,
+      requestHash: crmIdempotencyKeys.requestHash,
+      responseStatus: crmIdempotencyKeys.responseStatus,
+      responseBody: crmIdempotencyKeys.responseBody,
+    }).from(crmIdempotencyKeys).where(and(
+      eq(crmIdempotencyKeys.companyId, companyId),
+      eq(crmIdempotencyKeys.key, key),
+      gt(crmIdempotencyKeys.expiresAt, new Date()),
+    )).limit(1);
+
+    if (!record || record.responseStatus === null) return undefined;
+    return { method: record.method, path: record.path, requestHash: record.requestHash, responseStatus: record.responseStatus, responseBody: record.responseBody };
+  }
+
+  async saveCrmIdempotencyRecord(input: {
+    companyId: number;
+    integrationId: number;
+    key: string;
+    method: string;
+    path: string;
+    requestHash: string;
+    responseStatus: number;
+    responseBody: unknown;
+  }): Promise<void> {
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await db.insert(crmIdempotencyKeys).values({
+      companyId: input.companyId,
+      integrationId: input.integrationId,
+      key: input.key,
+      method: input.method,
+      path: input.path,
+      requestHash: input.requestHash,
+      responseStatus: input.responseStatus,
+      responseBody: input.responseBody as any,
+      expiresAt,
+    }).onConflictDoNothing({ target: [crmIdempotencyKeys.companyId, crmIdempotencyKeys.key] });
   }
 
   async getInactiveContactByIdentifierAndCompany(
@@ -10103,6 +10156,24 @@ export class DatabaseStorage implements IStorage {
       return this.mapToPaymentTransaction(transaction);
     } catch (error) {
       console.error(`Error getting payment transaction with ID ${id}:`, error);
+      return undefined;
+    }
+  }
+
+  async getPaymentTransactionByPaymentIntentId(paymentIntentId: string): Promise<PaymentTransaction | undefined> {
+    try {
+      const [transaction] = await db
+        .select()
+        .from(paymentTransactions)
+        .where(eq(paymentTransactions.paymentIntentId, paymentIntentId))
+        .orderBy(desc(paymentTransactions.id))
+        .limit(1);
+
+      if (!transaction) return undefined;
+
+      return this.mapToPaymentTransaction(transaction);
+    } catch (error) {
+      console.error(`Error getting payment transaction for payment intent ${paymentIntentId}:`, error);
       return undefined;
     }
   }

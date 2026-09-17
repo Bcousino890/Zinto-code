@@ -58,6 +58,51 @@ type MediaAccess = {
   resolveFilePath(mediaPath: string): string | null;
 };
 
+type ChannelsRead = {
+  listChannels(companyId: number): Promise<Array<{ id: number; name: string; type: string; status: string; phoneNumber?: string; displayName?: string }>>;
+};
+type ConversationsRead = {
+  listConversations(input: {
+    companyId: number;
+    filters?: { channelId?: number; status?: string; isGroup?: boolean };
+    pagination?: { page?: number; limit?: number };
+  }): Promise<{ conversations: unknown[]; total: number }>;
+};
+type MessageStatusRead = {
+  getMessageStatus(input: { companyId: number; messageId: number }): Promise<{ status: string; timestamp: Date } | null>;
+};
+type IdempotencyRecord = { method: string; path: string; requestHash: string; responseStatus: number; responseBody: unknown };
+type Idempotency = {
+  find(input: { companyId: number; key: string }): Promise<IdempotencyRecord | null>;
+  save(input: {
+    companyId: number;
+    integrationId: number;
+    key: string;
+    method: string;
+    path: string;
+    requestHash: string;
+    responseStatus: number;
+    responseBody: unknown;
+  }): Promise<void>;
+};
+
+/** A minimal, in-memory stand-in for the real storage-backed idempotency port, scoped like the real one (companyId + key). */
+function fakeIdempotencyStore(): Idempotency {
+  const records = new Map<string, IdempotencyRecord>();
+  return {
+    find: async ({ companyId, key }) => records.get(`${companyId}:${key}`) ?? null,
+    save: async (input) => {
+      records.set(`${input.companyId}:${input.key}`, {
+        method: input.method,
+        path: input.path,
+        requestHash: input.requestHash,
+        responseStatus: input.responseStatus,
+        responseBody: input.responseBody,
+      });
+    },
+  };
+}
+
 type CampaignSync = {
   syncBatch(input: {
     companyId: number;
@@ -87,6 +132,10 @@ async function withServer(
   initialSync?: InitialSync,
   resolveIntegrationId?: (companyId: number, publicId: string) => Promise<number | undefined>,
   mediaAccess?: MediaAccess,
+  channelsRead?: ChannelsRead,
+  conversationsRead?: ConversationsRead,
+  messageStatusRead?: MessageStatusRead,
+  idempotency?: Idempotency,
 ) {
   const app = express();
   app.use(express.json());
@@ -100,6 +149,10 @@ async function withServer(
     initialSync,
     resolveIntegrationId,
     mediaAccess,
+    channelsRead,
+    conversationsRead,
+    messageStatusRead,
+    idempotency,
   }));
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -582,6 +635,95 @@ test('refuses to download media owned by another company', async () => {
   }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, mediaAccess);
 });
 
+test('lists channels for the requesting company with channels:read', async () => {
+  const channelsRead: ChannelsRead = {
+    listChannels: async (companyId) => {
+      assert.equal(companyId, 12);
+      return [{ id: 44, name: 'WhatsApp Chile', type: 'whatsapp_official', status: 'active', phoneNumber: '+56912345678' }];
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['channels:read'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/channels`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), {
+      data: [{ id: 44, name: 'WhatsApp Chile', type: 'whatsapp_official', status: 'active', phoneNumber: '+56912345678' }],
+    });
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, channelsRead);
+});
+
+test('does not expose channel listing without channels:read', async () => {
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/channels`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(response.status, 403);
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, {
+    listChannels: async () => { throw new Error('must not list'); },
+  });
+});
+
+test('lists conversations with filters and pagination for the requesting company', async () => {
+  const received: unknown[] = [];
+  const conversationsRead: ConversationsRead = {
+    listConversations: async (input) => {
+      received.push(input);
+      return { conversations: [{ id: 91, contactId: 5, channelId: 44 }], total: 1 };
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['conversations:read'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/conversations?channelId=44&status=open&isGroup=false&page=2&limit=10`, {
+      headers: { 'X-Zinto-Integration-Id': '3' },
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { data: [{ id: 91, contactId: 5, channelId: 44 }], total: 1 });
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, conversationsRead);
+
+  assert.deepEqual(received, [{
+    companyId: 12,
+    filters: { channelId: 44, status: 'open', isGroup: false },
+    pagination: { page: 2, limit: 10 },
+  }]);
+});
+
+test('reads a message status, 404s when the port returns null', async () => {
+  const messageStatusRead: MessageStatusRead = {
+    getMessageStatus: async ({ messageId }) => (messageId === 77 ? { status: 'delivered', timestamp: new Date('2026-01-01T00:00:00Z') } : null),
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:read'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const found = await fetch(`${baseUrl}/api/v2/messages/77/status`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(found.status, 200);
+    assert.deepEqual(await found.json(), { data: { status: 'delivered', timestamp: '2026-01-01T00:00:00.000Z' } });
+
+    const missing = await fetch(`${baseUrl}/api/v2/messages/999/status`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(missing.status, 404);
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, messageStatusRead);
+});
+
+test('does not expose channels, conversations, or message status reads when their dependencies are not supplied', async () => {
+  await withServer((_req, _res, next) => next(), async (baseUrl) => {
+    assert.equal((await fetch(`${baseUrl}/api/v2/channels`)).status, 404);
+    assert.equal((await fetch(`${baseUrl}/api/v2/conversations`)).status, 404);
+    assert.equal((await fetch(`${baseUrl}/api/v2/messages/1/status`)).status, 404);
+  });
+});
+
 test('does not expose message dispatch when no message sync dependency is supplied', async () => {
   await withServer((_req, _res, next) => next(), async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/v2/messages`, { method: 'POST' });
@@ -673,7 +815,7 @@ test('accepts a validated campaign batch from a permitted integration', async ()
   }, async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-campaigns-batch-441' },
       body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }, { externalId: 'crm-campaign-442', name: 'Campaign 442', content: 'Hello' }] }),
     });
 
@@ -720,7 +862,7 @@ test('rejects campaign batches that violate the batch validation contract', asyn
   }, async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-campaigns-batch-442' },
       body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }, { externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }] }),
     });
     assert.equal(response.status, 400);
@@ -739,7 +881,7 @@ test('reports a campaign sync failure separately from an invalid batch', async (
   }, async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/v2/campaigns/batch`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-campaigns-batch-443' },
       body: JSON.stringify({ campaigns: [{ externalId: 'crm-campaign-441', name: 'Campaign 441', content: 'Hello' }] }),
     });
     assert.equal(response.status, 500);
@@ -825,6 +967,128 @@ test('creates a CRM deal through the pipeline with tenant, integration, and idem
     idempotencyKey: 'crm-deal-441',
     deal: { externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 },
   }]);
+});
+
+test('replays the cached response for a retried request with the same Idempotency-Key and body, without calling the sync service again', async () => {
+  let callCount = 0;
+  const dealPipelineSync: DealPipelineSync = {
+    upsert: async () => {
+      callCount += 1;
+      return { created: true, deal: { id: 91, externalId: 'hubspot-deal-441' } };
+    },
+  };
+  const idempotency = fakeIdempotencyStore();
+  const body = JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 });
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['deals:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const headers = { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-deal-retry-441' };
+    const first = await fetch(`${baseUrl}/api/v2/deals`, { method: 'POST', headers, body });
+    const second = await fetch(`${baseUrl}/api/v2/deals`, { method: 'POST', headers, body });
+
+    assert.equal(first.status, 201);
+    assert.equal(second.status, 201);
+    assert.deepEqual(await first.json(), await second.json());
+  }, undefined, undefined, undefined, undefined, dealPipelineSync, undefined, undefined, undefined, undefined, undefined, undefined, idempotency);
+
+  assert.equal(callCount, 1, 'the sync service must only run once — the retry should be served from the idempotency cache');
+});
+
+test('rejects a retried Idempotency-Key whose request body changed, without calling the sync service again', async () => {
+  let callCount = 0;
+  const dealPipelineSync: DealPipelineSync = {
+    upsert: async () => {
+      callCount += 1;
+      return { created: true, deal: { id: 91, externalId: 'hubspot-deal-441' } };
+    },
+  };
+  const idempotency = fakeIdempotencyStore();
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['deals:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const headers = { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-deal-conflict-441' };
+    const first = await fetch(`${baseUrl}/api/v2/deals`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 }),
+    });
+    assert.equal(first.status, 201);
+
+    const second = await fetch(`${baseUrl}/api/v2/deals`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 99999 }),
+    });
+    assert.equal(second.status, 409);
+    assert.equal((await second.json()).error, 'IDEMPOTENCY_KEY_CONFLICT');
+  }, undefined, undefined, undefined, undefined, dealPipelineSync, undefined, undefined, undefined, undefined, undefined, undefined, idempotency);
+
+  assert.equal(callCount, 1, 'the sync service must not run again for a conflicting retry');
+});
+
+test('rejects the same Idempotency-Key reused across two different operations', async () => {
+  const dealPipelineSync: DealPipelineSync = {
+    upsert: async () => ({ created: true, deal: { id: 91, externalId: 'hubspot-deal-441' } }),
+  };
+  const appointmentSync: AppointmentSync = {
+    sync: async () => { throw new Error('must not sync — the shared key was already used for a deal'); },
+  };
+  const idempotency = fakeIdempotencyStore();
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['deals:write', 'appointments:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const sharedKey = 'crm-shared-key-441';
+    const dealResponse = await fetch(`${baseUrl}/api/v2/deals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': sharedKey },
+      body: JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 }),
+    });
+    assert.equal(dealResponse.status, 201);
+
+    const appointmentResponse = await fetch(`${baseUrl}/api/v2/appointments/hubspot-appointment-441`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': sharedKey },
+      body: JSON.stringify({ contactId: 41, title: 'Consult', startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' }),
+    });
+    assert.equal(appointmentResponse.status, 409);
+    assert.equal((await appointmentResponse.json()).error, 'IDEMPOTENCY_KEY_REUSED');
+  }, undefined, undefined, undefined, appointmentSync, dealPipelineSync, undefined, undefined, undefined, undefined, undefined, undefined, idempotency);
+});
+
+test('does not cache a failed sync attempt — a retry after a failure is free to try again', async () => {
+  let callCount = 0;
+  const dealPipelineSync: DealPipelineSync = {
+    upsert: async () => {
+      callCount += 1;
+      if (callCount === 1) throw new Error('transient failure');
+      return { created: true, deal: { id: 91, externalId: 'hubspot-deal-441' } };
+    },
+  };
+  const idempotency = fakeIdempotencyStore();
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['deals:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const headers = { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-deal-retry-after-failure-441' };
+    const body = JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 });
+
+    const first = await fetch(`${baseUrl}/api/v2/deals`, { method: 'POST', headers, body });
+    assert.equal(first.status, 500);
+
+    const second = await fetch(`${baseUrl}/api/v2/deals`, { method: 'POST', headers, body });
+    assert.equal(second.status, 201);
+  }, undefined, undefined, undefined, undefined, dealPipelineSync, undefined, undefined, undefined, undefined, undefined, undefined, idempotency);
+
+  assert.equal(callCount, 2, 'the sync service must run again after a failed attempt with the same key');
 });
 
 test('does not expose appointment or deal synchronization without their dependencies', async () => {

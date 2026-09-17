@@ -66,6 +66,9 @@ error: v1 seguirá funcionando mientras se corrige el permiso.
 | POST | `/messages` | `messages:send` (+ `media:upload` si incluye `media`) |
 | POST | `/media/upload` | `media:upload` |
 | GET | `/media` | `media:read` |
+| GET | `/channels` | `channels:read` |
+| GET | `/conversations` | `conversations:read` |
+| GET | `/messages/{messageId}/status` | `messages:read` |
 | POST | `/campaigns/batch` | `campaigns:write` |
 | PUT | `/appointments/{externalId}` | `appointments:write` |
 | POST | `/deals` | `deals:write` |
@@ -117,7 +120,29 @@ curl -X POST "$BASE_URL/messages" \
 ```
 
 La respuesta es `202` y contiene el ID de Zinto. `channelId` debe pertenecer a
-la empresa de la API Key.
+la empresa de la API Key. Use `GET /channels` (vea la sección de solo lectura
+más abajo) para listar los canales disponibles y descubrir su `channelId`.
+
+### Plantilla de WhatsApp a un lead inactivo (fuera de 24 horas)
+
+Cuando un lead de SmartBC no ha escrito en las últimas 24 horas, WhatsApp
+rechaza texto o media libres — solo se puede reabrir la conversación con una
+plantilla ya aprobada. Use `template` en vez de `media` en `POST /messages`
+(son mutuamente excluyentes, nunca ambos a la vez); sigue bastando el permiso
+`messages:send`, no se introdujo ningún scope nuevo. Esta ruta envía una
+plantilla ya aprobada en Zinto — no la crea ni la somete a aprobación.
+
+```bash
+curl -X POST "$BASE_URL/messages" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  -d '{"channelId":42,"recipient":"+56912345678","template":{"name":"appointment_reminder","language":"es","components":[{"type":"body","parameters":[{"type":"text","text":"mañana 10:00"}]}]},"external_message_id":"smartbc-msg-8843"}'
+```
+
+`template.name` (obligatorio) es el nombre de una plantilla ya aprobada en
+Zinto. `template.language` (obligatorio) es el código de idioma de
+WhatsApp/Meta (p. ej. `es`, `en_US`). `template.components` es opcional;
+omítalo por completo si la plantilla no tiene variables.
 
 ### Foto de una propiedad → WhatsApp (media)
 
@@ -150,6 +175,41 @@ curl "$BASE_URL/media?type=image&filename=xyz789.jpg" \
 ```
 
 Requiere `media:read`; solo la empresa dueña del mensaje puede descargarlo.
+
+### Canales, conversaciones y estado de un mensaje (solo lectura)
+
+v2 ahora expone tres rutas de solo lectura, scoped a la empresa de la API
+Key; antes de esto la única forma de conocer un `channelId` o el estado de
+una entrega era mirar los eventos de webhook.
+
+```bash
+curl "$BASE_URL/channels" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID"
+# {"data":[{"id":42,"name":"WhatsApp Ventas","type":"whatsapp_official","status":"active","phoneNumber":"+56912345678","displayName":"Ventas"}]}
+```
+
+Requiere `channels:read`.
+
+```bash
+curl "$BASE_URL/conversations?channelId=42&status=open&limit=20" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID"
+# {"data":[{"id":501,"contactId":123,"channelId":42,"channelType":"whatsapp_official","status":"open","isGroup":false,"lastMessageAt":"2026-09-10T14:00:00Z","createdAt":"2026-08-01T10:00:00Z"}],"total":1}
+```
+
+Requiere `conversations:read`. Admite los filtros opcionales `channelId`,
+`status` e `isGroup` (`true`/`false`), y paginación `page`/`limit` (por
+defecto 20, máximo 100).
+
+```bash
+curl "$BASE_URL/messages/98765/status" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID"
+# {"data":{"status":"delivered","timestamp":"2026-09-10T14:00:05Z"}}
+```
+
+Requiere `messages:read`. `messageId` es el `data.id` devuelto por
+`POST /messages`. Devuelve `404 {"error":"NOT_FOUND", ...}` si el mensaje no
+existe o pertenece a otra empresa (misma respuesta en ambos casos, sin
+distinguirlos).
 
 ### Cita y oportunidad
 

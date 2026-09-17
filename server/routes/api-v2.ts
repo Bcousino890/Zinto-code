@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { Router, type NextFunction, type Request, type Response } from 'express';
 import { integrationCapabilities, requireIntegrationScope } from '../middleware/integration-scope';
 import { getApiV2OpenApiDocument } from './api-v2-openapi';
@@ -12,6 +13,7 @@ import type {
   InitialCrmSynchronizationInput,
   InitialCrmSynchronizationPlan,
 } from '../services/initial-crm-synchronization-plan';
+import type { CrmChannelsReadService, CrmConversationsReadService, CrmMessageStatusReadService } from '../services/crm-read-service';
 
 type AuthenticationMiddleware = (req: Request, res: Response, next: NextFunction) => void;
 type IntegrationIdResolver = (companyId: number, publicId: string) => Promise<number | undefined>;
@@ -87,6 +89,23 @@ type MediaAccess = {
   findOwnerCompanyId(mediaPath: string): Promise<number | null>;
   resolveFilePath(mediaPath: string): string | null;
 };
+type ChannelsRead = Pick<CrmChannelsReadService, 'listChannels'>;
+type ConversationsRead = Pick<CrmConversationsReadService, 'listConversations'>;
+type MessageStatusRead = Pick<CrmMessageStatusReadService, 'getMessageStatus'>;
+type IdempotencyRecord = { method: string; path: string; requestHash: string; responseStatus: number; responseBody: unknown };
+type Idempotency = {
+  find(input: { companyId: number; key: string }): Promise<IdempotencyRecord | null>;
+  save(input: {
+    companyId: number;
+    integrationId: number;
+    key: string;
+    method: string;
+    path: string;
+    requestHash: string;
+    responseStatus: number;
+    responseBody: unknown;
+  }): Promise<void>;
+};
 
 function isPositiveIntegrationId(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
@@ -105,6 +124,61 @@ function syncFailure(res: Response, code: string, genericMessage: string, error:
   return res.status(500).json({ error: code, message: genericMessage });
 }
 
+/** Same contract as syncFailure(), but returns a {status, body} pair for handlers wrapped in withIdempotency() rather than writing to `res` directly. */
+function syncFailureResult(code: string, genericMessage: string, error: unknown, context: string): { status: number; body: unknown } {
+  console.error(`[api-v2] ${context} failed:`, error);
+  return { status: 500, body: { error: code, message: genericMessage } };
+}
+
+function requestFingerprint(body: unknown): string {
+  return createHash('sha256').update(JSON.stringify(body ?? {})).digest('hex');
+}
+
+/**
+ * Makes `Idempotency-Key` do what its name promises for routes that declare
+ * one required: a retried request with the same key and body short-circuits
+ * to the exact response the first attempt produced, instead of the sync
+ * service (whose own upsert-by-externalId logic is a coarser, best-effort
+ * safety net, not a literal replay of the same response). Only successful
+ * (2xx) responses are cached — a failed attempt intentionally stays retryable
+ * with the same key, since most failures here are transient (a downstream
+ * sync error), not permanent.
+ */
+async function withIdempotency(
+  idempotency: Idempotency | undefined,
+  params: { companyId: number; integrationId: number; key: string; method: string; path: string; body: unknown },
+  work: () => Promise<{ status: number; body: unknown }>,
+): Promise<{ status: number; body: unknown }> {
+  if (!idempotency) return work();
+
+  const hash = requestFingerprint(params.body);
+  const existing = await idempotency.find({ companyId: params.companyId, key: params.key });
+  if (existing) {
+    if (existing.method !== params.method || existing.path !== params.path) {
+      return { status: 409, body: { error: 'IDEMPOTENCY_KEY_REUSED', message: 'This Idempotency-Key was already used for a different operation' } };
+    }
+    if (existing.requestHash !== hash) {
+      return { status: 409, body: { error: 'IDEMPOTENCY_KEY_CONFLICT', message: 'This Idempotency-Key was already used with a different request body' } };
+    }
+    return { status: existing.responseStatus, body: existing.responseBody };
+  }
+
+  const result = await work();
+  if (result.status >= 200 && result.status < 300) {
+    idempotency.save({
+      companyId: params.companyId,
+      integrationId: params.integrationId,
+      key: params.key,
+      method: params.method,
+      path: params.path,
+      requestHash: hash,
+      responseStatus: result.status,
+      responseBody: result.body,
+    }).catch((error) => console.error('[api-v2] failed to persist idempotency record:', error));
+  }
+  return result;
+}
+
 export function createApiV2Router({
   authenticate,
   contactSync,
@@ -114,6 +188,10 @@ export function createApiV2Router({
   dealPipelineSync,
   initialSync,
   mediaAccess,
+  channelsRead,
+  conversationsRead,
+  messageStatusRead,
+  idempotency,
   resolveIntegrationId,
 }: {
   authenticate: AuthenticationMiddleware;
@@ -124,6 +202,10 @@ export function createApiV2Router({
   dealPipelineSync?: DealPipelineSync;
   initialSync?: InitialSync;
   mediaAccess?: MediaAccess;
+  channelsRead?: ChannelsRead;
+  conversationsRead?: ConversationsRead;
+  messageStatusRead?: MessageStatusRead;
+  idempotency?: Idempotency;
   resolveIntegrationId?: IntegrationIdResolver;
 }) {
   const router = Router();
@@ -391,6 +473,92 @@ export function createApiV2Router({
     });
   }
 
+  if (channelsRead) {
+    router.get('/channels', requireIntegrationScope('channels:read'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+
+      if (!companyId || !isPositiveIntegrationId(integrationId)) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company and integration ID are required' });
+      }
+
+      try {
+        const channels = await channelsRead.listChannels(companyId);
+        return res.status(200).json({ data: channels });
+      } catch (error) {
+        return syncFailure(res, 'CHANNELS_READ_FAILED', 'Failed to read channels', error, 'channels read');
+      }
+    });
+  }
+
+  if (conversationsRead) {
+    router.get('/conversations', requireIntegrationScope('conversations:read'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+      const { channelId, status, isGroup, page, limit } = req.query;
+
+      const parsedChannelId = channelId !== undefined ? Number(channelId) : undefined;
+      const parsedIsGroup = isGroup === undefined ? undefined : isGroup === 'true' ? true : isGroup === 'false' ? false : undefined;
+      const parsedPage = page !== undefined ? Number(page) : undefined;
+      const parsedLimit = limit !== undefined ? Number(limit) : undefined;
+
+      if (
+        !companyId || !isPositiveIntegrationId(integrationId)
+        || (channelId !== undefined && (!Number.isFinite(parsedChannelId) || (parsedChannelId as number) <= 0))
+        || (status !== undefined && typeof status !== 'string')
+        || (isGroup !== undefined && parsedIsGroup === undefined)
+        || (page !== undefined && (!Number.isFinite(parsedPage) || (parsedPage as number) <= 0))
+        || (limit !== undefined && (!Number.isFinite(parsedLimit) || (parsedLimit as number) <= 0))
+      ) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company and integration ID are required; optional query params channelId, status, isGroup, page, limit must be well-formed' });
+      }
+
+      try {
+        const result = await conversationsRead.listConversations({
+          companyId,
+          ...(parsedChannelId !== undefined || status !== undefined || parsedIsGroup !== undefined ? {
+            filters: {
+              ...(parsedChannelId !== undefined ? { channelId: parsedChannelId } : {}),
+              ...(typeof status === 'string' ? { status } : {}),
+              ...(parsedIsGroup !== undefined ? { isGroup: parsedIsGroup } : {}),
+            },
+          } : {}),
+          ...(parsedPage !== undefined || parsedLimit !== undefined ? {
+            pagination: {
+              ...(parsedPage !== undefined ? { page: parsedPage } : {}),
+              ...(parsedLimit !== undefined ? { limit: parsedLimit } : {}),
+            },
+          } : {}),
+        });
+        return res.status(200).json({ data: result.conversations, total: result.total });
+      } catch (error) {
+        return syncFailure(res, 'CONVERSATIONS_READ_FAILED', 'Failed to read conversations', error, 'conversations read');
+      }
+    });
+  }
+
+  if (messageStatusRead) {
+    router.get('/messages/:messageId/status', requireIntegrationScope('messages:read'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+      const messageId = Number(req.params.messageId);
+
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !Number.isSafeInteger(messageId) || messageId <= 0) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and a positive message ID are required' });
+      }
+
+      try {
+        const status = await messageStatusRead.getMessageStatus({ companyId, messageId });
+        if (!status) {
+          return res.status(404).json({ error: 'NOT_FOUND', message: 'Message not found' });
+        }
+        return res.status(200).json({ data: status });
+      } catch (error) {
+        return syncFailure(res, 'MESSAGE_STATUS_READ_FAILED', 'Failed to read message status', error, 'message status read');
+      }
+    });
+  }
+
   if (campaignSync) {
     router.post('/campaigns/batch', requireIntegrationScope('campaigns:write'), async (req, res) => {
       const companyId = req.companyId;
@@ -401,26 +569,33 @@ export function createApiV2Router({
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and campaigns with external IDs are required' });
       }
 
-      try {
-        validateCampaignBatch(campaigns);
-      } catch (error) {
-        return res.status(400).json({
-          error: 'VALIDATION_ERROR',
-          message: error instanceof Error ? error.message : 'Campaign batch validation failed',
-        });
+      const idempotencyKey = req.header('Idempotency-Key');
+      if (!idempotencyKey?.trim()) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'An Idempotency-Key header is required' });
       }
 
-      try {
-        await campaignSync.syncBatch({
-          companyId,
-          integrationId,
-          ...(Number.isSafeInteger(req.apiKey?.userId) && req.apiKey!.userId > 0 ? { actorUserId: req.apiKey!.userId } : {}),
-          campaigns,
-        });
-        return res.status(202).json({ count: campaigns.length });
-      } catch (error) {
-        return syncFailure(res, 'CAMPAIGN_SYNC_FAILED', 'Campaign synchronization failed', error, 'campaign batch sync');
-      }
+      const { status, body } = await withIdempotency(idempotency, {
+        companyId, integrationId, key: idempotencyKey.trim(), method: 'POST', path: '/campaigns/batch', body: req.body,
+      }, async () => {
+        try {
+          validateCampaignBatch(campaigns);
+        } catch (error) {
+          return { status: 400, body: { error: 'VALIDATION_ERROR', message: error instanceof Error ? error.message : 'Campaign batch validation failed' } };
+        }
+
+        try {
+          await campaignSync.syncBatch({
+            companyId,
+            integrationId,
+            ...(Number.isSafeInteger(req.apiKey?.userId) && req.apiKey!.userId > 0 ? { actorUserId: req.apiKey!.userId } : {}),
+            campaigns,
+          });
+          return { status: 202, body: { count: campaigns.length } };
+        } catch (error) {
+          return syncFailureResult('CAMPAIGN_SYNC_FAILED', 'Campaign synchronization failed', error, 'campaign batch sync');
+        }
+      });
+      return res.status(status).json(body);
     });
   }
 
@@ -435,18 +610,23 @@ export function createApiV2Router({
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, external ID, and Idempotency-Key are required' });
       }
 
-      try {
-        const result = await appointmentSync.sync({
-          companyId,
-          integrationId,
-          externalId,
-          idempotencyKey,
-          appointment: { ...req.body, externalId },
-        });
-        return res.status(result.created ? 201 : 200).json({ data: { id: result.id }, created: result.created });
-      } catch (error) {
-        return syncFailure(res, 'APPOINTMENT_SYNC_FAILED', 'Appointment synchronization failed', error, 'appointment sync');
-      }
+      const { status, body } = await withIdempotency(idempotency, {
+        companyId, integrationId, key: idempotencyKey.trim(), method: 'PUT', path: '/appointments/:externalId', body: req.body,
+      }, async () => {
+        try {
+          const result = await appointmentSync.sync({
+            companyId,
+            integrationId,
+            externalId,
+            idempotencyKey,
+            appointment: { ...req.body, externalId },
+          });
+          return { status: result.created ? 201 : 200, body: { data: { id: result.id }, created: result.created } };
+        } catch (error) {
+          return syncFailureResult('APPOINTMENT_SYNC_FAILED', 'Appointment synchronization failed', error, 'appointment sync');
+        }
+      });
+      return res.status(status).json(body);
     });
   }
 
@@ -460,17 +640,22 @@ export function createApiV2Router({
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and Idempotency-Key are required' });
       }
 
-      try {
-        const result = await dealPipelineSync.upsert({
-          companyId,
-          integrationId,
-          idempotencyKey,
-          deal: req.body,
-        });
-        return res.status(result.created ? 201 : 200).json({ data: result.deal, created: result.created });
-      } catch (error) {
-        return syncFailure(res, 'DEAL_PIPELINE_SYNC_FAILED', 'Deal pipeline synchronization failed', error, 'deal pipeline sync');
-      }
+      const { status, body } = await withIdempotency(idempotency, {
+        companyId, integrationId, key: idempotencyKey.trim(), method: 'POST', path: '/deals', body: req.body,
+      }, async () => {
+        try {
+          const result = await dealPipelineSync.upsert({
+            companyId,
+            integrationId,
+            idempotencyKey,
+            deal: req.body,
+          });
+          return { status: result.created ? 201 : 200, body: { data: result.deal, created: result.created } };
+        } catch (error) {
+          return syncFailureResult('DEAL_PIPELINE_SYNC_FAILED', 'Deal pipeline synchronization failed', error, 'deal pipeline sync');
+        }
+      });
+      return res.status(status).json(body);
     });
   }
 
@@ -484,20 +669,25 @@ export function createApiV2Router({
         return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and Idempotency-Key are required' });
       }
 
-      try {
-        const plan = await initialSync.plan({
-          ...req.body,
-          companyId,
-          integrationId,
-          idempotencyKey,
-        });
-        return res.status(202).json({ data: plan });
-      } catch (error) {
-        return res.status(400).json({
-          error: 'VALIDATION_ERROR',
-          message: error instanceof Error ? error.message : 'Initial CRM synchronization validation failed',
-        });
-      }
+      const { status, body } = await withIdempotency(idempotency, {
+        companyId, integrationId, key: idempotencyKey.trim(), method: 'POST', path: '/sync-jobs', body: req.body,
+      }, async () => {
+        try {
+          const plan = await initialSync.plan({
+            ...req.body,
+            companyId,
+            integrationId,
+            idempotencyKey,
+          });
+          return { status: 202, body: { data: plan } };
+        } catch (error) {
+          return {
+            status: 400,
+            body: { error: 'VALIDATION_ERROR', message: error instanceof Error ? error.message : 'Initial CRM synchronization validation failed' },
+          };
+        }
+      });
+      return res.status(status).json(body);
     });
   }
 

@@ -23,6 +23,9 @@ test('dispatches an owned CRM message and persists its CRM origin metadata', asy
     sendMedia: async () => {
       throw new Error('sendMedia should not be called for a text message');
     },
+    sendTemplate: async () => {
+      throw new Error('sendTemplate should not be called for a text message');
+    },
   });
 
   const result = await adapter.send({
@@ -70,6 +73,9 @@ test('refuses dispatch when the CRM integration does not belong to the company',
     sendMedia: async () => {
       throw new Error('sendMedia should not be called in this test');
     },
+    sendTemplate: async () => {
+      throw new Error('sendTemplate should not be called in this test');
+    },
   });
 
   await assert.rejects(
@@ -105,6 +111,9 @@ test('dispatches an owned CRM media message and persists its CRM origin metadata
     sendMedia: async (companyId, request) => {
       sent.push({ companyId, request });
       return { id: 77 };
+    },
+    sendTemplate: async () => {
+      throw new Error('sendTemplate should not be called for a media message');
     },
   });
 
@@ -156,6 +165,9 @@ test('refuses media dispatch when the CRM integration does not belong to the com
       sent = true;
       return { id: 77 };
     },
+    sendTemplate: async () => {
+      throw new Error('sendTemplate should not be called in this test');
+    },
   });
 
   await assert.rejects(
@@ -166,6 +178,110 @@ test('refuses media dispatch when the CRM integration does not belong to the com
       to: '+56912345678',
       origin: 'crm',
       media: { url: 'https://smartbc.example.com/photo.jpg', type: 'image' },
+    }),
+    /Integration does not belong to this company/,
+  );
+  assert.equal(sent, false);
+});
+
+test('dispatches an owned CRM template message and persists its CRM origin metadata', async () => {
+  const sent: unknown[] = [];
+  const updated: unknown[] = [];
+  const adapter = createCrmApiV2MessageAdapter({
+    crmIntegrationBelongsToCompany: async () => true,
+    getMessageById: async () => ({
+      id: 91,
+      metadata: { existing: 'value' },
+    }),
+    updateMessage: async (_id, updates) => {
+      updated.push(updates);
+      return { id: 91 };
+    },
+    sendMessage: async () => {
+      throw new Error('sendMessage should not be called for a template message');
+    },
+    sendMedia: async () => {
+      throw new Error('sendMedia should not be called for a template message');
+    },
+    sendTemplate: async (companyId, request) => {
+      sent.push({ companyId, request });
+      return { id: 91 };
+    },
+  });
+
+  const result = await adapter.sendTemplate({
+    companyId: 12,
+    integrationId: 3,
+    channelId: 44,
+    to: '+56912345678',
+    externalMessageId: 'crm-message-443',
+    origin: 'crm',
+    template: {
+      name: 'appointment_confirmation',
+      language: 'es',
+      components: [
+        {
+          type: 'body',
+          parameters: [{ type: 'text', text: 'Juan' }],
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(result, { id: 91 });
+  assert.deepEqual(sent, [{
+    companyId: 12,
+    request: {
+      channelId: 44,
+      to: '+56912345678',
+      templateName: 'appointment_confirmation',
+      templateLanguage: 'es',
+      components: [
+        {
+          type: 'body',
+          parameters: [{ type: 'text', text: 'Juan' }],
+        },
+      ],
+    },
+  }]);
+  assert.deepEqual(updated, [{
+    metadata: {
+      existing: 'value',
+      crm: {
+        origin: 'crm',
+        integrationId: 3,
+        externalMessageId: 'crm-message-443',
+      },
+    },
+  }]);
+});
+
+test('refuses template dispatch when the CRM integration does not belong to the company', async () => {
+  let sent = false;
+  const adapter = createCrmApiV2MessageAdapter({
+    crmIntegrationBelongsToCompany: async () => false,
+    getMessageById: async () => undefined,
+    updateMessage: async () => ({ id: 91 }),
+    sendMessage: async () => {
+      throw new Error('sendMessage should not be called in this test');
+    },
+    sendMedia: async () => {
+      throw new Error('sendMedia should not be called in this test');
+    },
+    sendTemplate: async () => {
+      sent = true;
+      return { id: 91 };
+    },
+  });
+
+  await assert.rejects(
+    adapter.sendTemplate({
+      companyId: 12,
+      integrationId: 3,
+      channelId: 44,
+      to: '+56912345678',
+      origin: 'crm',
+      template: { name: 'appointment_confirmation', language: 'es' },
     }),
     /Integration does not belong to this company/,
   );

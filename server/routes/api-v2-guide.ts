@@ -34,7 +34,7 @@ El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo 
 
 1. El CRM envía un mensaje a POST /messages.
 2. Zinto lo entrega por el canal configurado y responde con 202 Accepted.
-3. Zinto envía al webhook del CRM los eventos message.sent, message.delivered, message.read o message.failed.
+3. Zinto envía al webhook del CRM los eventos message.sent, message.delivered, message.read o message.failed. message.read depende de que el destinatario tenga activados los recibos de lectura en WhatsApp: si los desactivó, ese mensaje nunca disparará message.read aunque message.delivered sí llegue con normalidad.
 4. Cuando el cliente responde, Zinto envía message.received; el CRM guarda el mensaje y no lo reenvía a Zinto.
 5. Los cambios de contactos, agenda, pipeline y campañas se sincronizan mediante los endpoints PUT y POST y sus eventos correspondientes.
 

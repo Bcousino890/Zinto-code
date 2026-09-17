@@ -34,6 +34,15 @@ type MessageSync = {
     origin: 'crm';
     media: { url: string; type: 'image' | 'video' | 'audio' | 'document'; filename?: string };
   }): Promise<{ id: string | number }>;
+  sendTemplate?(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    template: { name: string; language: string; components?: unknown[] };
+  }): Promise<{ id: string | number }>;
 };
 
 type MediaAccess = {
@@ -359,6 +368,91 @@ test('rejects a CRM message with an invalid media object and no text', async () 
   }
 });
 
+test('queues a CRM template message from a permitted integration', async () => {
+  const received: unknown[] = [];
+  const messageSync: MessageSync = {
+    send: async () => {
+      throw new Error('send should not be called for a template message');
+    },
+    sendTemplate: async (input) => {
+      received.push(input);
+      return { id: 'message-743' };
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({
+        channelId: 44,
+        recipient: '+56912345678',
+        template: {
+          name: 'appointment_reminder',
+          language: 'es',
+          components: [{ type: 'body', parameters: [{ type: 'text', text: 'mañana 10:00' }] }],
+        },
+        external_message_id: 'crm-message-443',
+      }),
+    });
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await response.json(), {
+      data: { id: 'message-743', origin: 'crm', external_message_id: 'crm-message-443' },
+    });
+  }, undefined, messageSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12,
+    integrationId: 3,
+    channelId: 44,
+    to: '+56912345678',
+    externalMessageId: 'crm-message-443',
+    origin: 'crm',
+    template: {
+      name: 'appointment_reminder',
+      language: 'es',
+      components: [{ type: 'body', parameters: [{ type: 'text', text: 'mañana 10:00' }] }],
+    },
+  }]);
+});
+
+test('rejects a CRM message that combines media and template, or an invalid template object', async () => {
+  const messageSync: MessageSync = {
+    send: async () => ({ id: 1 }),
+    sendTemplate: async () => {
+      throw new Error('sendTemplate should not be called for invalid input');
+    },
+    sendMedia: async () => {
+      throw new Error('sendMedia should not be called for invalid input');
+    },
+  };
+  for (const body of [
+    { channelId: 44, recipient: '+56912345678', template: { name: 'x', language: 'es' }, media: { url: 'https://smartbc.example.com/photo.jpg', type: 'image' } },
+    { channelId: 44, recipient: '+56912345678', template: { language: 'es' } },
+    { channelId: 44, recipient: '+56912345678', template: { name: 'x', language: 'es', components: [{ type: 'header', parameters: [123] }] } },
+    { channelId: 44, recipient: '+56912345678', template: {} },
+  ]) {
+    await withServer((req, _res, next) => {
+      req.companyId = 12;
+      req.apiKey = { permissions: ['messages:send', 'media:upload'] } as any;
+      next();
+    }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/v2/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+        body: JSON.stringify(body),
+      });
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+    }, undefined, messageSync);
+  }
+});
+
 test('does not expose media upload or download when no media access dependency is supplied', async () => {
   await withServer((_req, _res, next) => next(), async (baseUrl) => {
     const upload = await fetch(`${baseUrl}/api/v2/media/upload`, { method: 'POST' });
@@ -651,7 +745,7 @@ test('reports a campaign sync failure separately from an invalid batch', async (
     assert.equal(response.status, 500);
     assert.deepEqual(await response.json(), {
       error: 'CAMPAIGN_SYNC_FAILED',
-      message: 'Campaign queue unavailable',
+      message: 'Campaign synchronization failed',
     });
   }, undefined, undefined, {
     syncBatch: async () => {

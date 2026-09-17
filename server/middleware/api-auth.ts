@@ -44,12 +44,118 @@ export function isValidApiKeyFormat(key: string): boolean {
 }
 
 /**
+ * Failed-authentication throttle
+ * ------------------------------
+ * `rateLimitMiddleware` below only ever runs once `req.apiKey` has been resolved to a valid,
+ * active key — it throttles *usage* of a known-good key. It never sees requests that fail
+ * authentication (missing/malformed/unknown/inactive/expired key, or a disallowed IP), so those
+ * paths currently have zero throttling: someone can hammer the endpoint with garbage or leaked
+ * partial keys as fast as the network allows.
+ *
+ * This is a separate, in-memory, per-client-IP sliding/fixed window counter (analogous in style
+ * to the minute/hour/day windows `rateLimitMiddleware` already uses, just keyed by IP instead of
+ * API key ID, and kept in process memory rather than the `api_rate_limits` Postgres table since
+ * it must run *before* any DB lookup and must work even when no API key was ever resolved).
+ *
+ * It intentionally does NOT change any of the existing distinct error codes/messages/status
+ * codes below — it only adds a new check in front of them.
+ */
+const FAILED_AUTH_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+const FAILED_AUTH_MAX_ATTEMPTS = 20; // failed attempts allowed per IP per window
+
+interface FailedAuthBucket {
+  count: number;
+  windowStart: number;
+}
+
+const failedAuthAttemptsByIp = new Map<string, FailedAuthBucket>();
+
+/**
+ * Best-effort client IP extraction for throttling purposes. Uses `req.ip`, which already
+ * reflects `X-Forwarded-For` when the app has `trust proxy` configured, falling back to the
+ * raw socket address and finally the header itself.
+ */
+function getClientIpForThrottle(req: Request): string {
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const forwardedIp = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
+  return (
+    req.ip ||
+    req.connection?.remoteAddress ||
+    (forwardedIp ? forwardedIp.split(',')[0].trim() : undefined) ||
+    'unknown'
+  );
+}
+
+/**
+ * Returns whether `ip` is currently over the failed-auth budget, without recording anything.
+ * Exported (alongside the record/reset helpers below) so the counter logic can be unit tested
+ * as plain functions, independent of Express or the DB-backed `storage` singleton.
+ */
+export function isFailedAuthThrottled(
+  ip: string,
+  now: number = Date.now()
+): { throttled: boolean; retryAfterSeconds: number } {
+  const bucket = failedAuthAttemptsByIp.get(ip);
+
+  if (!bucket || now - bucket.windowStart >= FAILED_AUTH_WINDOW_MS) {
+    return { throttled: false, retryAfterSeconds: 0 };
+  }
+
+  if (bucket.count >= FAILED_AUTH_MAX_ATTEMPTS) {
+    const retryAfterSeconds = Math.max(1, Math.ceil((bucket.windowStart + FAILED_AUTH_WINDOW_MS - now) / 1000));
+    return { throttled: true, retryAfterSeconds };
+  }
+
+  return { throttled: false, retryAfterSeconds: 0 };
+}
+
+/**
+ * Records a failed authentication attempt for `ip`, starting a new window if the previous one
+ * has expired (or none exists yet).
+ */
+export function recordFailedAuthAttempt(ip: string, now: number = Date.now()): void {
+  const bucket = failedAuthAttemptsByIp.get(ip);
+  if (!bucket || now - bucket.windowStart >= FAILED_AUTH_WINDOW_MS) {
+    failedAuthAttemptsByIp.set(ip, { count: 1, windowStart: now });
+    return;
+  }
+  bucket.count += 1;
+}
+
+/**
+ * Clears any accumulated failed-attempt count for `ip`. Called after a successful
+ * authentication so that legitimate partners who mistype a key a few times before getting it
+ * right are not penalized for it later.
+ */
+export function resetFailedAuthAttempts(ip: string): void {
+  failedAuthAttemptsByIp.delete(ip);
+}
+
+/**
+ * Test-only helper: wipes all in-memory throttle state so tests don't leak state into each
+ * other. Not used in production code paths.
+ */
+export function __resetFailedAuthThrottleForTests(): void {
+  failedAuthAttemptsByIp.clear();
+}
+
+/**
  * API Authentication Middleware
  */
 export async function authenticateApiKey(req: Request, res: Response, next: NextFunction) {
   try {
     req.requestId = crypto.randomUUID();
     req.startTime = Date.now();
+
+    const throttleIp = getClientIpForThrottle(req);
+    const throttle = isFailedAuthThrottled(throttleIp);
+    if (throttle.throttled) {
+      res.setHeader('Retry-After', throttle.retryAfterSeconds.toString());
+      return res.status(429).json({
+        error: 'TOO_MANY_FAILED_ATTEMPTS',
+        message: 'Too many failed authentication attempts from this IP address. Please wait before retrying.'
+      });
+    }
 
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -62,6 +168,7 @@ export async function authenticateApiKey(req: Request, res: Response, next: Next
     const apiKey = authHeader.substring(7);
 
     if (!isValidApiKeyFormat(apiKey)) {
+      recordFailedAuthAttempt(throttleIp);
       return res.status(401).json({
         error: 'API_KEY_INVALID_FORMAT',
         message: 'Invalid API key format'
@@ -72,6 +179,7 @@ export async function authenticateApiKey(req: Request, res: Response, next: Next
 
     const apiKeyRecord = await storage.getApiKeyByHash(keyHash);
     if (!apiKeyRecord) {
+      recordFailedAuthAttempt(throttleIp);
       return res.status(401).json({
         error: 'API_KEY_NOT_FOUND',
         message: 'Invalid API key'
@@ -79,6 +187,7 @@ export async function authenticateApiKey(req: Request, res: Response, next: Next
     }
 
     if (!apiKeyRecord.isActive) {
+      recordFailedAuthAttempt(throttleIp);
       return res.status(401).json({
         error: 'API_KEY_INACTIVE',
         message: 'API key is inactive'
@@ -86,6 +195,7 @@ export async function authenticateApiKey(req: Request, res: Response, next: Next
     }
 
     if (apiKeyRecord.expiresAt && new Date() > apiKeyRecord.expiresAt) {
+      recordFailedAuthAttempt(throttleIp);
       return res.status(401).json({
         error: 'API_KEY_EXPIRED',
         message: 'API key has expired'
@@ -95,14 +205,17 @@ export async function authenticateApiKey(req: Request, res: Response, next: Next
     if (apiKeyRecord.allowedIps && Array.isArray(apiKeyRecord.allowedIps) && apiKeyRecord.allowedIps.length > 0) {
       const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] as string;
       const allowedIps = apiKeyRecord.allowedIps as string[];
-      
+
       if (!allowedIps.includes(clientIp)) {
+        recordFailedAuthAttempt(throttleIp);
         return res.status(403).json({
           error: 'IP_NOT_ALLOWED',
           message: 'Your IP address is not allowed to use this API key'
         });
       }
     }
+
+    resetFailedAuthAttempts(throttleIp);
 
     req.apiKey = apiKeyRecord;
     req.apiKeyId = apiKeyRecord.id;

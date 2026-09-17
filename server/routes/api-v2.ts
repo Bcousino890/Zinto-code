@@ -39,6 +39,22 @@ type MessageSync = {
       filename?: string;
     };
   }): Promise<{ id: string | number }>;
+  sendTemplate(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    template: {
+      name: string;
+      language: string;
+      components?: Array<{
+        type: 'header' | 'body' | 'button';
+        parameters: Array<string | { type: 'text'; text: string }>;
+      }>;
+    };
+  }): Promise<{ id: string | number }>;
 };
 type CampaignSync = {
   syncBatch(input: {
@@ -74,6 +90,19 @@ type MediaAccess = {
 
 function isPositiveIntegrationId(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
+}
+
+/**
+ * For internal synchronization failures only (never for our own input-validation
+ * errors, which are deliberately worded for the caller and should keep passing
+ * through as-is). Logs the real error server-side and returns a fixed, generic
+ * message — the underlying error can be a raw DB/driver message or internal
+ * business-logic text ("Integration does not belong to this company") that
+ * would otherwise leak implementation detail to an API caller.
+ */
+function syncFailure(res: Response, code: string, genericMessage: string, error: unknown, context: string): Response {
+  console.error(`[api-v2] ${context} failed:`, error);
+  return res.status(500).json({ error: code, message: genericMessage });
 }
 
 export function createApiV2Router({
@@ -166,7 +195,7 @@ export function createApiV2Router({
         });
         return res.status(result.created ? 201 : 200).json({ data: result.contact, created: result.created });
       } catch (error) {
-        return res.status(500).json({ error: 'CONTACT_SYNC_FAILED', message: error instanceof Error ? error.message : 'Contact synchronization failed' });
+        return syncFailure(res, 'CONTACT_SYNC_FAILED', 'Contact synchronization failed', error, 'contact sync');
       }
     });
   }
@@ -174,10 +203,26 @@ export function createApiV2Router({
   if (messageSync) {
     const MEDIA_TYPES = ['image', 'video', 'audio', 'document'] as const;
 
+    const TEMPLATE_COMPONENT_TYPES = ['header', 'body', 'button'] as const;
+
+    function isValidTemplateComponents(components: unknown): components is Array<{ type: 'header' | 'body' | 'button'; parameters: Array<string | { type: 'text'; text: string }> }> {
+      if (components === undefined) return true;
+      if (!Array.isArray(components)) return false;
+      return components.every((component) =>
+        component
+        && TEMPLATE_COMPONENT_TYPES.includes(component.type)
+        && Array.isArray(component.parameters)
+        && component.parameters.every((param: unknown) =>
+          typeof param === 'string'
+          || (param && typeof param === 'object' && (param as any).type === 'text' && typeof (param as any).text === 'string'),
+        ),
+      );
+    }
+
     router.post('/messages', requireIntegrationScope('messages:send'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
-      const { channelId, recipient, text, external_message_id: externalMessageId, media } = req.body ?? {};
+      const { channelId, recipient, text, external_message_id: externalMessageId, media, template } = req.body ?? {};
 
       const hasMedia = media !== undefined;
       const isMediaObject = hasMedia && typeof media === 'object' && media !== null;
@@ -190,10 +235,31 @@ export function createApiV2Router({
         && MEDIA_TYPES.includes(mediaType)
         && (mediaFilename === undefined || typeof mediaFilename === 'string')
       );
+
+      const hasTemplate = template !== undefined;
+      const isTemplateObject = hasTemplate && typeof template === 'object' && template !== null;
+      const templateName = isTemplateObject ? template.name : undefined;
+      const templateLanguage = isTemplateObject ? template.language : undefined;
+      const templateComponents = isTemplateObject ? template.components : undefined;
+      const isValidTemplate = !hasTemplate || (
+        isTemplateObject
+        && typeof templateName === 'string' && templateName.trim()
+        && typeof templateLanguage === 'string' && templateLanguage.trim()
+        && isValidTemplateComponents(templateComponents)
+      );
+
       const hasText = typeof text === 'string' && text.trim().length > 0;
 
-      if (!companyId || !isPositiveIntegrationId(integrationId) || !Number.isInteger(channelId) || channelId <= 0 || typeof recipient !== 'string' || !recipient.trim() || !isValidMedia || (!hasMedia && !hasText) || (text !== undefined && typeof text !== 'string') || (externalMessageId !== undefined && typeof externalMessageId !== 'string')) {
-        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive channel ID, recipient and either text or a valid media object ({url, type, filename?}) are required' });
+      if (
+        !companyId || !isPositiveIntegrationId(integrationId) || !Number.isInteger(channelId) || channelId <= 0
+        || typeof recipient !== 'string' || !recipient.trim()
+        || !isValidMedia || !isValidTemplate
+        || (hasMedia && hasTemplate)
+        || (!hasMedia && !hasTemplate && !hasText)
+        || (text !== undefined && typeof text !== 'string')
+        || (externalMessageId !== undefined && typeof externalMessageId !== 'string')
+      ) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive channel ID, recipient and one of text, a valid media object ({url, type, filename?}), or a valid template object ({name, language, components?}) are required' });
       }
 
       if (hasMedia) {
@@ -212,7 +278,21 @@ export function createApiV2Router({
       });
 
       try {
-        const result = hasMedia
+        const result = hasTemplate
+          ? await messageSync.sendTemplate({
+              companyId: normalizedMessage.companyId,
+              integrationId: normalizedMessage.integrationId,
+              channelId: normalizedMessage.conversationId,
+              to: recipient.trim(),
+              ...(normalizedMessage.externalMessageId ? { externalMessageId: normalizedMessage.externalMessageId } : {}),
+              origin: 'crm',
+              template: {
+                name: templateName,
+                language: templateLanguage,
+                ...(templateComponents ? { components: templateComponents } : {}),
+              },
+            })
+          : hasMedia
           ? await messageSync.sendMedia({
               companyId: normalizedMessage.companyId,
               integrationId: normalizedMessage.integrationId,
@@ -244,7 +324,7 @@ export function createApiV2Router({
           },
         });
       } catch (error) {
-        return res.status(500).json({ error: 'MESSAGE_SYNC_FAILED', message: error instanceof Error ? error.message : 'Message synchronization failed' });
+        return syncFailure(res, 'MESSAGE_SYNC_FAILED', 'Message synchronization failed', error, 'message send');
       }
     });
   }
@@ -278,7 +358,7 @@ export function createApiV2Router({
           },
         });
       } catch (error) {
-        return res.status(500).json({ error: 'MEDIA_UPLOAD_FAILED', message: error instanceof Error ? error.message : 'Media upload failed' });
+        return syncFailure(res, 'MEDIA_UPLOAD_FAILED', 'Media upload failed', error, 'media upload');
       }
     });
 
@@ -339,10 +419,7 @@ export function createApiV2Router({
         });
         return res.status(202).json({ count: campaigns.length });
       } catch (error) {
-        return res.status(500).json({
-          error: 'CAMPAIGN_SYNC_FAILED',
-          message: error instanceof Error ? error.message : 'Campaign synchronization failed',
-        });
+        return syncFailure(res, 'CAMPAIGN_SYNC_FAILED', 'Campaign synchronization failed', error, 'campaign batch sync');
       }
     });
   }
@@ -368,10 +445,7 @@ export function createApiV2Router({
         });
         return res.status(result.created ? 201 : 200).json({ data: { id: result.id }, created: result.created });
       } catch (error) {
-        return res.status(500).json({
-          error: 'APPOINTMENT_SYNC_FAILED',
-          message: error instanceof Error ? error.message : 'Appointment synchronization failed',
-        });
+        return syncFailure(res, 'APPOINTMENT_SYNC_FAILED', 'Appointment synchronization failed', error, 'appointment sync');
       }
     });
   }
@@ -395,10 +469,7 @@ export function createApiV2Router({
         });
         return res.status(result.created ? 201 : 200).json({ data: result.deal, created: result.created });
       } catch (error) {
-        return res.status(500).json({
-          error: 'DEAL_PIPELINE_SYNC_FAILED',
-          message: error instanceof Error ? error.message : 'Deal pipeline synchronization failed',
-        });
+        return syncFailure(res, 'DEAL_PIPELINE_SYNC_FAILED', 'Deal pipeline synchronization failed', error, 'deal pipeline sync');
       }
     });
   }

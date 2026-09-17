@@ -461,12 +461,11 @@ class ApiMessageService {
    */
   private async validateChannelAccess(companyId: number, channelId: number): Promise<ChannelConnection> {
     const connection = await storage.getChannelConnection(channelId);
-    if (!connection) {
+    // Identical message whether the channel doesn't exist or belongs to another
+    // company — distinguishing the two lets a caller enumerate channel IDs in
+    // use across every tenant on the platform, not just their own.
+    if (!connection || connection.companyId !== companyId) {
       throw new Error('Channel not found');
-    }
-
-    if (connection.companyId !== companyId) {
-      throw new Error('Access denied to this channel');
     }
 
     if (!isChannelAvailable(connection)) {

@@ -190,6 +190,30 @@ export class PlanLimitsService {
       }
 
 
+      // Trials never had a subscriptionEndDate to fall through the block above, and
+      // 'trial' was never in the expired/past_due/overdue list below either — so a
+      // trial company always reached the final "isExpired: false" fallback, no matter
+      // how long ago trialEndDate passed. This is the one place that actually compares
+      // it to now.
+      if (normalizedStatus === 'trial' && companyData.trialEndDate) {
+        const isTrialExpired = now > companyData.trialEndDate;
+        if (isTrialExpired) {
+          return {
+            isExpired: true,
+            status: 'trial_expired',
+            message: 'Your trial has ended. Please subscribe to continue using the service.'
+          };
+        }
+        const trialDaysRemaining = Math.ceil((companyData.trialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        return {
+          isExpired: false,
+          status: 'trial',
+          expirationDate: companyData.trialEndDate,
+          daysUntilExpiry: Math.max(0, trialDaysRemaining),
+          message: `Trial active. ${trialDaysRemaining} days remaining.`
+        };
+      }
+
       if (['expired', 'past_due', 'overdue'].includes(companyData.subscriptionStatus || '')) {
 
         if (!companyData.gracePeriodEnd) {

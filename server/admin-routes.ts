@@ -8,6 +8,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import Stripe from "stripe";
+import { computeSubscriptionEndDate } from "./routes/enhanced-subscription";
 import paypal from "@paypal/checkout-server-sdk";
 import { pool, db } from "./db";
 import { ensureSuperAdmin } from "./middleware";
@@ -3183,6 +3184,14 @@ function registerAdminRoutes(app: Express) {
           if (paymentIntent.metadata && paymentIntent.metadata.transactionId) {
             const transactionId = parseInt(paymentIntent.metadata.transactionId);
 
+            // Idempotency: Stripe delivers webhooks at-least-once and retries on
+            // anything but a fast 2xx. Without this check, every redelivery of the
+            // same event re-ran the block below and pushed subscriptionEndDate to
+            // "now + 30 days" again — a free extension on every retry, not just once.
+            const existingTransaction = await storage.getPaymentTransaction(transactionId);
+            if (existingTransaction?.status === 'completed') {
+              break;
+            }
 
             await storage.updatePaymentTransaction(transactionId, {
               status: 'completed',
@@ -3198,11 +3207,22 @@ function registerAdminRoutes(app: Express) {
 
 
               const plan = await storage.getPlan(planId);
+              const company = await storage.getCompany(companyId);
+              const now = new Date();
+              // Stack onto remaining time instead of a flat "now + 30 days" —
+              // matches activateSubscriptionAfterPayment's correct logic, so an
+              // early renewal doesn't lose paid time.
+              const baseDate = (company?.subscriptionEndDate && now <= company.subscriptionEndDate)
+                ? new Date(company.subscriptionEndDate)
+                : now;
+              const newEndDate = plan
+                ? computeSubscriptionEndDate(plan, baseDate)
+                : new Date(baseDate.getTime() + 30 * 24 * 60 * 60 * 1000);
               const updatedCompany = await storage.updateCompany(companyId, {
                 planId: planId,
                 plan: plan?.name.toLowerCase() || 'unknown',
                 subscriptionStatus: 'active',
-                subscriptionEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                subscriptionEndDate: newEndDate
               });
 
 

@@ -71,34 +71,49 @@ type ConversationsRead = {
 type MessageStatusRead = {
   getMessageStatus(input: { companyId: number; messageId: number }): Promise<{ status: string; timestamp: Date } | null>;
 };
-type IdempotencyRecord = { method: string; path: string; requestHash: string; responseStatus: number; responseBody: unknown };
+type IdempotencyRecord = { method: string; path: string; requestHash: string; responseStatus: number | null; responseBody: unknown };
+type IdempotencyClaim = { won: boolean; record: IdempotencyRecord };
 type Idempotency = {
-  find(input: { companyId: number; key: string }): Promise<IdempotencyRecord | null>;
-  save(input: {
-    companyId: number;
-    integrationId: number;
-    key: string;
-    method: string;
-    path: string;
-    requestHash: string;
-    responseStatus: number;
-    responseBody: unknown;
-  }): Promise<void>;
+  claim(input: { companyId: number; integrationId: number; key: string; method: string; path: string; requestHash: string }): Promise<IdempotencyClaim>;
+  complete(input: { companyId: number; key: string; responseStatus: number; responseBody: unknown }): Promise<void>;
+  release(input: { companyId: number; key: string }): Promise<void>;
 };
 
-/** A minimal, in-memory stand-in for the real storage-backed idempotency port, scoped like the real one (companyId + key). */
-function fakeIdempotencyStore(): Idempotency {
-  const records = new Map<string, IdempotencyRecord>();
+/**
+ * An in-memory stand-in for the real storage-backed idempotency port, scoped
+ * like the real one (companyId + key). Mirrors the real claim's atomicity
+ * (an "in flight" record with `responseStatus: null` blocks a second
+ * concurrent claim from winning) and its TTL-based reclaim (expiresAt in the
+ * past is treated as free), so tests against this fake actually exercise the
+ * same race/expiry semantics as the real DB-backed implementation.
+ */
+function fakeIdempotencyStore(options: { ttlMs?: number } = {}): Idempotency & { expireAll(): void } {
+  const ttlMs = options.ttlMs ?? 24 * 60 * 60 * 1000;
+  const records = new Map<string, IdempotencyRecord & { expiresAt: number }>();
+  const keyFor = (companyId: number, key: string) => `${companyId}:${key}`;
+
   return {
-    find: async ({ companyId, key }) => records.get(`${companyId}:${key}`) ?? null,
-    save: async (input) => {
-      records.set(`${input.companyId}:${input.key}`, {
-        method: input.method,
-        path: input.path,
-        requestHash: input.requestHash,
-        responseStatus: input.responseStatus,
-        responseBody: input.responseBody,
-      });
+    claim: async (input) => {
+      const k = keyFor(input.companyId, input.key);
+      const existing = records.get(k);
+      if (existing && existing.expiresAt > Date.now()) {
+        return { won: false, record: existing };
+      }
+      const record: IdempotencyRecord & { expiresAt: number } = {
+        method: input.method, path: input.path, requestHash: input.requestHash, responseStatus: null, responseBody: null, expiresAt: Date.now() + ttlMs,
+      };
+      records.set(k, record);
+      return { won: true, record };
+    },
+    complete: async ({ companyId, key, responseStatus, responseBody }) => {
+      const existing = records.get(keyFor(companyId, key));
+      if (existing) { existing.responseStatus = responseStatus; existing.responseBody = responseBody; }
+    },
+    release: async ({ companyId, key }) => {
+      records.delete(keyFor(companyId, key));
+    },
+    expireAll: () => {
+      for (const record of records.values()) record.expiresAt = Date.now() - 1;
     },
   };
 }
@@ -1089,6 +1104,173 @@ test('does not cache a failed sync attempt — a retry after a failure is free t
   }, undefined, undefined, undefined, undefined, dealPipelineSync, undefined, undefined, undefined, undefined, undefined, undefined, idempotency);
 
   assert.equal(callCount, 2, 'the sync service must run again after a failed attempt with the same key');
+});
+
+test('never runs the sync service twice for two concurrent requests sharing a brand-new Idempotency-Key', async () => {
+  let callCount = 0;
+  let releaseFirstAttempt: (() => void) | undefined;
+  const firstAttemptBlocked = new Promise<void>((resolve) => { releaseFirstAttempt = resolve; });
+  const dealPipelineSync: DealPipelineSync = {
+    upsert: async () => {
+      callCount += 1;
+      await firstAttemptBlocked; // hold the first request "in flight" until the test says so
+      return { created: true, deal: { id: 91, externalId: 'hubspot-deal-441' } };
+    },
+  };
+  const idempotency = fakeIdempotencyStore();
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['deals:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const headers = { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-deal-concurrent-441' };
+    const body = JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 });
+
+    const firstRequest = fetch(`${baseUrl}/api/v2/deals`, { method: 'POST', headers, body });
+    // Give the first request a turn of the event loop to reach — and win — the claim before the second is sent.
+    await new Promise((resolve) => setImmediate(resolve));
+
+    const second = await fetch(`${baseUrl}/api/v2/deals`, { method: 'POST', headers, body });
+    assert.equal(second.status, 409);
+    assert.equal((await second.json()).error, 'IDEMPOTENCY_KEY_IN_PROGRESS');
+
+    releaseFirstAttempt!();
+    const first = await firstRequest;
+    assert.equal(first.status, 201);
+  }, undefined, undefined, undefined, undefined, dealPipelineSync, undefined, undefined, undefined, undefined, undefined, undefined, idempotency);
+
+  assert.equal(callCount, 1, 'only the request that won the claim may ever call the sync service');
+});
+
+test('reclaims an Idempotency-Key whose prior claim has expired, instead of leaving it permanently unprotected', async () => {
+  let callCount = 0;
+  const dealPipelineSync: DealPipelineSync = {
+    upsert: async () => {
+      callCount += 1;
+      return { created: true, deal: { id: 91, externalId: 'hubspot-deal-441' } };
+    },
+  };
+  const idempotency = fakeIdempotencyStore();
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['deals:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const headers = { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-deal-expired-441' };
+    const body = JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 });
+
+    const first = await fetch(`${baseUrl}/api/v2/deals`, { method: 'POST', headers, body });
+    assert.equal(first.status, 201);
+
+    // A retry right away still replays the cached response...
+    const stillCached = await fetch(`${baseUrl}/api/v2/deals`, { method: 'POST', headers, body });
+    assert.equal(stillCached.status, 201);
+    assert.equal(callCount, 1);
+
+    // ...but once the claim's TTL has passed, the same key must be usable again, not permanently stuck.
+    idempotency.expireAll();
+    const afterExpiry = await fetch(`${baseUrl}/api/v2/deals`, { method: 'POST', headers, body });
+    assert.equal(afterExpiry.status, 201);
+  }, undefined, undefined, undefined, undefined, dealPipelineSync, undefined, undefined, undefined, undefined, undefined, undefined, idempotency);
+
+  assert.equal(callCount, 2, 'an expired claim must be reclaimable, running the sync service exactly once more');
+});
+
+test('rejects reusing an Idempotency-Key across two different appointments, instead of silently replaying the first one\'s cached result for the second', async () => {
+  // Before the resourceKey fix, `requestFingerprint` hashed only `req.body` — and
+  // AppointmentInput carries no externalId (it lives in the URL, not the body), so
+  // two PUTs for DIFFERENT appointments with an otherwise-identical body and the
+  // same Idempotency-Key hashed equal. withIdempotency would then treat the second
+  // as a plain replay and silently hand back the FIRST appointment's {id, created}
+  // — telling the caller appt-B was synced when only appt-A actually was. Folding
+  // the URL's externalId into the hash turns that silent data-corruption bug into
+  // a loud, correct 409: reusing one key for two different appointments is a
+  // caller mistake, and must be reported as one, not quietly misapplied.
+  let syncCallCount = 0;
+  const appointmentSync: AppointmentSync = {
+    sync: async () => {
+      syncCallCount += 1;
+      return { id: 91, created: true };
+    },
+  };
+  const idempotency = fakeIdempotencyStore();
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['appointments:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const headers = { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-shared-appt-key-441' };
+    const body = JSON.stringify({ contactId: 41, title: 'Consult', startsAt: '2026-10-03T09:00:00.000Z', endsAt: '2026-10-03T10:00:00.000Z', status: 'confirmed' });
+
+    const first = await fetch(`${baseUrl}/api/v2/appointments/appt-A`, { method: 'PUT', headers, body });
+    assert.equal(first.status, 201);
+
+    const second = await fetch(`${baseUrl}/api/v2/appointments/appt-B`, { method: 'PUT', headers, body });
+    assert.equal(second.status, 409);
+    assert.equal((await second.json()).error, 'IDEMPOTENCY_KEY_CONFLICT');
+  }, undefined, undefined, undefined, appointmentSync, undefined, undefined, undefined, undefined, undefined, undefined, undefined, idempotency);
+
+  assert.equal(syncCallCount, 1, 'appt-B must never actually be synced under a key that already belongs to appt-A');
+});
+
+test('surfaces a deal/appointment validation failure as a 400 with the real message, instead of hiding it as a generic 500', async () => {
+  const dealPipelineSync: DealPipelineSync = {
+    upsert: async () => {
+      throw new TypeError('stage must be one of: qualified, proposal, won, lost');
+    },
+  };
+  const appointmentSync: AppointmentSync = {
+    sync: async () => {
+      throw new TypeError('endsAt must be after startsAt');
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['deals:write', 'appointments:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const dealResponse = await fetch(`${baseUrl}/api/v2/deals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-deal-bad-stage-441' },
+      body: JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'not-a-real-stage', value: 12500 }),
+    });
+    assert.equal(dealResponse.status, 400);
+    assert.deepEqual(await dealResponse.json(), { error: 'VALIDATION_ERROR', message: 'stage must be one of: qualified, proposal, won, lost' });
+
+    const appointmentResponse = await fetch(`${baseUrl}/api/v2/appointments/appt-bad-dates`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-appt-bad-dates-441' },
+      body: JSON.stringify({ contactId: 41, title: 'Consult', startsAt: '2026-10-03T10:00:00.000Z', endsAt: '2026-10-03T09:00:00.000Z', status: 'confirmed' }),
+    });
+    assert.equal(appointmentResponse.status, 400);
+    assert.deepEqual(await appointmentResponse.json(), { error: 'VALIDATION_ERROR', message: 'endsAt must be after startsAt' });
+  }, undefined, undefined, undefined, appointmentSync, dealPipelineSync);
+});
+
+test('still hides a genuine internal deal/appointment sync failure behind a generic message', async () => {
+  const dealPipelineSync: DealPipelineSync = {
+    upsert: async () => {
+      throw new Error('Integration does not belong to this company');
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['deals:write'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/deals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-deal-internal-fail-441' },
+      body: JSON.stringify({ externalId: 'hubspot-deal-441', contactId: 41, pipelineId: 52, title: 'Enterprise rollout', stage: 'proposal', value: 12500 }),
+    });
+    assert.equal(response.status, 500);
+    assert.deepEqual(await response.json(), { error: 'DEAL_PIPELINE_SYNC_FAILED', message: 'Deal pipeline synchronization failed' });
+  }, undefined, undefined, undefined, undefined, dealPipelineSync);
 });
 
 test('does not expose appointment or deal synchronization without their dependencies', async () => {

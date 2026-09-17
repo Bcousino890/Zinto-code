@@ -1175,8 +1175,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       getMessageStatus: apiMessageService.getMessageStatus.bind(apiMessageService),
     })),
     idempotency: {
-      find: ({ companyId, key }) => storage.findCrmIdempotencyRecord(companyId, key).then((record) => record ?? null),
-      save: (input) => storage.saveCrmIdempotencyRecord(input),
+      claim: (input) => storage.claimCrmIdempotencyKey(input),
+      complete: ({ companyId, key, responseStatus, responseBody }) => storage.completeCrmIdempotencyKey(companyId, key, responseStatus, responseBody),
+      release: ({ companyId, key }) => storage.releaseCrmIdempotencyKey(companyId, key),
     },
     mediaAccess: {
       upload: apiMediaUpload.single('file'),

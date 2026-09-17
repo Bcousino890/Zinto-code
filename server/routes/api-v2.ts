@@ -7,7 +7,7 @@ import { API_V2_GUIDE_MARKDOWN } from './api-v2-guide';
 import { validateCampaignBatch, type CampaignBatchItem } from '../services/campaign-batch-validation';
 import type { CrmContactSyncService } from '../services/crm-contact-sync-service';
 import { normalizeOutboundCrmMessageRequest } from '../services/crm-message-sync-service';
-import type { AppointmentV2Service } from '../services/appointment-v2-service';
+import { AppointmentV2ValidationError, type AppointmentV2Service } from '../services/appointment-v2-service';
 import type { CrmDealPipelineApiV2Service } from '../services/crm-deal-pipeline-api-v2-service';
 import type {
   InitialCrmSynchronizationInput,
@@ -92,19 +92,15 @@ type MediaAccess = {
 type ChannelsRead = Pick<CrmChannelsReadService, 'listChannels'>;
 type ConversationsRead = Pick<CrmConversationsReadService, 'listConversations'>;
 type MessageStatusRead = Pick<CrmMessageStatusReadService, 'getMessageStatus'>;
-type IdempotencyRecord = { method: string; path: string; requestHash: string; responseStatus: number; responseBody: unknown };
+type IdempotencyClaim = {
+  won: boolean;
+  record: { method: string; path: string; requestHash: string; responseStatus: number | null; responseBody: unknown };
+};
 type Idempotency = {
-  find(input: { companyId: number; key: string }): Promise<IdempotencyRecord | null>;
-  save(input: {
-    companyId: number;
-    integrationId: number;
-    key: string;
-    method: string;
-    path: string;
-    requestHash: string;
-    responseStatus: number;
-    responseBody: unknown;
-  }): Promise<void>;
+  /** Atomically claims (companyId, key) — see withIdempotency() for why this must be a single atomic step, not a separate find+save. */
+  claim(input: { companyId: number; integrationId: number; key: string; method: string; path: string; requestHash: string }): Promise<IdempotencyClaim>;
+  complete(input: { companyId: number; key: string; responseStatus: number; responseBody: unknown }): Promise<void>;
+  release(input: { companyId: number; key: string }): Promise<void>;
 };
 
 function isPositiveIntegrationId(value: unknown): value is number {
@@ -130,8 +126,32 @@ function syncFailureResult(code: string, genericMessage: string, error: unknown,
   return { status: 500, body: { error: code, message: genericMessage } };
 }
 
-function requestFingerprint(body: unknown): string {
-  return createHash('sha256').update(JSON.stringify(body ?? {})).digest('hex');
+/**
+ * Like syncFailureResult(), but first checks whether `error` is one of this
+ * codebase's conventions for a deliberately-worded, safe-to-show validation
+ * failure (a plain TypeError — the convention crm-deal-pipeline-sync-service.ts
+ * and crm-appointment-sync-service.ts both use — or AppointmentV2ValidationError).
+ * Everything else (a plain Error, a raw DB/driver exception, "Integration does
+ * not belong to this company") is hidden behind the generic message, same as
+ * syncFailureResult().
+ */
+function syncOrValidationFailure(error: unknown, syncErrorCode: string, syncGenericMessage: string, context: string): { status: number; body: unknown } {
+  if (error instanceof TypeError || error instanceof AppointmentV2ValidationError) {
+    return { status: 400, body: { error: 'VALIDATION_ERROR', message: error.message } };
+  }
+  return syncFailureResult(syncErrorCode, syncGenericMessage, error, context);
+}
+
+/**
+ * `resourceKey` folds in whatever identifies the target resource but lives
+ * outside the JSON body (e.g. `:externalId` from the URL, for a route like
+ * PUT /appointments/:externalId whose body doesn't itself carry an
+ * externalId) — without it, two different appointments created with an
+ * otherwise-identical body and the same Idempotency-Key would hash equal and
+ * incorrectly look like the same retried request.
+ */
+function requestFingerprint(body: unknown, resourceKey?: string): string {
+  return createHash('sha256').update(JSON.stringify({ resourceKey: resourceKey ?? null, body: body ?? {} })).digest('hex');
 }
 
 /**
@@ -140,41 +160,52 @@ function requestFingerprint(body: unknown): string {
  * to the exact response the first attempt produced, instead of the sync
  * service (whose own upsert-by-externalId logic is a coarser, best-effort
  * safety net, not a literal replay of the same response). Only successful
- * (2xx) responses are cached — a failed attempt intentionally stays retryable
- * with the same key, since most failures here are transient (a downstream
- * sync error), not permanent.
+ * (2xx) responses are cached — a failed attempt is released immediately so
+ * a retry with the same key actually re-runs, since most failures here are
+ * transient (a downstream sync error), not permanent.
+ *
+ * Concurrency: `idempotency.claim()` must be a single atomic
+ * INSERT-or-conditional-UPDATE (see storage.ts's claimCrmIdempotencyKey) —
+ * a separate find-then-save here would let two near-simultaneous requests
+ * with a brand-new key both see "not found" and both run `work()`. Only the
+ * request that actually wins the claim ever calls `work()`; a request that
+ * loses the race is told to return here.
  */
 async function withIdempotency(
   idempotency: Idempotency | undefined,
-  params: { companyId: number; integrationId: number; key: string; method: string; path: string; body: unknown },
+  params: { companyId: number; integrationId: number; key: string; method: string; path: string; body: unknown; resourceKey?: string },
   work: () => Promise<{ status: number; body: unknown }>,
 ): Promise<{ status: number; body: unknown }> {
   if (!idempotency) return work();
 
-  const hash = requestFingerprint(params.body);
-  const existing = await idempotency.find({ companyId: params.companyId, key: params.key });
-  if (existing) {
-    if (existing.method !== params.method || existing.path !== params.path) {
+  const hash = requestFingerprint(params.body, params.resourceKey);
+  const claim = await idempotency.claim({
+    companyId: params.companyId, integrationId: params.integrationId, key: params.key, method: params.method, path: params.path, requestHash: hash,
+  });
+
+  if (!claim.won) {
+    const { record } = claim;
+    if (record.method !== params.method || record.path !== params.path) {
       return { status: 409, body: { error: 'IDEMPOTENCY_KEY_REUSED', message: 'This Idempotency-Key was already used for a different operation' } };
     }
-    if (existing.requestHash !== hash) {
+    if (record.requestHash !== hash) {
       return { status: 409, body: { error: 'IDEMPOTENCY_KEY_CONFLICT', message: 'This Idempotency-Key was already used with a different request body' } };
     }
-    return { status: existing.responseStatus, body: existing.responseBody };
+    if (record.responseStatus === null) {
+      return { status: 409, body: { error: 'IDEMPOTENCY_KEY_IN_PROGRESS', message: 'A request with this Idempotency-Key is already being processed' } };
+    }
+    return { status: record.responseStatus, body: record.responseBody };
   }
 
   const result = await work();
-  if (result.status >= 200 && result.status < 300) {
-    idempotency.save({
-      companyId: params.companyId,
-      integrationId: params.integrationId,
-      key: params.key,
-      method: params.method,
-      path: params.path,
-      requestHash: hash,
-      responseStatus: result.status,
-      responseBody: result.body,
-    }).catch((error) => console.error('[api-v2] failed to persist idempotency record:', error));
+  try {
+    if (result.status >= 200 && result.status < 300) {
+      await idempotency.complete({ companyId: params.companyId, key: params.key, responseStatus: result.status, responseBody: result.body });
+    } else {
+      await idempotency.release({ companyId: params.companyId, key: params.key });
+    }
+  } catch (error) {
+    console.error('[api-v2] failed to finalize idempotency claim:', error);
   }
   return result;
 }
@@ -611,7 +642,7 @@ export function createApiV2Router({
       }
 
       const { status, body } = await withIdempotency(idempotency, {
-        companyId, integrationId, key: idempotencyKey.trim(), method: 'PUT', path: '/appointments/:externalId', body: req.body,
+        companyId, integrationId, key: idempotencyKey.trim(), method: 'PUT', path: '/appointments/:externalId', body: req.body, resourceKey: externalId,
       }, async () => {
         try {
           const result = await appointmentSync.sync({
@@ -623,7 +654,7 @@ export function createApiV2Router({
           });
           return { status: result.created ? 201 : 200, body: { data: { id: result.id }, created: result.created } };
         } catch (error) {
-          return syncFailureResult('APPOINTMENT_SYNC_FAILED', 'Appointment synchronization failed', error, 'appointment sync');
+          return syncOrValidationFailure(error, 'APPOINTMENT_SYNC_FAILED', 'Appointment synchronization failed', 'appointment sync');
         }
       });
       return res.status(status).json(body);
@@ -652,7 +683,7 @@ export function createApiV2Router({
           });
           return { status: result.created ? 201 : 200, body: { data: result.deal, created: result.created } };
         } catch (error) {
-          return syncFailureResult('DEAL_PIPELINE_SYNC_FAILED', 'Deal pipeline synchronization failed', error, 'deal pipeline sync');
+          return syncOrValidationFailure(error, 'DEAL_PIPELINE_SYNC_FAILED', 'Deal pipeline synchronization failed', 'deal pipeline sync');
         }
       });
       return res.status(status).json(body);

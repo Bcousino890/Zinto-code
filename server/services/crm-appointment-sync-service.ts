@@ -22,13 +22,13 @@ const ISO_TIMESTAMP_PATTERN =
 
 function assertNonEmptyString(value: unknown, field: 'externalId' | 'title' | 'status'): asserts value is string {
   if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new Error(`${field} is required`);
+    throw new TypeError(`${field} is required`);
   }
 }
 
 function assertPositiveInteger(value: unknown, field: 'contactId'): asserts value is number {
   if (typeof value !== 'number' || !Number.isSafeInteger(value) || value <= 0) {
-    throw new Error(`${field} must be a positive integer`);
+    throw new TypeError(`${field} must be a positive integer`);
   }
 }
 
@@ -37,7 +37,7 @@ function assertSupportedStatus(value: unknown): asserts value is ContactAppointm
     typeof value !== 'string' ||
     !CONTACT_APPOINTMENT_STATUSES.some((status) => status === value)
   ) {
-    throw new Error('status must be a supported appointment status');
+    throw new TypeError('status must be a supported appointment status');
   }
 }
 
@@ -46,12 +46,12 @@ function parseIsoTimestamp(
   field: 'startsAt' | 'endsAt',
 ): { isoTimestamp: string; timestamp: number } {
   if (typeof value !== 'string') {
-    throw new Error(`${field} must be a valid ISO timestamp`);
+    throw new TypeError(`${field} must be a valid ISO timestamp`);
   }
 
   const match = ISO_TIMESTAMP_PATTERN.exec(value);
   if (!match) {
-    throw new Error(`${field} must be a valid ISO timestamp`);
+    throw new TypeError(`${field} must be a valid ISO timestamp`);
   }
 
   const timestamp = Date.parse(value);
@@ -62,7 +62,7 @@ function parseIsoTimestamp(
     calendarDate.getUTCDate() === Number(match[3]);
 
   if (Number.isNaN(timestamp) || !hasValidCalendarDate) {
-    throw new Error(`${field} must be a valid ISO timestamp`);
+    throw new TypeError(`${field} must be a valid ISO timestamp`);
   }
 
   return { isoTimestamp: value, timestamp };
@@ -76,7 +76,7 @@ export function validateIncomingCrmAppointment(
   input: unknown,
 ): ValidatedIncomingCrmAppointment {
   if (input === null || typeof input !== 'object' || Array.isArray(input)) {
-    throw new Error('incoming CRM appointment must be an object');
+    throw new TypeError('incoming CRM appointment must be an object');
   }
 
   const record = input as Record<string, unknown>;
@@ -89,7 +89,7 @@ export function validateIncomingCrmAppointment(
   assertSupportedStatus(record.status);
 
   if (endsAt.timestamp <= startsAt.timestamp) {
-    throw new Error('endsAt must be after startsAt');
+    throw new TypeError('endsAt must be after startsAt');
   }
 
   return {

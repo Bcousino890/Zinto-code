@@ -123,6 +123,20 @@ export class PlanLimitsService {
         };
       }
 
+      // 'paused' was never checked here at all, so a paused company sailed through
+      // every access check with isExpired:false — full product access the whole time
+      // it was "paused", exactly contrary to what the Pause Subscription UI promises
+      // ("access to premium features will be limited"). Blocking it here is
+      // independent of whether resumeSubscription's date-extension behavior is also
+      // reconsidered — see HANDOFF-billing-security-audit.md.
+      if (normalizedStatus === 'paused') {
+        return {
+          isExpired: true,
+          status: 'paused',
+          message: 'Subscription is paused. Resume it to continue using the service.'
+        };
+      }
+
 
       if (companyData.subscriptionEndDate) {
         const isExpired = now > companyData.subscriptionEndDate;

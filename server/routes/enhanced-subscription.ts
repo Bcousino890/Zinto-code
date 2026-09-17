@@ -8,7 +8,7 @@ import {
   companies,
   subscriptionEvents
 } from '@shared/schema';
-import { eq, desc, count } from 'drizzle-orm';
+import { eq, desc, count, and, sql } from 'drizzle-orm';
 import { subscriptionManager } from '../services/subscription-manager';
 import { subscriptionScheduler } from '../services/subscription-scheduler';
 import { SubscriptionWebhookHandler } from '../services/subscription-webhooks';
@@ -1876,6 +1876,31 @@ export async function activateSubscriptionAfterPayment(
       throw new Error('Plan not found');
     }
 
+    // This function has no other caller-side deduplication (some of its 12+
+    // call sites re-run on every webhook redelivery, and one, GET
+    // /stripe/success, can simply be replayed from browser history with no
+    // auth check at all) — without this, the same single payment can stack
+    // subscription time over and over. 'unknown' is a real fallback value
+    // used when a caller has no real payment id, so it's deliberately never
+    // treated as a duplicate.
+    if (paymentId !== 'unknown') {
+      const [alreadyProcessed] = await db
+        .select({ id: subscriptionEvents.id })
+        .from(subscriptionEvents)
+        .where(
+          and(
+            eq(subscriptionEvents.companyId, companyId),
+            eq(subscriptionEvents.eventType, 'subscription_renewed'),
+            sql`${subscriptionEvents.eventData}->>'paymentId' = ${paymentId}`
+          )
+        )
+        .limit(1);
+
+      if (alreadyProcessed) {
+        logger.info('enhanced-subscription', `Skipping duplicate subscription activation for company ${companyId}: payment ${paymentId} was already processed`);
+        return { success: true, newEndDate: company.subscriptionEndDate ?? new Date() };
+      }
+    }
 
     const now = new Date();
     const baseDate = (company.subscriptionEndDate && now <= company.subscriptionEndDate)

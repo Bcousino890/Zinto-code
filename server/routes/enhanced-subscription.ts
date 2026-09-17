@@ -389,133 +389,20 @@ router.post('/calculate-proration', ensureAuthenticated, async (req: any, res) =
 });
 
 /**
- * Change subscription plan
+ * DEPRECATED - SECURITY RISK: plan change with no real payment
+ * `prorationService.changePlan` swaps `planId` unconditionally and only ever
+ * records the price-difference charge as a `payment_transactions` row stuck
+ * at status 'pending' — it never calls Stripe or any gateway, and nothing
+ * ever collects that pending row. Any authenticated user (no admin check)
+ * could call this directly to jump to the most expensive plan for free.
+ * This endpoint is not used by any client UI today. Disabled until it
+ * actually charges through a verified gateway before applying the change.
  */
 router.post('/change-plan', ensureAuthenticated, async (req: any, res) => {
-  try {
-    const companyId = req.user?.companyId;
-    if (!companyId) {
-      return res.status(400).json({ error: 'Company ID required' });
-    }
-
-    const validation = planChangeSchema.safeParse(req.body);
-    if (!validation.success) {
-      return res.status(400).json({
-        error: 'Invalid request data',
-        details: validation.error.errors
-      });
-    }
-
-    const { planId, effectiveDate, prorationMode, reason } = validation.data;
-
-
-    const targetPlan = await storage.getPlan(planId);
-    if (!targetPlan) {
-      return res.status(404).json({ error: 'Target plan not found' });
-    }
-
-
-    const company = await storage.getCompany(companyId);
-    if (!company) {
-      return res.status(404).json({ error: 'Company not found' });
-    }
-
-    if (company.planId === planId) {
-      return res.status(400).json({ error: 'Company is already on this plan' });
-    }
-
-
-    if (!targetPlan.isActive) {
-      return res.status(400).json({ error: 'Target plan is not available' });
-    }
-
-
-    if (company.subscriptionStatus === 'cancelled') {
-      return res.status(400).json({
-        error: 'Cannot change plan for cancelled subscription. Please reactivate first.'
-      });
-    }
-
-
-    const result = await prorationService.changePlan(companyId, planId, {
-      effectiveDate: effectiveDate ? new Date(effectiveDate) : undefined,
-      prorationMode,
-      reason,
-      triggeredBy: 'customer'
-    });
-
-    if (result.success) {
-
-      if (prorationMode === 'immediate') {
-        try {
-
-          const updatedCompany = await storage.getCompany(companyId);
-          if (updatedCompany && (global as any).broadcastToCompany) {
-
-            (global as any).broadcastToCompany({
-              type: 'plan_updated',
-              data: {
-                companyId,
-                newPlan: updatedCompany.plan,
-                planId: updatedCompany.planId,
-                timestamp: new Date().toISOString(),
-                changeType: 'immediate'
-              }
-            }, companyId);
-          }
-        } catch (broadcastError) {
-          console.error('Error broadcasting plan update:', broadcastError);
-
-        }
-      }
-
-      res.json({
-        success: true,
-        message: prorationMode === 'immediate' ?
-          'Plan changed successfully' :
-          'Plan change scheduled successfully',
-        changeId: result.changeId,
-        newPlan: targetPlan.name,
-        prorationCalculation: result.prorationCalculation,
-        transactionId: result.transactionId
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        error: result.error
-      });
-    }
-
-  } catch (error) {
-    logger.error('enhanced-subscription', 'Error changing plan:', error);
-
-
-    let errorMessage = 'Failed to change plan';
-    let statusCode = 500;
-
-    if (error instanceof Error) {
-      if (error.message.includes('Company not found')) {
-        errorMessage = 'Company not found';
-        statusCode = 404;
-      } else if (error.message.includes('Plan not found')) {
-        errorMessage = 'Target plan not found';
-        statusCode = 404;
-      } else if (error.message.includes('already on this plan')) {
-        errorMessage = 'Company is already on this plan';
-        statusCode = 400;
-      } else if (error.message.includes('insufficient funds') || error.message.includes('payment')) {
-        errorMessage = 'Payment processing failed';
-        statusCode = 402;
-      } else {
-        errorMessage = error.message;
-      }
-    }
-
-    res.status(statusCode).json({
-      error: errorMessage,
-      details: process.env.NODE_ENV === 'development' ? error : undefined
-    });
-  }
+  return res.status(403).json({
+    error: 'PLAN_CHANGE_BLOCKED',
+    message: 'Direct plan changes are not allowed. Use /initiate-renewal with the desired plan instead — it only applies the change after a verified payment.',
+  });
 });
 
 /**
@@ -792,6 +679,12 @@ router.get('/grace-period/feature/:feature', ensureAuthenticated, async (req: an
 
 /**
  * Recover from grace period (manual payment)
+ *
+ * `transactionId` must reference a real, already-completed payment
+ * transaction owned by this company — it used to be passed straight through
+ * to gracePeriodService.recoverFromGracePeriod() as an audit-log label with
+ * no validation at all, so any authenticated user could POST a fabricated
+ * id and exit grace period into a full new billing cycle for free.
  */
 router.post('/grace-period/recover', ensureAuthenticated, async (req: any, res) => {
   try {
@@ -801,7 +694,17 @@ router.post('/grace-period/recover', ensureAuthenticated, async (req: any, res) 
     }
 
     const { transactionId } = req.body;
+    if (!transactionId) {
+      return res.status(400).json({ error: 'Transaction ID required' });
+    }
 
+    const transaction = await storage.getPaymentTransaction(transactionId);
+    if (!transaction || transaction.companyId !== companyId) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+    if (transaction.status !== 'completed') {
+      return res.status(400).json({ error: 'Transaction has not been completed' });
+    }
 
     const status = await gracePeriodService.getGracePeriodStatus(companyId);
     if (!status.isInGracePeriod) {
@@ -2014,23 +1917,27 @@ export async function activateSubscriptionAfterPayment(
 }
 
 /**
- * Manual bank transfer verification for renewals (admin use)
+ * Customer-side "I sent the transfer" acknowledgement for a pending bank
+ * transfer renewal. This can NEVER complete the transaction or extend the
+ * subscription itself — only an admin can, via the already-existing
+ * PATCH /api/admin/payments/transactions/:id/status (server/payment-routes.ts),
+ * which applies the subscription change through the same verified path used
+ * by every other payment method. A prior version of this route accepted a
+ * client-supplied `verified: true` and trusted it directly — that let any
+ * authenticated user grant themselves a paid month with no real payment.
  */
 router.post('/verify-bank-transfer-renewal', ensureAuthenticated, async (req: any, res) => {
   try {
-    const { transactionId, verified } = req.body;
-    
+    const { transactionId } = req.body;
+
     if (!transactionId) {
       return res.status(400).json({ error: 'Transaction ID required' });
     }
-
-
 
     const companyId = req.user?.companyId;
     if (!companyId) {
       return res.status(400).json({ error: 'Company ID required' });
     }
-
 
     const transaction = await storage.getPaymentTransaction(transactionId);
     if (!transaction || transaction.companyId !== companyId) {
@@ -2041,63 +1948,23 @@ router.post('/verify-bank-transfer-renewal', ensureAuthenticated, async (req: an
       return res.status(400).json({ error: 'This endpoint is only for bank transfer transactions' });
     }
 
-    if (verified) {
+    await logSubscriptionEvent(companyId, 'bank_transfer_marked_complete', {
+      transactionId,
+      planId: transaction.planId,
+      amount: transaction.amount,
+      note: 'User marked transfer as complete, pending verification'
+    });
 
-      await storage.updatePaymentTransactionStatus(transactionId, 'completed');
-      
-
-      const company = await storage.getCompany(companyId);
-      if (company && transaction.planId) {
-        const plan = await storage.getPlan(transaction.planId);
-        if (plan) {
-
-          const currentDate = new Date();
-          const expirationDate = company.subscriptionEndDate 
-            ? new Date(company.subscriptionEndDate) 
-            : currentDate;
-          
-
-          const startDate = expirationDate > currentDate ? expirationDate : currentDate;
-          const newExpiration = new Date(startDate);
-          newExpiration.setMonth(newExpiration.getMonth() + 1);
-          
-
-          await storage.updateCompany(companyId, {
-            subscriptionEndDate: newExpiration
-          });
-        }
-      }
-
-      await logSubscriptionEvent(companyId, 'renewal_completed_bank_transfer', {
-        transactionId,
-        planId: transaction.planId,
-        amount: transaction.amount
-      });
-
-      res.json({
-        success: true,
-        message: 'Bank transfer verified and subscription renewed successfully'
-      });
-    } else {
-
-      await logSubscriptionEvent(companyId, 'bank_transfer_marked_complete', {
-        transactionId,
-        planId: transaction.planId,
-        amount: transaction.amount,
-        note: 'User marked transfer as complete, pending verification'
-      });
-
-      res.json({
-        success: true,
-        message: 'Transfer marked as complete. Please wait for admin verification.'
-      });
-    }
+    res.json({
+      success: true,
+      message: 'Transfer marked as complete. Please wait for admin verification.'
+    });
 
   } catch (error: any) {
-    logger.error('enhanced-subscription', 'Error verifying bank transfer renewal:', error);
-    res.status(500).json({ 
+    logger.error('enhanced-subscription', 'Error acknowledging bank transfer renewal:', error);
+    res.status(500).json({
       error: 'VERIFICATION_FAILED',
-      message: 'Failed to verify bank transfer. Please try again.' 
+      message: 'Failed to record your transfer. Please try again.'
     });
   }
 });

@@ -3259,6 +3259,40 @@ function registerAdminRoutes(app: Express) {
             );
           }
           break;
+        // Neither of these was handled at all before: a refunded plan payment or a
+        // card dispute left `company.subscriptionStatus` untouched, so the company
+        // kept full access for the rest of its already-granted period regardless of
+        // the money being taken back. `subscriptionStatus: 'cancelled'` is already
+        // treated as immediately-expired everywhere access is checked.
+        case 'charge.refunded': {
+          const charge = event.data.object;
+          const isFullRefund = typeof charge.amount === 'number' && charge.amount_refunded >= charge.amount;
+          if (isFullRefund && charge.payment_intent) {
+            const refundedTransaction = await storage.getPaymentTransactionByPaymentIntentId(
+              typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent.id
+            );
+            if (refundedTransaction?.companyId) {
+              await storage.updatePaymentTransaction(refundedTransaction.id, { status: 'refunded' });
+              await storage.updateCompany(refundedTransaction.companyId, { subscriptionStatus: 'cancelled' });
+            }
+          }
+          break;
+        }
+        case 'charge.dispute.created': {
+          // Revoke access immediately rather than waiting for the dispute to
+          // resolve; the transaction itself is left as-is since a dispute can
+          // still be won, and 'disputed' isn't one of its valid status values.
+          const dispute = event.data.object;
+          if (dispute.payment_intent) {
+            const disputedTransaction = await storage.getPaymentTransactionByPaymentIntentId(
+              typeof dispute.payment_intent === 'string' ? dispute.payment_intent : dispute.payment_intent.id
+            );
+            if (disputedTransaction?.companyId) {
+              await storage.updateCompany(disputedTransaction.companyId, { subscriptionStatus: 'cancelled' });
+            }
+          }
+          break;
+        }
         default:
       }
 
@@ -3329,7 +3363,7 @@ function registerAdminRoutes(app: Express) {
                 status = 'pending';
             }
 
-            await storage.updatePaymentTransaction(transactionId, {
+            const updatedTransaction = await storage.updatePaymentTransaction(transactionId, {
               status: status as 'pending' | 'completed' | 'failed' | 'refunded',
               paymentIntentId: paymentData.id.toString(),
               metadata: {
@@ -3338,6 +3372,13 @@ function registerAdminRoutes(app: Express) {
                 mercadopago_status_detail: paymentData.status_detail
               }
             });
+
+            // Same reasoning as the Stripe webhook's charge.refunded case: a
+            // refund used to only update this transaction row, leaving the
+            // company's access untouched for the rest of the paid period.
+            if (status === 'refunded' && updatedTransaction.companyId) {
+              await storage.updateCompany(updatedTransaction.companyId, { subscriptionStatus: 'cancelled' });
+            }
           }
         }
       }

@@ -1371,44 +1371,12 @@ export function registerPaymentRoutes(app: Express) {
             if (!response.ok) {
               const errorData = await response.json().catch(() => ({}));
 
-
-              if (errorData.type === 'account_inactive_error') {
-
-
-                await storage.updatePaymentTransaction(transaction.id, {
-                  status: 'completed'
-                });
-
-
-                const { plan } = await applySubscriptionAfterVerifiedPayment(
-                  transaction,
-                  transaction.paymentIntentId || String(transaction.id)
-                );
-
-
-                try {
-                  if ((global as any).broadcastToCompany && plan) {
-                    (global as any).broadcastToCompany({
-                      type: 'plan_updated',
-                      data: {
-                        companyId: transaction.companyId,
-                        newPlan: plan.name.toLowerCase(),
-                        planId: transaction.planId,
-                        timestamp: new Date().toISOString(),
-                        changeType: 'payment_upgrade'
-                      }
-                    }, transaction.companyId);
-                  }
-                } catch (broadcastError) {
-                  console.error('Error broadcasting plan update:', broadcastError);
-                }
-
-                return res.json({
-                  success: true,
-                  status: 'completed',
-                  message: "Payment has been verified and subscription activated (Moyasar account needs activation)"
-                });
-              }
+              // A Moyasar `account_inactive_error` describes the MERCHANT's Moyasar
+              // account state — it says nothing about whether this specific customer's
+              // payment actually succeeded. Treating it as "verified, activate anyway"
+              // let anyone activate a subscription for free by verifying against a
+              // transaction while the merchant account happened to be inactive. Fall
+              // through to the generic failure below instead.
 
               throw new Error(`Failed to fetch Moyasar payment: ${response.status} ${response.statusText}`);
             }
@@ -1508,50 +1476,11 @@ export function registerPaymentRoutes(app: Express) {
           });
 
           if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-
-
-            if (errorData.type === 'account_inactive_error') {
-
-
-
-              await storage.updatePaymentTransaction(transaction.id, {
-                status: 'completed',
-                paymentIntentId: paymentId,
-                externalTransactionId: paymentId
-              });
-
-
-              const { plan } = await applySubscriptionAfterVerifiedPayment(
-                transaction,
-                paymentId
-              );
-
-
-              try {
-                if ((global as any).broadcastToCompany && plan) {
-                  (global as any).broadcastToCompany({
-                    type: 'plan_updated',
-                    data: {
-                      companyId: transaction.companyId,
-                      newPlan: plan.name.toLowerCase(),
-                      planId: transaction.planId,
-                      timestamp: new Date().toISOString(),
-                      changeType: 'payment_upgrade'
-                    }
-                  }, transaction.companyId);
-                }
-              } catch (broadcastError) {
-                console.error('Error broadcasting plan update:', broadcastError);
-              }
-
-              return res.json({
-                success: true,
-                status: 'completed',
-                message: "Payment has been verified and subscription activated (Moyasar account needs activation)"
-              });
-            }
-
+            // Same issue as the other Moyasar branch above: an `account_inactive_error`
+            // response describes the merchant account, not this payment, and
+            // `paymentId` here comes straight from the request body — a client could
+            // pass any string and get activated for free as long as the merchant
+            // account happened to be inactive. Always fail closed instead.
             throw new Error(`Failed to verify Moyasar payment: ${response.status} ${response.statusText}`);
           }
 

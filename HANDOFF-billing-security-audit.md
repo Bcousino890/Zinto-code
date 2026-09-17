@@ -47,7 +47,11 @@ Stripe checkout promo-code fix, and the plan-comparison-table admin UI. All depl
 verified working. Also live: PR #5 (CRM v2 media support) and several other sessions'
 commits (`034b656`, `458357e`, `b9ad543`, `aec2f42`) — see `git log --oneline -10`.
 
-## 2. Committed but NOT yet deployed — do this first
+## 2. ~~Committed but NOT yet deployed~~ — DEPLOYED (2026-09-17, ~15:03 CEST)
+
+Built and `pm2 restart`ed successfully; verified 5/5 consecutive HTTP 200s, stable
+uptime, no crash-restart, memory/CPU back to normal post-restart. The section below is
+kept for the record of what shipped and why.
 
 **Commit `9a58434`, branch `feature/crm-v2-security-hardening`** (already pushed to
 origin). Three fixes closing the most trivially-exploitable "get paid access for free"

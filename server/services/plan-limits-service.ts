@@ -1,18 +1,23 @@
 import { db } from '../db';
 import { storage } from '../storage';
-import { 
+import {
   companies,
   plans,
   planAiProviderConfigs,
   planAiUsageTracking,
   planAiBillingEvents,
+  users,
+  contacts,
+  channelConnections,
+  flows,
+  campaigns,
   Company,
   Plan,
   PlanAiProviderConfig,
   PlanAiUsageTracking,
   InsertPlanAiBillingEvent
 } from '@shared/schema';
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, sql, isNull, ne } from 'drizzle-orm';
 
 export interface PlanLimitCheck {
   allowed: boolean;
@@ -606,34 +611,55 @@ export class PlanLimitsService {
   }
 
 
+  // These five were hardcoded `return 0` — every checkPlanLimit() call for
+  // users/contacts/channels/campaigns (wired into the real creation routes in
+  // server/routes.ts and server/routes/campaigns.ts) always passed, on every plan,
+  // for every company, because "current usage" was always reported as zero. Real
+  // counts activate enforcement at all of those existing call sites immediately.
+  // Note: nothing currently calls checkPlanLimit(..., 'flows') at creation time, so
+  // getCurrentFlowCount being correct doesn't yet gate anything on its own — that's
+  // a separate, not-yet-wired call site, not a bug in this function.
+
   private async getCurrentUserCount(companyId: number): Promise<number> {
-
-
-    return 0; // Placeholder
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(users)
+      .where(eq(users.companyId, companyId));
+    return result?.count ?? 0;
   }
 
   private async getCurrentContactCount(companyId: number): Promise<number> {
-
-
-    return 0; // Placeholder
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(contacts)
+      .where(and(
+        eq(contacts.companyId, companyId),
+        eq(contacts.isArchived, false),
+        isNull(contacts.deletedAt),
+      ));
+    return result?.count ?? 0;
   }
 
   private async getCurrentChannelCount(companyId: number): Promise<number> {
-
-
-    return 0; // Placeholder
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(channelConnections)
+      .where(eq(channelConnections.companyId, companyId));
+    return result?.count ?? 0;
   }
 
   private async getCurrentFlowCount(companyId: number): Promise<number> {
-
-
-    return 0; // Placeholder
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(flows)
+      .where(and(
+        eq(flows.companyId, companyId),
+        ne(flows.status, 'archived'),
+      ));
+    return result?.count ?? 0;
   }
 
   private async getCurrentCampaignCount(companyId: number): Promise<number> {
-
-
-    return 0; // Placeholder
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(campaigns)
+      .where(eq(campaigns.companyId, companyId));
+    return result?.count ?? 0;
   }
 }
 

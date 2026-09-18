@@ -5,11 +5,43 @@ import paypal from "@paypal/checkout-server-sdk";
 import { affiliateService } from "./services/affiliate-service";
 import { getExchangeRate } from "./utils/exchange-rate";
 import { activateSubscriptionAfterPayment, computeSubscriptionEndDate } from "./routes/enhanced-subscription";
+import { planLimitsService } from "./services/plan-limits-service";
 
 const PAYSTACK_SUPPORTED_CURRENCIES = ['NGN', 'GHS', 'ZAR', 'USD', 'KES', 'XOF', 'EGP'];
 
 function isRenewalTransaction(transaction: Pick<PaymentTransaction, 'metadata'>): boolean {
   return transaction.metadata?.renewalType === 'subscription_renewal';
+}
+
+/**
+ * Product decision: a downgrade that would leave a company over the new plan's
+ * limits is blocked outright rather than auto-deactivating whatever put them over
+ * (safer default — never silently turns off a customer's users/channels/flows for
+ * them). Returns null when the purchase is allowed (new company, same plan, an
+ * upgrade, or a downgrade that still fits); otherwise a message safe to show the
+ * customer directly.
+ */
+async function blockedDowngradeReason(
+  companyId: number,
+  targetPlan: { id: number; name: string; price: string | number; maxUsers: number; maxContacts: number; maxChannels: number; maxFlows: number; maxCampaigns: number }
+): Promise<string | null> {
+  const company = await storage.getCompany(companyId);
+  if (!company?.planId) return null;
+
+  const currentPlan = await storage.getPlan(company.planId);
+  if (!currentPlan || Number(targetPlan.price) >= Number(currentPlan.price)) return null;
+
+  const { fits, violations } = await planLimitsService.checkUsageFitsPlan(companyId, targetPlan);
+  if (fits) return null;
+
+  const resourceNames: Record<string, string> = {
+    users: 'usuarios', contacts: 'contactos', channels: 'conexiones de canal',
+    flows: 'flujos', campaigns: 'campañas',
+  };
+  const details = violations
+    .map(v => `${resourceNames[v.resource] || v.resource}: tienes ${v.current}, el plan ${targetPlan.name} permite ${v.limit}`)
+    .join('; ');
+  return `No puedes cambiar al plan ${targetPlan.name} porque excedes sus límites (${details}). Reduce el uso antes de cambiar de plan.`;
 }
 
 async function applySubscriptionAfterVerifiedPayment(
@@ -41,6 +73,18 @@ async function applySubscriptionAfterVerifiedPayment(
     }
     if (!plan) {
       throw new Error('Plan not found');
+    }
+
+    // Last-line defense-in-depth: the checkout routes already refuse to start a
+    // downgrade that would leave the company over-limit, but usage can still shift
+    // between checkout creation and payment confirmation. Failing safe here means
+    // never overwriting planId into a state that immediately over-limits the
+    // company — the payment stays recorded as completed, but a human needs to
+    // resolve it (refund or ask the customer to reduce usage first).
+    const blockReason = await blockedDowngradeReason(companyId, plan);
+    if (blockReason) {
+      console.error(`Refusing to apply plan change for company ${companyId} to plan ${planId}: ${blockReason} (transaction ${transaction.id} already completed — needs manual resolution)`);
+      return { plan };
     }
 
     const now = new Date();
@@ -241,6 +285,11 @@ export function registerPaymentRoutes(app: Express) {
         return res.status(404).json({ error: "Plan not found" });
       }
 
+      const downgradeBlockReason = await blockedDowngradeReason(req.user.companyId, plan);
+      if (downgradeBlockReason) {
+        return res.status(400).json({ error: "DOWNGRADE_BLOCKED", message: downgradeBlockReason });
+      }
+
       const stripeSettingObj = await storage.getAppSetting('payment_stripe');
       if (!stripeSettingObj || !stripeSettingObj.value) {
         return res.status(400).json({ error: "Stripe is not configured" });
@@ -318,6 +367,11 @@ export function registerPaymentRoutes(app: Express) {
       const plan = await storage.getPlan(planId);
       if (!plan) {
         return res.status(404).json({ error: "Plan not found" });
+      }
+
+      const downgradeBlockReason = await blockedDowngradeReason(req.user.companyId, plan);
+      if (downgradeBlockReason) {
+        return res.status(400).json({ error: "DOWNGRADE_BLOCKED", message: downgradeBlockReason });
       }
 
       const mercadoPagoSettingObj = await storage.getAppSetting('payment_mercadopago');
@@ -473,6 +527,11 @@ export function registerPaymentRoutes(app: Express) {
         return res.status(404).json({ error: "Plan not found" });
       }
 
+      const downgradeBlockReason = await blockedDowngradeReason(req.user.companyId, plan);
+      if (downgradeBlockReason) {
+        return res.status(400).json({ error: "DOWNGRADE_BLOCKED", message: downgradeBlockReason });
+      }
+
       const paypalSettingObj = await storage.getAppSetting('payment_paypal');
       if (!paypalSettingObj || !paypalSettingObj.value) {
         return res.status(400).json({ error: "PayPal is not configured" });
@@ -601,6 +660,11 @@ export function registerPaymentRoutes(app: Express) {
         return res.status(404).json({ error: "Plan not found" });
       }
 
+      const downgradeBlockReason = await blockedDowngradeReason(req.user.companyId, plan);
+      if (downgradeBlockReason) {
+        return res.status(400).json({ error: "DOWNGRADE_BLOCKED", message: downgradeBlockReason });
+      }
+
       const paystackSettingObj = await storage.getAppSetting('payment_paystack');
       if (!paystackSettingObj || !paystackSettingObj.value || !(paystackSettingObj.value as any).enabled) {
         return res.status(400).json({ error: "Paystack is not configured" });
@@ -724,6 +788,11 @@ export function registerPaymentRoutes(app: Express) {
         return res.status(404).json({ error: "Plan not found" });
       }
 
+      const downgradeBlockReason = await blockedDowngradeReason(req.user.companyId, plan);
+      if (downgradeBlockReason) {
+        return res.status(400).json({ error: "DOWNGRADE_BLOCKED", message: downgradeBlockReason });
+      }
+
       const moyasarSettingObj = await storage.getAppSetting('payment_moyasar');
       if (!moyasarSettingObj || !moyasarSettingObj.value) {
         return res.status(400).json({ error: "Moyasar is not configured" });
@@ -802,6 +871,11 @@ export function registerPaymentRoutes(app: Express) {
       const plan = await storage.getPlan(planId);
       if (!plan) {
         return res.status(404).json({ error: "Plan not found" });
+      }
+
+      const downgradeBlockReason = await blockedDowngradeReason(req.user.companyId, plan);
+      if (downgradeBlockReason) {
+        return res.status(400).json({ error: "DOWNGRADE_BLOCKED", message: downgradeBlockReason });
       }
 
       const mpesaSettingObj = await storage.getAppSetting('payment_mpesa');
@@ -1745,6 +1819,11 @@ export function registerPaymentRoutes(app: Express) {
       const plan = await storage.getPlan(planId);
       if (!plan) {
         return res.status(404).json({ error: "Plan not found" });
+      }
+
+      const downgradeBlockReason = await blockedDowngradeReason(req.user.companyId, plan);
+      if (downgradeBlockReason) {
+        return res.status(400).json({ error: "DOWNGRADE_BLOCKED", message: downgradeBlockReason });
       }
 
       const bankTransferSettingObj = await storage.getAppSetting('payment_bank_transfer');

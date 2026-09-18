@@ -661,6 +661,36 @@ export class PlanLimitsService {
       .where(eq(campaigns.companyId, companyId));
     return result?.count ?? 0;
   }
+
+  /**
+   * Whether a company's current usage would fit under a DIFFERENT plan's limits
+   * (as opposed to checkPlanLimit(), which always checks against the company's own
+   * current plan). Used to block downgrades that would leave a company over-limit
+   * on day one, per the product decision to block rather than auto-deactivate.
+   */
+  async checkUsageFitsPlan(
+    companyId: number,
+    targetPlan: { maxUsers: number; maxContacts: number; maxChannels: number; maxFlows: number; maxCampaigns: number }
+  ): Promise<{ fits: boolean; violations: Array<{ resource: string; current: number; limit: number }> }> {
+    const [userCount, contactCount, channelCount, flowCount, campaignCount] = await Promise.all([
+      this.getCurrentUserCount(companyId),
+      this.getCurrentContactCount(companyId),
+      this.getCurrentChannelCount(companyId),
+      this.getCurrentFlowCount(companyId),
+      this.getCurrentCampaignCount(companyId),
+    ]);
+
+    const checks: Array<{ resource: string; current: number; limit: number }> = [
+      { resource: 'users', current: userCount, limit: targetPlan.maxUsers },
+      { resource: 'contacts', current: contactCount, limit: targetPlan.maxContacts },
+      { resource: 'channels', current: channelCount, limit: targetPlan.maxChannels },
+      { resource: 'flows', current: flowCount, limit: targetPlan.maxFlows },
+      { resource: 'campaigns', current: campaignCount, limit: targetPlan.maxCampaigns },
+    ];
+
+    const violations = checks.filter(c => c.current > c.limit);
+    return { fits: violations.length === 0, violations };
+  }
 }
 
 export const planLimitsService = new PlanLimitsService();

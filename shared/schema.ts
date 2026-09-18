@@ -64,6 +64,8 @@ export const companies = pgTable("companies", {
   contactPerson: text("contact_person"),
   iban: text("iban"),
   whatsappNumber: text("whatsapp_number"),
+  /** ISO 3166-1 alpha-2 country code. Drives billing currency (EU -> EUR, else USD); null defaults to USD. */
+  country: text("country"),
 
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
@@ -3107,6 +3109,82 @@ export const plans = pgTable("plans", {
   updatedAt: timestamp("updated_at").notNull().defaultNow()
 }, (table) => [
   check("plans_stripe_sync_status_check", sql`${table.stripeSyncStatus} IN ('pending', 'synced', 'failed')`),
+]);
+
+// Fixed catalog of paid add-ons a company can purchase on top of its plan (e.g. extra user seat,
+// extra WhatsApp connection). Dual-currency by design: unlike `plans` (one active currency for the
+// whole app), each add-on always has both an EUR and a USD price so the correct one can be charged
+// based on the purchasing company's country.
+export const addons = pgTable("addons", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description"),
+  unitPriceEur: numeric("unit_price_eur", { precision: 10, scale: 2 }).notNull(),
+  unitPriceUsd: numeric("unit_price_usd", { precision: 10, scale: 2 }).notNull(),
+  validityDays: integer("validity_days").notNull().default(30),
+  isActive: boolean("is_active").notNull().default(true),
+
+  stripeProductId: text("stripe_product_id"),
+  stripePriceIdEur: text("stripe_price_id_eur"),
+  stripePriceIdUsd: text("stripe_price_id_usd"),
+  stripeSyncStatus: text("stripe_sync_status", {
+    enum: ['pending', 'synced', 'failed']
+  }).notNull().default('pending'),
+  stripeSyncError: text("stripe_sync_error"),
+  stripeSyncedAt: timestamp("stripe_synced_at"),
+  stripeSyncFingerprint: text("stripe_sync_fingerprint"),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  check("addons_stripe_sync_status_check", sql`${table.stripeSyncStatus} IN ('pending', 'synced', 'failed')`),
+]);
+
+// One row per 30-day (validityDays) unit of quota a company has paid for. A company's currently
+// usable quantity for an add-on is always computed as
+// SUM(quantity) WHERE status = 'active' AND expires_at > now() — never cached/mutated in place —
+// so a refund, dispute, or expiry removes access on the very next read with no extra bookkeeping.
+export const addonPurchases = pgTable("addon_purchases", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
+  addonId: integer("addon_id").notNull().references(() => addons.id),
+  quantity: integer("quantity").notNull(),
+  currency: text("currency", { enum: ['EUR', 'USD'] }).notNull(),
+  unitAmountMinor: integer("unit_amount_minor").notNull(),
+  totalAmountMinor: integer("total_amount_minor").notNull(),
+
+  // pending: checkout/renewal charge created, awaiting webhook confirmation.
+  // active: payment confirmed, counts toward quota until expiresAt.
+  // failed: checkout expired or payment failed — never counted, never becomes active.
+  // expired: past expiresAt (informational; the quota query already excludes it by date).
+  // revoked: refunded or disputed after being active — stops counting immediately, before expiresAt.
+  status: text("status", {
+    enum: ['pending', 'active', 'failed', 'expired', 'revoked']
+  }).notNull().default('pending'),
+
+  stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+  stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
+  stripeChargeId: text("stripe_charge_id"),
+
+  autoRenew: boolean("auto_renew").notNull().default(false),
+  renewedFromId: integer("renewed_from_id"),
+
+  purchasedAt: timestamp("purchased_at"),
+  expiresAt: timestamp("expires_at"),
+  revokedAt: timestamp("revoked_at"),
+  revokedReason: text("revoked_reason"),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  check("addon_purchases_quantity_check", sql`${table.quantity} > 0`),
+  check("addon_purchases_status_check", sql`${table.status} IN ('pending', 'active', 'failed', 'expired', 'revoked')`),
+  check("addon_purchases_currency_check", sql`${table.currency} IN ('EUR', 'USD')`),
+  foreignKey({ columns: [table.renewedFromId], foreignColumns: [table.id] }),
+  uniqueIndex("addon_purchases_one_pending_per_company_addon")
+    .on(table.companyId, table.addonId)
+    .where(sql`${table.status} = 'pending'`),
+  index("addon_purchases_active_lookup_idx").on(table.companyId, table.addonId, table.status, table.expiresAt),
 ]);
 
 export const planAiProviderConfigs = pgTable("plan_ai_provider_configs", {

@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { storage } from '../storage';
 import { logger } from '../utils/logger';
 import { activateSubscriptionAfterPayment } from './enhanced-subscription';
+import { handleAddonWebhookEvent } from '../services/addon-billing-webhooks';
 
 const router = Router();
 
@@ -102,16 +103,34 @@ router.post('/stripe/webhook', async (req, res) => {
 
 
     switch (event.type) {
-      case 'checkout.session.completed':
+      case 'checkout.session.completed': {
         const session = event.data.object;
-        
+
+        // Add-on purchases are detected by `metadata.purchaseId` (set by
+        // AddonPurchaseService#createPurchaseCheckoutSession) and are mutually exclusive with the
+        // plan-renewal metadata shape below. This is the ONLY code path that ever moves an
+        // addon_purchases row from `pending` to `active`.
+        if (session.metadata?.purchaseId) {
+          try {
+            const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+            logger.info('payment-callbacks', `Add-on checkout.session.completed for session ${session.id}: ${JSON.stringify(result)}`);
+          } catch (addonError: any) {
+            // Re-thrown (not swallowed): a transient failure here must surface as a 5xx so Stripe
+            // retries the delivery, instead of leaving an already-charged purchase stuck
+            // 'pending' forever with res.json({received:true}) telling Stripe not to retry.
+            logger.error('payment-callbacks', 'Failed to process add-on checkout.session.completed:', addonError);
+            throw addonError;
+          }
+          break;
+        }
+
         if (session.metadata?.renewalType === 'subscription_renewal') {
 
           if (session.payment_status === 'paid') {
             const metadata = session.metadata || {};
             const companyId = metadata.companyId;
             const planId = metadata.planId;
-            
+
             if (companyId && planId) {
               try {
                 await activateSubscriptionAfterPayment(
@@ -120,7 +139,7 @@ router.post('/stripe/webhook', async (req, res) => {
                   session.payment_intent as string || 'unknown',
                   (session.amount_total || 0) / 100
                 );
-                
+
                 logger.info('payment-callbacks', `Subscription renewed via webhook for company ${companyId}, plan ${planId}, session ${session.id}`);
               } catch (activationError: any) {
                 logger.error('payment-callbacks', 'Failed to activate subscription via webhook:', activationError);
@@ -129,12 +148,72 @@ router.post('/stripe/webhook', async (req, res) => {
           }
         }
         break;
-        
-      case 'payment_intent.payment_failed':
+      }
+
+      // The customer never completed payment (Stripe expires an unpaid Checkout Session ~24h
+      // after creation). Must NEVER grant quota — only transitions a still-`pending` row to
+      // `failed`; an already-`active` row (out-of-order delivery) is left untouched.
+      case 'checkout.session.expired': {
+        const session = event.data.object;
+        if (session.metadata?.purchaseId) {
+          try {
+            const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+            logger.info('payment-callbacks', `Add-on checkout.session.expired for session ${session.id}: ${JSON.stringify(result)}`);
+          } catch (addonError: any) {
+            logger.error('payment-callbacks', 'Failed to process add-on checkout.session.expired:', addonError);
+            throw addonError;
+          }
+        }
+        break;
+      }
+
+      case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object;
         logger.warn('payment-callbacks', `Payment failed for intent ${paymentIntent.id}, amount: ${paymentIntent.amount} ${paymentIntent.currency}`);
+        try {
+          const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+          if (result.handled) {
+            logger.info('payment-callbacks', `Add-on payment_intent.payment_failed processed: ${JSON.stringify(result)}`);
+          }
+        } catch (addonError: any) {
+          logger.error('payment-callbacks', 'Failed to process add-on payment_intent.payment_failed:', addonError);
+          throw addonError;
+        }
         break;
-        
+      }
+
+      // A refund on an already-`active` add-on purchase revokes it immediately (regardless of the
+      // "no voluntary refunds" business policy — a manual refund from the Stripe dashboard must
+      // never leave phantom quota behind). A PARTIAL refund does not revoke — see
+      // addon-billing-webhooks.ts.
+      case 'charge.refunded': {
+        try {
+          const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+          if (result.handled) {
+            logger.info('payment-callbacks', `Add-on charge.refunded processed: ${JSON.stringify(result)}`);
+          }
+        } catch (addonError: any) {
+          logger.error('payment-callbacks', 'Failed to process add-on charge.refunded:', addonError);
+          throw addonError;
+        }
+        break;
+      }
+
+      // A chargeback revokes the matching active purchase immediately — does not wait for the
+      // dispute to resolve, closing the "dispute the charge, keep the quota" angle.
+      case 'charge.dispute.created': {
+        try {
+          const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+          if (result.handled) {
+            logger.info('payment-callbacks', `Add-on charge.dispute.created processed: ${JSON.stringify(result)}`);
+          }
+        } catch (addonError: any) {
+          logger.error('payment-callbacks', 'Failed to process add-on charge.dispute.created:', addonError);
+          throw addonError;
+        }
+        break;
+      }
+
       default:
         logger.info('Unhandled Stripe webhook event type:', event.type);
     }

@@ -74,6 +74,11 @@ app.use((req, res, next) => {
   // the request (Stripe, Paystack, etc.) can do so against what was actually
   // sent instead of re-serializing the parsed object (which can differ
   // byte-for-byte from the original and make every signature check fail).
+  // Covers both Stripe webhook paths (admin-routes.ts's /api/webhooks/stripe
+  // and payment-callbacks.ts's /api/payment/stripe/webhook) without needing a
+  // dedicated express.raw() carve-out for either — both already read
+  // req.rawBody, not req.body, so an express.raw() carve-out here would leave
+  // req.rawBody undefined and break their signature verification instead.
   express.json({
     limit: '50mb',
     verify: (req, _res, buf) => {
@@ -89,7 +94,9 @@ app.use((req, res, next) => {
       req.path === '/api/webhooks/messenger' ||
       req.path === '/api/webhooks/whatsapp' ||
       req.path === '/api/webhooks/tiktok' ||
-      req.path === '/api/webhooks/telnyx/voice')
+      req.path === '/api/webhooks/telnyx/voice' ||
+      req.path === '/api/payment/stripe/webhook' ||
+      req.path === '/api/webhooks/stripe')
   ) {
     return next();
   }
@@ -610,6 +617,15 @@ app.use((req, res, next) => {
           logger.info('subscription', '✅ Subscription Scheduler started successfully');
         } catch (error) {
           logger.error('subscription', '❌ Subscription Scheduler failed to start:', error);
+        }
+
+        logger.info('addon-renewal', 'Starting Add-on Renewal Scheduler...');
+        try {
+          const { startAddonRenewalScheduler } = await import('./services/addon-renewal-service');
+          startAddonRenewalScheduler();
+          logger.info('addon-renewal', '✅ Add-on Renewal Scheduler started successfully');
+        } catch (error) {
+          logger.error('addon-renewal', '❌ Add-on Renewal Scheduler failed to start:', error);
         }
 
         logger.info('template-status-sync', 'Starting WhatsApp Template Status Sync...');

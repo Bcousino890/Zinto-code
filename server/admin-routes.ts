@@ -17,6 +17,7 @@ import { createCipheriv, createDecipheriv, randomBytes as cryptoRandomBytes } fr
 import axios from "axios";
 import { rawAxiosHeaderToString } from "./utils/axios-headers";
 import { registerAffiliateRoutes } from "./routes/admin/affiliate-routes";
+import { handleAddonWebhookEvent } from "./services/addon-billing-webhooks";
 import adminAiCredentialsRoutes from "./routes/admin-ai-credentials";
 import { randomUUID } from "crypto";
 import {
@@ -3178,6 +3179,68 @@ function registerAdminRoutes(app: Express) {
       }
 
       switch (event.type) {
+        // Add-on billing (extra user seats / extra WhatsApp connections): this is the ONLY
+        // Stripe webhook endpoint actually configured in the live Stripe dashboard for this
+        // domain's checkout/payment events (see enabled_events on webhook endpoint
+        // we_1UF3iq6yRauBhYCt9tmAYxBD) — server/routes/payment-callbacks.ts has an equivalent
+        // handler wired to the SAME add-on logic, but it reads STRIPE_SECRET_KEY/
+        // STRIPE_WEBHOOK_SECRET from process.env (unset in this deployment) and has no matching
+        // webhook_endpoint in Stripe at all, so it never actually receives traffic. Add-on events
+        // are recognized by `metadata.purchaseId` (or, for charge events, by the underlying
+        // payment intent matching a recorded purchase) and are mutually exclusive with the
+        // transactionId-based handling below for the other two event types.
+        case 'checkout.session.completed': {
+          try {
+            const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+            if (result.handled) {
+              console.log('[admin-routes] Add-on checkout.session.completed:', result);
+            }
+          } catch (addonError) {
+            // Re-thrown (not swallowed): a transient failure here (e.g. a DB blip) must surface
+            // as a 5xx so Stripe retries the delivery. Swallowing it and still returning 200 below
+            // would leave an already-charged purchase permanently stuck 'pending' with no
+            // automatic recovery — Stripe would never know to try again.
+            console.error('[admin-routes] Failed to process add-on checkout.session.completed:', addonError);
+            throw addonError;
+          }
+          break;
+        }
+        case 'checkout.session.expired': {
+          try {
+            const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+            if (result.handled) {
+              console.log('[admin-routes] Add-on checkout.session.expired:', result);
+            }
+          } catch (addonError) {
+            console.error('[admin-routes] Failed to process add-on checkout.session.expired:', addonError);
+            throw addonError;
+          }
+          break;
+        }
+        case 'charge.refunded': {
+          try {
+            const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+            if (result.handled) {
+              console.log('[admin-routes] Add-on charge.refunded:', result);
+            }
+          } catch (addonError) {
+            console.error('[admin-routes] Failed to process add-on charge.refunded:', addonError);
+            throw addonError;
+          }
+          break;
+        }
+        case 'charge.dispute.created': {
+          try {
+            const result = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+            if (result.handled) {
+              console.log('[admin-routes] Add-on charge.dispute.created:', result);
+            }
+          } catch (addonError) {
+            console.error('[admin-routes] Failed to process add-on charge.dispute.created:', addonError);
+            throw addonError;
+          }
+          break;
+        }
         case 'payment_intent.succeeded':
           const paymentIntent = event.data.object;
           if (paymentIntent.metadata && paymentIntent.metadata.transactionId) {
@@ -3237,6 +3300,18 @@ function registerAdminRoutes(app: Express) {
                 paymentIntentId: failedPaymentIntent.id
               }
             );
+          }
+          // Distinct from the transactionId-based handling above: an add-on purchase/renewal
+          // attempt is recognized by metadata.purchaseId, or by its payment intent id already
+          // being recorded on a purchase row (renewal attempts). No-ops for anything else.
+          try {
+            const addonResult = await handleAddonWebhookEvent(event, { getStripeClient: async () => stripe });
+            if (addonResult.handled) {
+              console.log('[admin-routes] Add-on payment_intent.payment_failed:', addonResult);
+            }
+          } catch (addonError) {
+            console.error('[admin-routes] Failed to process add-on payment_intent.payment_failed:', addonError);
+            throw addonError;
           }
           break;
         default:

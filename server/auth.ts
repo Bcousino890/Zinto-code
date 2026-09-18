@@ -1062,7 +1062,7 @@ export async function setupAuth(app: Express) {
 
   app.post("/api/admin/companies", ensureSuperAdmin, async (req, res) => {
     try {
-      const { name, slug, logo, primaryColor, planId, maxUsers } = req.body;
+      const { name, slug, logo, primaryColor, planId, maxUsers, country } = req.body;
 
 
       if (!name || !slug) {
@@ -1149,6 +1149,7 @@ export async function setupAuth(app: Express) {
         plan: planName,
         planId: planId || null,
         maxUsers: planMaxUsers,
+        country: country || null,
         subscriptionStatus,
         subscriptionStartDate: subscriptionStatus === "active" ? new Date() : undefined,
         subscriptionEndDate
@@ -1328,7 +1329,7 @@ export async function setupAuth(app: Express) {
   app.put("/api/admin/companies/:id", ensureSuperAdmin, async (req, res) => {
     try {
       const companyId = parseInt(req.params.id);
-      const { name, slug, logo, primaryColor, active, planId, maxUsers, companyEmail, contactPerson, registerNumber, iban, whatsappImportMode, whatsappGroupsEnabled } = req.body;
+      const { name, slug, logo, primaryColor, active, planId, maxUsers, companyEmail, contactPerson, registerNumber, iban, whatsappImportMode, whatsappGroupsEnabled, country } = req.body;
 
 
       const existingCompany = await storage.getCompany(companyId);
@@ -1379,7 +1380,8 @@ export async function setupAuth(app: Express) {
         registerNumber,
         iban,
         whatsappImportMode: whatsappImportMode ?? existingCompany.whatsappImportMode,
-        whatsappGroupsEnabled: whatsappGroupsEnabled ?? existingCompany.whatsappGroupsEnabled
+        whatsappGroupsEnabled: whatsappGroupsEnabled ?? existingCompany.whatsappGroupsEnabled,
+        country: country !== undefined ? country : existingCompany.country
       };
 
 

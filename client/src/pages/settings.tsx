@@ -44,6 +44,7 @@ import { PlanCard } from "@/components/settings/PlanCard";
 import { CheckoutDialog } from "@/components/settings/CheckoutDialog";
 import { SubscriptionManagement } from "@/components/settings/SubscriptionManagement";
 import { AffiliateEarningsCard } from "@/components/settings/AffiliateEarningsCard";
+import { AddonsSection } from "@/components/settings/AddonsSection";
 import {
   Dialog,
   DialogContent,
@@ -3663,6 +3664,10 @@ export default function Settings() {
                         </div>
                       )}
                     </div>
+
+                    <Separator />
+
+                    <AddonsSection />
 
                     <div>
                       <h3 className="text-base sm:text-lg font-medium mb-4 text-foreground">Payment History</h3>

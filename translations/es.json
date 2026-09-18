@@ -69282,5 +69282,141 @@
   {
     "key": "settings.api_access.integrations.providers.pipedrive",
     "value": "Pipedrive"
+  },
+  {
+    "key": "settings.addons.fetch_error",
+    "value": "Error al cargar los extras"
+  },
+  {
+    "key": "settings.addons.purchase_error",
+    "value": "Error al iniciar el pago"
+  },
+  {
+    "key": "settings.addons.error_title",
+    "value": "Error"
+  },
+  {
+    "key": "settings.addons.no_checkout_url",
+    "value": "El servidor no devolvió una URL de pago."
+  },
+  {
+    "key": "settings.addons.auto_renew_error",
+    "value": "Error al actualizar la renovación automática"
+  },
+  {
+    "key": "settings.addons.title",
+    "value": "Extras"
+  },
+  {
+    "key": "settings.addons.description",
+    "value": "Añade capacidad adicional a tu plan: puestos de usuario o conexiones de WhatsApp extra."
+  },
+  {
+    "key": "settings.addons.none_available",
+    "value": "No hay extras disponibles por el momento."
+  },
+  {
+    "key": "settings.addons.unit_price",
+    "value": "{{price}} por unidad / {{days}} días"
+  },
+  {
+    "key": "settings.addons.active_quantity",
+    "value": "Cantidad activa"
+  },
+  {
+    "key": "settings.addons.nearest_expiry",
+    "value": "La próxima unidad vence el"
+  },
+  {
+    "key": "settings.addons.quantity_label",
+    "value": "Cantidad"
+  },
+  {
+    "key": "settings.addons.decrease_quantity",
+    "value": "Disminuir cantidad"
+  },
+  {
+    "key": "settings.addons.increase_quantity",
+    "value": "Aumentar cantidad"
+  },
+  {
+    "key": "settings.addons.subtotal",
+    "value": "Subtotal"
+  },
+  {
+    "key": "settings.addons.auto_renew_on_purchase_label",
+    "value": "Renovación automática"
+  },
+  {
+    "key": "settings.addons.auto_renew_on_purchase_description",
+    "value": "Vuelve a comprar esta cantidad automáticamente cada 30 días usando tu método de pago guardado."
+  },
+  {
+    "key": "settings.addons.buy_button",
+    "value": "Comprar"
+  },
+  {
+    "key": "settings.addons.existing_auto_renew_label",
+    "value": "Renovación automática de la cantidad activa"
+  },
+  {
+    "key": "settings.addons.existing_auto_renew_description",
+    "value": "Aplica a toda la cantidad actualmente activa de este extra."
+  },
+  {
+    "key": "settings.addons.terms",
+    "value": "Se cobra de inmediato y es válido durante 30 días desde que se confirma el pago. No reembolsable: desactivar la renovación automática solo detiene el próximo cobro, no reembolsa ni termina el período actual antes de tiempo."
+  },
+  {
+    "key": "settings.billing.no_plans_available",
+    "value": "No hay planes disponibles por el momento"
+  },
+  {
+    "key": "settings.billing.payment_history.title",
+    "value": "Historial de pagos"
+  },
+  {
+    "key": "settings.billing.payment_history.no_history",
+    "value": "No hay historial de pagos disponible"
+  },
+  {
+    "key": "settings.billing.payment_history.column_date",
+    "value": "Fecha"
+  },
+  {
+    "key": "settings.billing.payment_history.column_description",
+    "value": "Descripción"
+  },
+  {
+    "key": "settings.billing.payment_history.column_amount",
+    "value": "Monto"
+  },
+  {
+    "key": "settings.billing.payment_history.column_status",
+    "value": "Estado"
+  },
+  {
+    "key": "settings.billing.payment_history.default_description",
+    "value": "Pago de suscripción"
+  },
+  {
+    "key": "settings.billing.payment_history.status_pending",
+    "value": "Pendiente"
+  },
+  {
+    "key": "settings.billing.payment_history.status_completed",
+    "value": "Completado"
+  },
+  {
+    "key": "settings.billing.payment_history.status_failed",
+    "value": "Fallido"
+  },
+  {
+    "key": "settings.billing.payment_history.status_refunded",
+    "value": "Reembolsado"
+  },
+  {
+    "key": "settings.billing.payment_history.status_cancelled",
+    "value": "Cancelado"
   }
 ]

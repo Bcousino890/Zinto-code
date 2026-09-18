@@ -38,6 +38,18 @@ function createFakeStripe() {
         return { id };
       },
       update: async (id: string, input: any, options: any) => {
+        // Mirrors the real Stripe API constraint this test suite originally missed: a price
+        // cannot be archived while it is still its product's default_price. That gap is exactly
+        // why the very first real sync against production Stripe failed (both addon products'
+        // hand-created initial price was also their default_price) even though every test here
+        // passed — the fake let an archive succeed that the real API rejects.
+        if (input.active === false) {
+          const price = priceById.get(id);
+          const product = price ? productById.get(price.product) : undefined;
+          if (product?.default_price === id) {
+            throw new Error('This price cannot be archived because it is the default price of its product.');
+          }
+        }
         prices.updated.push({ id, input, options });
         priceById.set(id, { ...priceById.get(id), ...input });
         return { id };
@@ -146,9 +158,13 @@ test('crea un Product nuevo solo cuando el addon no tiene stripeProductId (caso 
   assert.ok(result.actions.includes('create_product'));
 });
 
-test('archiva un precio activo preexistente que no coincide (limpieza del metered antiguo compartido)', async () => {
+test('archiva un precio activo preexistente que no coincide (limpieza del metered antiguo compartido), incluso cuando ese precio es el default_price del producto', async () => {
+  // Realistic setup: a price hand-created in the Stripe dashboard alongside its product becomes
+  // that product's default_price by default. This is exactly the state both real addon products
+  // were in on their first-ever sync.
   const addon = fixture();
   const fakeStripe = createFakeStripe();
+  fakeStripe.seed.product({ id: addon.stripeProductId, default_price: 'price_old_metered' });
   fakeStripe.seed.price({
     id: 'price_old_metered',
     product: addon.stripeProductId,
@@ -158,8 +174,12 @@ test('archiva un precio activo preexistente que no coincide (limpieza del metere
   });
   const service = new AddonCatalogSyncService({ storage: createStorage(addon), stripe: fakeStripe });
 
-  await service.syncAddon(addon.id);
+  const result = await service.syncAddon(addon.id);
 
+  assert.equal(result.status, 'synced', `expected a clean sync, got: ${result.error}`);
+  const repointed = fakeStripe.products.updated.find((entry: any) => entry.id === addon.stripeProductId);
+  assert.ok(repointed, 'default_price should have been repointed before archiving the old default');
+  assert.equal(repointed.input.default_price, addon.stripePriceIdEur);
   const archived = fakeStripe.prices.updated.find((entry: any) => entry.id === 'price_old_metered');
   assert.ok(archived, 'the stale metered price should have been archived');
   assert.equal(archived.input.active, false);

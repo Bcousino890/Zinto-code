@@ -3660,7 +3660,7 @@ export default function Settings() {
                         </div>
                       ) : (
                         <div className="text-center py-8 text-muted-foreground text-sm sm:text-base">
-                          No plans available at the moment
+                          {t('settings.billing.no_plans_available', 'No plans available at the moment')}
                         </div>
                       )}
                     </div>
@@ -3670,7 +3670,9 @@ export default function Settings() {
                     <AddonsSection />
 
                     <div>
-                      <h3 className="text-base sm:text-lg font-medium mb-4 text-foreground">Payment History</h3>
+                      <h3 className="text-base sm:text-lg font-medium mb-4 text-foreground">
+                        {t('settings.billing.payment_history.title', 'Payment History')}
+                      </h3>
 
                       {(() => {
                         const { data: transactions, isLoading } = useQuery({
@@ -3693,10 +3695,13 @@ export default function Settings() {
                         if (!transactions || transactions.length === 0) {
                           return (
                             <div className="text-center py-4 text-muted-foreground text-sm sm:text-base">
-                              No payment history available
+                              {t('settings.billing.payment_history.no_history', 'No payment history available')}
                             </div>
                           );
                         }
+
+                        const statusLabel = (status: string) =>
+                          t(`settings.billing.payment_history.status_${status}`, status.charAt(0).toUpperCase() + status.slice(1));
 
                         return (
                           <div className="border border-border rounded-lg overflow-hidden">
@@ -3705,16 +3710,16 @@ export default function Settings() {
                                 <thead className="bg-muted">
                                   <tr>
                                     <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                      Date
+                                      {t('settings.billing.payment_history.column_date', 'Date')}
                                     </th>
                                     <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                      Description
+                                      {t('settings.billing.payment_history.column_description', 'Description')}
                                     </th>
                                     <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                      Amount
+                                      {t('settings.billing.payment_history.column_amount', 'Amount')}
                                     </th>
                                     <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                      Status
+                                      {t('settings.billing.payment_history.column_status', 'Status')}
                                     </th>
                                   </tr>
                                 </thead>
@@ -3725,7 +3730,7 @@ export default function Settings() {
                                         {new Date(transaction.createdAt).toLocaleDateString()}
                                       </td>
                                       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-foreground">
-                                        {transaction.planName || 'Subscription Payment'}
+                                        {transaction.planName || t('settings.billing.payment_history.default_description', 'Subscription Payment')}
                                       </td>
                                       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-muted-foreground font-medium">
                                         ${transaction.amount.toFixed(2)}
@@ -3737,7 +3742,7 @@ export default function Settings() {
                                               ? 'bg-secondary/10 text-secondary border border-secondary/20'
                                               : 'bg-destructive/10 text-destructive border border-destructive/20'
                                           }`}>
-                                          {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+                                          {statusLabel(transaction.status)}
                                         </span>
                                       </td>
                                     </tr>

@@ -18,6 +18,7 @@ import {
   InsertPlanAiBillingEvent
 } from '@shared/schema';
 import { eq, and, desc, sql, isNull, ne } from 'drizzle-orm';
+import { addonPurchaseService } from './addon-purchase-store';
 
 export interface PlanLimitCheck {
   allowed: boolean;
@@ -418,7 +419,7 @@ export class PlanLimitsService {
 
       switch (limitType) {
         case 'users':
-          limit = plan.maxUsers;
+          limit = plan.maxUsers + await this.getAddonBonus(companyId, 'extra_user');
           currentUsage = await this.getCurrentUserCount(companyId);
           break;
         case 'contacts':
@@ -426,7 +427,7 @@ export class PlanLimitsService {
           currentUsage = await this.getCurrentContactCount(companyId);
           break;
         case 'channels':
-          limit = plan.maxChannels;
+          limit = plan.maxChannels + await this.getAddonBonus(companyId, 'extra_whatsapp_connection');
           currentUsage = await this.getCurrentChannelCount(companyId);
           break;
         case 'flows':
@@ -619,6 +620,22 @@ export class PlanLimitsService {
   // Note: nothing currently calls checkPlanLimit(..., 'flows') at creation time, so
   // getCurrentFlowCount being correct doesn't yet gate anything on its own — that's
   // a separate, not-yet-wired call site, not a bug in this function.
+
+  // Purchased add-on capacity (extra_user / extra_whatsapp_connection) on top of the plan's own
+  // limit. Without this, buying extra seats/connections in Settings → Facturación charges the
+  // company real money but has zero effect on what they can actually create — the enforcement
+  // check above only ever knew about the base plan's maxUsers/maxChannels.
+  private async getAddonBonus(companyId: number, addonKey: 'extra_user' | 'extra_whatsapp_connection'): Promise<number> {
+    try {
+      const addons = await storage.getAllAddons();
+      const addon = addons.find((a) => a.key === addonKey);
+      if (!addon) return 0;
+      return await addonPurchaseService.getActiveQuantity(companyId, addon.id);
+    } catch (error) {
+      console.error(`Error getting addon bonus for company ${companyId}, addon ${addonKey}:`, error);
+      return 0;
+    }
+  }
 
   private async getCurrentUserCount(companyId: number): Promise<number> {
     const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })

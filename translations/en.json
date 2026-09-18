@@ -69282,5 +69282,141 @@
   {
     "key": "settings.api_access.integrations.providers.pipedrive",
     "value": "Pipedrive"
+  },
+  {
+    "key": "settings.addons.fetch_error",
+    "value": "Failed to load add-ons"
+  },
+  {
+    "key": "settings.addons.purchase_error",
+    "value": "Failed to start checkout"
+  },
+  {
+    "key": "settings.addons.error_title",
+    "value": "Error"
+  },
+  {
+    "key": "settings.addons.no_checkout_url",
+    "value": "No checkout URL was returned by the server."
+  },
+  {
+    "key": "settings.addons.auto_renew_error",
+    "value": "Failed to update auto-renew"
+  },
+  {
+    "key": "settings.addons.title",
+    "value": "Extras"
+  },
+  {
+    "key": "settings.addons.description",
+    "value": "Add extra capacity on top of your plan: extra user seats or WhatsApp connections."
+  },
+  {
+    "key": "settings.addons.none_available",
+    "value": "No add-ons available at the moment."
+  },
+  {
+    "key": "settings.addons.unit_price",
+    "value": "{{price}} per unit / {{days}} days"
+  },
+  {
+    "key": "settings.addons.active_quantity",
+    "value": "Active quantity"
+  },
+  {
+    "key": "settings.addons.nearest_expiry",
+    "value": "Next unit expires on"
+  },
+  {
+    "key": "settings.addons.quantity_label",
+    "value": "Quantity"
+  },
+  {
+    "key": "settings.addons.decrease_quantity",
+    "value": "Decrease quantity"
+  },
+  {
+    "key": "settings.addons.increase_quantity",
+    "value": "Increase quantity"
+  },
+  {
+    "key": "settings.addons.subtotal",
+    "value": "Subtotal"
+  },
+  {
+    "key": "settings.addons.auto_renew_on_purchase_label",
+    "value": "Auto-renew"
+  },
+  {
+    "key": "settings.addons.auto_renew_on_purchase_description",
+    "value": "Automatically re-purchase this quantity every 30 days using your saved payment method."
+  },
+  {
+    "key": "settings.addons.buy_button",
+    "value": "Buy"
+  },
+  {
+    "key": "settings.addons.existing_auto_renew_label",
+    "value": "Auto-renew on active quota"
+  },
+  {
+    "key": "settings.addons.existing_auto_renew_description",
+    "value": "Applies to all currently active quota for this add-on."
+  },
+  {
+    "key": "settings.addons.terms",
+    "value": "Charged immediately and valid for 30 days from confirmed payment. Non-refundable: turning auto-renew off only stops the next charge — it does not refund or end the current period early."
+  },
+  {
+    "key": "settings.billing.no_plans_available",
+    "value": "No plans available at the moment"
+  },
+  {
+    "key": "settings.billing.payment_history.title",
+    "value": "Payment History"
+  },
+  {
+    "key": "settings.billing.payment_history.no_history",
+    "value": "No payment history available"
+  },
+  {
+    "key": "settings.billing.payment_history.column_date",
+    "value": "Date"
+  },
+  {
+    "key": "settings.billing.payment_history.column_description",
+    "value": "Description"
+  },
+  {
+    "key": "settings.billing.payment_history.column_amount",
+    "value": "Amount"
+  },
+  {
+    "key": "settings.billing.payment_history.column_status",
+    "value": "Status"
+  },
+  {
+    "key": "settings.billing.payment_history.default_description",
+    "value": "Subscription Payment"
+  },
+  {
+    "key": "settings.billing.payment_history.status_pending",
+    "value": "Pending"
+  },
+  {
+    "key": "settings.billing.payment_history.status_completed",
+    "value": "Completed"
+  },
+  {
+    "key": "settings.billing.payment_history.status_failed",
+    "value": "Failed"
+  },
+  {
+    "key": "settings.billing.payment_history.status_refunded",
+    "value": "Refunded"
+  },
+  {
+    "key": "settings.billing.payment_history.status_cancelled",
+    "value": "Cancelled"
   }
 ]

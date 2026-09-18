@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { catalogFingerprint, toMinorUnits } from './stripe-catalog-domain';
 import { sanitizeStripeCatalogError } from './stripe-client-provider';
 
@@ -125,13 +126,21 @@ export class AddonCatalogSyncService {
       const activePrices = (await findAll(this.dependencies.stripe.prices)).filter(
         (price) => price.product === productId && price.active !== false && price.id !== priceIdEur && price.id !== priceIdUsd,
       );
+      if (activePrices.length > 0) {
+        // Stripe refuses to archive a price that is still its product's default_price — which the
+        // hand-created price being cleaned up here always is, since it was the only price on the
+        // product when the product itself was created by hand. Repointing default_price at one of
+        // our own tracked prices first is a no-op if it was already pointing there, so it's safe to
+        // do unconditionally rather than fetching the product just to check first.
+        await this.dependencies.stripe.products.update(
+          productId,
+          { default_price: priceIdEur ?? priceIdUsd },
+          freshRequestKey(),
+        );
+      }
       for (const price of activePrices) {
         actions.push('archive_price');
-        await this.dependencies.stripe.prices.update(
-          price.id,
-          { active: false },
-          requestKey(addonId, 'archive-stale-price', `${fingerprint}:${price.id}`),
-        );
+        await this.dependencies.stripe.prices.update(price.id, { active: false }, freshRequestKey());
       }
 
       await this.dependencies.storage.updateAddon(addonId, {
@@ -187,11 +196,7 @@ export class AddonCatalogSyncService {
 
     if (currentPriceId) {
       actions.push('archive_price');
-      await this.dependencies.stripe.prices.update(
-        currentPriceId,
-        { active: false },
-        requestKey(addonId, `archive-price-${currency.toLowerCase()}`, priceFingerprint),
-      );
+      await this.dependencies.stripe.prices.update(currentPriceId, { active: false }, freshRequestKey());
     }
 
     return created.id;
@@ -244,6 +249,18 @@ function entityMetadata(addonId: number, environment?: string): Metadata {
 
 function requestKey(addonId: number, operation: string, fingerprint: string): RequestOptions {
   return { idempotencyKey: `zinto-addon-catalog:${addonId}:${operation}:${fingerprint}` };
+}
+
+// For calls that only ever move a Stripe object toward a target state (archive a price, repoint
+// a product's default price) — unlike creating a Product/Price, replaying one of these has no
+// duplication risk, so there's nothing for a stable idempotency key to protect against. Worse,
+// a stable key here actively breaks retries: after a failed sync attempt is fixed and re-run,
+// Stripe would replay the FIRST attempt's cached response (including a cached failure) instead
+// of re-evaluating against the now-different state, which is exactly what happened while fixing
+// this file — a stale cached "can't archive the default price" kept coming back even after the
+// default had genuinely been repointed moments earlier in the same retry.
+function freshRequestKey(): RequestOptions {
+  return { idempotencyKey: randomUUID() };
 }
 
 async function findByMetadata(collection: Pick<Collection, 'list'>, key: string, value: string) {

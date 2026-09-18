@@ -145,7 +145,7 @@ export function AddonsSection() {
   const setQuantity = (key: string, next: number) => {
     setQuantities((prev) => ({ ...prev, [key]: Math.min(MAX_QUANTITY, Math.max(MIN_QUANTITY, next)) }));
   };
-  const getAutoRenew = (key: string) => autoRenewOnPurchase[key] ?? false;
+  const getAutoRenew = (key: string) => autoRenewOnPurchase[key] ?? true;
   const setAutoRenew = (key: string, next: boolean) => {
     setAutoRenewOnPurchase((prev) => ({ ...prev, [key]: next }));
   };

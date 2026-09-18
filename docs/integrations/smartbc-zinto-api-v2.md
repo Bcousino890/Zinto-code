@@ -4,6 +4,24 @@ Guía para el equipo de desarrollo de SmartBC. La integración es bidireccional:
 SmartBC escribe en Zinto mediante API y Zinto informa a SmartBC mediante
 webhooks.
 
+## Novedades recientes (ya activas en producción, no en desarrollo)
+
+- **Templates de WhatsApp** — `POST /messages` acepta un campo opcional
+  `template` (mutuamente excluyente con `media`), para contactar a alguien
+  que no escribió en las últimas 24hs. Ver la sección "Plantilla de WhatsApp
+  a un lead inactivo" más abajo.
+- **Tres endpoints de lectura nuevos** — `GET /channels`, `GET /conversations`
+  y `GET /messages/{messageId}/status`. Resuelven, entre otras cosas, cómo
+  descubrir el `channelId` sin pedirlo a mano. Ver la sección "Canales,
+  conversaciones y estado de un mensaje" más abajo.
+- **Foto de perfil de WhatsApp** (`avatarUrl` en `PUT /contacts` y
+  `data.contact.avatar_url` en webhooks) y **media** (imagen/vídeo/audio/
+  documento) en mensajes salientes y entrantes — ver sus secciones
+  correspondientes más abajo.
+
+Todo lo de esta sección ya está documentado en detalle en el resto de esta
+guía; esta lista es solo para ubicar rápido qué es nuevo.
+
 ## Arquitectura
 
 ```text

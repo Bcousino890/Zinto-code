@@ -8,8 +8,9 @@ base de la API es `https://crm.zinto.app/api/v2`.
 | Área | Estado público v2 | Notas |
 | --- | --- | --- |
 | Contactos | Disponible | Crea o actualiza por el identificador externo del CRM. |
-| Mensajes | Disponible | Envía mensajes de texto (y, opcionalmente, media) a través de un canal existente de la empresa. |
+| Mensajes | Disponible | Envía mensajes de texto (y, opcionalmente, media o una plantilla de WhatsApp ya aprobada) a través de un canal existente de la empresa. |
 | Media | Disponible | Sube un archivo (`POST /media/upload`), adjúntelo a un mensaje (`POST /messages`) y descargue lo recibido (`GET /media`). |
+| Lectura | Disponible | Consulta canales (`GET /channels`), conversaciones (`GET /conversations`) y el estado de un mensaje (`GET /messages/{messageId}/status`). |
 | Campañas | Disponible | Sincronización por lotes mediante `POST /campaigns/batch`. |
 | Agenda | Disponible | Crea o actualiza una cita para un contacto existente. |
 | Negocios/pipeline | Disponible | Crea o actualiza una oportunidad y su etapa. |
@@ -125,6 +126,83 @@ curl --request POST "$BASE_URL/messages" \
 `recipient` y `text` deben ser cadenas no vacías, y `channelId` debe ser un
 entero positivo. `external_message_id` es opcional, se devuelve sin cambios en
 la respuesta aceptada y sirve para correlación; no es una clave de reintento.
+Para descubrir los `channelId` válidos de la empresa, use `GET /channels`
+(ver la sección de lectura más abajo).
+
+## Enviar una plantilla de WhatsApp
+
+Fuera de la ventana de 24 horas desde el último mensaje del cliente, WhatsApp
+exige una plantilla pre-aprobada; el texto y la media libres se rechazan. En
+`POST /messages`, use el campo opcional `template` en vez de `media` (son
+mutuamente excluyentes, nunca ambos a la vez); no se necesita ningún permiso
+adicional a `messages:send`. Esta ruta envía una plantilla ya aprobada en
+Zinto — no la crea ni la somete a aprobación.
+
+```bash
+curl --request POST "$BASE_URL/messages" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "channelId": 42,
+    "recipient": "+56912345678",
+    "template": {
+      "name": "appointment_reminder",
+      "language": "es",
+      "components": [
+        { "type": "body", "parameters": [{ "type": "text", "text": "mañana 10:00" }] }
+      ]
+    },
+    "external_message_id": "crm-msg-8843"
+  }'
+```
+
+`template.name` (obligatorio) es el nombre de una plantilla ya aprobada en
+Zinto. `template.language` (obligatorio) es un código de idioma de
+WhatsApp/Meta (p. ej. `es`, `en_US`). `template.components` es opcional: cada
+elemento es `{type: 'header'|'body'|'button', parameters: [...]}`, donde cada
+parámetro es una cadena simple o `{type: 'text', text: string}`; omita el
+campo por completo si la plantilla no tiene variables.
+
+## Consultar canales, conversaciones y estado de mensajes
+
+Estas tres rutas son de solo lectura y están limitadas a la empresa de la API
+Key.
+
+`GET /channels` requiere `channels:read` y es la forma de descubrir el
+`channelId` que se usa en `POST /messages` y en el filtro de
+`GET /conversations`:
+
+```bash
+curl "$BASE_URL/channels" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Zinto-Integration-Id: $INTEGRATION_ID"
+# { "data": [{ "id": 42, "name": "WhatsApp Ventas", "type": "whatsapp_official", "status": "active", "phoneNumber": "+56912345678", "displayName": "Ventas" }] }
+```
+
+`GET /conversations` requiere `conversations:read` y admite los filtros
+opcionales `channelId`, `status` e `isGroup` (`true`/`false`), y paginación
+`page`/`limit` (por defecto 20, máximo 100):
+
+```bash
+curl "$BASE_URL/conversations?channelId=42&status=open&limit=20" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Zinto-Integration-Id: $INTEGRATION_ID"
+# { "data": [{ "id": 501, "contactId": 123, "channelId": 42, "channelType": "whatsapp_official", "status": "open", "isGroup": false, "lastMessageAt": "2026-09-10T14:00:00Z", "createdAt": "2026-08-01T10:00:00Z" }], "total": 1 }
+```
+
+`GET /messages/{messageId}/status` requiere `messages:read`; `messageId` es
+el `data.id` devuelto por `POST /messages`:
+
+```bash
+curl "$BASE_URL/messages/98765/status" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Zinto-Integration-Id: $INTEGRATION_ID"
+# { "data": { "status": "delivered", "timestamp": "2026-09-10T14:00:05Z" } }
+```
+
+Devuelve `404 { "error": "NOT_FOUND", ... }` si el mensaje no existe o
+pertenece a otra empresa (misma respuesta en ambos casos).
 
 ## Enviar y recibir media (imagen, vídeo, audio, documento)
 
@@ -218,6 +296,9 @@ claves usan la sesión de Zinto (no son parte de la API pública v2):
 | Enviar mensajes desde el CRM | `messages:send` |
 | Adjuntar media a un mensaje / subir archivo | `media:upload` |
 | Descargar media recibida | `media:read` |
+| Listar canales | `channels:read` |
+| Listar conversaciones | `conversations:read` |
+| Consultar estado de un mensaje | `messages:read` |
 | Crear/actualizar agenda | `appointments:write` |
 | Crear/actualizar negocios | `deals:write` |
 
@@ -282,7 +363,7 @@ contactos y mensajes pueden devolver:
 | 400 | `VALIDATION_ERROR` | Contexto de empresa, Integration ID, external ID o nombre de contacto ausente o inválido. |
 | 401 | `API_KEY_MISSING`, `API_KEY_INVALID_FORMAT`, `API_KEY_NOT_FOUND`, `API_KEY_INACTIVE` o `API_KEY_EXPIRED` | Falló la autenticación. |
 | 403 | `INSUFFICIENT_PERMISSIONS` | La API Key no tiene el permiso de la ruta. |
-| 404 | `NOT_FOUND` | `GET /media` no encontró el archivo o pertenece a otra empresa. |
+| 404 | `NOT_FOUND` | `GET /media` no encontró el archivo, `GET /messages/{messageId}/status` no encontró el mensaje, o el recurso pertenece a otra empresa (misma respuesta en ambos casos). |
 | 500 | `CONTACT_SYNC_FAILED`, `MESSAGE_SYNC_FAILED` o `MEDIA_UPLOAD_FAILED` | Falló la sincronización o la subida; investigue antes de reintentar. |
 
 Para fallos de red y `5xx`, use backoff exponencial acotado con jitter. No

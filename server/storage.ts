@@ -55,7 +55,7 @@ import {
   apiUsage, type ApiUsage, type InsertApiUsage,
   apiRateLimits, type ApiRateLimit, type InsertApiRateLimit,
   apiWebhooks, type ApiWebhook, type InsertApiWebhook,
-  crmExternalMappings, crmIntegrations, crmWebhookEvents, crmSyncConflicts,
+  crmExternalMappings, crmIntegrations, crmWebhookEvents, crmSyncConflicts, crmIdempotencyKeys,
   flows, type Flow, type InsertFlow,
   flowTemplates, type FlowTemplate, type InsertFlowTemplate,
   flowAssignments, type FlowAssignment, type InsertFlowAssignment,
@@ -718,6 +718,7 @@ export interface IStorage {
   getAllPaymentTransactions(): Promise<PaymentTransaction[]>;
   getPaymentTransactionsByCompany(companyId: number): Promise<PaymentTransaction[]>;
   getPaymentTransaction(id: number): Promise<PaymentTransaction | undefined>;
+  getPaymentTransactionByPaymentIntentId(paymentIntentId: string): Promise<PaymentTransaction | undefined>;
   createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction>;
   updatePaymentTransaction(id: number, updates: Partial<InsertPaymentTransaction>): Promise<PaymentTransaction>;
 
@@ -931,6 +932,19 @@ export interface IStorage {
   saveCrmContactMapping(companyId: number, integrationId: number, externalId: string, contactId: number): Promise<void>;
   getCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal' | 'campaign', externalId: string): Promise<{ zintoId: string } | undefined>;
   saveCrmExternalMapping(companyId: number, integrationId: number, entityType: 'appointment' | 'deal' | 'campaign', externalId: string, zintoId: number): Promise<void>;
+  claimCrmIdempotencyKey(input: {
+    companyId: number;
+    integrationId: number;
+    key: string;
+    method: string;
+    path: string;
+    requestHash: string;
+  }): Promise<{
+    won: boolean;
+    record: { method: string; path: string; requestHash: string; responseStatus: number | null; responseBody: unknown };
+  }>;
+  completeCrmIdempotencyKey(companyId: number, key: string, responseStatus: number, responseBody: unknown): Promise<void>;
+  releaseCrmIdempotencyKey(companyId: number, key: string): Promise<void>;
   claimPending(input: DurableWebhookClaimPendingInput): Promise<ClaimedDurableWebhookEvent | undefined>;
   updateDelivery(input: DurableWebhookDeliveryUpdate): Promise<boolean>;
   listCandidateScopes(): Promise<DurableWebhookEventScope[]>;
@@ -5638,6 +5652,102 @@ export class DatabaseStorage implements IStorage {
       target: [crmExternalMappings.companyId, crmExternalMappings.integrationId, crmExternalMappings.entityType, crmExternalMappings.externalId],
       set: { zintoId: String(zintoId), version: sql`${crmExternalMappings.version} + 1`, updatedAt: new Date() },
     });
+  }
+
+  /**
+   * Atomically claims an Idempotency-Key so at most one concurrent request
+   * ever runs the underlying side effect. Backed by a conditional upsert: a
+   * fresh key is inserted with `response_status = NULL` ("claimed, still in
+   * flight"); a key whose prior claim has expired (past `expires_at`) is
+   * reclaimed the same way; anything else — a live in-flight claim, or a
+   * completed one still within its TTL — is left untouched and `won: false`
+   * is returned along with that existing row, so the caller can tell a
+   * genuine replay from a real conflict without ever racing a second
+   * `work()` invocation against the first. The `WHERE expires_at < NOW()`
+   * clause on the UPDATE branch is what makes an expired row safely
+   * reclaimable instead of permanently blocking future use of the same key
+   * (onConflictDoNothing alone can't distinguish "expired" from "in use").
+   */
+  async claimCrmIdempotencyKey(input: {
+    companyId: number;
+    integrationId: number;
+    key: string;
+    method: string;
+    path: string;
+    requestHash: string;
+  }): Promise<{
+    won: boolean;
+    record: { method: string; path: string; requestHash: string; responseStatus: number | null; responseBody: unknown };
+  }> {
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const [claimed] = await db.insert(crmIdempotencyKeys).values({
+      companyId: input.companyId,
+      integrationId: input.integrationId,
+      key: input.key,
+      method: input.method,
+      path: input.path,
+      requestHash: input.requestHash,
+      responseStatus: null,
+      responseBody: null,
+      expiresAt,
+    }).onConflictDoUpdate({
+      target: [crmIdempotencyKeys.companyId, crmIdempotencyKeys.key],
+      set: {
+        integrationId: input.integrationId,
+        method: input.method,
+        path: input.path,
+        requestHash: input.requestHash,
+        responseStatus: null,
+        responseBody: null,
+        createdAt: new Date(),
+        expiresAt,
+      },
+      setWhere: lt(crmIdempotencyKeys.expiresAt, new Date()),
+    }).returning({
+      method: crmIdempotencyKeys.method,
+      path: crmIdempotencyKeys.path,
+      requestHash: crmIdempotencyKeys.requestHash,
+      responseStatus: crmIdempotencyKeys.responseStatus,
+      responseBody: crmIdempotencyKeys.responseBody,
+    });
+
+    if (claimed) {
+      return { won: true, record: claimed };
+    }
+
+    // Our conditional UPDATE didn't apply (an unexpired claim already owns this
+    // key) — read it back so the caller can tell a matching replay from a
+    // real conflict, without ever having won the right to run `work()`.
+    const [existing] = await db.select({
+      method: crmIdempotencyKeys.method,
+      path: crmIdempotencyKeys.path,
+      requestHash: crmIdempotencyKeys.requestHash,
+      responseStatus: crmIdempotencyKeys.responseStatus,
+      responseBody: crmIdempotencyKeys.responseBody,
+    }).from(crmIdempotencyKeys).where(and(
+      eq(crmIdempotencyKeys.companyId, input.companyId),
+      eq(crmIdempotencyKeys.key, input.key),
+    )).limit(1);
+
+    // Vanishingly unlikely (the row would have to be deleted between our failed
+    // claim and this read), but fail safe rather than crash on a missing row.
+    return {
+      won: false,
+      record: existing ?? { method: input.method, path: input.path, requestHash: input.requestHash, responseStatus: null, responseBody: null },
+    };
+  }
+
+  /** Fills in the response for a claim this same process just won (see claimCrmIdempotencyKey). */
+  async completeCrmIdempotencyKey(companyId: number, key: string, responseStatus: number, responseBody: unknown): Promise<void> {
+    await db.update(crmIdempotencyKeys)
+      .set({ responseStatus, responseBody: responseBody as any })
+      .where(and(eq(crmIdempotencyKeys.companyId, companyId), eq(crmIdempotencyKeys.key, key)));
+  }
+
+  /** Releases a claim this same process just won after a failed attempt, so a retry with the same key can actually re-run instead of waiting out the TTL. */
+  async releaseCrmIdempotencyKey(companyId: number, key: string): Promise<void> {
+    await db.delete(crmIdempotencyKeys)
+      .where(and(eq(crmIdempotencyKeys.companyId, companyId), eq(crmIdempotencyKeys.key, key)));
   }
 
   async getInactiveContactByIdentifierAndCompany(
@@ -10352,6 +10462,24 @@ export class DatabaseStorage implements IStorage {
       return this.mapToPaymentTransaction(transaction);
     } catch (error) {
       console.error(`Error getting payment transaction with ID ${id}:`, error);
+      return undefined;
+    }
+  }
+
+  async getPaymentTransactionByPaymentIntentId(paymentIntentId: string): Promise<PaymentTransaction | undefined> {
+    try {
+      const [transaction] = await db
+        .select()
+        .from(paymentTransactions)
+        .where(eq(paymentTransactions.paymentIntentId, paymentIntentId))
+        .orderBy(desc(paymentTransactions.id))
+        .limit(1);
+
+      if (!transaction) return undefined;
+
+      return this.mapToPaymentTransaction(transaction);
+    } catch (error) {
+      console.error(`Error getting payment transaction for payment intent ${paymentIntentId}:`, error);
       return undefined;
     }
   }

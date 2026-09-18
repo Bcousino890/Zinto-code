@@ -17,6 +17,17 @@ type CrmMediaMessageInput = Omit<CrmMessageInput, 'content'> & {
   };
 };
 
+type CrmTemplateMessageInput = Omit<CrmMessageInput, 'content'> & {
+  template: {
+    name: string;
+    language: string;
+    components?: Array<{
+      type: 'header' | 'body' | 'button';
+      parameters: Array<string | { type: 'text'; text: string }>;
+    }>;
+  };
+};
+
 type StoredMessage = {
   metadata?: unknown;
 };
@@ -39,6 +50,20 @@ type MessageSender = {
     caption?: string;
     filename?: string;
   }): Promise<{ id: string | number }>;
+  // Optional: existing call sites constructed before template support was
+  // added to this adapter don't provide it yet. Made required-in-spirit by
+  // the runtime check in `sendTemplate` below, which throws a clear error if
+  // it is missing rather than failing with a silent `undefined` call.
+  sendTemplate?(companyId: number, request: {
+    channelId: number;
+    to: string;
+    templateName: string;
+    templateLanguage: string;
+    components?: Array<{
+      type: 'header' | 'body' | 'button';
+      parameters: Array<string | { type: 'text'; text: string }>;
+    }>;
+  }): Promise<{ id: string | number }>;
 };
 
 type MessageStorage = {
@@ -50,6 +75,7 @@ type MessageStorage = {
 export type CrmApiV2MessageAdapter = {
   send(input: CrmMessageInput): Promise<{ id: string | number }>;
   sendMedia(input: CrmMediaMessageInput): Promise<{ id: string | number }>;
+  sendTemplate(input: CrmTemplateMessageInput): Promise<{ id: string | number }>;
 };
 
 function jsonValue(value: unknown): JsonValue | undefined {
@@ -76,7 +102,7 @@ function jsonObject(value: unknown): JsonObject {
   return normalized && !Array.isArray(normalized) && typeof normalized === 'object' ? normalized : {};
 }
 
-function crmMetadata(existingMetadata: unknown, input: CrmMessageInput | CrmMediaMessageInput): JsonObject {
+function crmMetadata(existingMetadata: unknown, input: CrmMessageInput | CrmMediaMessageInput | CrmTemplateMessageInput): JsonObject {
   const existing = jsonObject(existingMetadata);
   const existingCrm = jsonObject(existing.crm);
   const legacyMetadata = jsonValue(existingMetadata);
@@ -138,6 +164,35 @@ export function createCrmApiV2MessageAdapter(
         mediaUrl: input.media.url,
         ...(input.caption ? { caption: input.caption } : {}),
         ...(input.media.filename ? { filename: input.media.filename } : {}),
+      });
+
+      if (typeof result.id === 'number') {
+        const message = await dependencies.getMessageById(result.id);
+        if (message) {
+          await dependencies.updateMessage(result.id, {
+            metadata: crmMetadata(message.metadata, input),
+          });
+        }
+      }
+
+      return { id: result.id };
+    },
+
+    async sendTemplate(input) {
+      if (!await dependencies.crmIntegrationBelongsToCompany(input.companyId, input.integrationId)) {
+        throw new Error('Integration does not belong to this company');
+      }
+
+      if (!dependencies.sendTemplate) {
+        throw new Error('Template sending is not configured for this integration');
+      }
+
+      const result = await dependencies.sendTemplate(input.companyId, {
+        channelId: input.channelId,
+        to: input.to,
+        templateName: input.template.name,
+        templateLanguage: input.template.language,
+        ...(input.template.components ? { components: input.template.components } : {}),
       });
 
       if (typeof result.id === 'number') {

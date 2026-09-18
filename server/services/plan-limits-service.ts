@@ -1,18 +1,23 @@
 import { db } from '../db';
 import { storage } from '../storage';
-import { 
+import {
   companies,
   plans,
   planAiProviderConfigs,
   planAiUsageTracking,
   planAiBillingEvents,
+  users,
+  contacts,
+  channelConnections,
+  flows,
+  campaigns,
   Company,
   Plan,
   PlanAiProviderConfig,
   PlanAiUsageTracking,
   InsertPlanAiBillingEvent
 } from '@shared/schema';
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, sql, isNull, ne } from 'drizzle-orm';
 
 export interface PlanLimitCheck {
   allowed: boolean;
@@ -123,6 +128,20 @@ export class PlanLimitsService {
         };
       }
 
+      // 'paused' was never checked here at all, so a paused company sailed through
+      // every access check with isExpired:false — full product access the whole time
+      // it was "paused", exactly contrary to what the Pause Subscription UI promises
+      // ("access to premium features will be limited"). Blocking it here is
+      // independent of whether resumeSubscription's date-extension behavior is also
+      // reconsidered — see HANDOFF-billing-security-audit.md.
+      if (normalizedStatus === 'paused') {
+        return {
+          isExpired: true,
+          status: 'paused',
+          message: 'Subscription is paused. Resume it to continue using the service.'
+        };
+      }
+
 
       if (companyData.subscriptionEndDate) {
         const isExpired = now > companyData.subscriptionEndDate;
@@ -189,6 +208,30 @@ export class PlanLimitsService {
         };
       }
 
+
+      // Trials never had a subscriptionEndDate to fall through the block above, and
+      // 'trial' was never in the expired/past_due/overdue list below either — so a
+      // trial company always reached the final "isExpired: false" fallback, no matter
+      // how long ago trialEndDate passed. This is the one place that actually compares
+      // it to now.
+      if (normalizedStatus === 'trial' && companyData.trialEndDate) {
+        const isTrialExpired = now > companyData.trialEndDate;
+        if (isTrialExpired) {
+          return {
+            isExpired: true,
+            status: 'trial_expired',
+            message: 'Your trial has ended. Please subscribe to continue using the service.'
+          };
+        }
+        const trialDaysRemaining = Math.ceil((companyData.trialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        return {
+          isExpired: false,
+          status: 'trial',
+          expirationDate: companyData.trialEndDate,
+          daysUntilExpiry: Math.max(0, trialDaysRemaining),
+          message: `Trial active. ${trialDaysRemaining} days remaining.`
+        };
+      }
 
       if (['expired', 'past_due', 'overdue'].includes(companyData.subscriptionStatus || '')) {
 
@@ -568,34 +611,85 @@ export class PlanLimitsService {
   }
 
 
+  // These five were hardcoded `return 0` — every checkPlanLimit() call for
+  // users/contacts/channels/campaigns (wired into the real creation routes in
+  // server/routes.ts and server/routes/campaigns.ts) always passed, on every plan,
+  // for every company, because "current usage" was always reported as zero. Real
+  // counts activate enforcement at all of those existing call sites immediately.
+  // Note: nothing currently calls checkPlanLimit(..., 'flows') at creation time, so
+  // getCurrentFlowCount being correct doesn't yet gate anything on its own — that's
+  // a separate, not-yet-wired call site, not a bug in this function.
+
   private async getCurrentUserCount(companyId: number): Promise<number> {
-
-
-    return 0; // Placeholder
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(users)
+      .where(eq(users.companyId, companyId));
+    return result?.count ?? 0;
   }
 
   private async getCurrentContactCount(companyId: number): Promise<number> {
-
-
-    return 0; // Placeholder
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(contacts)
+      .where(and(
+        eq(contacts.companyId, companyId),
+        eq(contacts.isArchived, false),
+        isNull(contacts.deletedAt),
+      ));
+    return result?.count ?? 0;
   }
 
   private async getCurrentChannelCount(companyId: number): Promise<number> {
-
-
-    return 0; // Placeholder
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(channelConnections)
+      .where(eq(channelConnections.companyId, companyId));
+    return result?.count ?? 0;
   }
 
   private async getCurrentFlowCount(companyId: number): Promise<number> {
-
-
-    return 0; // Placeholder
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(flows)
+      .where(and(
+        eq(flows.companyId, companyId),
+        ne(flows.status, 'archived'),
+      ));
+    return result?.count ?? 0;
   }
 
   private async getCurrentCampaignCount(companyId: number): Promise<number> {
+    const [result] = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(campaigns)
+      .where(eq(campaigns.companyId, companyId));
+    return result?.count ?? 0;
+  }
 
+  /**
+   * Whether a company's current usage would fit under a DIFFERENT plan's limits
+   * (as opposed to checkPlanLimit(), which always checks against the company's own
+   * current plan). Used to block downgrades that would leave a company over-limit
+   * on day one, per the product decision to block rather than auto-deactivate.
+   */
+  async checkUsageFitsPlan(
+    companyId: number,
+    targetPlan: { maxUsers: number; maxContacts: number; maxChannels: number; maxFlows: number; maxCampaigns: number }
+  ): Promise<{ fits: boolean; violations: Array<{ resource: string; current: number; limit: number }> }> {
+    const [userCount, contactCount, channelCount, flowCount, campaignCount] = await Promise.all([
+      this.getCurrentUserCount(companyId),
+      this.getCurrentContactCount(companyId),
+      this.getCurrentChannelCount(companyId),
+      this.getCurrentFlowCount(companyId),
+      this.getCurrentCampaignCount(companyId),
+    ]);
 
-    return 0; // Placeholder
+    const checks: Array<{ resource: string; current: number; limit: number }> = [
+      { resource: 'users', current: userCount, limit: targetPlan.maxUsers },
+      { resource: 'contacts', current: contactCount, limit: targetPlan.maxContacts },
+      { resource: 'channels', current: channelCount, limit: targetPlan.maxChannels },
+      { resource: 'flows', current: flowCount, limit: targetPlan.maxFlows },
+      { resource: 'campaigns', current: campaignCount, limit: targetPlan.maxCampaigns },
+    ];
+
+    const violations = checks.filter(c => c.current > c.limit);
+    return { fits: violations.length === 0, violations };
   }
 }
 

@@ -82,10 +82,25 @@ export function getApiV2PostmanCollection() {
       },
       {
         name: 'Mensajes',
-        item: [item('Enviar mensaje desde CRM', 'POST', '/messages', {
-          body: jsonBody({ channelId: 1, recipient: '+56912345678', text: 'Hola desde mi CRM', external_message_id: 'crm-msg-8841' }),
-          description: 'Requiere messages:send. Zinto devuelve 202 y entrega estados por webhook.',
-        })],
+        item: [
+          item('Enviar mensaje desde CRM', 'POST', '/messages', {
+            body: jsonBody({ channelId: 1, recipient: '+56912345678', text: 'Hola desde mi CRM', external_message_id: 'crm-msg-8841' }),
+            description: 'Requiere messages:send. Zinto devuelve 202 y entrega estados por webhook.',
+          }),
+          item('Enviar plantilla de WhatsApp', 'POST', '/messages', {
+            body: jsonBody({
+              channelId: 1,
+              recipient: '+56912345678',
+              template: {
+                name: 'appointment_reminder',
+                language: 'es',
+                components: [{ type: 'body', parameters: [{ type: 'text', text: 'mañana 10:00' }] }],
+              },
+              external_message_id: 'crm-msg-8843',
+            }),
+            description: 'Requiere messages:send (mismo permiso, sin scope adicional). Use template en vez de media (son mutuamente excluyentes) para contactar a un destinatario fuera de la ventana de 24 horas, donde WhatsApp exige una plantilla ya aprobada.',
+          }),
+        ],
       },
       {
         name: 'Media',
@@ -111,6 +126,38 @@ export function getApiV2PostmanCollection() {
               header: authenticatedHeaders(true).filter((header) => header.key !== 'Content-Type'),
               url: queryUrl('/media', { type: 'image', filename: 'xyz789.jpg' }),
               description: 'Requiere media:read. type y filename llegan resueltos en data.media.url del evento message.received.',
+            },
+          },
+        ],
+      },
+      {
+        name: 'Lectura',
+        item: [
+          {
+            name: 'Listar canales',
+            request: {
+              method: 'GET',
+              header: authenticatedHeaders(true).filter((header) => header.key !== 'Content-Type'),
+              url: url('/channels'),
+              description: 'Requiere channels:read. Útil para descubrir el channelId usado en POST /messages y en el filtro channelId de GET /conversations.',
+            },
+          },
+          {
+            name: 'Listar conversaciones',
+            request: {
+              method: 'GET',
+              header: authenticatedHeaders(true).filter((header) => header.key !== 'Content-Type'),
+              url: queryUrl('/conversations', { channelId: '42', status: 'open', isGroup: 'false', page: '1', limit: '20' }),
+              description: 'Requiere conversations:read. channelId, status, isGroup, page y limit son opcionales (limit por defecto 20, máximo 100).',
+            },
+          },
+          {
+            name: 'Consultar estado de un mensaje',
+            request: {
+              method: 'GET',
+              header: authenticatedHeaders(true).filter((header) => header.key !== 'Content-Type'),
+              url: url('/messages/{messageId}/status'),
+              description: 'Requiere messages:read. Reemplace {messageId} por el data.id devuelto por POST /messages. Devuelve 404 NOT_FOUND si el mensaje no existe o pertenece a otra empresa.',
             },
           },
         ],

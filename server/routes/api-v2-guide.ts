@@ -34,7 +34,7 @@ El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo 
 
 1. El CRM envía un mensaje a POST /messages.
 2. Zinto lo entrega por el canal configurado y responde con 202 Accepted.
-3. Zinto envía al webhook del CRM los eventos message.sent, message.delivered, message.read o message.failed.
+3. Zinto envía al webhook del CRM los eventos message.sent, message.delivered, message.read o message.failed. message.read depende de que el destinatario tenga activados los recibos de lectura en WhatsApp: si los desactivó, ese mensaje nunca disparará message.read aunque message.delivered sí llegue con normalidad.
 4. Cuando el cliente responde, Zinto envía message.received; el CRM guarda el mensaje y no lo reenvía a Zinto.
 5. Los cambios de contactos, agenda, pipeline y campañas se sincronizan mediante los endpoints PUT y POST y sus eventos correspondientes.
 
@@ -48,9 +48,12 @@ El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo 
 | GET | /guide.md | Público |
 | GET | /capabilities | integrations:manage |
 | PUT | /contacts/{externalId} | contacts:write |
-| POST | /messages | messages:send (+ media:upload si incluye \`media\`) |
+| POST | /messages | messages:send (+ media:upload si incluye \`media\`; \`template\` no requiere permiso adicional) |
 | POST | /media/upload | media:upload |
 | GET | /media | media:read |
+| GET | /channels | channels:read |
+| GET | /conversations | conversations:read |
+| GET | /messages/{messageId}/status | messages:read |
 | POST | /campaigns/batch | campaigns:write |
 | PUT | /appointments/{externalId} | appointments:write |
 | POST | /deals | deals:write |
@@ -61,6 +64,8 @@ El payload de \`PUT /contacts/{externalId}\` admite \`name\`, \`phone\`, \`email
 La respuesta de \`PUT /contacts/{externalId}\` puede incluir además \`avatarUrl\` (URL absoluta) con la foto de perfil de WhatsApp del contacto: es un campo de solo salida — nunca se envía en el payload de entrada — y se omite cuando Zinto no dispone de la foto. Es un dato best-effort: solo se completa para contactos del canal WhatsApp no oficial (QR), se obtiene una única vez al crear el contacto y solo si WhatsApp la entregó en ese momento (muchos usuarios tienen la foto oculta por privacidad); no se actualiza si el contacto cambia su foto después. En el canal oficial de WhatsApp Cloud API nunca está presente.
 
 ## Ejemplo: enviar desde el CRM
+
+\`channelId\` identifica un canal de mensajería ya configurado en la empresa; use \`GET /channels\` (ver la sección Lectura más abajo) para listarlos y descubrir su \`id\`.
 
 ~~~bash
 curl -X POST https://crm.zinto.app/api/v2/messages \\
@@ -96,6 +101,53 @@ curl "https://crm.zinto.app/api/v2/media?type=image&filename=xyz789.jpg" \\
   -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
   -o foto-recibida.jpg
 ~~~
+
+## Enviar una plantilla de WhatsApp
+
+Fuera de la ventana de 24 horas desde el último mensaje del cliente, WhatsApp exige una plantilla pre-aprobada; el texto y la media libres se rechazan en ese caso. Use \`template\` en vez de \`media\` en \`POST /messages\` (son mutuamente excluyentes, nunca ambos a la vez); no se necesita ningún permiso adicional, sigue bastando \`messages:send\`. Esta ruta envía una plantilla ya aprobada en Zinto — no crea ni somete plantillas a aprobación.
+
+~~~bash
+curl -X POST https://crm.zinto.app/api/v2/messages \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
+  -H "Content-Type: application/json" \\
+  -d '{"channelId":1,"recipient":"+56912345678","template":{"name":"appointment_reminder","language":"es","components":[{"type":"body","parameters":[{"type":"text","text":"mañana 10:00"}]}]},"external_message_id":"crm-msg-8843"}'
+~~~
+
+\`template.name\` y \`template.language\` son obligatorios; \`template.components\` es opcional y se omite por completo si la plantilla no tiene variables. Cada componente es \`{type: 'header'|'body'|'button', parameters: [...]}\`, donde cada parámetro es una cadena simple o \`{type: 'text', text: string}\`.
+
+## Lectura: canales, conversaciones y estado de mensajes
+
+v2 expone tres rutas de solo lectura, todas limitadas a la empresa de la API Key.
+
+\`GET /channels\` (requiere \`channels:read\`) lista los canales de mensajería de la empresa; es la forma de descubrir el \`channelId\` que se usa en \`POST /messages\` y en el filtro de \`GET /conversations\`.
+
+~~~bash
+curl https://crm.zinto.app/api/v2/channels \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION"
+# {"data":[{"id":42,"name":"WhatsApp Ventas","type":"whatsapp_official","status":"active","phoneNumber":"+56912345678","displayName":"Ventas"}]}
+~~~
+
+\`GET /conversations\` (requiere \`conversations:read\`) admite los filtros opcionales \`channelId\`, \`status\` e \`isGroup\` (\`true\`/\`false\`), y paginación \`page\`/\`limit\` (por defecto 20, máximo 100).
+
+~~~bash
+curl "https://crm.zinto.app/api/v2/conversations?channelId=42&status=open&limit=20" \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION"
+# {"data":[{"id":501,"contactId":123,"channelId":42,"channelType":"whatsapp_official","status":"open","isGroup":false,"lastMessageAt":"2026-09-10T14:00:00Z","createdAt":"2026-08-01T10:00:00Z"}],"total":1}
+~~~
+
+\`GET /messages/{messageId}/status\` (requiere \`messages:read\`) — \`messageId\` es el \`data.id\` devuelto por \`POST /messages\`.
+
+~~~bash
+curl https://crm.zinto.app/api/v2/messages/98765/status \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION"
+# {"data":{"status":"delivered","timestamp":"2026-09-10T14:00:05Z"}}
+~~~
+
+Devuelve \`404 {"error":"NOT_FOUND", ...}\` si el mensaje no existe o pertenece a otra empresa (misma respuesta en ambos casos, sin distinguirlos).
 
 ## Webhooks y seguridad
 

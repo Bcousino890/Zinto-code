@@ -22,6 +22,10 @@ import {
   deriveMetaReferralContactTags,
   normalizeWhatsAppOfficialMetaReferral,
 } from './meta-referral-normalization';
+import {
+  resolveWhatsAppStatusUpdate,
+  type WhatsAppStatusWebhookEntry,
+} from './whatsapp-official-status';
 const activeConnections = new Map<number, boolean>();
 
 const eventEmitter = new EventEmitter();
@@ -1875,7 +1879,13 @@ export async function processWebhook(payload: any, companyId?: number): Promise<
       for (const change of entry.changes) {
         if (change.field === 'messages') {
           const value = change.value;
-          if (!value || !value.messages || !value.messages.length) continue;
+          const hasInboundMessages = !!(value?.messages && value.messages.length);
+          const hasStatusUpdates = !!(value?.statuses && value.statuses.length);
+          // Meta sends the same change.field ('messages') both for inbound
+          // messages (value.messages) and for outbound message status
+          // updates - sent/delivered/read/failed - via value.statuses. Skip
+          // only when this payload carries neither.
+          if (!value || (!hasInboundMessages && !hasStatusUpdates)) continue;
 
           const phoneNumberId = value.metadata?.phone_number_id;
           if (!phoneNumberId) {
@@ -1910,8 +1920,16 @@ export async function processWebhook(payload: any, companyId?: number): Promise<
             continue;
           }
 
-          for (const message of value.messages) {
-            await handleIncomingWebhookMessage(message, value.contacts, connection);
+          if (hasInboundMessages) {
+            for (const message of value.messages) {
+              await handleIncomingWebhookMessage(message, value.contacts, connection);
+            }
+          }
+
+          if (hasStatusUpdates) {
+            for (const statusEntry of value.statuses) {
+              await handleStatusWebhookUpdate(statusEntry, connection);
+            }
           }
         } else if (change.field === 'history') {
           await handleHistoryWebhook(change.value);
@@ -2436,6 +2454,51 @@ async function handleIncomingWebhookMessage(
 }
 
 export { handleIncomingWebhookMessage };
+
+/**
+ * Handle one entry of a Meta status webhook (`value.statuses[]`) - i.e. a
+ * sent/delivered/read/failed report for a message we previously sent
+ * through this connection. Looks up our internal message row by the wamid
+ * Meta stored as `externalId` when we sent it, works out whether this
+ * status represents forward progress (see resolveWhatsAppStatusUpdate /
+ * mapMetaStatusToInternalStatus), and - if so - updates it through the same
+ * storage.updateMessage() path that already fires the CRM v2
+ * message.delivered / message.read / message.failed webhooks correctly.
+ * @param statusEntry One element of value.statuses from the webhook payload
+ * @param connection The channel connection the webhook was resolved against
+ */
+async function handleStatusWebhookUpdate(
+  statusEntry: WhatsAppStatusWebhookEntry,
+  connection: ChannelConnection
+): Promise<void> {
+  try {
+    const wamid = statusEntry?.id;
+    if (!wamid) {
+      console.warn('[WhatsApp processWebhook] Status update missing message id, skipping');
+      return;
+    }
+
+    const message = await storage.getMessageByExternalId(wamid, connection.companyId || undefined);
+    if (!message) {
+      // No matching outbound message for this company (could predate
+      // externalId tracking, belong to another connection, or be a status
+      // for a message we never recorded). Nothing to update.
+      return;
+    }
+
+    const updates = resolveWhatsAppStatusUpdate(message, statusEntry);
+    if (!updates) {
+      // Duplicate redelivery of a status we already recorded, or a
+      // late/out-of-order webhook that would downgrade the message -
+      // intentionally a no-op so we never fire a duplicate CRM webhook.
+      return;
+    }
+
+    await storage.updateMessage(message.id, updates);
+  } catch (error) {
+    console.error('[WhatsApp processWebhook] Error handling status update:', error);
+  }
+}
 
 /**
  * Subscribe to WhatsApp Business API events

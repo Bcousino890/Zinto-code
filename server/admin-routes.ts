@@ -8,6 +8,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import Stripe from "stripe";
+import { computeSubscriptionEndDate } from "./routes/enhanced-subscription";
 import paypal from "@paypal/checkout-server-sdk";
 import { pool, db } from "./db";
 import { ensureSuperAdmin } from "./middleware";
@@ -3246,6 +3247,14 @@ function registerAdminRoutes(app: Express) {
           if (paymentIntent.metadata && paymentIntent.metadata.transactionId) {
             const transactionId = parseInt(paymentIntent.metadata.transactionId);
 
+            // Idempotency: Stripe delivers webhooks at-least-once and retries on
+            // anything but a fast 2xx. Without this check, every redelivery of the
+            // same event re-ran the block below and pushed subscriptionEndDate to
+            // "now + 30 days" again — a free extension on every retry, not just once.
+            const existingTransaction = await storage.getPaymentTransaction(transactionId);
+            if (existingTransaction?.status === 'completed') {
+              break;
+            }
 
             await storage.updatePaymentTransaction(transactionId, {
               status: 'completed',
@@ -3261,11 +3270,22 @@ function registerAdminRoutes(app: Express) {
 
 
               const plan = await storage.getPlan(planId);
+              const company = await storage.getCompany(companyId);
+              const now = new Date();
+              // Stack onto remaining time instead of a flat "now + 30 days" —
+              // matches activateSubscriptionAfterPayment's correct logic, so an
+              // early renewal doesn't lose paid time.
+              const baseDate = (company?.subscriptionEndDate && now <= company.subscriptionEndDate)
+                ? new Date(company.subscriptionEndDate)
+                : now;
+              const newEndDate = plan
+                ? computeSubscriptionEndDate(plan, baseDate)
+                : new Date(baseDate.getTime() + 30 * 24 * 60 * 60 * 1000);
               const updatedCompany = await storage.updateCompany(companyId, {
                 planId: planId,
                 plan: plan?.name.toLowerCase() || 'unknown',
                 subscriptionStatus: 'active',
-                subscriptionEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                subscriptionEndDate: newEndDate
               });
 
 
@@ -3314,6 +3334,40 @@ function registerAdminRoutes(app: Express) {
             throw addonError;
           }
           break;
+        // Neither of these was handled at all before: a refunded plan payment or a
+        // card dispute left `company.subscriptionStatus` untouched, so the company
+        // kept full access for the rest of its already-granted period regardless of
+        // the money being taken back. `subscriptionStatus: 'cancelled'` is already
+        // treated as immediately-expired everywhere access is checked.
+        case 'charge.refunded': {
+          const charge = event.data.object;
+          const isFullRefund = typeof charge.amount === 'number' && charge.amount_refunded >= charge.amount;
+          if (isFullRefund && charge.payment_intent) {
+            const refundedTransaction = await storage.getPaymentTransactionByPaymentIntentId(
+              typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent.id
+            );
+            if (refundedTransaction?.companyId) {
+              await storage.updatePaymentTransaction(refundedTransaction.id, { status: 'refunded' });
+              await storage.updateCompany(refundedTransaction.companyId, { subscriptionStatus: 'cancelled' });
+            }
+          }
+          break;
+        }
+        case 'charge.dispute.created': {
+          // Revoke access immediately rather than waiting for the dispute to
+          // resolve; the transaction itself is left as-is since a dispute can
+          // still be won, and 'disputed' isn't one of its valid status values.
+          const dispute = event.data.object;
+          if (dispute.payment_intent) {
+            const disputedTransaction = await storage.getPaymentTransactionByPaymentIntentId(
+              typeof dispute.payment_intent === 'string' ? dispute.payment_intent : dispute.payment_intent.id
+            );
+            if (disputedTransaction?.companyId) {
+              await storage.updateCompany(disputedTransaction.companyId, { subscriptionStatus: 'cancelled' });
+            }
+          }
+          break;
+        }
         default:
       }
 
@@ -3384,7 +3438,7 @@ function registerAdminRoutes(app: Express) {
                 status = 'pending';
             }
 
-            await storage.updatePaymentTransaction(transactionId, {
+            const updatedTransaction = await storage.updatePaymentTransaction(transactionId, {
               status: status as 'pending' | 'completed' | 'failed' | 'refunded',
               paymentIntentId: paymentData.id.toString(),
               metadata: {
@@ -3393,6 +3447,13 @@ function registerAdminRoutes(app: Express) {
                 mercadopago_status_detail: paymentData.status_detail
               }
             });
+
+            // Same reasoning as the Stripe webhook's charge.refunded case: a
+            // refund used to only update this transaction row, leaving the
+            // company's access untouched for the rest of the paid period.
+            if (status === 'refunded' && updatedTransaction.companyId) {
+              await storage.updateCompany(updatedTransaction.companyId, { subscriptionStatus: 'cancelled' });
+            }
           }
         }
       }

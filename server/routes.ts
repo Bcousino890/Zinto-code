@@ -283,7 +283,10 @@ import {
   isMetaWebhookSignatureBypassAllowed,
   isMetaLegacyTokenOnboardingAllowed,
 } from "./utils/meta-webhook-security";
-import { authenticateApiKey } from "./middleware/api-auth";
+import { authenticateApiKey, rateLimitMiddleware } from "./middleware/api-auth";
+import { planInitialCrmSynchronization } from "./services/initial-crm-synchronization-plan";
+import { CrmChannelsReadService, CrmConversationsReadService, CrmMessageStatusReadService } from "./services/crm-read-service";
+import { createCrmChannelsReadAdapter, createCrmConversationsReadAdapter, createCrmMessageStatusReadAdapter } from "./services/crm-read-storage-adapter";
 import apiV1Routes from "./routes/api-v1";
 import { createApiV2Router } from "./routes/api-v2";
 import { registerApiKeySettingsRoutes } from "./routes/api-key-settings-routes";
@@ -1131,8 +1134,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAdminRoutes(app);
 
   app.use('/api/v1', apiV1Routes);
+  // v1's router applies authenticateApiKey + rateLimitMiddleware as two separate
+  // router.use() calls; v2's router only accepts one `authenticate` slot, so the
+  // same two checks are composed into one function here instead.
+  const authenticateApiV2 = (req: Request, res: Response, next: NextFunction) => {
+    authenticateApiKey(req, res, () => rateLimitMiddleware(req, res, next));
+  };
   app.use('/api/v2', createApiV2Router({
-    authenticate: authenticateApiKey,
+    authenticate: authenticateApiV2,
     contactSync: new CrmContactSyncService(createCrmContactSyncStorageAdapter(storage)),
     messageSync: createCrmApiV2MessageAdapter({
       crmIntegrationBelongsToCompany: storage.crmIntegrationBelongsToCompany.bind(storage),
@@ -1140,6 +1149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       updateMessage: storage.updateMessage.bind(storage),
       sendMessage: apiMessageService.sendMessage.bind(apiMessageService),
       sendMedia: apiMessageService.sendMedia.bind(apiMessageService),
+      sendTemplate: apiMessageService.sendTemplateMessage.bind(apiMessageService),
     }),
     appointmentSync: new AppointmentV2Service<CrmAppointmentPayload>({
       port: createCrmAppointmentStorageAdapter(storage),
@@ -1157,6 +1167,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }),
     dealPipelineSync: createCrmDealPipelineApiV2Service(createCrmDealStorageAdapter(storage)),
     campaignSync: new CrmCampaignSyncService(storage, new CampaignService()),
+    initialSync: { plan: planInitialCrmSynchronization },
+    channelsRead: new CrmChannelsReadService(createCrmChannelsReadAdapter({
+      getChannels: apiMessageService.getChannels.bind(apiMessageService),
+    })),
+    conversationsRead: new CrmConversationsReadService(createCrmConversationsReadAdapter({
+      getConversations: apiMessageService.getConversations.bind(apiMessageService),
+    })),
+    messageStatusRead: new CrmMessageStatusReadService(createCrmMessageStatusReadAdapter({
+      getMessageStatus: apiMessageService.getMessageStatus.bind(apiMessageService),
+    })),
+    idempotency: {
+      claim: (input) => storage.claimCrmIdempotencyKey(input),
+      complete: ({ companyId, key, responseStatus, responseBody }) => storage.completeCrmIdempotencyKey(companyId, key, responseStatus, responseBody),
+      release: ({ companyId, key }) => storage.releaseCrmIdempotencyKey(companyId, key),
+    },
     mediaAccess: {
       upload: apiMediaUpload.single('file'),
       processUpload: processUploadedApiMedia,

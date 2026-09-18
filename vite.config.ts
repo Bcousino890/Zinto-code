@@ -23,25 +23,23 @@ export default defineConfig(({ mode }) => {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     sourcemap: false,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: isProduction, // Remove console logs in production
-        drop_debugger: true,
-        pure_funcs: isProduction ? ['console.log', 'console.info', 'console.debug', 'console.warn'] : [],
-      },
-      mangle: {
-        toplevel: true,
-      },
-      format: {
-        comments: false,
-      },
-    },
+    // Switched from terser to esbuild's built-in minifier: terser's peak memory
+    // usage on this bundle was reliably OOM-killing production builds on this
+    // host (confirmed via direct memory monitoring during a failed build —
+    // available memory dropped from 3.3GB to under 100MB during "rendering
+    // chunks" specifically, the minification step). esbuild's minifier is
+    // dramatically lighter and is itself a production-grade minifier used as
+    // Vite's own default; net output behavior (console/debugger stripping in
+    // production) is preserved via the `esbuild.drop` option below.
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks: undefined,
       },
     },
+  },
+  esbuild: {
+    drop: isProduction ? ['console', 'debugger'] : [],
   },
   json: {
     stringify: false,

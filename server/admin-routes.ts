@@ -3228,6 +3228,25 @@ function registerAdminRoutes(app: Express) {
             console.error('[admin-routes] Failed to process add-on charge.refunded:', addonError);
             throw addonError;
           }
+          // Independent of the add-on handling above: a refunded PLAN payment
+          // (not an add-on purchase) left `company.subscriptionStatus`
+          // untouched before, so the company kept full access for the rest of
+          // its already-granted period regardless of the money being taken
+          // back. `subscriptionStatus: 'cancelled'` is already treated as
+          // immediately-expired everywhere access is checked.
+          {
+            const charge = event.data.object;
+            const isFullRefund = typeof charge.amount === 'number' && charge.amount_refunded >= charge.amount;
+            if (isFullRefund && charge.payment_intent) {
+              const refundedTransaction = await storage.getPaymentTransactionByPaymentIntentId(
+                typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent.id
+              );
+              if (refundedTransaction?.companyId) {
+                await storage.updatePaymentTransaction(refundedTransaction.id, { status: 'refunded' });
+                await storage.updateCompany(refundedTransaction.companyId, { subscriptionStatus: 'cancelled' });
+              }
+            }
+          }
           break;
         }
         case 'charge.dispute.created': {
@@ -3239,6 +3258,21 @@ function registerAdminRoutes(app: Express) {
           } catch (addonError) {
             console.error('[admin-routes] Failed to process add-on charge.dispute.created:', addonError);
             throw addonError;
+          }
+          // Independent of the add-on handling above: a disputed PLAN payment
+          // revokes access immediately rather than waiting for the dispute to
+          // resolve; the transaction itself is left as-is since a dispute can
+          // still be won, and 'disputed' isn't one of its valid status values.
+          {
+            const dispute = event.data.object;
+            if (dispute.payment_intent) {
+              const disputedTransaction = await storage.getPaymentTransactionByPaymentIntentId(
+                typeof dispute.payment_intent === 'string' ? dispute.payment_intent : dispute.payment_intent.id
+              );
+              if (disputedTransaction?.companyId) {
+                await storage.updateCompany(disputedTransaction.companyId, { subscriptionStatus: 'cancelled' });
+              }
+            }
           }
           break;
         }
@@ -3334,40 +3368,6 @@ function registerAdminRoutes(app: Express) {
             throw addonError;
           }
           break;
-        // Neither of these was handled at all before: a refunded plan payment or a
-        // card dispute left `company.subscriptionStatus` untouched, so the company
-        // kept full access for the rest of its already-granted period regardless of
-        // the money being taken back. `subscriptionStatus: 'cancelled'` is already
-        // treated as immediately-expired everywhere access is checked.
-        case 'charge.refunded': {
-          const charge = event.data.object;
-          const isFullRefund = typeof charge.amount === 'number' && charge.amount_refunded >= charge.amount;
-          if (isFullRefund && charge.payment_intent) {
-            const refundedTransaction = await storage.getPaymentTransactionByPaymentIntentId(
-              typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent.id
-            );
-            if (refundedTransaction?.companyId) {
-              await storage.updatePaymentTransaction(refundedTransaction.id, { status: 'refunded' });
-              await storage.updateCompany(refundedTransaction.companyId, { subscriptionStatus: 'cancelled' });
-            }
-          }
-          break;
-        }
-        case 'charge.dispute.created': {
-          // Revoke access immediately rather than waiting for the dispute to
-          // resolve; the transaction itself is left as-is since a dispute can
-          // still be won, and 'disputed' isn't one of its valid status values.
-          const dispute = event.data.object;
-          if (dispute.payment_intent) {
-            const disputedTransaction = await storage.getPaymentTransactionByPaymentIntentId(
-              typeof dispute.payment_intent === 'string' ? dispute.payment_intent : dispute.payment_intent.id
-            );
-            if (disputedTransaction?.companyId) {
-              await storage.updateCompany(disputedTransaction.companyId, { subscriptionStatus: 'cancelled' });
-            }
-          }
-          break;
-        }
         default:
       }
 

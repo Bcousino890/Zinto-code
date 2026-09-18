@@ -474,3 +474,66 @@ real `/home/deploy/zinto` checkout; `tests/subscription-expiration.test.ts` (3/3
 — that last flag is required for `stripe-catalog-admin-routes.test.ts`'s `mock.module()`
 calls on Node 20, or the whole file fails with `mock.module is not a function`, not a
 real bug). 3+ minutes of stable pm2 uptime, repeated 200s, before ending this update.
+
+## 7. 2026-09-18, later: add-ons gaps found by the user's own live testing (commit `c65eeb4`)
+
+The user tried actually buying an add-on right after §6 shipped and hit real bugs the
+audit itself never would have caught (none of this is a security leak — it's "the
+feature doesn't do what it's paying for" territory, arguably just as serious).
+
+- **Buying extra capacity had zero effect.** `plan-limits-service.ts`'s `checkPlanLimit`
+  only ever compared usage against the base plan's `maxUsers`/`maxChannels` — the
+  §2c fix that made those checks real never learned that `addon_purchases` exists. A
+  company could pay for 5 extra user seats and still be blocked at the base plan's
+  limit. Fixed: `checkPlanLimit` now adds the active, non-expired addon quantity
+  (via the existing `addonPurchaseService.getActiveQuantity`) on top of the plan
+  limit before comparing.
+- **The Stripe catalog sync had never actually succeeded for either add-on** —
+  confirmed live when the user's first purchase attempt hit
+  `422: Add-on 'extra_user' is not synced with Stripe (status: pending)`. Two real
+  bugs in `addon-catalog-sync-service.ts`, both only visible against the real Stripe
+  API (the test suite's mock was too permissive to catch either):
+  1. Archiving a stale hand-created price failed because it was still the product's
+     `default_price` — Stripe rejects that. Fixed by repointing `default_price` to
+     one of the new tracked prices first.
+  2. That repoint (and the archive calls) used a *stable* idempotency key
+     (addon id + fingerprint), which doesn't change between retries of an otherwise
+     unchanged addon — so retrying after fix #1 landed, Stripe replayed the *first*
+     attempt's cached failure instead of re-evaluating. These operations are
+     naturally idempotent at the application level already (repeating them converges
+     to the same end state), so they don't need Stripe-side exactly-once protection
+     at all — switched them to a fresh random key per call. Ran the corrected sync
+     directly against production Stripe (not just tests) after fixing: both add-ons
+     now have real one-time EUR/USD prices, confirmed via direct Stripe API
+     inspection. Regression test added and verified to fail without the fix
+     (temporarily reverted the fix, confirmed the exact same real-world error message,
+     restored it).
+  If you ever add a third add-on or change these two, `POST /api/admin/addons/:id/sync`
+  is the intended way to trigger this now that it actually works — no need to repeat
+  today's manual script.
+- **Auto-renew on new add-on purchases defaulted to off**, inconsistent with the
+  plan-renewal dialog's already-fixed default (§2). Changed the default to on in
+  `AddonsSection.tsx`; the pre-existing toggle for *already-active* quota was
+  untouched (that one reflects real server state, not a client-side default).
+- **The whole Extras section and the Payment History table were rendering hardcoded
+  English** even with Spanish selected — not a missing-translation-key issue exactly,
+  `settings.addons.*` didn't exist as keys in *either* locale file, and Payment
+  History's table was never wrapped in `t()` at all. Added all missing keys to both
+  `translations/en.json` and `translations/es.json` (34 new keys each) and wrapped
+  the Payment History table (including translating the raw `transaction.status`
+  value, which was rendering as unstyled English). Chrome's own translate feature
+  then made this worse by machine-translating the leftover English into nonsense
+  ("Auto-renovar" → "Renovador de automóviles", literally "car renewer") — that part
+  wasn't a Zinto bug at all, just Chrome reacting to English content on a Spanish
+  page; it goes away on its own once the real strings are correct.
+
+Built, tested (218/218 integration + 83/83 across subscription-expiration/csrf/
+stripe-catalog/addon-catalog suites), deployed, verified 60 seconds of continuous
+stable pm2 uptime (10 checks, restart count unchanged, 0 unstable restarts) before
+calling it done — see §6 for why a single "online" reading right after a restart
+isn't trusted on this host anymore.
+
+**If you're touching `AddonsSection.tsx` or the payment history table again**: both
+now go through `t()` — add new keys to *both* locale files (`translations/en.json`
+and `translations/es.json`), not just one, or you'll reintroduce this exact bug for
+whichever language you skip.

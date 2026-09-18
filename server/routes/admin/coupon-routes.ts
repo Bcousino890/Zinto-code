@@ -2,6 +2,8 @@ import { Express, Request, Response } from "express";
 import { z } from "zod";
 import { storage } from "../../storage";
 import { ensureSuperAdmin } from "../../middleware";
+import { catalogFingerprint } from "../../services/stripe-catalog-domain";
+import { createStripeCatalogSyncService } from "./stripe-catalog-routes";
 
 
 const createCouponSchema = z.object({
@@ -29,12 +31,24 @@ const validateCouponSchema = z.object({
   amount: z.number().positive("Amount must be positive")
 });
 
-export function setupCouponRoutes(app: Express) {
+type CouponRouteDependencies = {
+  storage: Pick<typeof storage, 'getAllCoupons' | 'createCoupon' | 'updateCoupon' | 'getCouponById' | 'getCouponByCode' | 'deleteCoupon' | 'enqueueStripeCatalogSync' | 'validateCoupon' | 'getCouponUsageStats'>;
+  archiveCoupon: (couponId: number) => Promise<unknown>;
+};
+
+function couponSyncFingerprint(coupon: Record<string, unknown>) {
+  const { stripeCouponId, stripePromotionCodeId, stripeSyncStatus, stripeSyncError, stripeSyncedAt, stripeSyncFingerprint, ...catalog } = coupon;
+  return catalogFingerprint(catalog);
+}
+
+export function setupCouponRoutes(app: Express, dependencies: Partial<CouponRouteDependencies> = {}) {
+  const routeStorage = dependencies.storage ?? storage;
+  const archiveCoupon = dependencies.archiveCoupon ?? (async (couponId: number) => (await createStripeCatalogSyncService()).archiveCoupon(couponId));
   
 
   app.get("/api/admin/coupons", ensureSuperAdmin, async (req: Request, res: Response) => {
     try {
-      const coupons = await storage.getAllCoupons();
+      const coupons = await routeStorage.getAllCoupons();
       res.json(coupons);
     } catch (error: any) {
       console.error("Error fetching coupons:", error);
@@ -51,7 +65,7 @@ export function setupCouponRoutes(app: Express) {
       const validatedData = createCouponSchema.parse(req.body);
       
 
-      const existingCoupon = await storage.getCouponByCode(validatedData.code);
+      const existingCoupon = await routeStorage.getCouponByCode(validatedData.code);
       if (existingCoupon) {
         return res.status(400).json({
           success: false,
@@ -73,10 +87,12 @@ export function setupCouponRoutes(app: Express) {
         companyId: null // Global coupons for now
       };
 
-      const coupon = await storage.createCoupon(couponData);
+      const coupon = await routeStorage.createCoupon(couponData);
+      const pendingCoupon = await routeStorage.updateCoupon(coupon.id, { stripeSyncStatus: 'pending', stripeSyncError: null });
+      await routeStorage.enqueueStripeCatalogSync({ entityType: 'coupon', entityId: pendingCoupon.id, operation: 'upsert', fingerprint: couponSyncFingerprint(pendingCoupon) });
       res.status(201).json({
         success: true,
-        data: coupon
+        data: pendingCoupon
       });
 
     } catch (error: any) {
@@ -110,7 +126,7 @@ export function setupCouponRoutes(app: Express) {
       const validatedData = updateCouponSchema.parse({ ...req.body, id: couponId });
 
 
-      const existingCoupon = await storage.getCouponById(couponId);
+      const existingCoupon = await routeStorage.getCouponById(couponId);
       if (!existingCoupon) {
         return res.status(404).json({
           success: false,
@@ -120,7 +136,7 @@ export function setupCouponRoutes(app: Express) {
 
 
       if (validatedData.code && validatedData.code !== existingCoupon.code) {
-        const codeExists = await storage.getCouponByCode(validatedData.code);
+        const codeExists = await routeStorage.getCouponByCode(validatedData.code);
         if (codeExists) {
           return res.status(400).json({
             success: false,
@@ -137,10 +153,12 @@ export function setupCouponRoutes(app: Express) {
         });
       }
 
-      const updatedCoupon = await storage.updateCoupon(couponId, validatedData);
+      const updatedCoupon = await routeStorage.updateCoupon(couponId, validatedData);
+      const pendingCoupon = await routeStorage.updateCoupon(updatedCoupon.id, { stripeSyncStatus: 'pending', stripeSyncError: null });
+      await routeStorage.enqueueStripeCatalogSync({ entityType: 'coupon', entityId: pendingCoupon.id, operation: 'upsert', fingerprint: couponSyncFingerprint(pendingCoupon) });
       res.json({
         success: true,
-        data: updatedCoupon
+        data: pendingCoupon
       });
 
     } catch (error: any) {
@@ -171,7 +189,16 @@ export function setupCouponRoutes(app: Express) {
         });
       }
 
-      const deleted = await storage.deleteCoupon(couponId);
+      try {
+        await archiveCoupon(couponId);
+      } catch (error) {
+        return res.status(502).json({
+          success: false,
+          message: "Failed to archive coupon in Stripe"
+        });
+      }
+
+      const deleted = await routeStorage.deleteCoupon(couponId);
       if (!deleted) {
         return res.status(404).json({
           success: false,
@@ -198,7 +225,7 @@ export function setupCouponRoutes(app: Express) {
     try {
       const validatedData = validateCouponSchema.parse(req.body);
       
-      const validation = await storage.validateCoupon(
+      const validation = await routeStorage.validateCoupon(
         validatedData.code,
         validatedData.planId,
         validatedData.amount,
@@ -251,7 +278,7 @@ export function setupCouponRoutes(app: Express) {
         });
       }
 
-      const usage = await storage.getCouponUsageStats(couponId);
+      const usage = await routeStorage.getCouponUsageStats(couponId);
       res.json({
         success: true,
         data: usage

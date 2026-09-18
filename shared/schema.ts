@@ -1,4 +1,4 @@
-import { pgTable, text, varchar, serial, integer, bigint, bigserial, boolean, timestamp, jsonb, pgEnum, numeric, unique, uniqueIndex, index, date, real, foreignKey, uuid, vector } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, integer, bigint, bigserial, boolean, timestamp, jsonb, pgEnum, numeric, unique, uniqueIndex, index, check, date, real, foreignKey, uuid, vector } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -3087,6 +3087,16 @@ export const plans = pgTable("plans", {
   discountEndDate: timestamp("discount_end_date"),
   originalPrice: numeric("original_price", { precision: 10, scale: 2 }),
 
+  stripeProductId: text("stripe_product_id"),
+  stripePriceId: text("stripe_price_id"),
+  stripePlanCouponId: text("stripe_plan_coupon_id"),
+  stripeSyncStatus: text("stripe_sync_status", {
+    enum: ['pending', 'synced', 'failed']
+  }).notNull().default('pending'),
+  stripeSyncError: text("stripe_sync_error"),
+  stripeSyncedAt: timestamp("stripe_synced_at"),
+  stripeSyncFingerprint: text("stripe_sync_fingerprint"),
+
 
   storageLimit: integer("storage_limit").default(1024), // in MB
   bandwidthLimit: integer("bandwidth_limit").default(10240), // monthly bandwidth in MB
@@ -3095,7 +3105,9 @@ export const plans = pgTable("plans", {
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
-});
+}, (table) => [
+  check("plans_stripe_sync_status_check", sql`${table.stripeSyncStatus} IN ('pending', 'synced', 'failed')`),
+]);
 
 export const planAiProviderConfigs = pgTable("plan_ai_provider_configs", {
   id: serial("id").primaryKey(),
@@ -3905,9 +3917,20 @@ export const couponCodes = pgTable("coupon_codes", {
   createdBy: integer("created_by").references(() => users.id, { onDelete: "set null" }),
   metadata: jsonb("metadata").default({}),
 
+  stripeCouponId: text("stripe_coupon_id"),
+  stripePromotionCodeId: text("stripe_promotion_code_id"),
+  stripeSyncStatus: text("stripe_sync_status", {
+    enum: ['pending', 'synced', 'failed']
+  }).notNull().default('pending'),
+  stripeSyncError: text("stripe_sync_error"),
+  stripeSyncedAt: timestamp("stripe_synced_at"),
+  stripeSyncFingerprint: text("stripe_sync_fingerprint"),
+
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
-});
+}, (table) => [
+  check("coupon_codes_stripe_sync_status_check", sql`${table.stripeSyncStatus} IN ('pending', 'synced', 'failed')`),
+]);
 
 export const insertCouponCodeSchema = createInsertSchema(couponCodes).pick({
   companyId: true,
@@ -3929,6 +3952,40 @@ export const insertCouponCodeSchema = createInsertSchema(couponCodes).pick({
 
 export type CouponCode = typeof couponCodes.$inferSelect;
 export type InsertCouponCode = z.infer<typeof insertCouponCodeSchema>;
+
+export const stripeCatalogSyncJobs = pgTable("stripe_catalog_sync_jobs", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  entityType: text("entity_type", { enum: ['plan', 'coupon'] }).notNull(),
+  entityId: integer("entity_id").notNull(),
+  operation: text("operation", { enum: ['upsert', 'archive'] }).notNull(),
+  fingerprint: text("fingerprint").notNull(),
+  revision: integer("revision").notNull().default(1),
+  status: text("status", {
+    enum: ['pending', 'processing', 'completed', 'failed']
+  }).notNull().default('pending'),
+  attempts: integer("attempts").notNull().default(0),
+  nextAttemptAt: timestamp("next_attempt_at").notNull().defaultNow(),
+  lockedAt: timestamp("locked_at"),
+  lockedBy: text("locked_by"),
+  claimToken: text("claim_token"),
+  lastError: text("last_error"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  unique("stripe_catalog_sync_jobs_entity_fingerprint_unique")
+    .on(table.entityType, table.entityId, table.fingerprint, table.revision),
+  index("stripe_catalog_sync_jobs_due_idx").on(table.status, table.nextAttemptAt),
+  index("stripe_catalog_sync_jobs_entity_idx").on(table.entityType, table.entityId, table.createdAt),
+  check("stripe_catalog_sync_jobs_entity_type_check", sql`${table.entityType} IN ('plan', 'coupon')`),
+  check("stripe_catalog_sync_jobs_operation_check", sql`${table.operation} IN ('upsert', 'archive')`),
+  check("stripe_catalog_sync_jobs_status_check", sql`${table.status} IN ('pending', 'processing', 'completed', 'failed')`),
+  check("stripe_catalog_sync_jobs_revision_check", sql`${table.revision} > 0`),
+  check("stripe_catalog_sync_jobs_attempts_check", sql`${table.attempts} >= 0`),
+]);
+
+export type StripeCatalogSyncJob = typeof stripeCatalogSyncJobs.$inferSelect;
+export type InsertStripeCatalogSyncJob = typeof stripeCatalogSyncJobs.$inferInsert;
 
 export const couponUsage = pgTable("coupon_usage", {
   id: serial("id").primaryKey(),

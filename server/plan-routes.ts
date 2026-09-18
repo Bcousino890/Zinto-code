@@ -1,6 +1,8 @@
 import { Express, Request, Response } from "express";
 import { storage } from "./storage";
 import { z } from "zod";
+import { catalogFingerprint } from "./services/stripe-catalog-domain";
+import { createStripeCatalogSyncService } from "./routes/admin/stripe-catalog-routes";
 
 
 const ensureAuthenticated = (req: Request, res: Response, next: any) => {
@@ -63,11 +65,23 @@ const planSchema = z.object({
   customDurationDays: z.number().int().min(1, "Custom duration must be at least 1 day").nullable().optional()
 });
 
-export function registerPlanRoutes(app: Express) {
+type PlanRouteDependencies = {
+  storage: Pick<typeof storage, 'createPlan' | 'updatePlan' | 'getPlan' | 'deletePlan' | 'enqueueStripeCatalogSync' | 'getAllPlans'>;
+  archivePlan: (planId: number) => Promise<unknown>;
+};
+
+function planSyncFingerprint(plan: Record<string, unknown>) {
+  const { stripeProductId, stripePriceId, stripePlanCouponId, stripeSyncStatus, stripeSyncError, stripeSyncedAt, stripeSyncFingerprint, ...catalog } = plan;
+  return catalogFingerprint(catalog);
+}
+
+export function registerPlanRoutes(app: Express, dependencies: Partial<PlanRouteDependencies> = {}) {
+  const routeStorage = dependencies.storage ?? storage;
+  const archivePlan = dependencies.archivePlan ?? (async (planId: number) => (await createStripeCatalogSyncService()).archivePlan(planId));
 
   app.get("/api/plans", ensureAuthenticated, async (req, res) => {
     try {
-      const plans = await storage.getAllPlans();
+      const plans = await routeStorage.getAllPlans();
 
       const activePlans = plans.filter(plan => plan.isActive);
       res.json(activePlans);
@@ -80,7 +94,7 @@ export function registerPlanRoutes(app: Express) {
 
   app.get("/api/plans/public", async (req, res) => {
     try {
-      const plans = await storage.getAllPlans();
+      const plans = await routeStorage.getAllPlans();
 
       const activePlans = plans.filter(plan => plan.isActive);
       res.json(activePlans);
@@ -93,7 +107,7 @@ export function registerPlanRoutes(app: Express) {
 
   app.get("/api/plans/registration", async (req, res) => {
     try {
-      const plans = await storage.getAllPlans();
+      const plans = await routeStorage.getAllPlans();
 
       const registrationPlans = plans.filter(plan =>
         plan.isActive && (plan.isFree || plan.hasTrialPeriod)
@@ -108,7 +122,7 @@ export function registerPlanRoutes(app: Express) {
 
   app.get("/api/admin/plans", ensureSuperAdmin, async (req, res) => {
     try {
-      const plans = await storage.getAllPlans();
+      const plans = await routeStorage.getAllPlans();
       res.json(plans);
     } catch (error) {
       console.error("Error fetching plans:", error);
@@ -120,7 +134,7 @@ export function registerPlanRoutes(app: Express) {
   app.get("/api/admin/plans/:id", ensureSuperAdmin, async (req, res) => {
     try {
       const planId = parseInt(req.params.id);
-      const plan = await storage.getPlan(planId);
+      const plan = await routeStorage.getPlan(planId);
 
       if (!plan) {
         return res.status(404).json({ error: "Plan not found" });
@@ -224,7 +238,7 @@ export function registerPlanRoutes(app: Express) {
       const planData = validationResult.data;
 
 
-      const newPlan = await storage.createPlan({
+      const newPlan = await routeStorage.createPlan({
         name: planData.name,
         description: planData.description || "",
         price: planData.price,
@@ -266,7 +280,9 @@ export function registerPlanRoutes(app: Express) {
         customDurationDays: planData.customDurationDays
       });
 
-      res.status(201).json(newPlan);
+      const pendingPlan = await routeStorage.updatePlan(newPlan.id, { stripeSyncStatus: 'pending', stripeSyncError: null } as any);
+      await routeStorage.enqueueStripeCatalogSync({ entityType: 'plan', entityId: pendingPlan.id, operation: 'upsert', fingerprint: planSyncFingerprint(pendingPlan as Record<string, unknown>) });
+      res.status(201).json(pendingPlan);
     } catch (error) {
       console.error("Error creating plan:", error);
       res.status(500).json({ error: "Failed to create plan" });
@@ -279,7 +295,7 @@ export function registerPlanRoutes(app: Express) {
       const planId = parseInt(req.params.id);
 
 
-      const existingPlan = await storage.getPlan(planId);
+      const existingPlan = await routeStorage.getPlan(planId);
       if (!existingPlan) {
         return res.status(404).json({ error: "Plan not found" });
       }
@@ -378,9 +394,11 @@ export function registerPlanRoutes(app: Express) {
         discountEndDate: planData.discountEndDate ? new Date(planData.discountEndDate) : null,
       };
 
-      const updatedPlan = await storage.updatePlan(planId, transformedPlanData);
+      const updatedPlan = await routeStorage.updatePlan(planId, transformedPlanData);
+      const pendingPlan = await routeStorage.updatePlan(updatedPlan.id, { stripeSyncStatus: 'pending', stripeSyncError: null } as any);
+      await routeStorage.enqueueStripeCatalogSync({ entityType: 'plan', entityId: pendingPlan.id, operation: 'upsert', fingerprint: planSyncFingerprint(pendingPlan as Record<string, unknown>) });
 
-      res.json(updatedPlan);
+      res.json(pendingPlan);
     } catch (error) {
       console.error("Error updating plan:", error);
       res.status(500).json({ error: "Failed to update plan" });
@@ -393,13 +411,19 @@ export function registerPlanRoutes(app: Express) {
       const planId = parseInt(req.params.id);
 
 
-      const existingPlan = await storage.getPlan(planId);
+      const existingPlan = await routeStorage.getPlan(planId);
       if (!existingPlan) {
         return res.status(404).json({ error: "Plan not found" });
       }
 
 
-      const success = await storage.deletePlan(planId);
+      try {
+        await archivePlan(planId);
+      } catch (error) {
+        return res.status(502).json({ error: "Failed to archive plan in Stripe" });
+      }
+
+      const success = await routeStorage.deletePlan(planId);
 
       if (!success) {
         return res.status(500).json({ error: "Failed to delete plan" });

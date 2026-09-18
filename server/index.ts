@@ -21,6 +21,7 @@ import {
 dotenv.config();
 
 let durableWebhookWorkerLifecycle: DurableWebhookWorkerLifecycle | undefined;
+let stopStripeCatalogSyncWorker: (() => void) | undefined;
 
 try {
   assertEncryptionKeyConfigured();
@@ -198,6 +199,17 @@ app.use((req, res, next) => {
           } catch (error) {
             logger.error('crm-webhooks', 'Durable CRM webhook delivery worker failed to start', error);
           }
+        }
+
+        logger.info('stripe-catalog-sync', 'Evaluating Stripe catalog sync worker startup...');
+        try {
+          const { startStripeCatalogSyncWorker } = await import('./services/stripe-catalog-sync-worker');
+          stopStripeCatalogSyncWorker ??= startStripeCatalogSyncWorker();
+          logger.info('stripe-catalog-sync', process.env.STRIPE_CATALOG_AUTO_SYNC === 'true'
+            ? '✅ Stripe catalog sync worker started (STRIPE_CATALOG_AUTO_SYNC=true)'
+            : 'Stripe catalog sync worker not started (set STRIPE_CATALOG_AUTO_SYNC=true to enable)');
+        } catch (error) {
+          logger.error('stripe-catalog-sync', '❌ Stripe catalog sync worker failed to start:', error);
         }
 
         try {
@@ -662,6 +674,8 @@ app.use((req, res, next) => {
     logger.info('server', 'SIGTERM received, shutting down TikTok health monitoring...');
     durableWebhookWorkerLifecycle?.stop();
     logger.info('crm-webhooks', 'Durable CRM webhook delivery worker stopped');
+    stopStripeCatalogSyncWorker?.();
+    logger.info('stripe-catalog-sync', 'Stripe catalog sync worker stopped');
     try {
       const TikTokService = (await import('./services/channels/tiktok')).default;
       TikTokService.stopAllHealthMonitoring();
@@ -676,5 +690,7 @@ app.use((req, res, next) => {
   process.once('SIGINT', () => {
     durableWebhookWorkerLifecycle?.stop();
     logger.info('crm-webhooks', 'Durable CRM webhook delivery worker stopped');
+    stopStripeCatalogSyncWorker?.();
+    logger.info('stripe-catalog-sync', 'Stripe catalog sync worker stopped');
   });
 })();

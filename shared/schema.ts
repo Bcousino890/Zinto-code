@@ -150,7 +150,10 @@ export const users = pgTable("users", {
   customRoleId: integer("custom_role_id").references(() => companyCustomRoles.id, { onDelete: 'restrict' }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-  whatsappNumber: text("whatsapp_number")
+  whatsappNumber: text("whatsapp_number"),
+  /** Admin-issued provisional password hash. Coexists with `password` — login accepts either until this expires or is revoked. */
+  tempPasswordHash: text("temp_password_hash"),
+  tempPasswordExpiresAt: timestamp("temp_password_expires_at")
 }, (table) => [
   unique("idx_users_id_company").on(table.id, table.companyId),
 ]);

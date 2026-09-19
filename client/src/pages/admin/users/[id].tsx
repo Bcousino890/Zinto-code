@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "@/hooks/use-translation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, Save, Trash2 } from "lucide-react";
+import { Loader2, ArrowLeft, Save, Trash2, KeyRound, ShieldOff } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -59,6 +59,7 @@ interface User {
   isSuperAdmin: boolean;
   createdAt: string;
   updatedAt: string;
+  tempPasswordExpiresAt: string | null;
 }
 
 export default function UserDetailPage() {
@@ -67,6 +68,7 @@ export default function UserDetailPage() {
   const { toast } = useToast();
   const [userId, setUserId] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [tempPasswordDuration, setTempPasswordDuration] = useState("1440");
 
   const userUpdateSchema = useMemo(
     () =>
@@ -232,6 +234,71 @@ export default function UserDetailPage() {
     }
   });
 
+  const generateTempPasswordMutation = useMutation({
+    mutationFn: async (expiresInMinutes: number) => {
+      if (!userId) throw new Error("User ID is required");
+      const res = await apiRequest("POST", `/api/admin/users/${userId}/temp-password`, { expiresInMinutes });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || t("admin.users.error_temp_password", "Failed to create temporary password"));
+      }
+      return res.json();
+    },
+    onSuccess: async (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users', userId] });
+      const description = t("admin.users.toast.temporary_password_desc", "Temporary password: {{password}}", {
+        password: data.temporaryPassword,
+      });
+      try {
+        await navigator.clipboard.writeText(data.temporaryPassword);
+        toast({
+          title: t("admin.users.temp_password_created_title", "Temporary Password Created"),
+          description: `${description} ${t("admin.users.toast.copied_desc", "The temporary password has been copied to your clipboard.")}`,
+          duration: 15000,
+        });
+      } catch {
+        toast({
+          title: t("admin.users.temp_password_created_title", "Temporary Password Created"),
+          description,
+          duration: 15000,
+        });
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: t("common.error", "Error"),
+        description: error.message || t("admin.users.error_temp_password", "Failed to create temporary password"),
+        variant: "destructive",
+      });
+    }
+  });
+
+  const revokeTempPasswordMutation = useMutation({
+    mutationFn: async () => {
+      if (!userId) throw new Error("User ID is required");
+      const res = await apiRequest("DELETE", `/api/admin/users/${userId}/temp-password`);
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || t("admin.users.error_revoke_temp_password", "Failed to revoke temporary password"));
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users', userId] });
+      toast({
+        title: t("admin.users.temp_password_revoked_title", "Temporary Password Revoked"),
+        description: t("admin.users.temp_password_revoked_desc", "The temporary password has been revoked. The user's own password is unaffected."),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t("common.error", "Error"),
+        description: error.message || t("admin.users.error_revoke_temp_password", "Failed to revoke temporary password"),
+        variant: "destructive",
+      });
+    }
+  });
+
   const deleteUserMutation = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error("User ID is required");
@@ -269,6 +336,10 @@ export default function UserDetailPage() {
     changePasswordMutation.mutate({ newPassword: data.newPassword });
   };
 
+  const onGenerateTempPassword = () => {
+    generateTempPasswordMutation.mutate(parseInt(tempPasswordDuration, 10));
+  };
+
   const handleDeleteUser = () => {
     deleteUserMutation.mutate();
     setIsDeleteDialogOpen(false);
@@ -277,6 +348,9 @@ export default function UserDetailPage() {
   const handleCompanyChange = (value: string) => {
     form.setValue("companyId", parseInt(value));
   };
+
+  const tempPasswordExpiresAt = userData?.tempPasswordExpiresAt ? new Date(userData.tempPasswordExpiresAt) : null;
+  const tempPasswordActive = !!tempPasswordExpiresAt && tempPasswordExpiresAt > new Date();
 
   if (isLoading || isLoadingUser) {
     return (
@@ -542,6 +616,82 @@ export default function UserDetailPage() {
                     </Button>
                   </form>
                 </Form>
+              </CardContent>
+            </Card>
+
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>{t("admin.users.temp_password_card_title", "Provisional Password")}</CardTitle>
+                <CardDescription>
+                  {t(
+                    "admin.users.temp_password_card_desc",
+                    "Generate a temporary password for support access. It expires automatically and never touches the user's own password."
+                  )}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {tempPasswordActive ? (
+                  <div className="flex items-center justify-between rounded-md border p-3">
+                    <div className="text-sm">
+                      {t("admin.users.temp_password_active", "Active until {{date}}", {
+                        date: tempPasswordExpiresAt?.toLocaleString(),
+                      })}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => revokeTempPasswordMutation.mutate()}
+                      disabled={revokeTempPasswordMutation.isPending}
+                    >
+                      {revokeTempPasswordMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <ShieldOff className="mr-2 h-4 w-4" />
+                          {t("admin.users.temp_password_revoke", "Revoke")}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    {t("admin.users.temp_password_none", "No temporary password is currently active.")}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <Select value={tempPasswordDuration} onValueChange={setTempPasswordDuration}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="60">{t("admin.users.temp_password_duration_1h", "1 hour")}</SelectItem>
+                      <SelectItem value="1440">{t("admin.users.temp_password_duration_24h", "24 hours")}</SelectItem>
+                      <SelectItem value="10080">{t("admin.users.temp_password_duration_7d", "7 days")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    className="btn-brand-primary"
+                    onClick={onGenerateTempPassword}
+                    disabled={generateTempPasswordMutation.isPending}
+                  >
+                    {generateTempPasswordMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {t("admin.users.temp_password_generating", "Generating...")}
+                      </>
+                    ) : (
+                      <>
+                        <KeyRound className="mr-2 h-4 w-4" />
+                        {tempPasswordActive
+                          ? t("admin.users.temp_password_regenerate", "Generate New Temporary Password")
+                          : t("admin.users.temp_password_generate", "Generate Temporary Password")}
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

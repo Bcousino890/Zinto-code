@@ -34,7 +34,16 @@ export default defineConfig(({ mode }) => {
     minify: 'esbuild',
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        // Split node_modules into its own chunk. Without this, esbuild's
+        // minifier has to process one giant single-chunk bundle in one pass,
+        // which is what was pushing this build over the host's available RAM
+        // during "rendering chunks" (see the note above this block for the
+        // prior terser->esbuild memory fix for the same underlying problem).
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
       },
     },
   },

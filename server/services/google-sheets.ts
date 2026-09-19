@@ -3,9 +3,15 @@ import { JWT } from 'google-auth-library';
 import { OAuth2Client } from 'google-auth-library';
 import { storage } from '../storage';
 
+// Deliberately spreadsheets-only. Never add a Drive scope back here — the
+// OAuth consent screen for this flow must only ever ask for what this file
+// actually uses (Sheets), per Google's own verification review. Selecting a
+// spreadsheet is done by pasting its ID/URL (see GoogleSheetsNode.tsx),
+// which needs no Drive access at all — the "browse your Drive" picker that
+// used to live behind drive.readonly was removed for exactly this reason,
+// not replaced with anything.
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets',
-  'https://www.googleapis.com/auth/drive.readonly', 
 ];
 
 export interface GoogleSheetsConfig {
@@ -419,39 +425,6 @@ class GoogleSheetsService {
       return {
         connected: false,
         message: 'Error checking authentication status'
-      };
-    }
-  }
-
-  /**
-   * List user's Google Sheets
-   */
-  async listUserSheets(userId: number, companyId: number): Promise<{ success: boolean; sheets?: Array<{id: string, name: string}>; error?: string }> {
-    try {
-      const sheets = await this.getSheetsClientWithOAuth(userId, companyId);
-      const drive = google.drive({ version: 'v3', auth: sheets.context._options.auth });
-
-      const response = await drive.files.list({
-        q: "mimeType='application/vnd.google-apps.spreadsheet'",
-        fields: 'files(id, name)',
-        pageSize: 100,
-        orderBy: 'modifiedTime desc'
-      });
-
-      const sheetsList = response.data.files?.map(file => ({
-        id: file.id!,
-        name: file.name!
-      })) || [];
-
-      return {
-        success: true,
-        sheets: sheetsList
-      };
-    } catch (error) {
-      console.error('Error listing Google Sheets:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
     }
   }

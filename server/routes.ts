@@ -17573,6 +17573,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         originalSender: originalMessage.direction === 'inbound'
           ? (contact?.name || 'Contact')
           : 'You',
+        originalExternalId: originalMessage.externalId || undefined,
         quotedMessage: quotedMessage
       };
 
@@ -21551,20 +21552,9 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
   });
 
 
-  app.get('/api/google/sheets/list', ensureAuthenticated, async (req: any, res) => {
-    try {
-      const sheets = await googleSheetsService.listUserSheets(req.user.id, req.user.companyId);
-      res.json(sheets);
-    } catch (error) {
-      console.error('Error fetching Google Sheets:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Error fetching Google Sheets'
-      });
-    }
-  });
-
-
+  // /api/google/sheets/list (browse-your-Drive spreadsheet picker) was
+  // removed along with the drive.readonly scope in google-sheets.ts —
+  // selecting a spreadsheet by pasting its ID/URL needs no Drive access.
   app.post('/api/google/sheets/sheet-names', ensureAuthenticated, async (req: any, res) => {
     try {
       const { spreadsheetId } = req.body;

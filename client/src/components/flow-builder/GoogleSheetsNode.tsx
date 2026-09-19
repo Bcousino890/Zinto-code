@@ -749,13 +749,10 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [configurationProgress, setConfigurationProgress] = useState(0);
 
-  const [isFetchingSheets, setIsFetchingSheets] = useState(false);
   const [isFetchingSheetNames, setIsFetchingSheetNames] = useState(false);
-  const [fetchedSheets, setFetchedSheets] = useState<Array<{id: string, name: string}>>([]);
   const [fetchedSheetNames, setFetchedSheetNames] = useState<string[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [isCreatingOrdersWorkbook, setIsCreatingOrdersWorkbook] = useState(false);
-  const [selectedSheetId, setSelectedSheetId] = useState<string>('');
   const [selectedSheetName, setSelectedSheetName] = useState<string>('');
 
   const { setNodes } = useReactFlow();
@@ -895,16 +892,6 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
       }
     }
   }, [operation, config, selectedTemplate]);
-
-
-  useEffect(() => {
-    if (spreadsheetId && fetchedSheets.length > 0 && !selectedSheetId) {
-      const matchingSheet = fetchedSheets.find(sheet => sheet.id === spreadsheetId);
-      if (matchingSheet) {
-        setSelectedSheetId(spreadsheetId);
-      }
-    }
-  }, [spreadsheetId, fetchedSheets, selectedSheetId]);
 
 
   useEffect(() => {
@@ -1205,62 +1192,6 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
     } finally {
       setIsTesting(false);
       setShowTestResult(true);
-    }
-  };
-
-  const fetchGoogleSheets = async () => {
-    if (!isGoogleSheetsConnected) {
-      setTestResult({
-        success: false,
-        message: 'Please connect your Google account first to fetch sheets'
-      });
-      setShowTestResult(true);
-      return;
-    }
-
-    setIsFetchingSheets(true);
-    try {
-      const response = await fetch('/api/google/sheets/list', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch Google Sheets');
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        setFetchedSheets(result.sheets || []);
-
-
-        if (result.sheets && result.sheets.length > 0) {
-          setTestResult({
-            success: true,
-            message: `Found ${result.sheets.length} Google Sheets`
-          });
-          setShowTestResult(true);
-        }
-      } else {
-        setTestResult({
-          success: false,
-          message: result.error || 'Failed to fetch Google Sheets'
-        });
-        setShowTestResult(true);
-      }
-    } catch (error) {
-      console.error('Error fetching Google Sheets:', error);
-      setTestResult({
-        success: false,
-        message: 'Network error: Unable to fetch Google Sheets'
-      });
-      setShowTestResult(true);
-    } finally {
-      setIsFetchingSheets(false);
     }
   };
 
@@ -1710,10 +1641,6 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
                       setSpreadsheetId(value);
                       validateField('spreadsheetId', value, true);
 
-                      if (selectedSheetId) {
-                        setSelectedSheetId('');
-                      }
-
                       setSelectedSheetName('');
                       setSheetName('');
                       setFetchedSheetNames([]);
@@ -1725,91 +1652,11 @@ export function GoogleSheetsNode({ id, data, isConnectable }: GoogleSheetsNodePr
                     )}
                   />
                 </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-8 px-3 flex items-center gap-1.5"
-                        onClick={fetchGoogleSheets}
-                        disabled={isFetchingSheets || !isGoogleSheetsConnected}
-                      >
-                        {isFetchingSheets ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <>
-                            <img
-                              src="https://cdn-icons-png.flaticon.com/128/281/281761.png"
-                              alt={t('flow_builder.google_sheets.fetch_sheets', 'Fetch your Google Sheets')}
-                              className="w-3 h-3"
-                            />
-                            <span className="text-[11px] font-medium">
-                              {t('flow_builder.google_sheets.fetch', 'Fetch')}
-                            </span>
-                          </>
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      <p className="text-xs">
-                        {!isGoogleSheetsConnected
-                          ? t('flow_builder.google_sheets.connect_first', 'Connect your Google account first')
-                          : t('flow_builder.google_sheets.fetch_sheets', 'Fetch your Google Sheets')
-                        }
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
               {fieldValidation.spreadsheetId?.message && (
                 <p className="text-[10px] text-destructive mt-1">
                   {fieldValidation.spreadsheetId.message}
                 </p>
-              )}
-
-              {fetchedSheets.length > 0 && (
-                <div className="mt-2">
-                  <Label className="text-xs text-muted-foreground mb-1 block">{t('flow_builder.google_sheets.select_from_sheets', 'Select from your sheets:')}</Label>
-                  <Select
-                    value={selectedSheetId}
-                    onValueChange={(value) => {
-                      const selectedSheet = fetchedSheets.find(sheet => sheet.id === value);
-                      if (selectedSheet) {
-                        setSelectedSheetId(value);
-                        setSpreadsheetId(selectedSheet.id);
-                        validateField('spreadsheetId', selectedSheet.id, true);
-
-                        setSelectedSheetName('');
-                        setSheetName('');
-                        setFetchedSheetNames([]);
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="text-xs h-7">
-                      <SelectValue placeholder={t('flow_builder.google_sheets.choose_sheet', 'Choose a sheet...')}>
-                        {selectedSheetId ? fetchedSheets.find(sheet => sheet.id === selectedSheetId)?.name : t('flow_builder.google_sheets.choose_sheet', 'Choose a sheet...')}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fetchedSheets.map((sheet) => (
-                        <SelectItem key={sheet.id} value={sheet.id}>
-                          <div className="flex items-center gap-2">
-                            <img 
-                              src="https://cdn.activepieces.com/pieces/google-sheets.png" 
-                              alt={t('flow_builder.node_types.google_sheets', 'Google Sheets')} 
-                              className="w-3 h-3"
-                            />
-                            <div>
-                              <div className="font-medium text-xs">{sheet.name}</div>
-                              <div className="text-[10px] text-muted-foreground">{sheet.id}</div>
-                            </div>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               )}
             </div>
 

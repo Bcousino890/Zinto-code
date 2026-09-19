@@ -41,6 +41,12 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
+async function matchesTemporaryPassword(user: SelectUser, supplied: string) {
+  if (!user.tempPasswordHash || !user.tempPasswordExpiresAt) return false;
+  if (new Date() > user.tempPasswordExpiresAt) return false;
+  return comparePasswords(supplied, user.tempPasswordHash);
+}
+
 function isUsableBoundLocalIp(ip: string | undefined): boolean {
   if (!ip) return false;
   if (ip === "::" || ip === "0.0.0.0") return false;
@@ -439,7 +445,7 @@ export async function setupAuth(app: Express) {
       try {
 
         const user = await storage.getUserByUsernameOrEmail(username);
-        if (!user || !(await comparePasswords(password, user.password))) {
+        if (!user || !((await comparePasswords(password, user.password)) || (await matchesTemporaryPassword(user, password)))) {
           return done(null, false);
         } else {
 
@@ -460,7 +466,7 @@ export async function setupAuth(app: Express) {
       try {
 
         const user = await storage.getUserByUsernameOrEmail(username);
-        if (!user || !(await comparePasswords(password, user.password)) || !user.isSuperAdmin) {
+        if (!user || !((await comparePasswords(password, user.password)) || (await matchesTemporaryPassword(user, password))) || !user.isSuperAdmin) {
           return done(null, false);
         } else {
           return done(null, user);
@@ -928,7 +934,8 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    res.json(req.user);
+    const { password, tempPasswordHash, ...safeUser } = req.user as SelectUser;
+    res.json(safeUser);
   });
 
 

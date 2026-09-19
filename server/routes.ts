@@ -14605,7 +14605,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       }
 
 
-      const { password, ...safeAgentData } = assignedAgent;
+      const { password, tempPasswordHash, ...safeAgentData } = assignedAgent;
       res.json({
         assignedAgent: safeAgentData,
         conversationId: mostRecentConversation.id,
@@ -23798,7 +23798,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       const customRoleNameById = new Map(customRoles.map((role) => [role.id, role.name]));
 
       const safeTeamMembers = teamMembers.map(member => {
-        const { password, ...safeUser } = member;
+        const { password, tempPasswordHash, ...safeUser } = member;
         return {
           ...safeUser,
           customRoleName: member.customRoleId
@@ -23896,7 +23896,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         customPermissions: normalizedCustomPermissions ?? {},
       });
 
-      const { password: _, ...safeUser } = newUser;
+      const { password: _, tempPasswordHash: __, ...safeUser } = newUser;
 
       res.status(201).json(safeUser);
     } catch (error) {
@@ -24014,7 +24014,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
 
       const updatedUser = await storage.updateUser(memberId, userUpdateData);
 
-      const { password: _, ...safeUser } = updatedUser;
+      const { password: _, tempPasswordHash: __, ...safeUser } = updatedUser;
 
       res.json(safeUser);
     } catch (error) {
@@ -24080,7 +24080,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       const activeMembers = await storage.getActiveTeamMembersByCompany(user.companyId);
 
       const safeActiveMembers = activeMembers.map(member => {
-        const { password, ...safeUser } = member;
+        const { password, tempPasswordHash, ...safeUser } = member;
         return safeUser;
       });
 
@@ -29836,7 +29836,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
       const users = await storage.getActiveTeamMembersByCompany(user.companyId);
 
       const safeUsers = users.map(member => {
-        const { password, ...safeUser } = member;
+        const { password, tempPasswordHash, ...safeUser } = member;
         return safeUser;
       });
 

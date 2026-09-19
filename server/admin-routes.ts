@@ -619,7 +619,7 @@ function registerAdminRoutes(app: Express) {
       const allUsers = await storage.getAllUsers();
 
       const safeUsers = allUsers.map(user => {
-        const { password, ...safeUser } = user;
+        const { password, tempPasswordHash, ...safeUser } = user;
         return safeUser;
       });
 
@@ -638,7 +638,7 @@ function registerAdminRoutes(app: Express) {
         return res.status(404).json({ error: "User not found" });
       }
 
-      const { password, ...safeUser } = user;
+      const { password, tempPasswordHash, ...safeUser } = user;
 
       res.json(safeUser);
     } catch (error) {
@@ -678,7 +678,7 @@ function registerAdminRoutes(app: Express) {
         isSuperAdmin: !!isSuperAdmin
       });
 
-      const { password: _, ...safeUser } = newUser;
+      const { password: _, tempPasswordHash: __, ...safeUser } = newUser;
 
       res.status(201).json(safeUser);
     } catch (error) {
@@ -712,7 +712,7 @@ function registerAdminRoutes(app: Express) {
         active: active !== undefined ? !!active : undefined
       });
 
-      const { password, ...safeUser } = updatedUser;
+      const { password, tempPasswordHash, ...safeUser } = updatedUser;
 
       res.json(safeUser);
     } catch (error) {
@@ -773,6 +773,61 @@ function registerAdminRoutes(app: Express) {
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to reset password" });
+    }
+  });
+
+  app.post("/api/admin/users/:id/temp-password", ensureSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+
+      const existingUser = await storage.getUser(userId);
+      if (!existingUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const requestedMinutes = Number(req.body?.expiresInMinutes);
+      const expiresInMinutes = Number.isFinite(requestedMinutes)
+        ? Math.min(Math.max(requestedMinutes, 5), 10080) // 5 minutes .. 7 days
+        : 1440; // default 24h
+
+      const temporaryPassword = randomBytes(4).toString("hex");
+      const hashedPassword = await hashPassword(temporaryPassword);
+      const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
+
+      const success = await storage.setTemporaryPassword(userId, hashedPassword, expiresAt);
+
+      if (!success) {
+        return res.status(500).json({ error: "Failed to create temporary password" });
+      }
+
+      res.json({
+        message: "Temporary password created successfully",
+        temporaryPassword,
+        expiresAt
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create temporary password" });
+    }
+  });
+
+  app.delete("/api/admin/users/:id/temp-password", ensureSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+
+      const existingUser = await storage.getUser(userId);
+      if (!existingUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const success = await storage.clearTemporaryPassword(userId);
+
+      if (!success) {
+        return res.status(500).json({ error: "Failed to revoke temporary password" });
+      }
+
+      res.json({ message: "Temporary password revoked successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to revoke temporary password" });
     }
   });
 

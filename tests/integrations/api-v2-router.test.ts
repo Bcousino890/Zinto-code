@@ -231,6 +231,9 @@ test('does not disclose CRM capabilities to a key without integration permission
 });
 
 test('exposes the supported CRM scopes to an integration administrator', async () => {
+  const contactSync = {
+    upsert: async () => ({ created: true, contact: { id: 1, name: 'Test' } }),
+  } as Pick<CrmContactSyncService, 'upsert'>;
   await withServer((req, _res, next) => {
     req.apiKey = { permissions: ['integrations:manage'] } as any;
     next();
@@ -238,9 +241,13 @@ test('exposes the supported CRM scopes to an integration administrator', async (
     const response = await fetch(`${baseUrl}/api/v2/capabilities`);
     assert.equal(response.status, 200);
     const body = await response.json() as { scopes: string[]; webhookSignature: string };
+    // Only scopes with a route actually backed by a configured dependency are
+    // reported (see integration-scope.ts's activeScopes) — contactSync is the
+    // dependency wired in below, so contacts:write is the one CRM scope this
+    // router instance can genuinely serve.
     assert.ok(body.scopes.includes('contacts:write'));
     assert.equal(body.webhookSignature, 'v1=hmac-sha256(timestamp.raw_body)');
-  });
+  }, contactSync);
 });
 
 test('upserts a contact from a permitted CRM without exposing another company', async () => {

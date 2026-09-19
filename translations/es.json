@@ -17000,6 +17000,10 @@
     "value": "Nombre Completo"
   },
   {
+    "key": "contacts.details.instagram_username",
+    "value": "Usuario de Instagram"
+  },
+  {
     "key": "contacts.details.no_tags_added",
     "value": "No hay etiquetas agregadas"
   },
@@ -50198,6 +50202,10 @@
   {
     "key": "message_bubble.reply",
     "value": "Responder a este mensaje"
+  },
+  {
+    "key": "message_bubble.edited",
+    "value": "Editado"
   },
   {
     "key": "message_bubble.sticker",

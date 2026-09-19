@@ -12091,14 +12091,30 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
 
         success = await whatsAppOfficialService.disconnect(connectionId, req.user.id, req.user.companyId);
       }
+      else if (connection.channelType === 'instagram') {
+        success = await instagramService.disconnect(connectionId, req.user.id);
+      }
+      else if (connection.channelType === 'messenger') {
+        const permissions = await getUserPermissions(req.user);
+        const hasManagePermission = req.user.isSuperAdmin || permissions[PERMISSIONS.MANAGE_CHANNELS] === true;
+        success = await messengerService.disconnect(connectionId, req.user.id, {
+          allowManageChannels: hasManagePermission
+        });
+      }
+      else if (connection.channelType === 'telegram') {
+        success = await telegramService.disconnect(connectionId, req.user.id);
+      }
+      else if (connection.channelType === 'tiktok') {
+        success = await TikTokService.disconnectConnection(connectionId);
+      }
       else {
         return res.status(400).json({ message: 'Connection type not supported for disconnect' });
       }
 
       if (success) {
-        res.json({ message: 'WhatsApp disconnected successfully' });
+        res.json({ message: 'Channel disconnected successfully' });
       } else {
-        res.status(500).json({ message: 'Failed to disconnect from WhatsApp' });
+        res.status(500).json({ message: 'Failed to disconnect channel' });
       }
     } catch (err: any) {
       res.status(400).json({ message: err.message });
@@ -18793,20 +18809,41 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
           return res.status(201).json(message);
 
         } else if (conversation.channelType === 'instagram') {
-          if (!['image', 'video'].includes(determinedMediaType)) {
+          if (!['image', 'video', 'audio'].includes(determinedMediaType)) {
             await fsExtra.unlink(req.file.path);
             return res.status(400).json({
               error: 'Unsupported file format for Instagram',
-              message: 'Instagram media messages only support image and video files.'
+              message: 'Instagram media messages only support image, video, and audio files.'
             });
           }
 
           const instagramSupportedTypes = {
             image: ['image/png', 'image/jpeg', 'image/gif'],
-            video: ['video/mp4', 'video/ogg', 'video/avi', 'video/x-msvideo', 'video/quicktime', 'video/webm']
+            video: ['video/mp4', 'video/ogg', 'video/avi', 'video/x-msvideo', 'video/quicktime', 'video/webm'],
+            // Matches the Messenger allowlist below — Instagram messaging shares the same Send API.
+            audio: ['audio/mpeg', 'audio/mp4', 'audio/aac', 'audio/ogg', 'audio/wav']
           };
 
-          const supportedMimeTypes = instagramSupportedTypes[determinedMediaType as 'image' | 'video'];
+          if (determinedMediaType === 'audio' && !instagramSupportedTypes.audio.includes(req.file.mimetype)) {
+            // Browser voice recordings are typically audio/webm, which Instagram's Send API doesn't
+            // accept — convert to Opus/OGG the same way the cross-platform WhatsApp path does.
+            const { convertAudioForCrossPlatform } = await import('./utils/audio-converter');
+            const conversionResult = await convertAudioForCrossPlatform(req.file.path, UPLOAD_DIR, req.file.originalname);
+            if (!conversionResult.success || !conversionResult.audioUrl) {
+              await fsExtra.unlink(req.file.path);
+              return res.status(500).json({
+                error: 'Audio conversion failed',
+                message: conversionResult.error || 'Failed to convert audio for Instagram'
+              });
+            }
+            const convertedFileName = path.basename(conversionResult.audioUrl);
+            await fsExtra.unlink(req.file.path);
+            req.file.path = path.join(UPLOAD_DIR, convertedFileName);
+            req.file.mimetype = 'audio/ogg';
+            convertedAudioPath = req.file.path;
+          }
+
+          const supportedMimeTypes = instagramSupportedTypes[determinedMediaType as 'image' | 'video' | 'audio'];
           if (!supportedMimeTypes.includes(req.file.mimetype)) {
             await fsExtra.unlink(req.file.path);
             return res.status(400).json({
@@ -18890,7 +18927,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
             conversation.channelId,
             instagramRecipient,
             publicUrl,
-            determinedMediaType as 'image' | 'video',
+            determinedMediaType as 'image' | 'video' | 'audio',
             messageCaption,
             req.user.id
           );

@@ -239,7 +239,7 @@ interface InstagramMediaMessageRequestBody {
   recipient: { id: string };
   message: {
     attachment: {
-      type: 'image' | 'video';
+      type: 'image' | 'video' | 'audio';
       payload: { url: string; is_reusable?: boolean };
     };
   };
@@ -1332,7 +1332,7 @@ export async function sendInstagramMediaMessage(
   connectionId: number,
   to: string,
   mediaUrl: string,
-  mediaType: 'image' | 'video',
+  mediaType: 'image' | 'video' | 'audio',
   caption?: string,
   userId?: number
 ): Promise<{ success: boolean; messageId?: string; captionMessageId?: string; error?: string }> {
@@ -1773,7 +1773,7 @@ async function findOrCreateConversation(connectionId: number, recipientId: strin
   }
 
 
-  let contact = await storage.getContactByPhone(recipientId, companyId);
+  let contact = await storage.getContactByIdentifierAndCompany(recipientId, 'instagram', companyId);
 
   if (!contact) {
     const connection = await storage.getChannelConnection(connectionId) as ChannelConnection | null;
@@ -1802,7 +1802,6 @@ async function findOrCreateConversation(connectionId: number, recipientId: strin
     const contactData: InsertContact = {
       companyId: companyId,
       name,
-      phone: recipientId,
       email: null,
       avatarUrl,
       identifier: recipientId,
@@ -1885,6 +1884,44 @@ async function handleIncomingInstagramMessage(messagingEvent: InstagramWebhookMe
       return;
     }
 
+    const messageEdit = (messagingEvent as any).message_edit;
+    if (messageEdit) {
+      logger.info('instagram', 'Received message_edit event', { raw: messageEdit });
+      const editedMid = messageEdit.mid;
+      const editedText = typeof messageEdit.text === 'string' ? messageEdit.text : undefined;
+      if (!editedMid || editedText === undefined) {
+        logger.warn('instagram', 'message_edit event missing mid or text — skipping', { messageEdit });
+        return;
+      }
+      const existingMessage = await storage.getMessageByExternalId(editedMid);
+      if (!existingMessage) {
+        logger.warn('instagram', `message_edit for unknown message ${editedMid} — skipping`);
+        return;
+      }
+      const updates = {
+        content: editedText,
+        metadata: {
+          ...((existingMessage.metadata as any) || {}),
+          isEdited: true,
+          editedAt: new Date().toISOString(),
+        },
+      };
+      await storage.updateMessage(existingMessage.id, updates);
+      const conversation = await storage.getConversation(existingMessage.conversationId);
+      if (conversation?.companyId && (global as any).broadcastToCompany) {
+        (global as any).broadcastToCompany({
+          type: 'messageUpdated',
+          data: {
+            messageId: existingMessage.id,
+            conversationId: existingMessage.conversationId,
+            updates,
+          },
+        }, conversation.companyId);
+      }
+      logger.info('instagram', `Applied edit to message ${existingMessage.id}`);
+      return;
+    }
+
     if (!message || !message.mid) {
       console.warn('⚠️ [INSTAGRAM HANDLER] Missing required message data:', {
         hasMessage: !!message,
@@ -1960,7 +1997,7 @@ async function handleIncomingInstagramMessage(messagingEvent: InstagramWebhookMe
     }
 
 
-    let contact = await storage.getContactByPhone(counterpartyId, connection.companyId) as Contact | null;
+    let contact = await storage.getContactByIdentifierAndCompany(counterpartyId, 'instagram', connection.companyId) as Contact | null;
     let contactWasCreatedByInboundWebhook = false;
     let conversationWasCreated = false;
 
@@ -1976,7 +2013,6 @@ async function handleIncomingInstagramMessage(messagingEvent: InstagramWebhookMe
 
       const insertContactData: InsertContact = {
         companyId: connection.companyId,
-        phone: counterpartyId,
         name: profileData ? normalizeInstagramDisplayName(profileData, counterpartyId) : `Instagram User ${counterpartyId.substring(0, 6)}...`,
         avatarUrl: profileData?.profile_pic || null,
         source: 'instagram',
@@ -2190,6 +2226,14 @@ async function handleIncomingInstagramMessage(messagingEvent: InstagramWebhookMe
         contactWasCreatedByInboundWebhook: !isEcho && contactWasCreatedByInboundWebhook,
       }) as InsertMessage['metadata'],
     };
+
+    if (isEcho && message.mid) {
+      const alreadyRecorded = await storage.getMessageByExternalId(message.mid, connection.companyId ?? undefined);
+      if (alreadyRecorded) {
+        logger.info('instagram', `Skipping duplicate echo for message ${message.mid} — already recorded as message ${alreadyRecorded.id} when it was sent`);
+        return;
+      }
+    }
 
     console.log('📝 [INSTAGRAM HANDLER] Creating message in database:', {
       conversationId: conversation.id,
@@ -2802,10 +2846,23 @@ export async function setupWebhookSubscription(
     'pages_show_list',
     'pages_read_engagement',
   ];
-  const missingRequiredScopes = requiredScopes.filter((scope) =>
-    scopeDiagnostics.missingScopes.includes(scope) ||
-    scopeDiagnostics.restrictedScopes.includes(scope)
-  );
+  // Meta grants Instagram messaging under different permission names depending on
+  // how the account was connected — the legacy Instagram-via-Page flow grants
+  // instagram_manage_messages, while newer Facebook Login for Business setups (what
+  // this connector actually uses) grant instagram_business_manage_messages instead.
+  // Either one authorizes the same messages/message_reactions webhook delivery, so
+  // don't fail the subscription just because the legacy name isn't the one granted.
+  const MESSAGING_SCOPE_ALTERNATIVES: Record<string, string[]> = {
+    instagram_manage_messages: ['instagram_business_manage_messages'],
+  };
+  const missingRequiredScopes = requiredScopes.filter((scope) => {
+    const isMissing =
+      scopeDiagnostics.missingScopes.includes(scope) ||
+      scopeDiagnostics.restrictedScopes.includes(scope);
+    if (!isMissing) return false;
+    const alternatives = MESSAGING_SCOPE_ALTERNATIVES[scope] || [];
+    return !alternatives.some((alt) => scopeDiagnostics.grantedScopes.includes(alt));
+  });
 
   if (missingRequiredScopes.length > 0) {
     const error = `Page token missing required scopes: ${missingRequiredScopes.join(', ')}`;

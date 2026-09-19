@@ -48,16 +48,16 @@ const log = (level: LogLevel, source: string, message: string, ...args: any[]) =
         console.error(`${prefix} ERROR: ${message}`, ...args);
         break;
       case LogLevel.WARN:
-        
+        console.warn(`${prefix} WARN: ${message}`, ...args);
         break;
       case LogLevel.INFO:
-        
+        console.info(`${prefix} INFO: ${message}`, ...args);
         break;
       case LogLevel.DEBUG:
-        
+        console.debug(`${prefix} DEBUG: ${message}`, ...args);
         break;
       case LogLevel.VERBOSE:
-        
+        console.debug(`${prefix} VERBOSE: ${message}`, ...args);
         break;
     }
   }

@@ -254,12 +254,39 @@ export async function inspectTokenScopes(
 
     const grantedScopes = data.scopes || [];
     const granular = data.granular_scopes || [];
+
+    // Meta grants Instagram messaging/profile access under different permission
+    // names depending on how the account was connected — the legacy
+    // Instagram-via-Page flow grants instagram_basic / instagram_manage_messages,
+    // while Facebook Login for Business setups (what this app actually uses)
+    // grant instagram_business_basic / instagram_business_manage_messages
+    // instead. Treat the newer name as satisfying the legacy requirement so
+    // accounts that were genuinely granted access aren't reported as
+    // missing/restricted just because the alternate name isn't the one present.
+    const INSTAGRAM_SCOPE_ALIASES: Record<string, string[]> = {
+      instagram_basic: ['instagram_business_basic'],
+      instagram_manage_messages: ['instagram_business_manage_messages'],
+    };
+    const effectiveGrantedScopes = [...grantedScopes];
+    for (const [legacyScope, aliases] of Object.entries(INSTAGRAM_SCOPE_ALIASES)) {
+      if (
+        !effectiveGrantedScopes.includes(legacyScope) &&
+        aliases.some((alias) => grantedScopes.includes(alias))
+      ) {
+        effectiveGrantedScopes.push(legacyScope);
+      }
+    }
+
     const restrictedScopes = granular
       .filter((entry) => requiredScopes.includes(entry.scope) && (!entry.target_ids || entry.target_ids.length === 0))
-      .map((entry) => entry.scope);
+      .map((entry) => entry.scope)
+      .filter((scope) => {
+        const aliases = INSTAGRAM_SCOPE_ALIASES[scope] || [];
+        return !aliases.some((alias) => grantedScopes.includes(alias));
+      });
 
     return {
-      ...buildDiagnostics(grantedScopes, requiredScopes, { restrictedScopes }),
+      ...buildDiagnostics(effectiveGrantedScopes, requiredScopes, { restrictedScopes }),
       appId: data.app_id,
     };
   } catch (error: any) {
@@ -288,7 +315,7 @@ async function getUserPages(
   try {
     const baseFields = 'id,name,access_token,category,picture';
     const fields = includeInstagram
-      ? `${baseFields},instagram_business_account{id,username,name,profile_picture_url,account_type}`
+      ? `${baseFields},instagram_business_account{id,username,name,profile_picture_url}`
       : baseFields;
 
     const response = await axios.get(
@@ -352,7 +379,7 @@ async function fetchBusinessPages(
   userAccessToken: string
 ): Promise<FacebookPage[]> {
   const pageFields =
-    'id,name,access_token,instagram_business_account{id,username,name,profile_picture_url,account_type}';
+    'id,name,access_token,instagram_business_account{id,username,name,profile_picture_url}';
 
   for (const edge of ['client_pages', 'owned_pages'] as const) {
     try {
@@ -403,7 +430,7 @@ async function getBusinessOwnedInstagramAccounts(
         `${GRAPH_API_URL}/${GRAPH_API_VERSION}/${business.id}/owned_instagram_accounts`,
         {
           params: {
-            fields: 'id,username,name,profile_picture_url,account_type',
+            fields: 'id,username,name,profile_picture_url',
             access_token: userAccessToken,
           },
         }
@@ -815,7 +842,7 @@ export async function getPageInfo(
 ): Promise<any> {
   try {
     const fields = includeInstagram
-      ? 'id,name,category,picture,access_token,instagram_business_account{id,username,name,profile_picture_url,account_type}'
+      ? 'id,name,category,picture,access_token,instagram_business_account{id,username,name,profile_picture_url}'
       : 'id,name,category,picture,access_token';
 
     const response = await axios.get(
@@ -841,7 +868,7 @@ export async function getInstagramAccountInfo(instagramAccountId: string, access
       `${GRAPH_API_URL}/${GRAPH_API_VERSION}/${instagramAccountId}`,
       {
         params: {
-          fields: 'id,username,name,profile_picture_url,account_type',
+          fields: 'id,username,name,profile_picture_url',
           access_token: accessToken,
         },
       }

@@ -210,6 +210,7 @@ export default function MessageBubble({ message, contact, channelType, onReply, 
                      : message.createdAt);
   
   const formattedTime = formatMessageDateTime(new Date(timestamp), t);
+  const isEdited = message.metadata?.isEdited === true;
 
   useEffect(() => {
     const mediaTypes = ['image', 'video', 'audio', 'voice', 'sticker'];
@@ -1163,6 +1164,9 @@ export default function MessageBubble({ message, contact, channelType, onReply, 
                   {channelType === 'tiktok' && (
                     <i className="ri-tiktok-line text-muted-foreground" title={t('conversations.view.channel.tiktok', 'TikTok')} />
                   )}
+                  {isEdited && (
+                    <span className="message-edited-indicator italic">{t('message_bubble.edited', 'Edited')}</span>
+                  )}
                   <span className="message-time">{formattedTime}</span>
                   {message.status && message.status !== 'delivered' && (
                     <span className="message-status">
@@ -1229,6 +1233,9 @@ export default function MessageBubble({ message, contact, channelType, onReply, 
               <div className="flex items-center gap-1 text-xs flex-shrink-0">
                 {channelType === 'tiktok' && (
                   <i className="ri-tiktok-line opacity-80" title={t('conversations.view.channel.tiktok', 'TikTok')} />
+                )}
+                {isEdited && (
+                  <span className="message-edited-indicator italic opacity-80">{t('message_bubble.edited', 'Edited')}</span>
                 )}
                 <span className="message-time">{formattedTime}</span>
                 {message.status && message.status !== 'sent' && (

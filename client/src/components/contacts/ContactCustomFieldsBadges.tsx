@@ -8,6 +8,20 @@ function fieldNameToLabel(name: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+/**
+ * Fields written internally by channel integrations (e.g. Instagram profile sync) to
+ * power matching/automation — not meant for a human to read as a "custom field".
+ */
+export const INTERNAL_CUSTOM_FIELD_KEYS = new Set([
+  'instagramUsername',
+  'instagramIgsid',
+  'instagramProfileFetchedAt',
+  'instagramIsVerifiedUser',
+  'follower_count',
+  'is_user_follow_business',
+  'is_business_follow_user',
+]);
+
 type SchemaField = {
   fieldName: string;
   fieldLabel: string;
@@ -35,6 +49,7 @@ export function ContactCustomFieldsBadges({
   const items: { label: string; value: string }[] = [];
 
   for (const [key, val] of Object.entries(customFields)) {
+    if (INTERNAL_CUSTOM_FIELD_KEYS.has(key)) continue;
     if (val === undefined || val === null || val === '') continue;
     if (Array.isArray(val) && val.length === 0) continue;
 

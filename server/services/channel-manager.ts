@@ -40,6 +40,7 @@ export interface ReplyOptions {
   originalMessageId: string;
   originalContent: string;
   originalSender: string;
+  originalExternalId?: string;
   quotedMessage?: any;
 }
 

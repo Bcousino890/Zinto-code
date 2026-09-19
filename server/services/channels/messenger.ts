@@ -511,7 +511,7 @@ async function findOrCreateConversation(connectionId: number, recipientId: strin
 
   const cleanedRecipientId = cleanRecipientId(recipientId);
 
-  let contact = await storage.getContactByPhone(cleanedRecipientId, companyId);
+  let contact = await storage.getContactByIdentifierAndCompany(cleanedRecipientId, 'messenger', companyId);
 
   if (!contact) {
 
@@ -537,7 +537,6 @@ async function findOrCreateConversation(connectionId: number, recipientId: strin
     const contactData: InsertContact = {
       companyId: companyId,
       name: userName,
-      phone: cleanedRecipientId,
       email: null,
       avatarUrl: avatarUrl,
       identifier: cleanedRecipientId,
@@ -2066,7 +2065,7 @@ async function handleIncomingMessengerMessage(messagingEvent: any, companyId?: n
     });
     const metaReferral = metaReferralFromEvent ?? consumePendingMetaReferral(pendingKey);
 
-    let contact = await storage.getContactByPhone(senderId, connection.companyId);
+    let contact = await storage.getContactByIdentifierAndCompany(senderId, 'messenger', connection.companyId);
     let contactWasCreatedByInboundWebhook = false;
     let conversationWasCreated = false;
     if (!contact) {
@@ -2113,7 +2112,6 @@ async function handleIncomingMessengerMessage(messagingEvent: any, companyId?: n
       const metaReferralContactTags = deriveMetaReferralContactTags(metaReferral);
       const insertContactData: InsertContact = {
         companyId: connection.companyId,
-        phone: senderId,
         name: userName,
         avatarUrl: avatarUrl,
         source: 'messenger',

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import crypto from 'crypto';
 import { storage } from '../storage';
 
 const WHATSAPP_GRAPH_URL = 'https://graph.facebook.com';
@@ -194,7 +195,8 @@ export async function verifyWebhookConfiguration(
  */
 export async function testWebhookDelivery(
   webhookUrl: string,
-  verifyToken: string
+  verifyToken: string,
+  appSecret?: string | null
 ): Promise<{ success: boolean; message: string; error?: any }> {
   try {
 
@@ -238,10 +240,23 @@ export async function testWebhookDelivery(
       ]
     };
 
-    const response = await axios.post(webhookUrl, testPayload, {
+    if (!appSecret) {
+      return {
+        success: false,
+        message: 'Cannot test webhook: no App Secret is configured for this partner configuration yet. Save the App Secret first, then test again.'
+      };
+    }
+
+    // The receiving endpoint validates X-Hub-Signature-256 against the raw request
+    // body, exactly like Meta does. We have to sign the same bytes we send, so the
+    // payload is serialized once here rather than left to axios.
+    const rawBody = JSON.stringify(testPayload);
+    const signature = 'sha256=' + crypto.createHmac('sha256', appSecret).update(rawBody).digest('hex');
+
+    const response = await axios.post(webhookUrl, rawBody, {
       headers: {
         'Content-Type': 'application/json',
-        'X-Hub-Signature-256': 'test_signature'
+        'X-Hub-Signature-256': signature
       },
       timeout: 10000,
       validateStatus: (status) => status < 500 // Accept 2xx, 3xx, 4xx as valid responses

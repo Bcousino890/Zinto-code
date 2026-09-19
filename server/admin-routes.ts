@@ -5104,7 +5104,7 @@ function registerAdminRoutes(app: Express) {
         const { webhookUrl, webhookVerifyToken } = req.body;
         if (webhookUrl) {
           try {
-            const webhookTest = await testWebhookDelivery(webhookUrl, webhookVerifyToken || '');
+            const webhookTest = await testWebhookDelivery(webhookUrl, webhookVerifyToken || '', appSecret);
             validationResults.webhook.reachable = webhookTest.success;
             if (!webhookTest.success) {
               validationResults.webhook.error = webhookTest.message;
@@ -5260,7 +5260,10 @@ function registerAdminRoutes(app: Express) {
         return res.status(400).json({ error: 'Webhook URL is required' });
       }
 
-      const result = await testWebhookDelivery(webhookUrl, webhookVerifyToken || '');
+      const partnerConfig = await storage.getPartnerConfiguration('meta');
+      const appSecret = partnerConfig?.partnerSecret?.trim() || process.env.META_WHATSAPP_APP_SECRET || null;
+
+      const result = await testWebhookDelivery(webhookUrl, webhookVerifyToken || '', appSecret);
 
       if (result.success) {
         res.json({ success: true, message: result.message });

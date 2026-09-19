@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { ContactAvatar } from '@/components/contacts/ContactAvatar';
-import { ContactCustomFieldsBadges } from '@/components/contacts/ContactCustomFieldsBadges';
+import { ContactCustomFieldsBadges, INTERNAL_CUSTOM_FIELD_KEYS } from '@/components/contacts/ContactCustomFieldsBadges';
 import { useCompanyContactCustomFields } from '@/hooks/use-company-contact-custom-fields';
 import { ClearChatHistoryDialog } from './ClearChatHistoryDialog';
 import { TwilioIcon } from '@/components/icons/TwilioIcon';
@@ -196,6 +196,18 @@ export default function ContactDetails({
               <p className="text-sm">{currentContact?.name || contact?.name}</p>
             </div>
 
+            {(() => {
+              const instagramUsername =
+                (currentContact?.customFields || contact?.customFields)?.instagramUsername;
+              if (!instagramUsername) return null;
+              return (
+                <div>
+                  <p className="text-xs text-muted-foreground">{t('contacts.details.instagram_username', 'Instagram Username')}</p>
+                  <p className="text-sm">@{instagramUsername}</p>
+                </div>
+              );
+            })()}
+
             <div>
               <p className="text-xs text-muted-foreground">{t('contacts.details.phone', 'Phone')}</p>
               <p className="text-sm">
@@ -240,14 +252,22 @@ export default function ContactDetails({
           </div>
         </div>
 
-        {(currentContact?.customFields || contact?.customFields) && typeof (currentContact?.customFields || contact?.customFields) === 'object' && Object.keys(currentContact?.customFields || contact?.customFields || {}).length > 0 && (
-          <div className="p-4 border-b border-border">
-            <h3 className="font-medium mb-4">{t('contacts.details.custom_fields', 'Custom Fields')}</h3>
-            <div className="overflow-x-auto overflow-y-hidden -mx-1 px-1">
-              <ContactCustomFieldsBadges customFields={currentContact?.customFields || contact?.customFields} schema={companyCustomFields} maxVisible={99} className="flex-nowrap w-max" />
+        {(() => {
+          const rawCustomFields = currentContact?.customFields || contact?.customFields;
+          if (!rawCustomFields || typeof rawCustomFields !== 'object') return null;
+          const visibleCustomFields = Object.fromEntries(
+            Object.entries(rawCustomFields).filter(([key]) => !INTERNAL_CUSTOM_FIELD_KEYS.has(key))
+          );
+          if (Object.keys(visibleCustomFields).length === 0) return null;
+          return (
+            <div className="p-4 border-b border-border">
+              <h3 className="font-medium mb-4">{t('contacts.details.custom_fields', 'Custom Fields')}</h3>
+              <div className="overflow-x-auto overflow-y-hidden -mx-1 px-1">
+                <ContactCustomFieldsBadges customFields={visibleCustomFields} schema={companyCustomFields} maxVisible={99} className="flex-nowrap w-max" />
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         <div className="p-4 border-b border-border">
           <h3 className="font-medium mb-4">{t('contacts.details.conversation_details', 'Conversation Details')}</h3>

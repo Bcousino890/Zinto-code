@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 import { Router, type NextFunction, type Request, type Response } from 'express';
 import { integrationCapabilities, requireIntegrationScope } from '../middleware/integration-scope';
+import type { IntegrationScope } from '../../shared/integrations/contracts';
 import { getApiV2OpenApiDocument } from './api-v2-openapi';
 import { getApiV2PostmanCollection } from './api-v2-postman';
 import { API_V2_GUIDE_MARKDOWN } from './api-v2-guide';
@@ -276,11 +277,20 @@ export function createApiV2Router({
     return resolveIntegrationId(req.companyId, raw);
   };
 
+  // Populated below as each optional dependency's route block registers —
+  // `integrations:manage` is unconditional since /capabilities and (when
+  // initialSync is present) /sync-jobs both always require it. The handler
+  // closure below reads this by reference, so it sees the fully-populated
+  // set by the time a real request calls it, even though it's registered
+  // before the later `if` blocks run.
+  const activeScopes = new Set<IntegrationScope>(['integrations:manage']);
+
   router.get('/capabilities', requireIntegrationScope('integrations:manage'), (_req, res) => {
-    res.json(integrationCapabilities());
+    res.json(integrationCapabilities(activeScopes));
   });
 
   if (contactSync) {
+    activeScopes.add('contacts:write');
     router.put('/contacts/:externalId', requireIntegrationScope('contacts:write'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
@@ -314,6 +324,7 @@ export function createApiV2Router({
   }
 
   if (messageSync) {
+    activeScopes.add('messages:send');
     const MEDIA_TYPES = ['image', 'video', 'audio', 'document'] as const;
 
     const TEMPLATE_COMPONENT_TYPES = ['header', 'body', 'button'] as const;
@@ -443,6 +454,8 @@ export function createApiV2Router({
   }
 
   if (mediaAccess) {
+    activeScopes.add('media:upload');
+    activeScopes.add('media:read');
     router.post('/media/upload', requireIntegrationScope('media:upload'), mediaAccess.upload, async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
@@ -505,6 +518,7 @@ export function createApiV2Router({
   }
 
   if (channelsRead) {
+    activeScopes.add('channels:read');
     router.get('/channels', requireIntegrationScope('channels:read'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
@@ -523,6 +537,7 @@ export function createApiV2Router({
   }
 
   if (conversationsRead) {
+    activeScopes.add('conversations:read');
     router.get('/conversations', requireIntegrationScope('conversations:read'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
@@ -569,6 +584,7 @@ export function createApiV2Router({
   }
 
   if (messageStatusRead) {
+    activeScopes.add('messages:read');
     router.get('/messages/:messageId/status', requireIntegrationScope('messages:read'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
@@ -591,6 +607,7 @@ export function createApiV2Router({
   }
 
   if (campaignSync) {
+    activeScopes.add('campaigns:write');
     router.post('/campaigns/batch', requireIntegrationScope('campaigns:write'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
@@ -631,6 +648,7 @@ export function createApiV2Router({
   }
 
   if (appointmentSync) {
+    activeScopes.add('appointments:write');
     router.put('/appointments/:externalId', requireIntegrationScope('appointments:write'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
@@ -662,6 +680,7 @@ export function createApiV2Router({
   }
 
   if (dealPipelineSync) {
+    activeScopes.add('deals:write');
     router.post('/deals', requireIntegrationScope('deals:write'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);

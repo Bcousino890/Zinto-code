@@ -2,6 +2,7 @@ import type { Express, RequestHandler } from 'express';
 import { assertIntegrationScopes, type IntegrationScope } from '../../shared/integrations/contracts';
 import { decryptValue, encryptValue } from '../utils/crypto';
 import { generateWebhookSecret } from '../utils/webhook-token-generator';
+import { assertPublicHttpUrl, isReservedTestDomain } from '../utils/ssrf-guard';
 
 type CrmIntegrationRecord = {
   id: number;
@@ -61,12 +62,25 @@ function isPublicId(value: unknown): value is string {
   return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
-function parseWebhookUrl(value: unknown): string | null | undefined {
+async function parseWebhookUrl(value: unknown): Promise<string | null | undefined> {
   if (value === null || value === undefined || value === '') return null;
   if (typeof value !== 'string' || value.length > 2048) throw new Error('webhookUrl debe ser una URL HTTPS válida');
   let url: URL;
   try { url = new URL(value); } catch { throw new Error('webhookUrl debe ser una URL HTTPS válida'); }
   if (url.protocol !== 'https:') throw new Error('webhookUrl debe utilizar HTTPS');
+  // Rejects localhost/private/reserved/cloud-metadata destinations (and
+  // resolves the hostname to check the real IP, not just the literal host)
+  // so a company admin can't point a webhook at an internal service. This is
+  // a first line of defense at save time — the actual delivery worker
+  // (durable-webhook-delivery-service.ts) re-checks immediately before every
+  // send, since DNS can change after this check passes.
+  if (!isReservedTestDomain(url.hostname)) {
+    try {
+      await assertPublicHttpUrl(url.toString());
+    } catch {
+      throw new Error('webhookUrl debe apuntar a un host público, no a una dirección privada, local o reservada');
+    }
+  }
   return url.toString();
 }
 
@@ -151,7 +165,7 @@ export function registerCrmIntegrationManagementRoutes(
       if (typeof body.name !== 'string' || !body.name.trim() || body.name.trim().length > 120) throw new Error('name es obligatorio y debe tener entre 1 y 120 caracteres');
       const provider = body.provider === undefined ? 'custom' : body.provider;
       if (typeof provider !== 'string' || !PROVIDER_PATTERN.test(provider)) throw new Error('provider debe ser un identificador válido');
-      const webhookUrl = parseWebhookUrl(body.webhookUrl);
+      const webhookUrl = await parseWebhookUrl(body.webhookUrl);
       const scopes = parseScopes(body.scopes);
       const conflictRules = parseConflictRules(body.conflictRules);
       const webhookSecret = secret(options);
@@ -175,7 +189,7 @@ export function registerCrmIntegrationManagementRoutes(
       if (body.name !== undefined) { if (typeof body.name !== 'string' || !body.name.trim() || body.name.trim().length > 120) throw new Error('name debe tener entre 1 y 120 caracteres'); data.name = body.name.trim(); }
       if (body.provider !== undefined) { if (typeof body.provider !== 'string' || !PROVIDER_PATTERN.test(body.provider)) throw new Error('provider debe ser un identificador válido'); data.provider = body.provider; }
       if (body.status !== undefined) { if (!['draft', 'active', 'inactive'].includes(body.status)) throw new Error('status inválido'); data.status = body.status; }
-      if (body.webhookUrl !== undefined) { const url = parseWebhookUrl(body.webhookUrl); data.webhookUrl = url; if (url && !existing.webhookSecretEncrypted) { const webhookSecret = secret(options); data.webhookSecretEncrypted = (options.encryptSecret ?? encryptValue)(webhookSecret); } }
+      if (body.webhookUrl !== undefined) { const url = await parseWebhookUrl(body.webhookUrl); data.webhookUrl = url; if (url && !existing.webhookSecretEncrypted) { const webhookSecret = secret(options); data.webhookSecretEncrypted = (options.encryptSecret ?? encryptValue)(webhookSecret); } }
       if (body.scopes !== undefined) data.scopes = parseScopes(body.scopes, []);
       if (body.conflictRules !== undefined) data.conflictRules = parseConflictRules(body.conflictRules);
       const updated = await storage.updateCrmIntegration(id, req.user.companyId, data);

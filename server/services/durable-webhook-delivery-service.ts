@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { assertPublicHttpUrl, isReservedTestDomain } from '../utils/ssrf-guard';
 import { buildWebhookDelivery, type WebhookDelivery } from './integration-webhook-service';
 import { planWebhookDelivery, type WebhookDeliveryPlan } from './integration-webhook-worker';
 import type {
@@ -155,6 +156,16 @@ export function createFetchWebhookDeliveryTransport(
   return {
     async deliver(delivery) {
       try {
+        // Re-checked immediately before the request (not just when the URL was
+        // saved) so a domain that resolved publicly at config time and was
+        // since repointed at a private address (DNS rebinding) can't be used
+        // to reach internal services through a scheduled webhook delivery.
+        // (.test/.example are exempt — see isReservedTestDomain — everything
+        // else, including localhost, is checked for real every time.)
+        const deliveryUrl = new URL(delivery.url);
+        if (!isReservedTestDomain(deliveryUrl.hostname)) {
+          await assertPublicHttpUrl(delivery.url);
+        }
         const response = await fetchImpl(delivery.url, {
           method: 'POST',
           headers: delivery.headers,

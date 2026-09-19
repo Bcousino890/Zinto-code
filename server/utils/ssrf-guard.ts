@@ -20,6 +20,20 @@ export class SsrfBlockedError extends Error {
 }
 
 /**
+ * `.test` and `.example` are permanently reserved by RFC 2606 and can never
+ * be registered as real, resolvable internet domains — unlike `localhost`,
+ * which genuinely resolves back to whatever machine makes the request, so
+ * allowing it would defeat the point of this guard unless the caller has its
+ * own explicit, deliberate sandbox-mode flag gating it (as
+ * sandbox-api-key-policy.ts does for API keys). Safe to skip DNS resolution
+ * for these two TLDs unconditionally; nothing else gets a pass here.
+ */
+export function isReservedTestDomain(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+  return host.endsWith('.test') || host.endsWith('.example');
+}
+
+/**
  * Throws SsrfBlockedError if `rawUrl` is not safe for the server to fetch
  * on behalf of a user-supplied destination. Call this immediately before
  * making the actual outbound request (not earlier), so the DNS check is

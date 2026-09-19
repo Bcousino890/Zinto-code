@@ -15,10 +15,21 @@ export function requireIntegrationScope(scope: IntegrationScope) {
   };
 }
 
-export function integrationCapabilities() {
+/**
+ * `activeScopes`, when given, restricts the reported list to scopes that
+ * actually gate a live route on this router instance — see
+ * createApiV2Router's own `activeScopes` set, built from exactly the same
+ * `if (dependency)` conditionals that register each route, so this can
+ * never drift from what the router really does. Omitted (or an empty set)
+ * falls back to every scope this API v2 contract has ever declared, which
+ * is what created the original bug this guards against: a partner asking
+ * "what can I do?" being told about scopes with no route behind them at
+ * all (contacts:read, webhooks:manage, audit:read, ...).
+ */
+export function integrationCapabilities(activeScopes?: ReadonlySet<IntegrationScope>) {
   return {
     version: 'v2',
-    scopes: INTEGRATION_SCOPES,
+    scopes: activeScopes && activeScopes.size > 0 ? INTEGRATION_SCOPES.filter((scope) => activeScopes.has(scope)) : INTEGRATION_SCOPES,
     webhookSignature: 'v1=hmac-sha256(timestamp.raw_body)',
   };
 }

@@ -155,3 +155,41 @@ test('rejects integration management for non-admin users', async () => {
     assert.equal(response.status, 403);
   });
 });
+
+test('rejects a webhook URL that resolves to a private or local address (SSRF)', async () => {
+  let createCalled = false;
+  const app = createApp({
+    async createCrmIntegration() { createCalled = true; return {}; },
+  });
+  await withServer(app, async (baseUrl) => {
+    for (const webhookUrl of [
+      'https://127.0.0.1/zinto',
+      'https://localhost/zinto',
+      'https://10.0.0.5/zinto',
+      'https://169.254.169.254/latest/meta-data/',
+    ]) {
+      const response = await fetch(`${baseUrl}/api/settings/crm-integrations`, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name: 'Mi CRM', webhookUrl, scopes: [] }),
+      });
+      assert.equal(response.status, 400, `expected ${webhookUrl} to be rejected`);
+      assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+    }
+  });
+  assert.equal(createCalled, false, 'must never reach storage for a disallowed webhook URL');
+});
+
+test('still accepts a .test webhook URL used for local development/testing', async () => {
+  const created: any[] = [];
+  const app = createApp({
+    async createCrmIntegration(data: any) { created.push(data); return { id: 12, ...data, createdAt: new Date(), updatedAt: new Date() }; },
+  });
+  await withServer(app, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/settings/crm-integrations`, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'Mi CRM', webhookUrl: 'https://mi-servidor-local.test/zinto', scopes: [] }),
+    });
+    assert.equal(response.status, 201);
+  });
+  assert.equal(created.length, 1);
+});

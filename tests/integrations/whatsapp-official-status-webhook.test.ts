@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   mapMetaStatusToInternalStatus,
+  mapMetaTemplateStatus,
   mergeWhatsAppMessageMetadata,
   resolveWhatsAppStatusUpdate,
 } from '../../server/services/channels/whatsapp-official-status';
@@ -142,4 +143,41 @@ test('returns null (no write) when there is no message to update', () => {
 test('returns null (no write) for a malformed status entry', () => {
   assert.equal(resolveWhatsAppStatusUpdate({ status: 'sent', metadata: null }, {}), null);
   assert.equal(resolveWhatsAppStatusUpdate({ status: 'sent', metadata: null }, { id: 'wamid.123' }), null);
+});
+
+// mapMetaTemplateStatus ----------------------------------------------------
+//
+// message_template_status_update is a separate Meta webhook field (template
+// review status, not message delivery) that used to be silently discarded
+// in processWebhook - this is the pure mapping its handler now uses to
+// decide whether/how to persist an incoming event.
+
+test('maps each Meta template event with a real DB-enum equivalent', () => {
+  assert.equal(mapMetaTemplateStatus('APPROVED'), 'approved');
+  assert.equal(mapMetaTemplateStatus('REJECTED'), 'rejected');
+  assert.equal(mapMetaTemplateStatus('PENDING'), 'pending');
+  assert.equal(mapMetaTemplateStatus('DISABLED'), 'disabled');
+});
+
+test('maps PAUSED to disabled, since a paused template cannot be sent either', () => {
+  assert.equal(mapMetaTemplateStatus('PAUSED'), 'disabled');
+});
+
+test('is case-insensitive on the incoming Meta event string', () => {
+  assert.equal(mapMetaTemplateStatus('approved'), 'approved');
+  assert.equal(mapMetaTemplateStatus('Rejected'), 'rejected');
+});
+
+test('returns null for Meta events with no equivalent in our status enum', () => {
+  assert.equal(mapMetaTemplateStatus('IN_APPEAL'), null);
+  assert.equal(mapMetaTemplateStatus('PENDING_DELETION'), null);
+  assert.equal(mapMetaTemplateStatus('DELETED'), null);
+  assert.equal(mapMetaTemplateStatus('FLAGGED'), null);
+  assert.equal(mapMetaTemplateStatus('LOCKED'), null);
+});
+
+test('returns null for a missing/malformed event value', () => {
+  assert.equal(mapMetaTemplateStatus(undefined), null);
+  assert.equal(mapMetaTemplateStatus(null), null);
+  assert.equal(mapMetaTemplateStatus(''), null);
 });

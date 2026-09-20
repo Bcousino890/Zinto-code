@@ -147,3 +147,31 @@ export function resolveWhatsAppStatusUpdate(
 
   return updates;
 }
+
+// message_template_status_update ------------------------------------------
+//
+// Meta's separate webhook field for template review status changes
+// (approved/rejected/disabled/...) - unrelated to the message-status ladder
+// above, but the same "pure decision, DB-free" shape.
+
+const META_TEMPLATE_STATUS_MAP: Record<string, 'pending' | 'approved' | 'rejected' | 'disabled'> = {
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+  PENDING: 'pending',
+  DISABLED: 'disabled',
+  PAUSED: 'disabled',
+};
+
+/**
+ * Maps a Meta `message_template_status_update` webhook `event` string onto
+ * our own campaignTemplates.whatsappTemplateStatus enum. PAUSED maps to
+ * 'disabled' since a paused template can't be sent either, which is the
+ * effect that matters to us. Anything else Meta might send (IN_APPEAL,
+ * PENDING_DELETION, DELETED, FLAGGED, LOCKED, ...) has no equivalent in our
+ * enum and returns null - the caller should skip persisting rather than
+ * write a value the DB's enum constraint would reject.
+ */
+export function mapMetaTemplateStatus(event: string | null | undefined): 'pending' | 'approved' | 'rejected' | 'disabled' | null {
+  if (typeof event !== 'string' || !event) return null;
+  return META_TEMPLATE_STATUS_MAP[event.toUpperCase()] ?? null;
+}

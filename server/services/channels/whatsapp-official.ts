@@ -23,6 +23,7 @@ import {
   normalizeWhatsAppOfficialMetaReferral,
 } from './meta-referral-normalization';
 import {
+  mapMetaTemplateStatus,
   resolveWhatsAppStatusUpdate,
   type WhatsAppStatusWebhookEntry,
 } from './whatsapp-official-status';
@@ -1933,6 +1934,8 @@ export async function processWebhook(payload: any, companyId?: number): Promise<
           }
         } else if (change.field === 'history') {
           await handleHistoryWebhook(change.value);
+        } else if (change.field === 'message_template_status_update') {
+          await handleTemplateStatusWebhook(change.value);
         }
       }
     }
@@ -2497,6 +2500,62 @@ async function handleStatusWebhookUpdate(
     await storage.updateMessage(message.id, updates);
   } catch (error) {
     console.error('[WhatsApp processWebhook] Error handling status update:', error);
+  }
+}
+
+/**
+ * Handles the `message_template_status_update` webhook field, which Meta
+ * sends whenever a template's review status changes (approved, rejected,
+ * disabled, ...). Until now this event was silently discarded here - only
+ * the 5-minute poller in template-status-sync.ts caught these changes, so a
+ * template's status in our DB could lag Meta's real status by up to 5
+ * minutes. This is scoped to whatever company the matched template already
+ * belongs to (its own companyId column) rather than trusting anything from
+ * the webhook payload itself, since this event carries no phone_number_id
+ * or other connection-identifying field to correlate against.
+ * @param value The value object from a change with field 'message_template_status_update'
+ */
+async function handleTemplateStatusWebhook(value: any): Promise<void> {
+  try {
+    const templateId = value?.message_template_id != null ? String(value.message_template_id) : undefined;
+    const event = typeof value?.event === 'string' ? value.event.toUpperCase() : undefined;
+    if (!templateId || !event) {
+      console.warn('[WhatsApp processWebhook] Template status update missing message_template_id or event, skipping');
+      return;
+    }
+
+    const newStatus = mapMetaTemplateStatus(event);
+    if (!newStatus) {
+      // No DB-enum equivalent for this event (see mapMetaTemplateStatus) - nothing to persist.
+      return;
+    }
+
+    const db = (await import('../../db')).db;
+    const { campaignTemplates } = await import('@shared/schema');
+    const { eq } = await import('drizzle-orm');
+
+    const templates = await db.select()
+      .from(campaignTemplates)
+      .where(eq(campaignTemplates.whatsappTemplateId, templateId))
+      .limit(1);
+    const template = templates[0];
+
+    if (!template) {
+      // Could be a template created outside this app, or one we haven't synced yet - nothing to update.
+      return;
+    }
+
+    if (template.whatsappTemplateStatus === newStatus) {
+      return;
+    }
+
+    await db.update(campaignTemplates)
+      .set({ whatsappTemplateStatus: newStatus, updatedAt: new Date() })
+      .where(eq(campaignTemplates.id, template.id));
+
+    console.log(`[WhatsApp processWebhook] Template "${template.name}" (${templateId}) status updated via webhook: ${template.whatsappTemplateStatus} -> ${newStatus}`);
+  } catch (error) {
+    console.error('[WhatsApp processWebhook] Error handling template status update:', error);
   }
 }
 

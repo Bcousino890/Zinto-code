@@ -8040,6 +8040,33 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
           const { access_token: _pageToken, ...pageInfo } = rawPageInfo;
           const verifyToken = config.webhookVerifyToken?.trim() || '';
 
+          // Same class of bug as the Instagram embedded signup: prevent a stale duplicate
+          // connection to the same Page (possibly under a different company) from competing
+          // for incoming messages once this new connection goes live.
+          try {
+            const allMessengerConnections = await storage.getChannelConnectionsByType('messenger');
+            const staleDuplicates = allMessengerConnections.filter(
+              (c) => c.accountId === pageId && c.status !== 'replaced' && c.status !== 'disconnected'
+            );
+            for (const stale of staleDuplicates) {
+              await storage.updateChannelConnection(stale.id, {
+                status: 'replaced',
+                connectionData: {
+                  ...(stale.connectionData as Record<string, unknown> || {}),
+                  replacedReason: 'superseded_by_new_messenger_connection',
+                  replacedAt: new Date().toISOString(),
+                },
+              });
+              logger.warn('messenger', `Auto-replaced duplicate Messenger connection ${stale.id} (company ${stale.companyId}) — superseded by new connection for page ${pageId}`);
+              broadcastToCompany({
+                type: 'channelConnectionUpdated',
+                data: await storage.getChannelConnection(stale.id),
+              }, stale.companyId!);
+            }
+          } catch (dedupeError) {
+            logger.error('messenger', 'Failed to auto-replace duplicate Messenger connections', { error: dedupeError });
+          }
+
           const connection = await storage.createChannelConnection({
             userId: user.id,
             companyId: user.companyId,
@@ -8277,6 +8304,34 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
           }
 
           const verifyToken = config.webhookVerifyToken?.trim() || '';
+
+          // Prevent duplicate/stale connections to the same Instagram account (possibly under a
+          // different company) from competing for incoming messages — see the id=29/id=55 routing
+          // bug where two connections shared one instagramAccountId and webhook delivery picked the
+          // wrong one. Superseding here means only one connection can ever be 'active' per account.
+          try {
+            const allInstagramConnections = await storage.getChannelConnectionsByType('instagram');
+            const staleDuplicates = allInstagramConnections.filter(
+              (c) => c.accountId === instagramAccountId && c.status !== 'replaced' && c.status !== 'disconnected'
+            );
+            for (const stale of staleDuplicates) {
+              await storage.updateChannelConnection(stale.id, {
+                status: 'replaced',
+                connectionData: {
+                  ...(stale.connectionData as Record<string, unknown> || {}),
+                  replacedReason: 'superseded_by_new_instagram_connection',
+                  replacedAt: new Date().toISOString(),
+                },
+              });
+              logger.warn('instagram', `Auto-replaced duplicate Instagram connection ${stale.id} (company ${stale.companyId}) — superseded by new connection for account ${instagramAccountId}`);
+              broadcastToCompany({
+                type: 'channelConnectionUpdated',
+                data: metaGraphAPI.sanitizeMetaConnectionForClient(await storage.getChannelConnection(stale.id)),
+              }, stale.companyId!);
+            }
+          } catch (dedupeError) {
+            logger.error('instagram', 'Failed to auto-replace duplicate Instagram connections', { error: dedupeError });
+          }
 
           const connection = await storage.createChannelConnection({
             userId: user.id,
@@ -18923,6 +18978,14 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
           }
           const shouldPreserveUploadedFile = path.resolve(req.file.path) === path.resolve(publicPath);
 
+          // NOTE: tried uploading directly to Meta and referencing the resulting attachment_id
+          // (sendMediaFromFile) to avoid depending on Meta fetching a URL from us — Meta accepted
+          // the upload (returned a valid attachment_id) but then rejected referencing it in the
+          // message send with "Unsupported request - method type: post". That reusable-attachment
+          // flow is Messenger-specific; Instagram's Send API only accepts payload.url. The
+          // consistent "(#100) Upload failed" on the URL flow despite the URL being reachable
+          // (verified directly) most likely reflects the pending Advanced Access approval for
+          // instagram_business_manage_messages, not a bug on our end — see App Review status.
           const instagramResult = await instagramService.sendMedia(
             conversation.channelId,
             instagramRecipient,
@@ -19077,7 +19140,7 @@ elSend.onclick=async()=>{const v=(elInput).value.trim();if(!v)return;push('out',
         }
       }
 
-      if (convertedAudioPath) {
+      if (convertedAudioPath && !preserveUploadedFile) {
         try {
           await fsExtra.unlink(convertedAudioPath);
         } catch (cleanupError) {

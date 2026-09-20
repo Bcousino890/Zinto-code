@@ -1959,7 +1959,26 @@ async function handleIncomingInstagramMessage(messagingEvent: InstagramWebhookMe
       status: conn.status
     })));
     
-    connection = connections.find(conn => instagramConnectionMatchesEntry(conn, recipientIgAccountId)) || null;
+    // Multiple connections can share the same Instagram account ID (old disconnected/replaced
+    // ones aren't always cleaned up, and their `status` can still read 'active' even once
+    // their token has expired) — pick whichever match was (re)connected most recently rather
+    // than trusting `status` or array order, so a webhook doesn't land on a long-dead duplicate.
+    const allMatchingConnections = connections.filter(conn => instagramConnectionMatchesEntry(conn, recipientIgAccountId));
+    // 'replaced'/'disconnected' connections are known-superseded (see the auto-replace logic in
+    // the embedded-signup route) — exclude them outright before falling back to recency.
+    const matchingConnections = allMatchingConnections.some(c => c.status !== 'replaced' && c.status !== 'disconnected')
+      ? allMatchingConnections.filter(c => c.status !== 'replaced' && c.status !== 'disconnected')
+      : allMatchingConnections;
+    const connectionRecency = (conn: ChannelConnection) => {
+      const data = conn.connectionData as InstagramConnectionData | undefined;
+      const timestamp = data?.lastConnectedAt || data?.lastValidatedAt;
+      return timestamp ? new Date(timestamp).getTime() : 0;
+    };
+    connection = matchingConnections.length
+      ? matchingConnections.reduce((mostRecent, candidate) =>
+          connectionRecency(candidate) >= connectionRecency(mostRecent) ? candidate : mostRecent
+        )
+      : null;
 
     if (!connection) {
       logger.warn('instagram', 'No matching Instagram connection for webhook entry', {

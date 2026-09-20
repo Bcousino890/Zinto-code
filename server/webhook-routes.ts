@@ -2854,13 +2854,31 @@ export function registerWebhookRoutes(app: Express): void {
         entryAccountId = entryAccountIds[0] || null;
 
         if (entryAccountIds.length > 0) {
-          targetConnection = instagramConnections.find((conn: any) => {
+          // Multiple connections (even across different companies) can share the same
+          // Instagram account ID — pick whichever was (re)connected most recently rather
+          // than the first match, so a stale duplicate doesn't steal every webhook.
+          const allMatchingConnections = instagramConnections.filter((conn: any) => {
             const connectionData = conn.connectionData as any;
             return entryAccountIds.some((id: string) =>
               String(connectionData?.instagramAccountId || '') === id ||
               String(conn.accountId || '') === id
             );
-          }) || null;
+          });
+          // 'replaced'/'disconnected' connections are known-superseded (see the auto-replace
+          // logic in the embedded-signup route) — exclude them before falling back to recency.
+          const matchingConnections = allMatchingConnections.some((c: any) => c.status !== 'replaced' && c.status !== 'disconnected')
+            ? allMatchingConnections.filter((c: any) => c.status !== 'replaced' && c.status !== 'disconnected')
+            : allMatchingConnections;
+          const connectionRecency = (conn: any) => {
+            const data = conn.connectionData as any;
+            const timestamp = data?.lastConnectedAt || data?.lastValidatedAt;
+            return timestamp ? new Date(timestamp).getTime() : 0;
+          };
+          targetConnection = matchingConnections.length
+            ? matchingConnections.reduce((mostRecent: any, candidate: any) =>
+                connectionRecency(candidate) >= connectionRecency(mostRecent) ? candidate : mostRecent
+              )
+            : null;
         }
       }
 

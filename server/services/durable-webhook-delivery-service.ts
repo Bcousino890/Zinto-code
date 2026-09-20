@@ -149,6 +149,15 @@ export class DurableWebhookDeliveryWorker implements DurableWebhookWorker {
   }
 }
 
+const MAX_WEBHOOK_REDIRECTS = 5;
+
+/** Re-validates (unless it's a reserved test domain) and returns the given URL, or throws. */
+async function assertDeliverableUrl(rawUrl: string): Promise<URL> {
+  const url = new URL(rawUrl);
+  if (isReservedTestDomain(url.hostname)) return url;
+  return assertPublicHttpUrl(rawUrl);
+}
+
 /** Uses Node's fetch implementation and reports request failures as retries. */
 export function createFetchWebhookDeliveryTransport(
   fetchImpl: typeof fetch = globalThis.fetch,
@@ -156,26 +165,57 @@ export function createFetchWebhookDeliveryTransport(
   return {
     async deliver(delivery) {
       try {
-        // Re-checked immediately before the request (not just when the URL was
-        // saved) so a domain that resolved publicly at config time and was
-        // since repointed at a private address (DNS rebinding) can't be used
-        // to reach internal services through a scheduled webhook delivery.
-        // (.test/.example are exempt — see isReservedTestDomain — everything
-        // else, including localhost, is checked for real every time.)
-        const deliveryUrl = new URL(delivery.url);
-        if (!isReservedTestDomain(deliveryUrl.hostname)) {
-          await assertPublicHttpUrl(delivery.url);
+        // Re-validated immediately before the request (not just when the URL
+        // was saved), so a domain that resolved publicly at config time and
+        // was since repointed at a private address (DNS rebinding) can't be
+        // used to reach internal services through a scheduled webhook
+        // delivery. (.test/.example are exempt — see isReservedTestDomain —
+        // everything else, including localhost, is checked for real.)
+        //
+        // redirect: 'manual' plus this same re-validation on every hop closes
+        // the other half of this: fetch()'s default redirect handling would
+        // otherwise let a webhook target that passes validation 302 the
+        // request straight to an internal address, bypassing the check
+        // entirely. A remaining, narrower gap this does NOT close - the
+        // validating DNS lookup and fetch's own internal resolution are two
+        // separate round trips, so a DNS-rebinding attacker with control over
+        // answer timing could in principle still slip through - is the same
+        // TOCTOU window assertPublicHttpUrl's own callers accept everywhere
+        // else in this codebase (see its docstring); performFlowHttpRequest's
+        // IP-pinning closes that fully but isn't reusable here without losing
+        // this transport's injectable-fetch test seam.
+        let currentUrl = await assertDeliverableUrl(delivery.url);
+        let method = 'POST';
+        let body: string | undefined = delivery.body;
+
+        for (let redirects = 0; ; redirects++) {
+          const response = await fetchImpl(currentUrl.toString(), {
+            method,
+            headers: delivery.headers,
+            body: method === 'GET' ? undefined : body,
+            redirect: 'manual',
+          });
+
+          const isRedirect = [301, 302, 303, 307, 308].includes(response.status);
+          const location = response.headers.get('location');
+          if (!isRedirect || !location) {
+            const retryAfter = response.headers.get('retry-after');
+            const retryAfterSeconds = retryAfter && /^\d+$/.test(retryAfter.trim())
+              ? Number(retryAfter)
+              : undefined;
+            return { statusCode: response.status, retryAfterSeconds };
+          }
+
+          if (redirects >= MAX_WEBHOOK_REDIRECTS) {
+            return { networkError: true };
+          }
+
+          currentUrl = await assertDeliverableUrl(new URL(location, currentUrl).toString());
+          if (response.status !== 307 && response.status !== 308) {
+            method = 'GET';
+            body = undefined;
+          }
         }
-        const response = await fetchImpl(delivery.url, {
-          method: 'POST',
-          headers: delivery.headers,
-          body: delivery.body,
-        });
-        const retryAfter = response.headers.get('retry-after');
-        const retryAfterSeconds = retryAfter && /^\d+$/.test(retryAfter.trim())
-          ? Number(retryAfter)
-          : undefined;
-        return { statusCode: response.status, retryAfterSeconds };
       } catch {
         return { networkError: true };
       }

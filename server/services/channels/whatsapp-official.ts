@@ -24,6 +24,7 @@ import {
 } from './meta-referral-normalization';
 import {
   mapMetaTemplateStatus,
+  resolveTemplateStatusUpdate,
   resolveWhatsAppStatusUpdate,
   type WhatsAppStatusWebhookEntry,
 } from './whatsapp-official-status';
@@ -2509,10 +2510,11 @@ async function handleStatusWebhookUpdate(
  * disabled, ...). Until now this event was silently discarded here - only
  * the 5-minute poller in template-status-sync.ts caught these changes, so a
  * template's status in our DB could lag Meta's real status by up to 5
- * minutes. This is scoped to whatever company the matched template already
- * belongs to (its own companyId column) rather than trusting anything from
- * the webhook payload itself, since this event carries no phone_number_id
- * or other connection-identifying field to correlate against.
+ * minutes. Matches purely on Meta's own whatsappTemplateId, since this event
+ * carries no phone_number_id or other connection-identifying field to
+ * correlate against - and, because that column has no unique constraint,
+ * only applies the update when exactly one row matches, skipping (and
+ * leaving it to the poller) if the ID is ambiguous across more than one row.
  * @param value The value object from a change with field 'message_template_status_update'
  */
 async function handleTemplateStatusWebhook(value: any): Promise<void> {
@@ -2534,26 +2536,38 @@ async function handleTemplateStatusWebhook(value: any): Promise<void> {
     const { campaignTemplates } = await import('@shared/schema');
     const { eq } = await import('drizzle-orm');
 
+    // whatsappTemplateId has no unique constraint (shared/schema.ts) - a WABA
+    // can move between companies (see the Instagram/Messenger duplicate-
+    // connection bug fixed alongside this: the identical failure mode
+    // applies here) and leave a stale row with the same Meta template ID
+    // behind. Fetching 2 rather than 1 is enough to detect that case without
+    // scanning the whole match set.
     const templates = await db.select()
       .from(campaignTemplates)
       .where(eq(campaignTemplates.whatsappTemplateId, templateId))
-      .limit(1);
-    const template = templates[0];
+      .limit(2);
 
-    if (!template) {
-      // Could be a template created outside this app, or one we haven't synced yet - nothing to update.
-      return;
-    }
-
-    if (template.whatsappTemplateStatus === newStatus) {
+    const resolved = resolveTemplateStatusUpdate(templates, newStatus);
+    if (!resolved) {
+      if (templates.length > 1) {
+        // Ambiguous: this template ID isn't unique to one company's row, so
+        // we can't tell which one this webhook is actually about. Skip
+        // rather than guess - the 5-minute poller in template-status-sync.ts
+        // still catches this correctly since it syncs each row individually
+        // against its own connection's access token, not by this ambiguous
+        // ID match.
+        console.warn(`[WhatsApp processWebhook] Template status update for ID ${templateId} matched ${templates.length} rows across possibly different companies - skipping to avoid an ambiguous cross-company update`);
+      }
+      // Otherwise: no match (template created outside this app, or not yet
+      // synced), or already at this status - nothing to update either way.
       return;
     }
 
     await db.update(campaignTemplates)
       .set({ whatsappTemplateStatus: newStatus, updatedAt: new Date() })
-      .where(eq(campaignTemplates.id, template.id));
+      .where(eq(campaignTemplates.id, resolved.templateId));
 
-    console.log(`[WhatsApp processWebhook] Template "${template.name}" (${templateId}) status updated via webhook: ${template.whatsappTemplateStatus} -> ${newStatus}`);
+    console.log(`[WhatsApp processWebhook] Template ${templateId} (row ${resolved.templateId}) status updated via webhook to: ${newStatus}`);
   } catch (error) {
     console.error('[WhatsApp processWebhook] Error handling template status update:', error);
   }

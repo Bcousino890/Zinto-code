@@ -175,3 +175,31 @@ export function mapMetaTemplateStatus(event: string | null | undefined): 'pendin
   if (typeof event !== 'string' || !event) return null;
   return META_TEMPLATE_STATUS_MAP[event.toUpperCase()] ?? null;
 }
+
+/** The subset of a campaignTemplates row this module needs to decide on a template status update. */
+export interface TemplateStatusMatchInput {
+  id: number;
+  whatsappTemplateStatus: string | null;
+}
+
+/**
+ * Decides whether/which row to update for an incoming template status
+ * webhook, given every campaignTemplates row that matched Meta's
+ * whatsappTemplateId. That column has no unique constraint (a WABA can move
+ * between companies and leave a stale row with the same Meta template ID
+ * behind - the same failure mode as the Instagram/Messenger duplicate-
+ * connection bug), so this only ever returns an id to update when exactly
+ * one row matched; an ambiguous (>1) or empty match returns null, leaving
+ * the 5-minute poller (which syncs each row individually against its own
+ * connection's access token, not by this ambiguous ID) to catch it instead
+ * of risking an update to the wrong company's row.
+ */
+export function resolveTemplateStatusUpdate(
+  matchingTemplates: readonly TemplateStatusMatchInput[],
+  newStatus: 'pending' | 'approved' | 'rejected' | 'disabled'
+): { templateId: number } | null {
+  if (matchingTemplates.length !== 1) return null;
+  const template = matchingTemplates[0]!;
+  if (template.whatsappTemplateStatus === newStatus) return null;
+  return { templateId: template.id };
+}

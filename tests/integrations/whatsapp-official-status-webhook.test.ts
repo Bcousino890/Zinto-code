@@ -5,6 +5,7 @@ import {
   mapMetaStatusToInternalStatus,
   mapMetaTemplateStatus,
   mergeWhatsAppMessageMetadata,
+  resolveTemplateStatusUpdate,
   resolveWhatsAppStatusUpdate,
 } from '../../server/services/channels/whatsapp-official-status';
 
@@ -180,4 +181,42 @@ test('returns null for a missing/malformed event value', () => {
   assert.equal(mapMetaTemplateStatus(undefined), null);
   assert.equal(mapMetaTemplateStatus(null), null);
   assert.equal(mapMetaTemplateStatus(''), null);
+});
+
+// resolveTemplateStatusUpdate ----------------------------------------------
+//
+// whatsappTemplateId has no unique constraint, so a webhook matching more
+// than one row is ambiguous (which company's template is this about?) and
+// must not guess - this is the cross-company leak an adversarial review
+// found in the first version of the handler that called this.
+
+test('updates the single matching row when its status actually changed', () => {
+  const result = resolveTemplateStatusUpdate(
+    [{ id: 42, whatsappTemplateStatus: 'pending' }],
+    'approved'
+  );
+  assert.deepEqual(result, { templateId: 42 });
+});
+
+test('does nothing when the single matching row is already at the target status', () => {
+  const result = resolveTemplateStatusUpdate(
+    [{ id: 42, whatsappTemplateStatus: 'approved' }],
+    'approved'
+  );
+  assert.equal(result, null);
+});
+
+test('does nothing when no row matches', () => {
+  assert.equal(resolveTemplateStatusUpdate([], 'approved'), null);
+});
+
+test('refuses to guess when the template ID matches more than one row (cross-company ambiguity)', () => {
+  const result = resolveTemplateStatusUpdate(
+    [
+      { id: 42, whatsappTemplateStatus: 'pending' },
+      { id: 91, whatsappTemplateStatus: 'pending' },
+    ],
+    'approved'
+  );
+  assert.equal(result, null);
 });

@@ -4,816 +4,94 @@ import { ensureAuthenticated, requirePermission } from '../middleware';
 import { PERMISSIONS } from '@shared/schema';
 import { db } from '../db';
 import { campaignTemplates, channelConnections } from '@shared/schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import axios from 'axios';
-import { rawAxiosHeaderToString } from '../utils/axios-headers';
 import { logger } from '../utils/logger';
 import { syncSpecificTemplates } from '../services/template-status-sync';
+import {
+  WHATSAPP_GRAPH_URL,
+  WHATSAPP_API_VERSION,
+  listCompanyTemplates,
+  getCompanyTemplate,
+  createCompanyTemplate,
+  updateCompanyTemplate,
+  deleteCompanyTemplate,
+} from '../services/whatsapp-template-management-service';
 
 const router = express.Router();
-
-const WHATSAPP_GRAPH_URL = 'https://graph.facebook.com';
-const WHATSAPP_API_VERSION = 'v23.0';
-
-/**
- * Upload media for template using WhatsApp Resumable Upload API
- * This is required for template creation, not the regular media upload endpoint
- * Reference: https://developers.facebook.com/docs/graph-api/guides/upload
- */
-async function uploadMediaForTemplate(
-  mediaUrl: string,
-  accessToken: string,
-  wabaId: string,
-  appId?: string
-): Promise<string> {
-
-  const uploadId = wabaId || appId;
-
-  if (!uploadId) {
-    throw new Error('Either WABA ID or App ID is required for media upload');
-  }
-
-  try {
-    logger.info('whatsapp-templates', 'Starting Resumable Upload for template media', {
-      mediaUrl,
-      uploadId,
-      usingWabaId: !!wabaId,
-      usingAppId: !wabaId && !!appId
-    });
-
-
-    const mediaResponse = await axios.get(mediaUrl, {
-      responseType: 'arraybuffer',
-      timeout: 30000
-    });
-
-
-    const contentType =
-      rawAxiosHeaderToString(mediaResponse.headers['content-type']) || 'application/octet-stream';
-    const urlParts = mediaUrl.split('/');
-    const filename = urlParts[urlParts.length - 1];
-    const fileSize = mediaResponse.data.byteLength;
-
-    logger.info('whatsapp-templates', 'Media downloaded', {
-      filename,
-      contentType,
-      fileSize
-    });
-
-
-    const sessionUrl = `${WHATSAPP_GRAPH_URL}/${WHATSAPP_API_VERSION}/${uploadId}/uploads?file_length=${fileSize}&file_type=${encodeURIComponent(contentType)}&access_token=${accessToken}`;
-
-    logger.info('whatsapp-templates', 'Creating upload session', {
-      sessionUrl: sessionUrl.replace(accessToken, 'REDACTED'),
-      uploadId
-    });
-
-    const sessionResponse = await axios.post(sessionUrl, {}, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!sessionResponse.data?.id) {
-      throw new Error('Failed to create upload session: No session ID returned');
-    }
-
-    const uploadSessionId = sessionResponse.data.id;
-    logger.info('whatsapp-templates', 'Upload session created', {
-      uploadSessionId
-    });
-
-
-    const uploadUrl = `${WHATSAPP_GRAPH_URL}/${WHATSAPP_API_VERSION}/${uploadSessionId}`;
-
-    logger.info('whatsapp-templates', 'Uploading file data', {
-      uploadUrl,
-      fileSize
-    });
-
-    const uploadResponse = await axios.post(uploadUrl, mediaResponse.data, {
-      headers: {
-        'Authorization': `OAuth ${accessToken}`,
-        'file_offset': '0',
-        'Content-Type': 'application/octet-stream'
-      },
-      maxBodyLength: Infinity,
-      maxContentLength: Infinity,
-      timeout: 120000
-    });
-
-    if (!uploadResponse.data?.h) {
-      throw new Error('Failed to upload media: No media handle returned');
-    }
-
-    const mediaHandle = uploadResponse.data.h;
-    logger.info('whatsapp-templates', 'Media uploaded successfully via Resumable Upload API', {
-      mediaHandle
-    });
-
-    return mediaHandle;
-  } catch (error: any) {
-    logger.error('whatsapp-templates', 'Error uploading media for template', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-      uploadId,
-      usingWabaId: !!wabaId,
-      usingAppId: !wabaId && !!appId
-    });
-
-
-    if (wabaId && appId && error.response?.status === 400) {
-      logger.info('whatsapp-templates', 'Retrying with App ID instead of WABA ID');
-      return uploadMediaForTemplate(mediaUrl, accessToken, '', appId);
-    }
-
-    throw error;
-  }
-}
 
 /**
  * Get all templates for the company
  * Only returns official WhatsApp Business API templates
  */
 router.get('/', ensureAuthenticated, requirePermission(PERMISSIONS.MANAGE_TEMPLATES), async (req, res) => {
-  try {
-    const user = req.user as any;
-    if (!user || !user.companyId) {
-      return res.status(403).json({ error: 'No company association found' });
-    }
-
-
-    const templates = await db
-      .select({
-        template: campaignTemplates,
-        connection: channelConnections
-      })
-      .from(campaignTemplates)
-      .leftJoin(channelConnections, eq(campaignTemplates.connectionId, channelConnections.id))
-      .where(
-        and(
-          eq(campaignTemplates.companyId, user.companyId),
-          eq(campaignTemplates.whatsappChannelType, 'official')
-        )
-      )
-      .orderBy(desc(campaignTemplates.createdAt));
-
-
-    const formattedTemplates = templates.map(({ template, connection }) => {
-      const connectionData = connection?.connectionData as any;
-      
-      // Log connection data structure for debugging embedded signup connections
-      if (connectionData) {
-        logger.info('whatsapp-templates', 'Template connection data structure', {
-          templateId: template.id,
-          templateName: template.name,
-          connectionId: connection?.id,
-          connectionDataKeys: Object.keys(connectionData),
-          hasWabaId: !!(connectionData.wabaId || connectionData.businessAccountId || connectionData.waba_id),
-          hasAccessToken: !!(connectionData.accessToken || connectionData.access_token),
-          hasAppId: !!(connectionData.appId || connectionData.app_id),
-          partnerManaged: connectionData.partnerManaged === true,
-          phoneNumberId: connectionData.phoneNumberId || connectionData.phone_number_id
-        });
-      }
-      
-      return {
-        ...template,
-        connection: connection ? {
-          id: connection.id,
-          accountName: connection.accountName,
-          phoneNumber: connectionData?.phoneNumber || connectionData?.phone_number,
-          status: connection.status
-        } : null
-      };
-    });
-
-    res.json(formattedTemplates);
-  } catch (error) {
-    logger.error('whatsapp-templates', 'Error fetching templates:', error);
-    res.status(500).json({ error: 'Failed to fetch templates' });
+  const user = req.user as any;
+  if (!user || !user.companyId) {
+    return res.status(403).json({ error: 'No company association found' });
   }
+
+  const { status, body } = await listCompanyTemplates(user.companyId);
+  res.status(status).json(body);
 });
 
 /**
  * Get a single template by ID
  */
 router.get('/:id', ensureAuthenticated, requirePermission(PERMISSIONS.MANAGE_TEMPLATES), async (req, res) => {
-  try {
-    const user = req.user as any;
-    const templateId = parseInt(req.params.id);
+  const user = req.user as any;
+  const templateId = parseInt(req.params.id);
 
-    if (!user || !user.companyId) {
-      return res.status(403).json({ error: 'No company association found' });
-    }
-
-    const template = await db
-      .select()
-      .from(campaignTemplates)
-      .where(
-        and(
-          eq(campaignTemplates.id, templateId),
-          eq(campaignTemplates.companyId, user.companyId)
-        )
-      )
-      .limit(1);
-
-    if (!template || template.length === 0) {
-      return res.status(404).json({ error: 'Template not found' });
-    }
-
-    res.json(template[0]);
-  } catch (error) {
-    logger.error('whatsapp-templates', 'Error fetching template:', error);
-    res.status(500).json({ error: 'Failed to fetch template' });
+  if (!user || !user.companyId) {
+    return res.status(403).json({ error: 'No company association found' });
   }
+
+  const { status, body } = await getCompanyTemplate(user.companyId, templateId);
+  res.status(status).json(body);
 });
 
 /**
  * Create a new template and submit to WhatsApp Business API
  */
 router.post('/', ensureAuthenticated, requirePermission(PERMISSIONS.MANAGE_TEMPLATES), async (req, res) => {
-  try {
-    const user = req.user as any;
-    if (!user || !user.companyId) {
-      return res.status(403).json({ error: 'No company association found' });
-    }
-
-    const {
-      name,
-      description,
-      whatsappTemplateCategory,
-      whatsappTemplateLanguage,
-      content,
-      variables,
-      connectionId,
-      headerType,
-      headerText,
-      headerMediaUrl,
-      footerText,
-    } = req.body;
-
-
-    if (!name || !content) {
-      return res.status(400).json({ error: 'Name and content are required' });
-    }
-
-
-    if (!/^[a-z0-9_]+$/.test(name)) {
-      return res.status(400).json({
-        error: 'Template name must contain only lowercase letters, numbers, and underscores'
-      });
-    }
-
-    if (!connectionId) {
-      return res.status(400).json({ error: 'WhatsApp connection is required' });
-    }
-
-
-    const existingTemplate = await db
-      .select()
-      .from(campaignTemplates)
-      .where(
-        and(
-          eq(campaignTemplates.companyId, user.companyId),
-          eq(campaignTemplates.name, name)
-        )
-      )
-      .limit(1);
-
-    if (existingTemplate && existingTemplate.length > 0) {
-      return res.status(400).json({ error: 'A template with this name already exists' });
-    }
-
-
-    const whatsappChannel = await storage.getChannelConnection(connectionId);
-
-    if (!whatsappChannel) {
-      logger.error('whatsapp-templates', 'WhatsApp channel not found', { connectionId });
-      return res.status(404).json({
-        error: 'WhatsApp connection not found'
-      });
-    }
-
-
-    if (whatsappChannel.companyId !== user.companyId) {
-      logger.error('whatsapp-templates', 'Unauthorized access to channel', {
-        connectionId,
-        channelCompanyId: whatsappChannel.companyId,
-        userCompanyId: user.companyId
-      });
-      return res.status(403).json({
-        error: 'Unauthorized access to this connection'
-      });
-    }
-
-
-    if (whatsappChannel.channelType !== 'whatsapp_official') {
-      logger.error('whatsapp-templates', 'Invalid channel type', {
-        connectionId,
-        channelType: whatsappChannel.channelType
-      });
-      return res.status(400).json({
-        error: 'Selected connection is not a WhatsApp Official channel'
-      });
-    }
-
-
-    const connectionData = whatsappChannel.connectionData as any;
-    
-    // Log complete connection data structure for debugging
-    logger.info('whatsapp-templates', 'Connection data structure for template creation', {
-      connectionId,
-      connectionDataKeys: Object.keys(connectionData || {}),
-      connectionData: {
-        wabaId: connectionData?.wabaId,
-        businessAccountId: connectionData?.businessAccountId,
-        waba_id: connectionData?.waba_id,
-        accessToken: connectionData?.accessToken ? '***REDACTED***' : undefined,
-        access_token: connectionData?.access_token ? '***REDACTED***' : undefined,
-        appId: connectionData?.appId,
-        app_id: connectionData?.app_id,
-        phoneNumberId: connectionData?.phoneNumberId,
-        phone_number_id: connectionData?.phone_number_id,
-        partnerManaged: connectionData?.partnerManaged
-      }
-    });
-    
-    let wabaId = connectionData.wabaId || connectionData.businessAccountId || connectionData.waba_id;
-    let accessToken = connectionData.accessToken || connectionData.access_token;
-    const phoneNumberId = connectionData.phoneNumberId || connectionData.phone_number_id;
-    let appId = connectionData.appId || connectionData.app_id;
-    const partnerManaged = connectionData.partnerManaged === true;
-    
-    // Add partner config fallback for embedded signup connections
-    if (partnerManaged && (!appId || !accessToken)) {
-      try {
-        const partnerConfig = await storage.getPartnerConfiguration('meta');
-        if (partnerConfig) {
-          logger.info('whatsapp-templates', 'Using partner configuration for template creation', {
-            connectionId,
-            hadAppId: !!appId,
-            hadAccessToken: !!accessToken,
-            partnerConfigHasAppId: !!partnerConfig.partnerApiKey,
-            partnerConfigHasAccessToken: !!partnerConfig.accessToken
-          });
-          
-          if (!appId && partnerConfig.partnerApiKey) {
-            appId = partnerConfig.partnerApiKey;
-          }
-          // Note: We typically use connection-level access token for template creation
-          // but can fall back to partner token if connection token is missing
-          if (!accessToken && partnerConfig.accessToken) {
-            accessToken = partnerConfig.accessToken;
-          }
-        }
-      } catch (partnerConfigError: any) {
-        logger.error('whatsapp-templates', 'Error fetching partner configuration', {
-          connectionId,
-          error: partnerConfigError.message
-        });
-      }
-    }
-
-    logger.info('whatsapp-templates', 'Connection credentials', {
-      hasWabaId: !!wabaId,
-      wabaId: wabaId,
-      hasAccessToken: !!accessToken,
-      hasPhoneNumberId: !!phoneNumberId,
-      phoneNumberId: phoneNumberId,
-      hasAppId: !!appId,
-      appId: appId,
-      partnerManaged,
-      connectionDataKeys: Object.keys(connectionData || {}),
-      tokenSource: partnerManaged && accessToken !== (connectionData.accessToken || connectionData.access_token) 
-        ? 'partner-config' 
-        : 'connection'
-    });
-
-    if (!wabaId || !accessToken) {
-      return res.status(400).json({
-        error: 'WhatsApp Business Account ID or access token not found in connection'
-      });
-    }
-
-
-    let mediaHandle: string | undefined;
-
-    logger.info('whatsapp-templates', 'Checking if media upload needed', {
-      hasHeaderMediaUrl: !!headerMediaUrl,
-      headerType,
-      headerMediaUrl,
-      shouldUpload: headerMediaUrl && ['image', 'video', 'document'].includes(headerType)
-    });
-
-    if (headerMediaUrl && ['image', 'video', 'document'].includes(headerType)) {
-      if (!appId) {
-        logger.error('whatsapp-templates', 'App ID not found in connection data', {
-          connectionDataKeys: Object.keys(connectionData || {})
-        });
-        return res.status(400).json({
-          error: 'App ID not found in connection. Media upload requires App ID for Resumable Upload API.'
-        });
-      }
-
-      try {
-
-        let fullMediaUrl = headerMediaUrl;
-        
-        if (!headerMediaUrl.startsWith('http')) {
-          const baseUrl = process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL;
-          
-          if (baseUrl) {
-
-            const cleanBaseUrl = baseUrl.replace(/\/$/, '');
-            const cleanMediaUrl = headerMediaUrl.startsWith('/') ? headerMediaUrl : `/${headerMediaUrl}`;
-            fullMediaUrl = `${cleanBaseUrl}${cleanMediaUrl}`;
-          } else {
-
-            const basePort = process.env.PORT || '9000';
-            const host = process.env.HOST || 'localhost';
-            const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-
-            if (host === 'localhost' || host === '127.0.0.1') {
-              fullMediaUrl = `${protocol}://${host}:${basePort}${headerMediaUrl.startsWith('/') ? headerMediaUrl : `/${headerMediaUrl}`}`;
-            } else {
-              fullMediaUrl = `${protocol}://${host}${headerMediaUrl.startsWith('/') ? headerMediaUrl : `/${headerMediaUrl}`}`;
-            }
-          }
-        }
-
-        logger.info('whatsapp-templates', 'Uploading media for template using Resumable Upload API with App ID', {
-          headerType,
-          mediaUrl: fullMediaUrl,
-          appId
-        });
-
-
-        mediaHandle = await uploadMediaForTemplate(fullMediaUrl, accessToken, '', appId);
-
-        logger.info('whatsapp-templates', 'Media uploaded, got handle', { mediaHandle });
-      } catch (error: any) {
-        logger.error('whatsapp-templates', 'Failed to upload media', {
-          error: error.message,
-          stack: error.stack
-        });
-        return res.status(400).json({
-          error: 'Failed to upload media to WhatsApp: ' + error.message
-        });
-      }
-    }
-
-
-    const components: any[] = [];
-
-
-    if (headerType === 'text' && headerText) {
-      components.push({
-        type: 'HEADER',
-        format: 'TEXT',
-        text: headerText,
-      });
-    } else if (headerType === 'image' && mediaHandle) {
-      components.push({
-        type: 'HEADER',
-        format: 'IMAGE',
-        example: {
-          header_handle: [mediaHandle]
-        }
-      });
-    } else if (headerType === 'video' && mediaHandle) {
-      components.push({
-        type: 'HEADER',
-        format: 'VIDEO',
-        example: {
-          header_handle: [mediaHandle]
-        }
-      });
-    } else if (headerType === 'document' && mediaHandle) {
-      components.push({
-        type: 'HEADER',
-        format: 'DOCUMENT',
-        example: {
-          header_handle: [mediaHandle]
-        }
-      });
-    }
-
-
-    const bodyComponent: any = {
-      type: 'BODY',
-      text: content,
-    };
-
-
-    if (variables && variables.length > 0) {
-      bodyComponent.example = {
-        body_text: [variables.map((_v: any, i: number) => `Example ${i + 1}`)]
-      };
-    }
-
-    components.push(bodyComponent);
-
-
-    if (footerText) {
-      components.push({
-        type: 'FOOTER',
-        text: footerText,
-      });
-    }
-
-
-    let whatsappTemplateId: string | undefined;
-    let whatsappTemplateStatus = 'pending';
-
-    try {
-      const whatsappApiUrl = `${WHATSAPP_GRAPH_URL}/${WHATSAPP_API_VERSION}/${wabaId}/message_templates`;
-
-
-      const categoryUppercase = (whatsappTemplateCategory || 'utility').toUpperCase();
-
-      const templatePayload = {
-        name,
-        language: whatsappTemplateLanguage || 'en',
-        category: categoryUppercase,
-        components,
-      };
-
-      logger.info('whatsapp-templates', 'Submitting template to WhatsApp API', {
-        name,
-        wabaId,
-        category: categoryUppercase,
-        language: whatsappTemplateLanguage || 'en',
-        componentsCount: components.length,
-        payload: JSON.stringify(templatePayload, null, 2)
-      });
-
-      const response = await axios.post(whatsappApiUrl, templatePayload, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        timeout: 60000, // 60 second timeout
-        maxBodyLength: Infinity,
-        maxContentLength: Infinity,
-      });
-
-      if (response.data && response.data.id) {
-        whatsappTemplateId = response.data.id;
-
-        whatsappTemplateStatus = (response.data.status || 'pending').toLowerCase();
-
-        logger.info('whatsapp-templates', 'Template submitted successfully', {
-          templateId: whatsappTemplateId,
-          status: whatsappTemplateStatus,
-          response: response.data
-        });
-
-
-        try {
-          const templateDetailsUrl = `${WHATSAPP_GRAPH_URL}/${WHATSAPP_API_VERSION}/${whatsappTemplateId}?fields=id,name,status,category,language`;
-          const detailsResponse = await axios.get(templateDetailsUrl, {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-            },
-            timeout: 30000, // 30 second timeout
-          });
-
-          if (detailsResponse.data && detailsResponse.data.status) {
-
-            whatsappTemplateStatus = detailsResponse.data.status.toLowerCase();
-            logger.info('whatsapp-templates', 'Fetched template status', {
-              templateId: whatsappTemplateId,
-              status: whatsappTemplateStatus,
-              details: detailsResponse.data
-            });
-          }
-        } catch (statusError: any) {
-          logger.warn('whatsapp-templates', 'Could not fetch template status, using default', {
-            error: statusError.message,
-            defaultStatus: whatsappTemplateStatus
-          });
-        }
-      }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error?.message || error.message;
-      const errorDetails = error.response?.data?.error || error.response?.data || {};
-      const errorSubcode = error.response?.data?.error?.error_subcode;
-
-
-      const isNetworkError = error.code === 'ECONNABORTED' ||
-                            error.code === 'ECONNRESET' ||
-                            error.message?.includes('socket hang up') ||
-                            error.message?.includes('timeout');
-
-      logger.error('whatsapp-templates', 'Error submitting template to WhatsApp API', {
-        message: errorMessage,
-        errorCode: error.response?.data?.error?.code || error.code,
-        errorType: error.response?.data?.error?.type,
-        errorSubcode: errorSubcode,
-        fullError: JSON.stringify(errorDetails, null, 2),
-        statusCode: error.response?.status,
-        isNetworkError,
-        stack: error.stack
-      });
-
-
-      if (errorSubcode === 2388023) {
-
-        return res.status(400).json({
-          error: 'A template with this name is currently being deleted. Please wait 1-2 minutes before creating a new template with the same name, or use a different name.',
-          errorCode: errorSubcode,
-          errorType: 'template_deletion_in_progress'
-        });
-      }
-
-      if (errorSubcode === 2388024) {
-
-        return res.status(400).json({
-          error: 'A template with this name and language already exists. Please use a different name or delete the existing template first.',
-          errorCode: errorSubcode,
-          errorType: 'template_already_exists'
-        });
-      }
-
-      if (errorSubcode === 2494102) {
-
-        return res.status(400).json({
-          error: 'Failed to upload media. Please try again or use a different image.',
-          errorCode: errorSubcode,
-          errorType: 'invalid_media_handle'
-        });
-      }
-
-
-      if (isNetworkError) {
-        logger.warn('whatsapp-templates', 'Network error during template submission, checking if template exists', {
-          templateName: name
-        });
-
-
-        try {
-          const checkUrl = `${WHATSAPP_GRAPH_URL}/${WHATSAPP_API_VERSION}/${wabaId}/message_templates?name=${encodeURIComponent(name)}`;
-          const checkResponse = await axios.get(checkUrl, {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-            },
-            timeout: 10000,
-          });
-
-
-          if (checkResponse.data?.data && Array.isArray(checkResponse.data.data)) {
-            const existingTemplate = checkResponse.data.data.find((t: any) =>
-              t.name === name && t.language === (whatsappTemplateLanguage || 'en')
-            );
-
-            if (existingTemplate) {
-              whatsappTemplateId = existingTemplate.id;
-
-              whatsappTemplateStatus = (existingTemplate.status || 'pending').toLowerCase();
-              logger.info('whatsapp-templates', 'Found existing template after network error', {
-                templateId: whatsappTemplateId,
-                status: whatsappTemplateStatus
-              });
-            } else {
-              whatsappTemplateStatus = 'pending';
-            }
-          } else {
-            whatsappTemplateStatus = 'pending';
-          }
-        } catch (checkError: any) {
-          logger.warn('whatsapp-templates', 'Could not verify template creation after network error', {
-            error: checkError.message
-          });
-          whatsappTemplateStatus = 'pending';
-        }
-      } else {
-
-        whatsappTemplateStatus = 'rejected';
-      }
-    }
-
-
-    const newTemplate = await db
-      .insert(campaignTemplates)
-      .values({
-        companyId: user.companyId,
-        createdById: user.id,
-        connectionId: connectionId,
-        name,
-        description: description || null,
-        category: 'whatsapp',
-        whatsappTemplateCategory: whatsappTemplateCategory || 'utility',
-        whatsappTemplateStatus: whatsappTemplateStatus as 'pending' | 'approved' | 'rejected' | 'disabled',
-        whatsappTemplateId: whatsappTemplateId || null,
-        whatsappTemplateName: name,
-        whatsappTemplateLanguage: whatsappTemplateLanguage || 'en',
-        content,
-        variables: variables || [],
-        mediaUrls: headerMediaUrl ? [headerMediaUrl] : [],
-        mediaHandle: mediaHandle || null, // Store the WhatsApp media handle for reuse in campaigns
-        channelType: 'whatsapp',
-        whatsappChannelType: 'official',
-        isActive: true,
-        usageCount: 0,
-      })
-      .returning();
-
-    res.status(201).json(newTemplate[0]);
-  } catch (error) {
-    logger.error('whatsapp-templates', 'Error creating template:', error);
-    res.status(500).json({ error: 'Failed to create template' });
+  const user = req.user as any;
+  if (!user || !user.companyId) {
+    return res.status(403).json({ error: 'No company association found' });
   }
+
+  const { status, body } = await createCompanyTemplate(user.companyId, user.id, req.body);
+  res.status(status).json(body);
 });
 
 /**
  * Update a template (limited fields)
  */
 router.patch('/:id', ensureAuthenticated, requirePermission(PERMISSIONS.MANAGE_TEMPLATES), async (req, res) => {
-  try {
-    const user = req.user as any;
-    const templateId = parseInt(req.params.id);
+  const user = req.user as any;
+  const templateId = parseInt(req.params.id);
 
-    if (!user || !user.companyId) {
-      return res.status(403).json({ error: 'No company association found' });
-    }
-
-    const { description, isActive } = req.body;
-
-
-    const existingTemplate = await db
-      .select()
-      .from(campaignTemplates)
-      .where(
-        and(
-          eq(campaignTemplates.id, templateId),
-          eq(campaignTemplates.companyId, user.companyId)
-        )
-      )
-      .limit(1);
-
-    if (!existingTemplate || existingTemplate.length === 0) {
-      return res.status(404).json({ error: 'Template not found' });
-    }
-
-
-    const updatedTemplate = await db
-      .update(campaignTemplates)
-      .set({
-        description: description !== undefined ? description : existingTemplate[0].description,
-        isActive: isActive !== undefined ? isActive : existingTemplate[0].isActive,
-        updatedAt: new Date(),
-      })
-      .where(eq(campaignTemplates.id, templateId))
-      .returning();
-
-    res.json(updatedTemplate[0]);
-  } catch (error) {
-    logger.error('whatsapp-templates', 'Error updating template:', error);
-    res.status(500).json({ error: 'Failed to update template' });
+  if (!user || !user.companyId) {
+    return res.status(403).json({ error: 'No company association found' });
   }
+
+  const { status, body } = await updateCompanyTemplate(user.companyId, templateId, req.body);
+  res.status(status).json(body);
 });
 
 /**
  * Delete a template
  */
 router.delete('/:id', ensureAuthenticated, requirePermission(PERMISSIONS.MANAGE_TEMPLATES), async (req, res) => {
-  try {
-    const user = req.user as any;
-    const templateId = parseInt(req.params.id);
+  const user = req.user as any;
+  const templateId = parseInt(req.params.id);
 
-    if (!user || !user.companyId) {
-      return res.status(403).json({ error: 'No company association found' });
-    }
-
-
-    const existingTemplate = await db
-      .select()
-      .from(campaignTemplates)
-      .where(
-        and(
-          eq(campaignTemplates.id, templateId),
-          eq(campaignTemplates.companyId, user.companyId)
-        )
-      )
-      .limit(1);
-
-    if (!existingTemplate || existingTemplate.length === 0) {
-      return res.status(404).json({ error: 'Template not found' });
-    }
-
-
-    await db
-      .delete(campaignTemplates)
-      .where(eq(campaignTemplates.id, templateId));
-
-    res.json({ success: true, message: 'Template deleted successfully' });
-  } catch (error) {
-    logger.error('whatsapp-templates', 'Error deleting template:', error);
-    res.status(500).json({ error: 'Failed to delete template' });
+  if (!user || !user.companyId) {
+    return res.status(403).json({ error: 'No company association found' });
   }
+
+  const { status, body } = await deleteCompanyTemplate(user.companyId, templateId);
+  res.status(status).json(body);
 });
+
 
 /**
  * Sync template status with WhatsApp API

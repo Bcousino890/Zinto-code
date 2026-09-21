@@ -163,6 +163,36 @@ export function getApiV2PostmanCollection() {
         ],
       },
       {
+        name: 'Plantillas',
+        item: [
+          item('Listar plantillas', 'GET', '/templates', { description: 'Requiere templates:read.' }),
+          item('Consultar una plantilla', 'GET', '/templates/{templateId}', { description: 'Requiere templates:read. Reemplace {templateId} por el data.id devuelto al crear o listar. Devuelve 404 NOT_FOUND si la plantilla no existe o pertenece a otra empresa.' }),
+          {
+            name: 'Crear plantilla',
+            request: {
+              method: 'POST',
+              header: [...authenticatedHeaders(true), { key: 'Idempotency-Key', value: 'crm-template-welcome-v1', type: 'text' }],
+              url: url('/templates'),
+              body: jsonBody({ name: 'appointment_reminder', content: 'Su cita es mañana a las {{1}}', connectionId: 42, whatsappTemplateCategory: 'utility', whatsappTemplateLanguage: 'es', variables: [{}] }),
+              description: 'Requiere templates:write e Idempotency-Key. connectionId debe ser un canal WhatsApp Official de la empresa (ver GET /channels). Somete la plantilla a aprobación de Meta; el estado inicial suele ser pending.',
+            },
+          },
+          item('Actualizar plantilla', 'PATCH', '/templates/{templateId}', {
+            body: jsonBody({ isActive: false }),
+            description: 'Requiere templates:write. Solo admite description e isActive.',
+          }),
+          {
+            name: 'Eliminar plantilla',
+            request: {
+              method: 'DELETE',
+              header: authenticatedHeaders(true).filter((header) => header.key !== 'Content-Type'),
+              url: url('/templates/{templateId}'),
+              description: 'Requiere templates:write. Elimina la plantilla de Zinto (no de Meta).',
+            },
+          },
+        ],
+      },
+      {
         name: 'Campañas',
         item: [item('Sincronizar lote de campañas', 'POST', '/campaigns/batch', {
           body: jsonBody({ campaigns: [{ externalId: 'campaign-123', name: 'Campaña bienvenida', status: 'active' }] }),

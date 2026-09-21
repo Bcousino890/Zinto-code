@@ -287,6 +287,15 @@ import { authenticateApiKey, rateLimitMiddleware } from "./middleware/api-auth";
 import { planInitialCrmSynchronization } from "./services/initial-crm-synchronization-plan";
 import { CrmChannelsReadService, CrmConversationsReadService, CrmMessageStatusReadService } from "./services/crm-read-service";
 import { createCrmChannelsReadAdapter, createCrmConversationsReadAdapter, createCrmMessageStatusReadAdapter } from "./services/crm-read-storage-adapter";
+import { WhatsAppTemplatesReadService, WhatsAppTemplatesWriteService } from "./services/whatsapp-template-v2-service";
+import { createWhatsAppTemplatesReadAdapter, createWhatsAppTemplatesWriteAdapter } from "./services/whatsapp-template-v2-adapter";
+import {
+  listCompanyTemplates as listCompanyWhatsAppTemplates,
+  getCompanyTemplate as getCompanyWhatsAppTemplate,
+  createCompanyTemplate as createCompanyWhatsAppTemplate,
+  updateCompanyTemplate as updateCompanyWhatsAppTemplate,
+  deleteCompanyTemplate as deleteCompanyWhatsAppTemplate,
+} from "./services/whatsapp-template-management-service";
 import apiV1Routes from "./routes/api-v1";
 import { createApiV2Router } from "./routes/api-v2";
 import { registerApiKeySettingsRoutes } from "./routes/api-key-settings-routes";
@@ -1176,6 +1185,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     })),
     messageStatusRead: new CrmMessageStatusReadService(createCrmMessageStatusReadAdapter({
       getMessageStatus: apiMessageService.getMessageStatus.bind(apiMessageService),
+    })),
+    templatesRead: new WhatsAppTemplatesReadService(createWhatsAppTemplatesReadAdapter({
+      listCompanyTemplates: listCompanyWhatsAppTemplates,
+      getCompanyTemplate: getCompanyWhatsAppTemplate,
+    })),
+    templatesWrite: new WhatsAppTemplatesWriteService(createWhatsAppTemplatesWriteAdapter({
+      createCompanyTemplate: createCompanyWhatsAppTemplate,
+      updateCompanyTemplate: updateCompanyWhatsAppTemplate,
+      deleteCompanyTemplate: deleteCompanyWhatsAppTemplate,
     })),
     idempotency: {
       claim: (input) => storage.claimCrmIdempotencyKey(input),

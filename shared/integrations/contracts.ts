@@ -17,6 +17,8 @@ export const INTEGRATION_SCOPES = [
   'webhooks:manage',
   'integrations:manage',
   'audit:read',
+  'templates:read',
+  'templates:write',
 ] as const;
 
 export type IntegrationScope = (typeof INTEGRATION_SCOPES)[number];

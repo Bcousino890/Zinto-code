@@ -15,6 +15,7 @@ import type {
   InitialCrmSynchronizationPlan,
 } from '../services/initial-crm-synchronization-plan';
 import type { CrmChannelsReadService, CrmConversationsReadService, CrmMessageStatusReadService } from '../services/crm-read-service';
+import { WhatsAppTemplateValidationError, type WhatsAppTemplatesReadService, type WhatsAppTemplatesWriteService, type CreateWhatsAppTemplateInput } from '../services/whatsapp-template-v2-service';
 
 type AuthenticationMiddleware = (req: Request, res: Response, next: NextFunction) => void;
 type IntegrationIdResolver = (companyId: number, publicId: string) => Promise<number | undefined>;
@@ -93,6 +94,8 @@ type MediaAccess = {
 type ChannelsRead = Pick<CrmChannelsReadService, 'listChannels'>;
 type ConversationsRead = Pick<CrmConversationsReadService, 'listConversations'>;
 type MessageStatusRead = Pick<CrmMessageStatusReadService, 'getMessageStatus'>;
+type TemplatesRead = Pick<WhatsAppTemplatesReadService, 'list' | 'get'>;
+type TemplatesWrite = Pick<WhatsAppTemplatesWriteService, 'create' | 'update' | 'delete'>;
 type IdempotencyClaim = {
   won: boolean;
   record: { method: string; path: string; requestHash: string; responseStatus: number | null; responseBody: unknown };
@@ -137,7 +140,7 @@ function syncFailureResult(code: string, genericMessage: string, error: unknown,
  * syncFailureResult().
  */
 function syncOrValidationFailure(error: unknown, syncErrorCode: string, syncGenericMessage: string, context: string): { status: number; body: unknown } {
-  if (error instanceof TypeError || error instanceof AppointmentV2ValidationError) {
+  if (error instanceof TypeError || error instanceof AppointmentV2ValidationError || error instanceof WhatsAppTemplateValidationError) {
     return { status: 400, body: { error: 'VALIDATION_ERROR', message: error.message } };
   }
   return syncFailureResult(syncErrorCode, syncGenericMessage, error, context);
@@ -223,6 +226,8 @@ export function createApiV2Router({
   channelsRead,
   conversationsRead,
   messageStatusRead,
+  templatesRead,
+  templatesWrite,
   idempotency,
   resolveIntegrationId,
 }: {
@@ -237,6 +242,8 @@ export function createApiV2Router({
   channelsRead?: ChannelsRead;
   conversationsRead?: ConversationsRead;
   messageStatusRead?: MessageStatusRead;
+  templatesRead?: TemplatesRead;
+  templatesWrite?: TemplatesWrite;
   idempotency?: Idempotency;
   resolveIntegrationId?: IntegrationIdResolver;
 }) {
@@ -602,6 +609,138 @@ export function createApiV2Router({
         return res.status(200).json({ data: status });
       } catch (error) {
         return syncFailure(res, 'MESSAGE_STATUS_READ_FAILED', 'Failed to read message status', error, 'message status read');
+      }
+    });
+  }
+
+  if (templatesRead) {
+    activeScopes.add('templates:read');
+    router.get('/templates', requireIntegrationScope('templates:read'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+
+      if (!companyId || !isPositiveIntegrationId(integrationId)) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company and integration ID are required' });
+      }
+
+      try {
+        const templates = await templatesRead.list(companyId);
+        return res.status(200).json({ data: templates });
+      } catch (error) {
+        return syncFailure(res, 'TEMPLATES_READ_FAILED', 'Failed to read templates', error, 'templates read');
+      }
+    });
+
+    router.get('/templates/:templateId', requireIntegrationScope('templates:read'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+      const templateId = Number(req.params.templateId);
+
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !Number.isSafeInteger(templateId) || templateId <= 0) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and a positive template ID are required' });
+      }
+
+      try {
+        const template = await templatesRead.get(companyId, templateId);
+        if (!template) {
+          return res.status(404).json({ error: 'NOT_FOUND', message: 'Template not found' });
+        }
+        return res.status(200).json({ data: template });
+      } catch (error) {
+        return syncFailure(res, 'TEMPLATE_READ_FAILED', 'Failed to read template', error, 'template read');
+      }
+    });
+  }
+
+  if (templatesWrite) {
+    activeScopes.add('templates:write');
+
+    function isValidCreateTemplateBody(body: unknown): body is CreateWhatsAppTemplateInput {
+      if (!body || typeof body !== 'object') return false;
+      const candidate = body as Record<string, unknown>;
+      return typeof candidate.name === 'string' && candidate.name.trim().length > 0
+        && typeof candidate.content === 'string' && candidate.content.trim().length > 0
+        && Number.isSafeInteger(candidate.connectionId) && (candidate.connectionId as number) > 0
+        && (candidate.description === undefined || typeof candidate.description === 'string')
+        && (candidate.whatsappTemplateCategory === undefined || typeof candidate.whatsappTemplateCategory === 'string')
+        && (candidate.whatsappTemplateLanguage === undefined || typeof candidate.whatsappTemplateLanguage === 'string')
+        && (candidate.variables === undefined || Array.isArray(candidate.variables))
+        && (candidate.headerType === undefined || typeof candidate.headerType === 'string')
+        && (candidate.headerText === undefined || typeof candidate.headerText === 'string')
+        && (candidate.headerMediaUrl === undefined || typeof candidate.headerMediaUrl === 'string')
+        && (candidate.footerText === undefined || typeof candidate.footerText === 'string');
+    }
+
+    router.post('/templates', requireIntegrationScope('templates:write'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+      const userId = req.apiKey?.userId;
+      const idempotencyKey = req.header('Idempotency-Key');
+
+      if (
+        !companyId || !isPositiveIntegrationId(integrationId)
+        || !Number.isSafeInteger(userId) || (userId as number) <= 0
+        || !idempotencyKey?.trim()
+        || !isValidCreateTemplateBody(req.body)
+      ) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, Idempotency-Key, and a valid template (name, content, connectionId required) are required' });
+      }
+
+      const { status, body } = await withIdempotency(idempotency, {
+        companyId, integrationId, key: idempotencyKey.trim(), method: 'POST', path: '/templates', body: req.body,
+      }, async () => {
+        try {
+          const template = await templatesWrite.create(companyId, userId as number, req.body);
+          return { status: 201, body: { data: template } };
+        } catch (error) {
+          return syncOrValidationFailure(error, 'TEMPLATE_CREATE_FAILED', 'Template creation failed', 'template create');
+        }
+      });
+      return res.status(status).json(body);
+    });
+
+    router.patch('/templates/:templateId', requireIntegrationScope('templates:write'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+      const templateId = Number(req.params.templateId);
+      const { description, isActive } = req.body ?? {};
+
+      if (
+        !companyId || !isPositiveIntegrationId(integrationId) || !Number.isSafeInteger(templateId) || templateId <= 0
+        || (description !== undefined && typeof description !== 'string')
+        || (isActive !== undefined && typeof isActive !== 'boolean')
+      ) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive template ID, and well-formed description/isActive are required' });
+      }
+
+      try {
+        const template = await templatesWrite.update(companyId, templateId, { description, isActive });
+        if (!template) {
+          return res.status(404).json({ error: 'NOT_FOUND', message: 'Template not found' });
+        }
+        return res.status(200).json({ data: template });
+      } catch (error) {
+        return syncFailure(res, 'TEMPLATE_UPDATE_FAILED', 'Template update failed', error, 'template update');
+      }
+    });
+
+    router.delete('/templates/:templateId', requireIntegrationScope('templates:write'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+      const templateId = Number(req.params.templateId);
+
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !Number.isSafeInteger(templateId) || templateId <= 0) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and a positive template ID are required' });
+      }
+
+      try {
+        const deleted = await templatesWrite.delete(companyId, templateId);
+        if (!deleted) {
+          return res.status(404).json({ error: 'NOT_FOUND', message: 'Template not found' });
+        }
+        return res.status(200).json({ data: { success: true } });
+      } catch (error) {
+        return syncFailure(res, 'TEMPLATE_DELETE_FAILED', 'Template delete failed', error, 'template delete');
       }
     });
   }

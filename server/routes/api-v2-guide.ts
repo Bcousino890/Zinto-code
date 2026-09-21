@@ -54,6 +54,11 @@ El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo 
 | GET | /channels | channels:read |
 | GET | /conversations | conversations:read |
 | GET | /messages/{messageId}/status | messages:read |
+| GET | /templates | templates:read |
+| GET | /templates/{templateId} | templates:read |
+| POST | /templates | templates:write |
+| PATCH | /templates/{templateId} | templates:write |
+| DELETE | /templates/{templateId} | templates:write |
 | POST | /campaigns/batch | campaigns:write |
 | PUT | /appointments/{externalId} | appointments:write |
 | POST | /deals | deals:write |
@@ -115,6 +120,26 @@ curl -X POST https://crm.zinto.app/api/v2/messages \\
 ~~~
 
 \`template.name\` y \`template.language\` son obligatorios; \`template.components\` es opcional y se omite por completo si la plantilla no tiene variables. Cada componente es \`{type: 'header'|'body'|'button', parameters: [...]}\`, donde cada parámetro es una cadena simple o \`{type: 'text', text: string}\`.
+
+## Plantillas de WhatsApp: crear, listar y administrar
+
+Esta sección crea y administra las plantillas en sí (someterlas a aprobación de Meta). Para **enviar** una plantilla ya aprobada, use \`POST /messages\` con \`template\` (ver la sección anterior) — esa ruta no requiere \`templates:*\`.
+
+\`GET /templates\` (requiere \`templates:read\`) lista las plantillas de la empresa. \`GET /templates/{templateId}\` (mismo permiso) devuelve una sola.
+
+\`POST /templates\` (requiere \`templates:write\` e \`Idempotency-Key\`) crea una plantilla y la somete a Meta para aprobación — la clave de idempotencia evita someter dos veces la misma plantilla si su cliente reintenta la petición (p. ej. por timeout). \`connectionId\` debe ser un canal WhatsApp Official de la empresa (use \`GET /channels\` para listarlos); \`name\` solo admite minúsculas, números y guion bajo. El estado inicial suele ser \`pending\` — consulte \`GET /templates/{templateId}\` más tarde para ver si Meta la aprobó o rechazó.
+
+~~~bash
+curl -X POST https://crm.zinto.app/api/v2/templates \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
+  -H "Idempotency-Key: crm-template-welcome-v1" \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"appointment_reminder","content":"Su cita es mañana a las {{1}}","connectionId":42,"whatsappTemplateCategory":"utility","whatsappTemplateLanguage":"es","variables":[{}]}'
+# {"data":{"id":501,"name":"appointment_reminder","whatsappTemplateStatus":"pending", ...}}
+~~~
+
+\`PATCH /templates/{templateId}\` (requiere \`templates:write\`) solo permite editar \`description\` e \`isActive\` — el contenido ya sometido a Meta no se puede modificar; elimine la plantilla y cree una nueva si necesita cambiar el texto. \`DELETE /templates/{templateId}\` (mismo permiso) la elimina de Zinto (no de Meta). Ambas devuelven \`404 {"error":"NOT_FOUND", ...}\` si la plantilla no existe o pertenece a otra empresa.
 
 ## Lectura: canales, conversaciones y estado de mensajes
 

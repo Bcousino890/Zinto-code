@@ -87,6 +87,11 @@ error: v1 seguirá funcionando mientras se corrige el permiso.
 | GET | `/channels` | `channels:read` |
 | GET | `/conversations` | `conversations:read` |
 | GET | `/messages/{messageId}/status` | `messages:read` |
+| GET | `/templates` | `templates:read` |
+| GET | `/templates/{templateId}` | `templates:read` |
+| POST | `/templates` | `templates:write` |
+| PATCH | `/templates/{templateId}` | `templates:write` |
+| DELETE | `/templates/{templateId}` | `templates:write` |
 | POST | `/campaigns/batch` | `campaigns:write` |
 | PUT | `/appointments/{externalId}` | `appointments:write` |
 | POST | `/deals` | `deals:write` |
@@ -94,8 +99,9 @@ error: v1 seguirá funcionando mientras se corrige el permiso.
 
 Todas las rutas de recursos protegidas requieren `Authorization` y
 `X-Zinto-Integration-Id`. `/capabilities` requiere solo `Authorization`.
-`/campaigns/batch`, `/appointments`, `/deals` y `/sync-jobs` deben incluir
-además `Idempotency-Key` según el contrato OpenAPI.
+`POST /campaigns/batch`, `/appointments`, `/deals`, `POST /templates` y
+`/sync-jobs` deben incluir además `Idempotency-Key` según el contrato
+OpenAPI.
 
 ## Ejemplos
 
@@ -161,6 +167,31 @@ curl -X POST "$BASE_URL/messages" \
 Zinto. `template.language` (obligatorio) es el código de idioma de
 WhatsApp/Meta (p. ej. `es`, `en_US`). `template.components` es opcional;
 omítalo por completo si la plantilla no tiene variables.
+
+### Crear una plantilla de WhatsApp
+
+Esto crea la plantilla en sí y la somete a aprobación de Meta (distinto de
+*enviar* una plantilla ya aprobada — ver la sección anterior). Requiere
+`templates:write` e `Idempotency-Key` (evita someter dos veces la misma
+plantilla si SmartBC reintenta la petición); `connectionId` debe ser un canal
+WhatsApp Official de la empresa (use `GET /channels` para listarlos y
+descubrir su `id`).
+
+```bash
+curl -X POST "$BASE_URL/templates" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Idempotency-Key: smartbc-template-welcome-v1" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"appointment_reminder","content":"Su cita es mañana a las {{1}}","connectionId":42,"whatsappTemplateCategory":"utility","whatsappTemplateLanguage":"es","variables":[{}]}'
+# {"data":{"id":501,"name":"appointment_reminder","whatsappTemplateStatus":"pending", ...}}
+```
+
+El estado inicial suele ser `pending`; consulte `GET /templates/{templateId}`
+(requiere `templates:read`) más tarde para ver si Meta la aprobó o rechazó.
+`PATCH /templates/{templateId}` solo admite `description` e `isActive` — el
+contenido ya sometido no se puede editar. Ambas rutas, junto con `DELETE
+/templates/{templateId}`, devuelven `404 NOT_FOUND` si la plantilla no existe
+o pertenece a otra empresa.
 
 ### Foto de una propiedad → WhatsApp (media)
 

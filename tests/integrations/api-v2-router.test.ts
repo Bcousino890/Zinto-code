@@ -71,6 +71,15 @@ type ConversationsRead = {
 type MessageStatusRead = {
   getMessageStatus(input: { companyId: number; messageId: number }): Promise<{ status: string; timestamp: Date } | null>;
 };
+type TemplatesRead = {
+  list(companyId: number): Promise<unknown[]>;
+  get(companyId: number, templateId: number): Promise<unknown | null>;
+};
+type TemplatesWrite = {
+  create(companyId: number, userId: number, input: unknown): Promise<unknown>;
+  update(companyId: number, templateId: number, input: unknown): Promise<unknown | null>;
+  delete(companyId: number, templateId: number): Promise<boolean>;
+};
 type IdempotencyRecord = { method: string; path: string; requestHash: string; responseStatus: number | null; responseBody: unknown };
 type IdempotencyClaim = { won: boolean; record: IdempotencyRecord };
 type Idempotency = {
@@ -151,6 +160,8 @@ async function withServer(
   conversationsRead?: ConversationsRead,
   messageStatusRead?: MessageStatusRead,
   idempotency?: Idempotency,
+  templatesRead?: TemplatesRead,
+  templatesWrite?: TemplatesWrite,
 ) {
   const app = express();
   app.use(express.json());
@@ -168,6 +179,8 @@ async function withServer(
     conversationsRead,
     messageStatusRead,
     idempotency,
+    templatesRead: templatesRead as any,
+    templatesWrite: templatesWrite as any,
   }));
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -1416,4 +1429,275 @@ test('returns planner validation failures as bad requests', async () => {
       message: 'batchSize must be a positive safe integer',
     });
   }, undefined, undefined, undefined, undefined, undefined, { plan: planInitialCrmSynchronization });
+});
+
+test('lists templates for the requesting company with templates:read', async () => {
+  const templatesRead: TemplatesRead = {
+    list: async (companyId) => {
+      assert.equal(companyId, 12);
+      return [{ id: 1, name: 'welcome' }];
+    },
+    get: async () => null,
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:read'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/templates`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { data: [{ id: 1, name: 'welcome' }] });
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesRead);
+});
+
+test('does not expose template listing without templates:read', async () => {
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/templates`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(response.status, 403);
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, {
+    list: async () => { throw new Error('must not list'); },
+    get: async () => { throw new Error('must not get'); },
+  });
+});
+
+test('returns 404 for a template that does not exist or belongs to another company', async () => {
+  const templatesRead: TemplatesRead = { list: async () => [], get: async () => null };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:read'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/templates/999`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(response.status, 404);
+    assert.equal((await response.json()).error, 'NOT_FOUND');
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesRead);
+});
+
+test('creates a template for the requesting company with templates:write, attributed to the API key owner', async () => {
+  const received: unknown[] = [];
+  const templatesWrite: TemplatesWrite = {
+    create: async (companyId, userId, input) => {
+      received.push([companyId, userId, input]);
+      return { id: 1, name: 'welcome' };
+    },
+    update: async () => null,
+    delete: async () => false,
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:write'], userId: 7 } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/templates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-template-welcome-1' },
+      body: JSON.stringify({ name: 'welcome', content: 'Hola', connectionId: 44 }),
+    });
+    assert.equal(response.status, 201);
+    assert.deepEqual(await response.json(), { data: { id: 1, name: 'welcome' } });
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesWrite);
+
+  assert.deepEqual(received, [[12, 7, { name: 'welcome', content: 'Hola', connectionId: 44 }]]);
+});
+
+test('rejects template creation with a missing connectionId before calling the service', async () => {
+  const templatesWrite: TemplatesWrite = {
+    create: async () => { throw new Error('must not create'); },
+    update: async () => null,
+    delete: async () => false,
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:write'], userId: 7 } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/templates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-template-welcome-1' },
+      body: JSON.stringify({ name: 'welcome', content: 'Hola' }),
+    });
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesWrite);
+});
+
+test('rejects template creation without an Idempotency-Key', async () => {
+  const templatesWrite: TemplatesWrite = {
+    create: async () => { throw new Error('must not create'); },
+    update: async () => null,
+    delete: async () => false,
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:write'], userId: 7 } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/templates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ name: 'welcome', content: 'Hola', connectionId: 44 }),
+    });
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesWrite);
+});
+
+test('replays the cached response for a retried POST /templates with the same Idempotency-Key and body, instead of submitting to Meta twice', async () => {
+  let callCount = 0;
+  const templatesWrite: TemplatesWrite = {
+    create: async () => {
+      callCount += 1;
+      return { id: 501, name: 'welcome', whatsappTemplateStatus: 'pending' };
+    },
+    update: async () => null,
+    delete: async () => false,
+  };
+  const idempotency = fakeIdempotencyStore();
+  const body = JSON.stringify({ name: 'welcome', content: 'Hola', connectionId: 44 });
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:write'], userId: 7 } as any;
+    next();
+  }, async (baseUrl) => {
+    const headers = { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-template-retry-501' };
+    const first = await fetch(`${baseUrl}/api/v2/templates`, { method: 'POST', headers, body });
+    const second = await fetch(`${baseUrl}/api/v2/templates`, { method: 'POST', headers, body });
+
+    assert.equal(first.status, 201);
+    assert.equal(second.status, 201);
+    assert.deepEqual(await first.json(), await second.json());
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, idempotency, undefined, templatesWrite);
+
+  assert.equal(callCount, 1, 'the template service must only run once — a retried request should be served from the idempotency cache, never re-submitted to Meta');
+});
+
+test('surfaces a template validation failure as 400 without leaking the underlying exception', async () => {
+  const templatesWrite: TemplatesWrite = {
+    create: async () => {
+      const { WhatsAppTemplateValidationError } = await import('../../server/services/whatsapp-template-v2-service');
+      throw new WhatsAppTemplateValidationError('A template with this name already exists');
+    },
+    update: async () => null,
+    delete: async () => false,
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:write'], userId: 7 } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/templates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-template-welcome-1' },
+      body: JSON.stringify({ name: 'welcome', content: 'Hola', connectionId: 44 }),
+    });
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { error: 'VALIDATION_ERROR', message: 'A template with this name already exists' });
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesWrite);
+});
+
+test('hides an unexpected template creation failure behind a generic message', async () => {
+  const templatesWrite: TemplatesWrite = {
+    create: async () => { throw new Error('duplicate key value violates unique constraint "campaign_templates_pkey"'); },
+    update: async () => null,
+    delete: async () => false,
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:write'], userId: 7 } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/templates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3', 'Idempotency-Key': 'crm-template-welcome-1' },
+      body: JSON.stringify({ name: 'welcome', content: 'Hola', connectionId: 44 }),
+    });
+    assert.equal(response.status, 500);
+    const body = await response.json();
+    assert.equal(body.error, 'TEMPLATE_CREATE_FAILED');
+    assert.ok(!JSON.stringify(body).includes('campaign_templates_pkey'), 'must not leak the raw DB error');
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesWrite);
+});
+
+test('updates a template and returns 404 for one that does not exist or belongs to another company', async () => {
+  const templatesWrite: TemplatesWrite = {
+    create: async () => { throw new Error('must not create'); },
+    update: async (companyId, templateId, input) => {
+      assert.equal(companyId, 12);
+      if (templateId === 999) return null;
+      return { id: templateId, isActive: (input as any).isActive };
+    },
+    delete: async () => false,
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:write'], userId: 7 } as any;
+    next();
+  }, async (baseUrl) => {
+    const ok = await fetch(`${baseUrl}/api/v2/templates/5`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ isActive: false }),
+    });
+    assert.equal(ok.status, 200);
+    assert.deepEqual(await ok.json(), { data: { id: 5, isActive: false } });
+
+    const missing = await fetch(`${baseUrl}/api/v2/templates/999`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ isActive: false }),
+    });
+    assert.equal(missing.status, 404);
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesWrite);
+});
+
+test('deletes a template and returns 404 for one that does not exist or belongs to another company', async () => {
+  const templatesWrite: TemplatesWrite = {
+    create: async () => { throw new Error('must not create'); },
+    update: async () => null,
+    delete: async (companyId, templateId) => {
+      assert.equal(companyId, 12);
+      return templateId === 5;
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['templates:write'], userId: 7 } as any;
+    next();
+  }, async (baseUrl) => {
+    const ok = await fetch(`${baseUrl}/api/v2/templates/5`, { method: 'DELETE', headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(ok.status, 200);
+    assert.deepEqual(await ok.json(), { data: { success: true } });
+
+    const missing = await fetch(`${baseUrl}/api/v2/templates/999`, { method: 'DELETE', headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(missing.status, 404);
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesWrite);
+});
+
+test('exposes templates:read and templates:write in capabilities only when both dependencies are configured', async () => {
+  const templatesRead: TemplatesRead = { list: async () => [], get: async () => null };
+  const templatesWrite: TemplatesWrite = { create: async () => ({}), update: async () => null, delete: async () => false };
+
+  await withServer((req, _res, next) => {
+    req.apiKey = { permissions: ['integrations:manage'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/capabilities`);
+    const body = await response.json() as { scopes: string[] };
+    assert.ok(body.scopes.includes('templates:read'));
+    assert.ok(body.scopes.includes('templates:write'));
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesRead, templatesWrite);
 });

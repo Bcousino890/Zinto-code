@@ -121,6 +121,40 @@ curl -X POST https://crm.zinto.app/api/v2/messages \\
 
 \`template.name\` y \`template.language\` son obligatorios; \`template.components\` es opcional y se omite por completo si la plantilla no tiene variables. Cada componente es \`{type: 'header'|'body'|'button', parameters: [...]}\`, donde cada parámetro es una cadena simple o \`{type: 'text', text: string}\`.
 
+## Reacciones, ubicación y responder citando un mensaje
+
+Estas tres capacidades solo están disponibles en canales WhatsApp Official. Cada una usa un campo propio de \`POST /messages\`, mutuamente excluyente con \`text\`/\`media\`/\`template\` (salvo \`context\`, ver más abajo); sigue bastando el permiso \`messages:send\`.
+
+**Reaccionar a un mensaje** — \`reaction: {messageId, emoji}\`. \`messageId\` es el \`data.id\` de un mensaje propio (recibido o enviado) de esta empresa, no un identificador de WhatsApp. Un \`emoji\` vacío (\`""\`) quita una reacción ya enviada.
+
+~~~bash
+curl -X POST https://crm.zinto.app/api/v2/messages \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
+  -H "Content-Type: application/json" \\
+  -d '{"channelId":1,"recipient":"+56912345678","reaction":{"messageId":98765,"emoji":"👍"}}'
+~~~
+
+**Enviar una ubicación** — \`location: {latitude, longitude, name?, address?}\`.
+
+~~~bash
+curl -X POST https://crm.zinto.app/api/v2/messages \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
+  -H "Content-Type: application/json" \\
+  -d '{"channelId":1,"recipient":"+56912345678","location":{"latitude":-33.45,"longitude":-70.66,"name":"Oficina central"}}'
+~~~
+
+**Responder citando un mensaje** — agregue \`context: {messageId}\` junto con \`text\` (por ahora no está soportado junto con \`media\`/\`template\`/\`reaction\`/\`location\`). Igual que en \`reaction\`, \`messageId\` es el \`data.id\` de un mensaje propio de esta empresa.
+
+~~~bash
+curl -X POST https://crm.zinto.app/api/v2/messages \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
+  -H "Content-Type: application/json" \\
+  -d '{"channelId":1,"recipient":"+56912345678","text":"Sí, mañana a las 10","context":{"messageId":98765}}'
+~~~
+
 ## Plantillas de WhatsApp: crear, listar y administrar
 
 Esta sección crea y administra las plantillas en sí (someterlas a aprobación de Meta). Para **enviar** una plantilla ya aprobada, use \`POST /messages\` con \`template\` (ver la sección anterior) — esa ruta no requiere \`templates:*\`.
@@ -183,6 +217,14 @@ El campo \`data\` de los eventos \`message.*\` incluye \`conversation_id\`, \`ch
 Cuando el mensaje tiene un adjunto, \`data\` además trae \`media\`: \`{"url": "https://crm.zinto.app/api/v2/media?type=image&filename=xyz789.jpg", "type": "image", "mime_type": "image/jpeg"}\`. \`media.type\` coincide con el \`type\` general del mensaje (\`image\`/\`video\`/\`audio\`/\`document\`); no hay un campo de caption aparte — si el cliente escribió uno, viaja en \`content\` (con fallback al nombre del archivo en documentos, o a un texto fijo en audio, que WhatsApp no permite subtitular). \`media\` se omite por completo en mensajes de solo texto.
 
 El objeto \`contact\` de estos mismos eventos puede incluir además \`avatar_url\` (URL absoluta) con la foto de perfil de WhatsApp, descargable con el mismo mecanismo de \`GET /media\` que los adjuntos de mensajes (\`type=profile_pictures\`). Es un dato best-effort: solo se completa para contactos del canal WhatsApp no oficial (QR), se obtiene una única vez al crear el contacto y solo si WhatsApp la entregó en ese momento; no se actualiza si el contacto cambia su foto después, y nunca está presente en el canal oficial de WhatsApp Cloud API. \`avatar_url\` se omite por completo cuando Zinto no tiene la foto.
+
+\`data\` también trae, cada uno omitido por completo cuando no aplica:
+
+- \`button: {payload, text}\` / \`list: {payload, text, description?}\` — cuando el mensaje es la respuesta del cliente a un botón o una lista interactiva que Zinto envió.
+- \`reaction: {emoji, message_id?}\` — cuando el mensaje es una reacción. \`emoji\` es \`null\` si el cliente quitó una reacción previa. \`message_id\` (el \`data.id\` del mensaje propio al que se reaccionó) se omite si Zinto no logró resolver a cuál de sus propios mensajes corresponde.
+- \`contacts: [{name, phones, emails?}]\` — cuando el cliente comparte una o más tarjetas de contacto de WhatsApp.
+- \`location: {latitude, longitude, name?, address?}\` — ubicación estructurada (el formato de solo texto \`"Location: lat,lng"\` sigue apareciendo en \`content\` para compatibilidad).
+- \`reply_to: {message_id}\` — cuando el mensaje cita/responde a otro. \`message_id\` es el \`data.id\` de ese mensaje propio; se omite si Zinto no lo tiene (p. ej. mensajes muy antiguos).
 
 Zinto entrega al menos una vez; responda 2xx después de persistir el evento y use una cola para trabajo lento. Respete 429 y Retry-After con espera exponencial.
 

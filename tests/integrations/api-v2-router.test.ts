@@ -43,6 +43,25 @@ type MessageSync = {
     origin: 'crm';
     template: { name: string; language: string; components?: unknown[] };
   }): Promise<{ id: string | number }>;
+  sendReaction?(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    targetMessageId: number;
+    emoji: string;
+  }): Promise<{ id: string | number }>;
+  sendLocation?(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    location: { latitude: number; longitude: number; name?: string; address?: string };
+  }): Promise<{ id: string | number }>;
 };
 
 type MediaAccess = {
@@ -524,6 +543,182 @@ test('rejects a CRM message that combines media and template, or an invalid temp
     { channelId: 44, recipient: '+56912345678', template: { language: 'es' } },
     { channelId: 44, recipient: '+56912345678', template: { name: 'x', language: 'es', components: [{ type: 'header', parameters: [123] }] } },
     { channelId: 44, recipient: '+56912345678', template: {} },
+  ]) {
+    await withServer((req, _res, next) => {
+      req.companyId = 12;
+      req.apiKey = { permissions: ['messages:send', 'media:upload'] } as any;
+      next();
+    }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/v2/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+        body: JSON.stringify(body),
+      });
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+    }, undefined, messageSync);
+  }
+});
+
+test('sends a CRM reaction from a permitted integration', async () => {
+  const received: unknown[] = [];
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('send should not be called for a reaction'); },
+    sendReaction: async (input) => { received.push(input); return { id: 501 }; },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ channelId: 44, recipient: '+56912345678', reaction: { messageId: 91, emoji: '👍' } }),
+    });
+    assert.equal(response.status, 202);
+    assert.deepEqual(await response.json(), { data: { id: 501, origin: 'crm' } });
+  }, undefined, messageSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12, integrationId: 3, channelId: 44, to: '+56912345678', origin: 'crm', targetMessageId: 91, emoji: '👍',
+  }]);
+});
+
+test('removes a CRM reaction by sending an empty emoji', async () => {
+  const received: unknown[] = [];
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('send should not be called for a reaction'); },
+    sendReaction: async (input) => { received.push(input); return { id: 502 }; },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ channelId: 44, recipient: '+56912345678', reaction: { messageId: 91, emoji: '' } }),
+    });
+    assert.equal(response.status, 202);
+  }, undefined, messageSync);
+
+  assert.equal((received[0] as any).emoji, '');
+});
+
+test('rejects a reaction combined with text, or with a non-positive messageId', async () => {
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('must not be called'); },
+    sendReaction: async () => { throw new Error('must not be called for invalid input'); },
+  };
+  for (const body of [
+    { channelId: 44, recipient: '+56912345678', reaction: { messageId: 91, emoji: '👍' }, text: 'hi' },
+    { channelId: 44, recipient: '+56912345678', reaction: { messageId: -1, emoji: '👍' } },
+    { channelId: 44, recipient: '+56912345678', reaction: { emoji: '👍' } },
+  ]) {
+    await withServer((req, _res, next) => {
+      req.companyId = 12;
+      req.apiKey = { permissions: ['messages:send'] } as any;
+      next();
+    }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/v2/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+        body: JSON.stringify(body),
+      });
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+    }, undefined, messageSync);
+  }
+});
+
+test('sends a CRM structured location from a permitted integration', async () => {
+  const received: unknown[] = [];
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('send should not be called for a location'); },
+    sendLocation: async (input) => { received.push(input); return { id: 503 }; },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ channelId: 44, recipient: '+56912345678', location: { latitude: -33.45, longitude: -70.66, name: 'Oficina' } }),
+    });
+    assert.equal(response.status, 202);
+  }, undefined, messageSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12, integrationId: 3, channelId: 44, to: '+56912345678', origin: 'crm', location: { latitude: -33.45, longitude: -70.66, name: 'Oficina' },
+  }]);
+});
+
+test('rejects a location out of range, combined with text, or with the wrong field types', async () => {
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('must not be called'); },
+    sendLocation: async () => { throw new Error('must not be called for invalid input'); },
+  };
+  for (const body of [
+    { channelId: 44, recipient: '+56912345678', location: { latitude: 200, longitude: -70.66 } },
+    { channelId: 44, recipient: '+56912345678', location: { latitude: -33.45, longitude: -70.66 }, text: 'hi' },
+    { channelId: 44, recipient: '+56912345678', location: { latitude: '−33.45', longitude: -70.66 } },
+  ]) {
+    await withServer((req, _res, next) => {
+      req.companyId = 12;
+      req.apiKey = { permissions: ['messages:send'] } as any;
+      next();
+    }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/v2/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+        body: JSON.stringify(body),
+      });
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+    }, undefined, messageSync);
+  }
+});
+
+test('forwards context.messageId as replyToMessageId on a plain-text CRM send', async () => {
+  const received: unknown[] = [];
+  const messageSync: MessageSync = {
+    send: async (input) => { received.push(input); return { id: 504 }; },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ channelId: 44, recipient: '+56912345678', text: 'Sí, mañana a las 10', context: { messageId: 77 } }),
+    });
+    assert.equal(response.status, 202);
+  }, undefined, messageSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12, integrationId: 3, channelId: 44, to: '+56912345678', content: 'Sí, mañana a las 10', origin: 'crm', replyToMessageId: 77,
+  }]);
+});
+
+test('rejects context.messageId combined with media, template, reaction, or location', async () => {
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('must not be called'); },
+    sendMedia: async () => { throw new Error('must not be called'); },
+    sendReaction: async () => { throw new Error('must not be called'); },
+  };
+  for (const body of [
+    { channelId: 44, recipient: '+56912345678', media: { url: 'https://smartbc.example.com/photo.jpg', type: 'image' }, context: { messageId: 77 } },
+    { channelId: 44, recipient: '+56912345678', reaction: { messageId: 91, emoji: '👍' }, context: { messageId: 77 } },
   ]) {
     await withServer((req, _res, next) => {
       req.companyId = 12;

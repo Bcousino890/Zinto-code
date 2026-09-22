@@ -1,4 +1,5 @@
 import { storage } from '../storage';
+import { decideMessageExternalIdAccess } from './message-ownership';
 import { ChannelConnection, InsertMessage, InsertConversation, InsertContact } from '@shared/schema';
 import { isChannelAvailable } from '@shared/channel-utils';
 import whatsAppService from './channels/whatsapp';
@@ -14,6 +15,8 @@ export interface SendMessageRequest {
   to: string;
   message: string;
   messageType?: 'text';
+  /** Zinto's own id of the message being replied to/quoted — WhatsApp official channels only. */
+  replyToMessageId?: number;
 }
 
 export interface SendMediaRequest {
@@ -86,14 +89,34 @@ class ApiMessageService {
       
 
       const conversation = await this.findOrCreateConversation(contact.id, connection);
-      
 
-      const sentMessage = await this.sendThroughChannel(
-        connection,
-        request.to,
-        request.message,
-        conversation.id
-      );
+      let sentMessage;
+      if (request.replyToMessageId !== undefined) {
+        if (connection.channelType !== 'whatsapp_official') {
+          throw new Error('Replying to a message is only supported on WhatsApp official channels');
+        }
+        if (!connection.companyId) {
+          throw new Error('Company ID is required for WhatsApp Official messages');
+        }
+        const replyToExternalId = await this.resolveOwnMessageExternalId(companyId, request.replyToMessageId);
+        const systemUserId = 1;
+        sentMessage = await whatsAppOfficialService.sendMessage(
+          connection.id,
+          systemUserId,
+          connection.companyId,
+          request.to,
+          request.message,
+          false,
+          { messageId: request.replyToMessageId, externalId: replyToExternalId },
+        );
+      } else {
+        sentMessage = await this.sendThroughChannel(
+          connection,
+          request.to,
+          request.message,
+          conversation.id
+        );
+      }
 
       return {
         id: sentMessage.id,
@@ -176,6 +199,112 @@ class ApiMessageService {
       console.error('Error getting message status:', error);
       throw error;
     }
+  }
+
+  /**
+   * Resolves a Zinto message id to its WhatsApp message id (wamid), scoped to
+   * `companyId` — for a caller-supplied message id used as the *target* of a
+   * new send (a reaction, or a reply/quote), not as the primary resource
+   * being read. "Doesn't exist" and "belongs to another company" collapse to
+   * the same thrown message deliberately (same convention as
+   * getMessageStatus above) so a caller can't use this to enumerate other
+   * companies' message ids.
+   */
+  private async resolveOwnMessageExternalId(companyId: number, messageId: number): Promise<string> {
+    const message = await storage.getMessageById(messageId);
+    const conversation = message ? await storage.getConversation(message.conversationId) : undefined;
+    const access = decideMessageExternalIdAccess(message, conversation, companyId);
+
+    if (!access.ok) {
+      throw new Error(access.reason === 'no_external_id'
+        ? 'This message has no WhatsApp message ID on file and cannot be reacted to or quoted'
+        : 'Message not found or access denied');
+    }
+    return access.externalId;
+  }
+
+  /**
+   * Send (or remove, with an empty emoji) a reaction to a previously
+   * exchanged message. WhatsApp official channels only.
+   */
+  async sendReaction(companyId: number, request: { channelId: number; to: string; targetMessageId: number; emoji: string }): Promise<MessageResponse> {
+    const connection = await this.validateChannelAccess(companyId, request.channelId);
+    if (connection.channelType !== 'whatsapp_official') {
+      throw new Error('Reactions are only supported on WhatsApp official channels');
+    }
+    if (!connection.companyId) {
+      throw new Error('Company ID is required for WhatsApp Official reactions');
+    }
+
+    const targetExternalId = await this.resolveOwnMessageExternalId(companyId, request.targetMessageId);
+    const contact = await this.findOrCreateContact(companyId, request.to, connection.channelType);
+    const conversation = await this.findOrCreateConversation(contact.id, connection);
+    const systemUserId = 1;
+
+    const { sendReactionMessage } = await import('./channels/whatsapp-official');
+    const result = await sendReactionMessage(connection.id, request.to, targetExternalId, request.emoji);
+
+    const messageData: InsertMessage = {
+      conversationId: conversation.id,
+      senderId: systemUserId,
+      content: request.emoji || '',
+      type: 'reaction',
+      direction: 'outbound',
+      status: result.success ? 'sent' : 'failed',
+      externalId: result.messageId,
+      metadata: { reaction: { emoji: request.emoji || null, messageId: request.targetMessageId } } as any,
+    };
+    const sentMessage = await storage.createMessage(messageData);
+
+    return {
+      id: sentMessage.id,
+      externalId: sentMessage.externalId || undefined,
+      status: sentMessage.status || 'sent',
+      timestamp: sentMessage.createdAt || new Date(),
+      channelType: connection.channelType,
+      conversationId: conversation.id,
+    };
+  }
+
+  /**
+   * Send a structured location. WhatsApp official channels only.
+   */
+  async sendLocation(companyId: number, request: { channelId: number; to: string; location: { latitude: number; longitude: number; name?: string; address?: string } }): Promise<MessageResponse> {
+    const connection = await this.validateChannelAccess(companyId, request.channelId);
+    if (connection.channelType !== 'whatsapp_official') {
+      throw new Error('Sending a location is only supported on WhatsApp official channels');
+    }
+    if (!connection.companyId) {
+      throw new Error('Company ID is required for WhatsApp Official location messages');
+    }
+
+    const contact = await this.findOrCreateContact(companyId, request.to, connection.channelType);
+    const conversation = await this.findOrCreateConversation(contact.id, connection);
+    const systemUserId = 1;
+
+    const { sendLocationMessage } = await import('./channels/whatsapp-official');
+    const result = await sendLocationMessage(connection.id, request.to, request.location);
+
+    const messageData: InsertMessage = {
+      conversationId: conversation.id,
+      senderId: systemUserId,
+      content: request.location.name ? `Location: ${request.location.name}` : `Location: ${request.location.latitude},${request.location.longitude}`,
+      type: 'location',
+      direction: 'outbound',
+      status: result.success ? 'sent' : 'failed',
+      externalId: result.messageId,
+      metadata: { location: request.location } as any,
+    };
+    const sentMessage = await storage.createMessage(messageData);
+
+    return {
+      id: sentMessage.id,
+      externalId: sentMessage.externalId || undefined,
+      status: sentMessage.status || 'sent',
+      timestamp: sentMessage.createdAt || new Date(),
+      channelType: connection.channelType,
+      conversationId: conversation.id,
+    };
   }
 
   /**

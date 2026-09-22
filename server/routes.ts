@@ -1159,6 +1159,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       sendMessage: apiMessageService.sendMessage.bind(apiMessageService),
       sendMedia: apiMessageService.sendMedia.bind(apiMessageService),
       sendTemplate: apiMessageService.sendTemplateMessage.bind(apiMessageService),
+      sendReaction: apiMessageService.sendReaction.bind(apiMessageService),
+      sendLocation: apiMessageService.sendLocation.bind(apiMessageService),
     }),
     appointmentSync: new AppointmentV2Service<CrmAppointmentPayload>({
       port: createCrmAppointmentStorageAdapter(storage),

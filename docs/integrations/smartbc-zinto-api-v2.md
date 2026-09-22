@@ -168,6 +168,35 @@ Zinto. `template.language` (obligatorio) es el código de idioma de
 WhatsApp/Meta (p. ej. `es`, `en_US`). `template.components` es opcional;
 omítalo por completo si la plantilla no tiene variables.
 
+### Reaccionar, enviar ubicación y responder citando un mensaje
+
+Solo canales WhatsApp Official. Cada capacidad usa su propio campo en `POST
+/messages`, mutuamente excluyente con `text`/`media`/`template` (salvo
+`context`, que se combina con `text`); sigue bastando `messages:send`.
+
+```bash
+# Reaccionar (emoji vacío quita una reacción ya enviada)
+curl -X POST "$BASE_URL/messages" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  -d '{"channelId":42,"recipient":"+56912345678","reaction":{"messageId":98765,"emoji":"👍"}}'
+
+# Ubicación estructurada
+curl -X POST "$BASE_URL/messages" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  -d '{"channelId":42,"recipient":"+56912345678","location":{"latitude":-33.45,"longitude":-70.66,"name":"Oficina central"}}'
+
+# Responder citando un mensaje
+curl -X POST "$BASE_URL/messages" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  -d '{"channelId":42,"recipient":"+56912345678","text":"Sí, mañana a las 10","context":{"messageId":98765}}'
+```
+
+En los tres casos, `messageId` es el `data.id` de un mensaje propio de esta
+empresa (recibido o enviado) — no un identificador interno de WhatsApp.
+
 ### Crear una plantilla de WhatsApp
 
 Esto crea la plantilla en sí y la somete a aprobación de Meta (distinto de
@@ -331,6 +360,15 @@ crear el contacto y solo si WhatsApp la entregó en ese momento; no se
 actualiza si el contacto cambia su foto después. En el canal oficial de
 WhatsApp Cloud API nunca está presente, y se omite por completo cuando Zinto
 no tiene la foto.
+
+`data` en los eventos `message.*` también trae, cada uno omitido por completo
+cuando no aplica: `button`/`list` (respuesta del cliente a un botón o lista
+interactiva enviada por Zinto), `reaction` (`{emoji, message_id?}` —
+`emoji: null` si se quitó una reacción), `contacts` (tarjetas de contacto
+compartidas), `location` (`{latitude, longitude, name?, address?}`) y
+`reply_to` (`{message_id}`, cuando el mensaje cita a otro). En todos los
+casos `message_id` es el `data.id` de un mensaje propio de esta empresa, no
+un identificador de WhatsApp.
 
 ## Permisos recomendados
 

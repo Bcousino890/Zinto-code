@@ -28,6 +28,8 @@ type MessageSync = {
     content: string;
     externalMessageId?: string;
     origin: 'crm';
+    /** Zinto's own internal id of the message being replied to (quoted) — resolved and ownership-checked downstream. */
+    replyToMessageId?: number;
   }): Promise<{ id: string | number }>;
   sendMedia(input: {
     companyId: number;
@@ -57,6 +59,32 @@ type MessageSync = {
         type: 'header' | 'body' | 'button';
         parameters: Array<string | { type: 'text'; text: string }>;
       }>;
+    };
+  }): Promise<{ id: string | number }>;
+  sendReaction(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    /** Zinto's own internal id of the message being reacted to — resolved and ownership-checked downstream. */
+    targetMessageId: number;
+    /** Empty string removes a previously-sent reaction (Meta's own convention). */
+    emoji: string;
+  }): Promise<{ id: string | number }>;
+  sendLocation(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    location: {
+      latitude: number;
+      longitude: number;
+      name?: string;
+      address?: string;
     };
   }): Promise<{ id: string | number }>;
 };
@@ -353,7 +381,36 @@ export function createApiV2Router({
     router.post('/messages', requireIntegrationScope('messages:send'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
-      const { channelId, recipient, text, external_message_id: externalMessageId, media, template } = req.body ?? {};
+      const { channelId, recipient, text, external_message_id: externalMessageId, media, template, reaction, location, context } = req.body ?? {};
+
+      const hasReaction = reaction !== undefined;
+      const isReactionObject = hasReaction && typeof reaction === 'object' && reaction !== null;
+      const reactionMessageId = isReactionObject ? reaction.messageId : undefined;
+      const reactionEmoji = isReactionObject ? reaction.emoji : undefined;
+      const isValidReaction = !hasReaction || (
+        isReactionObject
+        && Number.isSafeInteger(reactionMessageId) && reactionMessageId > 0
+        && typeof reactionEmoji === 'string'
+      );
+
+      const hasLocation = location !== undefined;
+      const isLocationObject = hasLocation && typeof location === 'object' && location !== null;
+      const locationLatitude = isLocationObject ? location.latitude : undefined;
+      const locationLongitude = isLocationObject ? location.longitude : undefined;
+      const locationName = isLocationObject ? location.name : undefined;
+      const locationAddress = isLocationObject ? location.address : undefined;
+      const isValidLocation = !hasLocation || (
+        isLocationObject
+        && typeof locationLatitude === 'number' && locationLatitude >= -90 && locationLatitude <= 90
+        && typeof locationLongitude === 'number' && locationLongitude >= -180 && locationLongitude <= 180
+        && (locationName === undefined || typeof locationName === 'string')
+        && (locationAddress === undefined || typeof locationAddress === 'string')
+      );
+
+      const hasContext = context !== undefined;
+      const isContextObject = hasContext && typeof context === 'object' && context !== null;
+      const contextMessageId = isContextObject ? context.messageId : undefined;
+      const isValidContext = !hasContext || (isContextObject && Number.isSafeInteger(contextMessageId) && contextMessageId > 0);
 
       const hasMedia = media !== undefined;
       const isMediaObject = hasMedia && typeof media === 'object' && media !== null;
@@ -380,17 +437,23 @@ export function createApiV2Router({
       );
 
       const hasText = typeof text === 'string' && text.trim().length > 0;
+      const contentModeCount = [hasMedia, hasTemplate, hasReaction, hasLocation].filter(Boolean).length;
 
       if (
         !companyId || !isPositiveIntegrationId(integrationId) || !Number.isInteger(channelId) || channelId <= 0
         || typeof recipient !== 'string' || !recipient.trim()
-        || !isValidMedia || !isValidTemplate
-        || (hasMedia && hasTemplate)
-        || (!hasMedia && !hasTemplate && !hasText)
+        || !isValidMedia || !isValidTemplate || !isValidReaction || !isValidLocation || !isValidContext
+        || contentModeCount > 1
+        || (contentModeCount === 0 && !hasText)
+        || ((hasReaction || hasLocation) && hasText)
         || (text !== undefined && typeof text !== 'string')
         || (externalMessageId !== undefined && typeof externalMessageId !== 'string')
+        // Reply context (`context.messageId`) is only supported quoting a plain-text
+        // send today — not yet threaded through the media/template/reaction/location
+        // paths. Scoped this way deliberately; see the parity-plan handoff for why.
+        || (hasContext && (hasMedia || hasTemplate || hasReaction || hasLocation))
       ) {
-        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive channel ID, recipient and one of text, a valid media object ({url, type, filename?}), or a valid template object ({name, language, components?}) are required' });
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive channel ID, recipient and exactly one of text, a valid media object ({url, type, filename?}), a valid template object ({name, language, components?}), a valid reaction object ({messageId, emoji}), or a valid location object ({latitude, longitude, name?, address?}) are required; reaction/location cannot be combined with text, and context.messageId is only supported alongside plain text' });
       }
 
       if (hasMedia) {
@@ -438,6 +501,32 @@ export function createApiV2Router({
                 ...(mediaFilename ? { filename: mediaFilename } : {}),
               },
             })
+          : hasReaction
+          ? await messageSync.sendReaction({
+              companyId: normalizedMessage.companyId,
+              integrationId: normalizedMessage.integrationId,
+              channelId: normalizedMessage.conversationId,
+              to: recipient.trim(),
+              ...(normalizedMessage.externalMessageId ? { externalMessageId: normalizedMessage.externalMessageId } : {}),
+              origin: 'crm',
+              targetMessageId: reactionMessageId,
+              emoji: reactionEmoji,
+            })
+          : hasLocation
+          ? await messageSync.sendLocation({
+              companyId: normalizedMessage.companyId,
+              integrationId: normalizedMessage.integrationId,
+              channelId: normalizedMessage.conversationId,
+              to: recipient.trim(),
+              ...(normalizedMessage.externalMessageId ? { externalMessageId: normalizedMessage.externalMessageId } : {}),
+              origin: 'crm',
+              location: {
+                latitude: locationLatitude,
+                longitude: locationLongitude,
+                ...(locationName ? { name: locationName } : {}),
+                ...(locationAddress ? { address: locationAddress } : {}),
+              },
+            })
           : await messageSync.send({
               companyId: normalizedMessage.companyId,
               integrationId: normalizedMessage.integrationId,
@@ -446,6 +535,7 @@ export function createApiV2Router({
               content: normalizedMessage.content,
               ...(normalizedMessage.externalMessageId ? { externalMessageId: normalizedMessage.externalMessageId } : {}),
               origin: 'crm',
+              ...(hasContext ? { replyToMessageId: contextMessageId } : {}),
             });
         return res.status(202).json({
           data: {

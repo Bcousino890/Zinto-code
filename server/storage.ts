@@ -1,28 +1,10 @@
 /** TikTok channel/partner secrets: encrypted via `tiktok-secret-storage` — rotation script `server/scripts/reencrypt-tiktok-at-rest-secrets.ts`. */
 import { randomUUID } from "crypto";
-import mimeTypes from "mime-types";
-import { buildCrmMediaDownloadUrl } from "./services/crm-media-url";
-
-/** Media fields for the CRM v2 `message.*` webhook `data` payload — omitted entirely for plain-text messages. */
-function crmWebhookMediaPayload(message: { mediaUrl: string | null; type: string | null }): { media?: { url: string; type: string | null; mime_type: string | null } } {
-  if (!message.mediaUrl) return {};
-  const url = buildCrmMediaDownloadUrl(message.mediaUrl);
-  if (!url) return {};
-  return {
-    media: {
-      url,
-      type: message.type,
-      mime_type: mimeTypes.lookup(message.mediaUrl) || null,
-    },
-  };
-}
-
-/** `avatar_url` for the CRM v2 webhook `data.contact` object — omitted when Zinto has no photo on file (most contacts). */
-function crmWebhookContactAvatarField(avatarUrl: string | null | undefined): { avatar_url?: string } {
-  if (!avatarUrl) return {};
-  const url = buildCrmMediaDownloadUrl(avatarUrl);
-  return url ? { avatar_url: url } : {};
-}
+import {
+  crmWebhookMediaPayload,
+  crmWebhookContactAvatarField,
+  crmWebhookMessageMetadataPayload,
+} from "./services/crm-webhook-message-payload";
 import {
   encryptTikTokChannelConnectionForWrite,
   encryptTikTokPartnerConfigurationForWrite,
@@ -6874,6 +6856,7 @@ export class DatabaseStorage implements IStorage {
                   ...crmWebhookContactAvatarField(conversation.contactAvatarUrl),
                 } : null,
                 ...crmWebhookMediaPayload(newMessage),
+                ...crmWebhookMessageMetadataPayload(newMessage),
               },
             ));
         })

@@ -100,6 +100,18 @@ export function getApiV2PostmanCollection() {
             }),
             description: 'Requiere messages:send (mismo permiso, sin scope adicional). Use template en vez de media (son mutuamente excluyentes) para contactar a un destinatario fuera de la ventana de 24 horas, donde WhatsApp exige una plantilla ya aprobada.',
           }),
+          item('Reaccionar a un mensaje', 'POST', '/messages', {
+            body: jsonBody({ channelId: 1, recipient: '+56912345678', reaction: { messageId: 98765, emoji: '👍' } }),
+            description: 'Requiere messages:send. Solo canales WhatsApp Official. messageId es el data.id de un mensaje propio de esta empresa. emoji vacío ("") quita una reacción ya enviada.',
+          }),
+          item('Enviar ubicación', 'POST', '/messages', {
+            body: jsonBody({ channelId: 1, recipient: '+56912345678', location: { latitude: -33.45, longitude: -70.66, name: 'Oficina central' } }),
+            description: 'Requiere messages:send. Solo canales WhatsApp Official.',
+          }),
+          item('Responder citando un mensaje', 'POST', '/messages', {
+            body: jsonBody({ channelId: 1, recipient: '+56912345678', text: 'Sí, mañana a las 10', context: { messageId: 98765 } }),
+            description: 'Requiere messages:send. Solo admitido junto con text (no con media/template/reaction/location) y solo en canales WhatsApp Official. messageId es el data.id del mensaje propio que se cita.',
+          }),
         ],
       },
       {

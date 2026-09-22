@@ -1,6 +1,12 @@
 import { storage } from '../../storage';
 import { getCachedCompanySetting, getCachedTargetPipelineStage } from '../../utils/pipeline-cache';
 import {
+  parseWhatsAppLocationMetadata,
+  parseWhatsAppSharedContacts,
+  summarizeWhatsAppSharedContacts,
+  parseWhatsAppReaction,
+} from './whatsapp-official-inbound-parsing';
+import {
   InsertMessage,
   InsertConversation,
   InsertContact,
@@ -2171,6 +2177,35 @@ async function handleIncomingWebhookMessage(
       if (message.location.name) {
         messageContent += ` - ${message.location.name}`;
       }
+      const parsedLocation = parseWhatsAppLocationMetadata(message.location);
+      if (parsedLocation) {
+        msgMetadata.location = parsedLocation;
+      }
+    }
+    else if (message.type === 'contacts' && Array.isArray(message.contacts) && message.contacts.length > 0) {
+      messageType = 'contacts';
+      const sharedContacts = parseWhatsAppSharedContacts(message.contacts);
+      messageContent = summarizeWhatsAppSharedContacts(sharedContacts);
+      msgMetadata.contacts = sharedContacts;
+    }
+    else if (message.type === 'reaction') {
+      messageType = 'reaction';
+      const { emoji, externalMessageId: reactedToExternalId } = parseWhatsAppReaction(message.reaction);
+      messageContent = emoji || 'Reaction removed';
+      msgMetadata.reaction = {
+        emoji,
+        externalMessageId: reactedToExternalId,
+      };
+      if (reactedToExternalId) {
+        try {
+          const reactedToMessage = await storage.getMessageByExternalId(reactedToExternalId, connection.companyId || undefined);
+          if (reactedToMessage) {
+            msgMetadata.reaction.messageId = reactedToMessage.id;
+          }
+        } catch (error) {
+          console.error('Error resolving the message a reaction refers to:', error);
+        }
+      }
     }
     else if (message.type === 'interactive' && message.interactive) {
       messageType = 'interactive';
@@ -2281,6 +2316,18 @@ async function handleIncomingWebhookMessage(
 
     if (metaReferral) {
       msgMetadata.metaReferral = metaReferral;
+    }
+
+    if (message.context?.id) {
+      msgMetadata.replyTo = { externalMessageId: message.context.id };
+      try {
+        const repliedToMessage = await storage.getMessageByExternalId(message.context.id, connection.companyId || undefined);
+        if (repliedToMessage) {
+          msgMetadata.replyTo.messageId = repliedToMessage.id;
+        }
+      } catch (error) {
+        console.error('Error resolving the message a reply refers to:', error);
+      }
     }
 
     if (!contactWasCreatedByInboundWebhook && conversation) {
@@ -2853,7 +2900,9 @@ export async function sendMessage(
   companyId: number,
   to: string,
   message: string,
-  isFromBot: boolean = false
+  isFromBot: boolean = false,
+  /** The message this one replies to/quotes — only applied to the first chunk. */
+  replyTo?: { messageId: number; externalId: string }
 ) {
   try {
     if (!companyId) {
@@ -2902,7 +2951,8 @@ export async function sendMessage(
         type: 'text',
         text: {
           body: chunks[0]
-        }
+        },
+        ...(replyTo ? { context: { message_id: replyTo.externalId } } : {}),
       },
       {
         headers: {
@@ -2931,7 +2981,8 @@ export async function sendMessage(
           timestamp: new Date().toISOString(),
           phone_number_id: phoneNumberId,
           chunkIndex: 0,
-          totalChunks: chunks.length
+          totalChunks: chunks.length,
+          ...(replyTo ? { replyTo: { messageId: replyTo.messageId, externalMessageId: replyTo.externalId } } : {}),
         })
       });
 
@@ -3171,6 +3222,107 @@ export async function sendInteractiveMessage(
 }
 
 /**
+ * Sends (or removes, with emoji: '') a reaction to a previously exchanged
+ * message. `targetExternalId` must be a WhatsApp message ID (wamid) — the
+ * caller is responsible for resolving and authorizing whichever internal
+ * message that corresponds to (see api-message-service.ts's sendReaction).
+ * Does not persist a Zinto message row itself, same as sendInteractiveMessage —
+ * the caller does that (reactions aren't a "message" the recipient sees in a
+ * conversation thread the way text/media are, so callers are expected to
+ * decide their own storage shape rather than have one imposed here).
+ */
+export async function sendReactionMessage(
+  connectionId: number,
+  to: string,
+  targetExternalId: string,
+  emoji: string
+): Promise<{ messageId?: string; success: boolean }> {
+  const connection = await storage.getChannelConnection(connectionId);
+  if (!connection) {
+    throw new Error(`Connection ${connectionId} not found`);
+  }
+
+  const connectionData = connection.connectionData as any;
+  const accessToken = connectionData?.accessToken || connection.accessToken;
+  const phoneNumberId = connectionData?.phoneNumberId;
+
+  if (!accessToken) {
+    throw new Error('WhatsApp Business API access token is missing');
+  }
+  if (!phoneNumberId) {
+    throw new Error('WhatsApp Business API phone number ID is missing');
+  }
+
+  try {
+    const response = await axios.post(
+      `${WHATSAPP_GRAPH_URL}/${WHATSAPP_API_VERSION}/${phoneNumberId}/messages`,
+      {
+        messaging_product: 'whatsapp',
+        to: normalizePhoneToE164(to),
+        type: 'reaction',
+        reaction: { message_id: targetExternalId, emoji },
+      },
+      { headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, timeout: 30000 },
+    );
+
+    return response.data?.messages?.[0]?.id
+      ? { messageId: response.data.messages[0].id, success: true }
+      : { success: true };
+  } catch (error: any) {
+    console.error('Error sending WhatsApp reaction:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.error?.message || error.message);
+  }
+}
+
+/** Sends a structured location (mirrors sendReactionMessage's shape — no self-persistence, see its comment). */
+export async function sendLocationMessage(
+  connectionId: number,
+  to: string,
+  location: { latitude: number; longitude: number; name?: string; address?: string }
+): Promise<{ messageId?: string; success: boolean }> {
+  const connection = await storage.getChannelConnection(connectionId);
+  if (!connection) {
+    throw new Error(`Connection ${connectionId} not found`);
+  }
+
+  const connectionData = connection.connectionData as any;
+  const accessToken = connectionData?.accessToken || connection.accessToken;
+  const phoneNumberId = connectionData?.phoneNumberId;
+
+  if (!accessToken) {
+    throw new Error('WhatsApp Business API access token is missing');
+  }
+  if (!phoneNumberId) {
+    throw new Error('WhatsApp Business API phone number ID is missing');
+  }
+
+  try {
+    const response = await axios.post(
+      `${WHATSAPP_GRAPH_URL}/${WHATSAPP_API_VERSION}/${phoneNumberId}/messages`,
+      {
+        messaging_product: 'whatsapp',
+        to: normalizePhoneToE164(to),
+        type: 'location',
+        location: {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          ...(location.name ? { name: location.name } : {}),
+          ...(location.address ? { address: location.address } : {}),
+        },
+      },
+      { headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, timeout: 30000 },
+    );
+
+    return response.data?.messages?.[0]?.id
+      ? { messageId: response.data.messages[0].id, success: true }
+      : { success: true };
+  } catch (error: any) {
+    console.error('Error sending WhatsApp location:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.error?.message || error.message);
+  }
+}
+
+/**
  * Get current typing configuration
  * @returns Current typing configuration
  */
@@ -3243,6 +3395,8 @@ export default {
   sendMessage: sendMessage, // Use the enhanced sendMessage function
   sendBusinessMessage: sendWhatsAppBusinessMessage, // Keep the original for backward compatibility
   sendInteractiveMessage: sendInteractiveMessage, // Add interactive message support
+  sendReactionMessage,
+  sendLocationMessage,
   sendWhatsAppTestTemplate, // Add the test template function
   sendTemplateMessage, // Add the campaign template message function
   sendMedia: sendWhatsAppBusinessMediaMessage,

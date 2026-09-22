@@ -3322,6 +3322,37 @@ export async function sendLocationMessage(
   }
 }
 
+/** Marks a previously received message (by its wamid) as read on WhatsApp. */
+export async function markMessageAsRead(connectionId: number, targetExternalId: string): Promise<{ success: boolean }> {
+  const connection = await storage.getChannelConnection(connectionId);
+  if (!connection) {
+    throw new Error(`Connection ${connectionId} not found`);
+  }
+
+  const connectionData = connection.connectionData as any;
+  const accessToken = connectionData?.accessToken || connection.accessToken;
+  const phoneNumberId = connectionData?.phoneNumberId;
+
+  if (!accessToken) {
+    throw new Error('WhatsApp Business API access token is missing');
+  }
+  if (!phoneNumberId) {
+    throw new Error('WhatsApp Business API phone number ID is missing');
+  }
+
+  try {
+    await axios.post(
+      `${WHATSAPP_GRAPH_URL}/${WHATSAPP_API_VERSION}/${phoneNumberId}/messages`,
+      { messaging_product: 'whatsapp', status: 'read', message_id: targetExternalId },
+      { headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, timeout: 30000 },
+    );
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error marking WhatsApp message as read:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.error?.message || error.message);
+  }
+}
+
 /**
  * Get current typing configuration
  * @returns Current typing configuration
@@ -3397,6 +3428,7 @@ export default {
   sendInteractiveMessage: sendInteractiveMessage, // Add interactive message support
   sendReactionMessage,
   sendLocationMessage,
+  markMessageAsRead,
   sendWhatsAppTestTemplate, // Add the test template function
   sendTemplateMessage, // Add the campaign template message function
   sendMedia: sendWhatsAppBusinessMediaMessage,

@@ -16,6 +16,7 @@ import type {
 } from '../services/initial-crm-synchronization-plan';
 import type { CrmChannelsReadService, CrmConversationsReadService, CrmMessageStatusReadService } from '../services/crm-read-service';
 import { WhatsAppTemplateValidationError, type WhatsAppTemplatesReadService, type WhatsAppTemplatesWriteService, type CreateWhatsAppTemplateInput } from '../services/whatsapp-template-v2-service';
+import type { CrmWebhookConfigService } from '../services/crm-webhook-config-service';
 
 type AuthenticationMiddleware = (req: Request, res: Response, next: NextFunction) => void;
 type IntegrationIdResolver = (companyId: number, publicId: string) => Promise<number | undefined>;
@@ -86,6 +87,23 @@ type MessageSync = {
       name?: string;
       address?: string;
     };
+  }): Promise<{ id: string | number }>;
+  markAsRead(input: { companyId: number; integrationId: number; messageId: number }): Promise<{ id: number }>;
+  sendInteractive(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    interactiveType: 'button' | 'list';
+    content: {
+      header?: { type: 'text' | 'image' | 'video' | 'document'; text?: string; mediaUrl?: string };
+      body: { text: string };
+      footer?: { text: string };
+    };
+    options: { type: 'button'; buttons: Array<{ id: string; title: string }> }
+      | { type: 'list'; button: string; sections: Array<{ title?: string; rows: Array<{ id: string; title: string; description?: string }> }> };
   }): Promise<{ id: string | number }>;
 };
 type CampaignSync = {
@@ -256,6 +274,7 @@ export function createApiV2Router({
   messageStatusRead,
   templatesRead,
   templatesWrite,
+  webhookConfig,
   idempotency,
   resolveIntegrationId,
 }: {
@@ -272,6 +291,7 @@ export function createApiV2Router({
   messageStatusRead?: MessageStatusRead;
   templatesRead?: TemplatesRead;
   templatesWrite?: TemplatesWrite;
+  webhookConfig?: Pick<CrmWebhookConfigService, 'get' | 'update'>;
   idempotency?: Idempotency;
   resolveIntegrationId?: IntegrationIdResolver;
 }) {
@@ -378,10 +398,53 @@ export function createApiV2Router({
       );
     }
 
+    const INTERACTIVE_HEADER_TYPES = ['text', 'image', 'video', 'document'] as const;
+
+    function isValidInteractiveHeader(header: unknown): boolean {
+      if (header === undefined) return true;
+      if (!header || typeof header !== 'object') return false;
+      const h = header as any;
+      if (!INTERACTIVE_HEADER_TYPES.includes(h.type)) return false;
+      return h.type === 'text'
+        ? typeof h.text === 'string' && h.text.trim().length > 0
+        : typeof h.mediaUrl === 'string' && /^https?:\/\//i.test(h.mediaUrl);
+    }
+
+    function isValidInteractiveButtons(buttons: unknown): buttons is Array<{ id: string; title: string }> {
+      return Array.isArray(buttons) && buttons.length >= 1 && buttons.length <= 3
+        && buttons.every((b: any) => b && typeof b.id === 'string' && b.id.trim() && typeof b.title === 'string' && b.title.trim());
+    }
+
+    function isValidInteractiveListSections(sections: unknown): sections is Array<{ title?: string; rows: Array<{ id: string; title: string; description?: string }> }> {
+      return Array.isArray(sections) && sections.length >= 1
+        && sections.every((s: any) => s && Array.isArray(s.rows) && s.rows.length >= 1
+          && (s.title === undefined || typeof s.title === 'string')
+          && s.rows.every((r: any) => r && typeof r.id === 'string' && r.id.trim() && typeof r.title === 'string' && r.title.trim() && (r.description === undefined || typeof r.description === 'string')));
+    }
+
+    function isValidInteractive(interactive: unknown): interactive is {
+      type: 'button' | 'list'; body: string; footer?: string;
+      header?: { type: 'text' | 'image' | 'video' | 'document'; text?: string; mediaUrl?: string };
+      buttons?: Array<{ id: string; title: string }>;
+      list?: { button: string; sections: Array<{ title?: string; rows: Array<{ id: string; title: string; description?: string }> }> };
+    } {
+      if (!interactive || typeof interactive !== 'object') return false;
+      const i = interactive as any;
+      if (i.type !== 'button' && i.type !== 'list') return false;
+      if (typeof i.body !== 'string' || !i.body.trim()) return false;
+      if (!isValidInteractiveHeader(i.header)) return false;
+      if (i.footer !== undefined && typeof i.footer !== 'string') return false;
+      if (i.type === 'button') {
+        return isValidInteractiveButtons(i.buttons) && i.list === undefined;
+      }
+      return !!i.list && typeof i.list.button === 'string' && i.list.button.trim()
+        && isValidInteractiveListSections(i.list.sections) && i.buttons === undefined;
+    }
+
     router.post('/messages', requireIntegrationScope('messages:send'), async (req, res) => {
       const companyId = req.companyId;
       const integrationId = await getIntegrationId(req);
-      const { channelId, recipient, text, external_message_id: externalMessageId, media, template, reaction, location, context } = req.body ?? {};
+      const { channelId, recipient, text, external_message_id: externalMessageId, media, template, reaction, location, context, interactive } = req.body ?? {};
 
       const hasReaction = reaction !== undefined;
       const isReactionObject = hasReaction && typeof reaction === 'object' && reaction !== null;
@@ -436,24 +499,27 @@ export function createApiV2Router({
         && isValidTemplateComponents(templateComponents)
       );
 
+      const hasInteractive = interactive !== undefined;
+      const isValidInteractiveBody = !hasInteractive || isValidInteractive(interactive);
+
       const hasText = typeof text === 'string' && text.trim().length > 0;
-      const contentModeCount = [hasMedia, hasTemplate, hasReaction, hasLocation].filter(Boolean).length;
+      const contentModeCount = [hasMedia, hasTemplate, hasReaction, hasLocation, hasInteractive].filter(Boolean).length;
 
       if (
         !companyId || !isPositiveIntegrationId(integrationId) || !Number.isInteger(channelId) || channelId <= 0
         || typeof recipient !== 'string' || !recipient.trim()
-        || !isValidMedia || !isValidTemplate || !isValidReaction || !isValidLocation || !isValidContext
+        || !isValidMedia || !isValidTemplate || !isValidReaction || !isValidLocation || !isValidContext || !isValidInteractiveBody
         || contentModeCount > 1
         || (contentModeCount === 0 && !hasText)
-        || ((hasReaction || hasLocation) && hasText)
+        || ((hasReaction || hasLocation || hasInteractive) && hasText)
         || (text !== undefined && typeof text !== 'string')
         || (externalMessageId !== undefined && typeof externalMessageId !== 'string')
         // Reply context (`context.messageId`) is only supported quoting a plain-text
-        // send today — not yet threaded through the media/template/reaction/location
-        // paths. Scoped this way deliberately; see the parity-plan handoff for why.
-        || (hasContext && (hasMedia || hasTemplate || hasReaction || hasLocation))
+        // send today — not yet threaded through the media/template/reaction/location/
+        // interactive paths. Scoped this way deliberately; see the parity-plan handoff for why.
+        || (hasContext && (hasMedia || hasTemplate || hasReaction || hasLocation || hasInteractive))
       ) {
-        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive channel ID, recipient and exactly one of text, a valid media object ({url, type, filename?}), a valid template object ({name, language, components?}), a valid reaction object ({messageId, emoji}), or a valid location object ({latitude, longitude, name?, address?}) are required; reaction/location cannot be combined with text, and context.messageId is only supported alongside plain text' });
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, positive channel ID, recipient and exactly one of text, a valid media object ({url, type, filename?}), a valid template object ({name, language, components?}), a valid reaction object ({messageId, emoji}), a valid location object ({latitude, longitude, name?, address?}), or a valid interactive object ({type, body, buttons|list}) are required; reaction/location/interactive cannot be combined with text, and context.messageId is only supported alongside plain text' });
       }
 
       if (hasMedia) {
@@ -527,6 +593,24 @@ export function createApiV2Router({
                 ...(locationAddress ? { address: locationAddress } : {}),
               },
             })
+          : hasInteractive
+          ? await messageSync.sendInteractive({
+              companyId: normalizedMessage.companyId,
+              integrationId: normalizedMessage.integrationId,
+              channelId: normalizedMessage.conversationId,
+              to: recipient.trim(),
+              ...(normalizedMessage.externalMessageId ? { externalMessageId: normalizedMessage.externalMessageId } : {}),
+              origin: 'crm',
+              interactiveType: interactive.type,
+              content: {
+                body: { text: interactive.body },
+                ...(interactive.header ? { header: interactive.header } : {}),
+                ...(interactive.footer ? { footer: { text: interactive.footer } } : {}),
+              },
+              options: interactive.type === 'button'
+                ? { type: 'button' as const, buttons: interactive.buttons! }
+                : { type: 'list' as const, button: interactive.list!.button, sections: interactive.list!.sections },
+            })
           : await messageSync.send({
               companyId: normalizedMessage.companyId,
               integrationId: normalizedMessage.integrationId,
@@ -546,6 +630,23 @@ export function createApiV2Router({
         });
       } catch (error) {
         return syncFailure(res, 'MESSAGE_SYNC_FAILED', 'Message synchronization failed', error, 'message send');
+      }
+    });
+
+    router.post('/messages/:messageId/read', requireIntegrationScope('messages:send'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+      const messageId = Number(req.params.messageId);
+
+      if (!companyId || !isPositiveIntegrationId(integrationId) || !Number.isSafeInteger(messageId) || messageId <= 0) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and a positive message ID are required' });
+      }
+
+      try {
+        const result = await messageSync.markAsRead({ companyId, integrationId, messageId });
+        return res.status(200).json({ data: { id: result.id } });
+      } catch (error) {
+        return syncFailure(res, 'MESSAGE_READ_FAILED', 'Marking the message as read failed', error, 'message read');
       }
     });
   }
@@ -831,6 +932,47 @@ export function createApiV2Router({
         return res.status(200).json({ data: { success: true } });
       } catch (error) {
         return syncFailure(res, 'TEMPLATE_DELETE_FAILED', 'Template delete failed', error, 'template delete');
+      }
+    });
+  }
+
+  if (webhookConfig) {
+    activeScopes.add('webhooks:manage');
+
+    router.get('/webhook', requireIntegrationScope('webhooks:manage'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+
+      if (!companyId || !isPositiveIntegrationId(integrationId)) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company and integration ID are required' });
+      }
+
+      try {
+        const { status, body } = await webhookConfig.get(companyId, integrationId);
+        return res.status(status).json(status === 200 ? { data: body } : body);
+      } catch (error) {
+        return syncFailure(res, 'WEBHOOK_CONFIG_READ_FAILED', 'Failed to read webhook configuration', error, 'webhook config read');
+      }
+    });
+
+    router.patch('/webhook', requireIntegrationScope('webhooks:manage'), async (req, res) => {
+      const companyId = req.companyId;
+      const integrationId = await getIntegrationId(req);
+      const { url, rotateSecret } = req.body ?? {};
+
+      if (
+        !companyId || !isPositiveIntegrationId(integrationId)
+        || (url !== undefined && url !== null && typeof url !== 'string')
+        || (rotateSecret !== undefined && typeof rotateSecret !== 'boolean')
+      ) {
+        return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'A company, integration ID, and a well-formed url (string or null) / rotateSecret (boolean) are required' });
+      }
+
+      try {
+        const { status, body } = await webhookConfig.update(companyId, integrationId, { url, rotateSecret });
+        return res.status(status).json(status === 200 ? { data: body } : body);
+      } catch (error) {
+        return syncFailure(res, 'WEBHOOK_CONFIG_UPDATE_FAILED', 'Failed to update webhook configuration', error, 'webhook config update');
       }
     });
   }

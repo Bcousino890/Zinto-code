@@ -289,6 +289,8 @@ import { CrmChannelsReadService, CrmConversationsReadService, CrmMessageStatusRe
 import { createCrmChannelsReadAdapter, createCrmConversationsReadAdapter, createCrmMessageStatusReadAdapter } from "./services/crm-read-storage-adapter";
 import { WhatsAppTemplatesReadService, WhatsAppTemplatesWriteService } from "./services/whatsapp-template-v2-service";
 import { createWhatsAppTemplatesReadAdapter, createWhatsAppTemplatesWriteAdapter } from "./services/whatsapp-template-v2-adapter";
+import { createWebhookConfigService } from "./services/crm-webhook-config-service";
+import { encryptValue as encryptCrmWebhookSecret } from "./utils/crypto";
 import {
   listCompanyTemplates as listCompanyWhatsAppTemplates,
   getCompanyTemplate as getCompanyWhatsAppTemplate,
@@ -1161,6 +1163,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       sendTemplate: apiMessageService.sendTemplateMessage.bind(apiMessageService),
       sendReaction: apiMessageService.sendReaction.bind(apiMessageService),
       sendLocation: apiMessageService.sendLocation.bind(apiMessageService),
+      markMessageAsRead: apiMessageService.markMessageAsRead.bind(apiMessageService),
+      sendInteractiveMessage: apiMessageService.sendInteractiveMessage.bind(apiMessageService),
     }),
     appointmentSync: new AppointmentV2Service<CrmAppointmentPayload>({
       port: createCrmAppointmentStorageAdapter(storage),
@@ -1197,6 +1201,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       updateCompanyTemplate: updateCompanyWhatsAppTemplate,
       deleteCompanyTemplate: deleteCompanyWhatsAppTemplate,
     })),
+    webhookConfig: createWebhookConfigService({
+      getCrmIntegrationByIdAndCompany: storage.getCrmIntegrationByIdAndCompany.bind(storage),
+      updateCrmIntegration: storage.updateCrmIntegration.bind(storage),
+      encryptSecret: encryptCrmWebhookSecret,
+    }),
     idempotency: {
       claim: (input) => storage.claimCrmIdempotencyKey(input),
       complete: ({ companyId, key, responseStatus, responseBody }) => storage.completeCrmIdempotencyKey(companyId, key, responseStatus, responseBody),

@@ -62,6 +62,23 @@ type MessageSync = {
     origin: 'crm';
     location: { latitude: number; longitude: number; name?: string; address?: string };
   }): Promise<{ id: string | number }>;
+  markAsRead?(input: { companyId: number; integrationId: number; messageId: number }): Promise<{ id: number }>;
+  sendInteractive?(input: {
+    companyId: number;
+    integrationId: number;
+    channelId: number;
+    to: string;
+    externalMessageId?: string;
+    origin: 'crm';
+    interactiveType: 'button' | 'list';
+    content: {
+      header?: { type: 'text' | 'image' | 'video' | 'document'; text?: string; mediaUrl?: string };
+      body: { text: string };
+      footer?: { text: string };
+    };
+    options: { type: 'button'; buttons: Array<{ id: string; title: string }> }
+      | { type: 'list'; button: string; sections: Array<{ title?: string; rows: Array<{ id: string; title: string; description?: string }> }> };
+  }): Promise<{ id: string | number }>;
 };
 
 type MediaAccess = {
@@ -98,6 +115,10 @@ type TemplatesWrite = {
   create(companyId: number, userId: number, input: unknown): Promise<unknown>;
   update(companyId: number, templateId: number, input: unknown): Promise<unknown | null>;
   delete(companyId: number, templateId: number): Promise<boolean>;
+};
+type WebhookConfig = {
+  get(companyId: number, integrationId: number): Promise<{ status: number; body: Record<string, unknown> }>;
+  update(companyId: number, integrationId: number, input: { url?: string | null; rotateSecret?: boolean }): Promise<{ status: number; body: Record<string, unknown> }>;
 };
 type IdempotencyRecord = { method: string; path: string; requestHash: string; responseStatus: number | null; responseBody: unknown };
 type IdempotencyClaim = { won: boolean; record: IdempotencyRecord };
@@ -181,6 +202,7 @@ async function withServer(
   idempotency?: Idempotency,
   templatesRead?: TemplatesRead,
   templatesWrite?: TemplatesWrite,
+  webhookConfig?: WebhookConfig,
 ) {
   const app = express();
   app.use(express.json());
@@ -200,6 +222,7 @@ async function withServer(
     idempotency,
     templatesRead: templatesRead as any,
     templatesWrite: templatesWrite as any,
+    webhookConfig: webhookConfig as any,
   }));
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -734,6 +757,169 @@ test('rejects context.messageId combined with media, template, reaction, or loca
       assert.equal((await response.json()).error, 'VALIDATION_ERROR');
     }, undefined, messageSync);
   }
+});
+
+test('sends a CRM interactive button message from a permitted integration', async () => {
+  const received: unknown[] = [];
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('send should not be called for an interactive message'); },
+    sendInteractive: async (input) => { received.push(input); return { id: 601 }; },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({
+        channelId: 44,
+        recipient: '+56912345678',
+        interactive: { type: 'button', body: '¿Confirmamos la cita?', buttons: [{ id: 'yes', title: 'Sí' }, { id: 'no', title: 'No' }] },
+      }),
+    });
+    assert.equal(response.status, 202);
+  }, undefined, messageSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12, integrationId: 3, channelId: 44, to: '+56912345678', origin: 'crm',
+    interactiveType: 'button',
+    content: { body: { text: '¿Confirmamos la cita?' } },
+    options: { type: 'button', buttons: [{ id: 'yes', title: 'Sí' }, { id: 'no', title: 'No' }] },
+  }]);
+});
+
+test('sends a CRM interactive list message with a header and footer', async () => {
+  const received: unknown[] = [];
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('must not be called'); },
+    sendInteractive: async (input) => { received.push(input); return { id: 602 }; },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({
+        channelId: 44,
+        recipient: '+56912345678',
+        interactive: {
+          type: 'list',
+          header: { type: 'text', text: 'Planes' },
+          body: 'Elija un plan',
+          footer: 'Precios en USD',
+          list: { button: 'Ver planes', sections: [{ title: 'Planes', rows: [{ id: 'basic', title: 'Básico' }, { id: 'pro', title: 'Pro', description: 'Hasta 10 usuarios' }] }] },
+        },
+      }),
+    });
+    assert.equal(response.status, 202);
+  }, undefined, messageSync);
+
+  assert.deepEqual(received, [{
+    companyId: 12, integrationId: 3, channelId: 44, to: '+56912345678', origin: 'crm',
+    interactiveType: 'list',
+    content: { header: { type: 'text', text: 'Planes' }, body: { text: 'Elija un plan' }, footer: { text: 'Precios en USD' } },
+    options: { type: 'list', button: 'Ver planes', sections: [{ title: 'Planes', rows: [{ id: 'basic', title: 'Básico' }, { id: 'pro', title: 'Pro', description: 'Hasta 10 usuarios' }] }] },
+  }]);
+});
+
+test('rejects an interactive message combined with text, missing its required fields, or with too many buttons', async () => {
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('must not be called'); },
+    sendInteractive: async () => { throw new Error('must not be called for invalid input'); },
+  };
+  for (const body of [
+    { channelId: 44, recipient: '+56912345678', interactive: { type: 'button', body: 'x', buttons: [{ id: 'a', title: 'A' }] }, text: 'hi' },
+    { channelId: 44, recipient: '+56912345678', interactive: { type: 'button', body: 'x' } },
+    { channelId: 44, recipient: '+56912345678', interactive: { type: 'button', body: 'x', buttons: [{ id: '1', title: '1' }, { id: '2', title: '2' }, { id: '3', title: '3' }, { id: '4', title: '4' }] } },
+    { channelId: 44, recipient: '+56912345678', interactive: { type: 'list', body: 'x' } },
+    { channelId: 44, recipient: '+56912345678', interactive: { type: 'button', body: 'x', buttons: [{ id: 'a', title: 'A' }], list: { button: 'b', sections: [{ rows: [{ id: 'a', title: 'A' }] }] } } },
+  ]) {
+    await withServer((req, _res, next) => {
+      req.companyId = 12;
+      req.apiKey = { permissions: ['messages:send'] } as any;
+      next();
+    }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/v2/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+        body: JSON.stringify(body),
+      });
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+    }, undefined, messageSync);
+  }
+});
+
+test('marks a message as read for a permitted integration', async () => {
+  const received: unknown[] = [];
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('must not be called'); },
+    markAsRead: async (input) => { received.push(input); return { id: input.messageId }; },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages/501/read`, {
+      method: 'POST',
+      headers: { 'X-Zinto-Integration-Id': '3' },
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { data: { id: 501 } });
+  }, undefined, messageSync);
+
+  assert.deepEqual(received, [{ companyId: 12, integrationId: 3, messageId: 501 }]);
+});
+
+test('rejects marking a message as read with a non-positive message id', async () => {
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('must not be called'); },
+    markAsRead: async () => { throw new Error('must not be called for invalid input'); },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages/-1/read`, {
+      method: 'POST',
+      headers: { 'X-Zinto-Integration-Id': '3' },
+    });
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+  }, undefined, messageSync);
+});
+
+test('hides an unexpected mark-as-read failure behind a generic message', async () => {
+  const messageSync: MessageSync = {
+    send: async () => { throw new Error('must not be called'); },
+    markAsRead: async () => { throw new Error('duplicate key value violates unique constraint'); },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/messages/501/read`, {
+      method: 'POST',
+      headers: { 'X-Zinto-Integration-Id': '3' },
+    });
+    assert.equal(response.status, 500);
+    const body = await response.json();
+    assert.equal(body.error, 'MESSAGE_READ_FAILED');
+    assert.ok(!JSON.stringify(body).includes('unique constraint'));
+  }, undefined, messageSync);
 });
 
 test('does not expose media upload or download when no media access dependency is supplied', async () => {
@@ -1895,4 +2081,114 @@ test('exposes templates:read and templates:write in capabilities only when both 
     assert.ok(body.scopes.includes('templates:read'));
     assert.ok(body.scopes.includes('templates:write'));
   }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, templatesRead, templatesWrite);
+});
+
+test('reads the requesting integration\'s own webhook config with webhooks:manage', async () => {
+  const received: unknown[] = [];
+  const webhookConfig: WebhookConfig = {
+    get: async (companyId, integrationId) => {
+      received.push({ companyId, integrationId });
+      return { status: 200, body: { url: 'https://smartbc.example/webhooks/zinto', secretConfigured: true } };
+    },
+    update: async () => ({ status: 200, body: {} }),
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['webhooks:manage'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/webhook`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { data: { url: 'https://smartbc.example/webhooks/zinto', secretConfigured: true } });
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, webhookConfig);
+
+  assert.deepEqual(received, [{ companyId: 12, integrationId: 3 }]);
+});
+
+test('does not expose webhook config reads without webhooks:manage', async () => {
+  const webhookConfig: WebhookConfig = {
+    get: async () => { throw new Error('must not be called'); },
+    update: async () => { throw new Error('must not be called'); },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['messages:send'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/webhook`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(response.status, 403);
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, webhookConfig);
+});
+
+test('updates the requesting integration\'s own webhook URL and returns a fresh secret only when one was generated', async () => {
+  const received: unknown[] = [];
+  const webhookConfig: WebhookConfig = {
+    get: async () => { throw new Error('must not be called'); },
+    update: async (companyId, integrationId, input) => {
+      received.push({ companyId, integrationId, input });
+      return { status: 200, body: { url: 'https://smartbc.example/webhooks/zinto', secretConfigured: true, secret: 'zinto_whsec_fresh' } };
+    },
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['webhooks:manage'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/v2/webhook`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ url: 'https://smartbc.example/webhooks/zinto' }),
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { data: { url: 'https://smartbc.example/webhooks/zinto', secretConfigured: true, secret: 'zinto_whsec_fresh' } });
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, webhookConfig);
+
+  assert.deepEqual(received, [{ companyId: 12, integrationId: 3, input: { url: 'https://smartbc.example/webhooks/zinto', rotateSecret: undefined } }]);
+});
+
+test('rejects an ill-formed webhook config update', async () => {
+  const webhookConfig: WebhookConfig = {
+    get: async () => { throw new Error('must not be called'); },
+    update: async () => { throw new Error('must not be called for invalid input'); },
+  };
+  for (const body of [{ url: 42 }, { rotateSecret: 'yes' }]) {
+    await withServer((req, _res, next) => {
+      req.companyId = 12;
+      req.apiKey = { permissions: ['webhooks:manage'] } as any;
+      next();
+    }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/v2/webhook`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+        body: JSON.stringify(body),
+      });
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).error, 'VALIDATION_ERROR');
+    }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, webhookConfig);
+  }
+});
+
+test('reports 404 from webhook config reads/updates without leaking anything else', async () => {
+  const webhookConfig: WebhookConfig = {
+    get: async () => ({ status: 404, body: { error: 'Integration not found' } }),
+    update: async () => ({ status: 404, body: { error: 'Integration not found' } }),
+  };
+
+  await withServer((req, _res, next) => {
+    req.companyId = 12;
+    req.apiKey = { permissions: ['webhooks:manage'] } as any;
+    next();
+  }, async (baseUrl) => {
+    const getResponse = await fetch(`${baseUrl}/api/v2/webhook`, { headers: { 'X-Zinto-Integration-Id': '3' } });
+    assert.equal(getResponse.status, 404);
+    const patchResponse = await fetch(`${baseUrl}/api/v2/webhook`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-Zinto-Integration-Id': '3' },
+      body: JSON.stringify({ rotateSecret: true }),
+    });
+    assert.equal(patchResponse.status, 404);
+  }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, webhookConfig);
 });

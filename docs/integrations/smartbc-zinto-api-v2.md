@@ -71,6 +71,24 @@ Key en **Configuración → Acceso API → Claves API**, activar
 `integrations:manage` y repetir la prueba. No active v2 para resolver este
 error: v1 seguirá funcionando mientras se corrige el permiso.
 
+### Configurar el webhook desde SmartBC (self-service)
+
+Alternativa a hacerlo desde el panel de Zinto. `GET /webhook` (requiere
+`webhooks:manage`) devuelve la URL configurada y si hay un secreto
+(`secretConfigured`) — nunca el secreto en sí.
+
+```bash
+curl -X PATCH "$BASE_URL/webhook" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://portal.smartbc.cl/api/webhooks/zinto"}'
+# {"data":{"url":"https://portal.smartbc.cl/api/webhooks/zinto","secretConfigured":true,"secret":"zinto_whsec_..."}}
+```
+
+`secret` solo viene en la respuesta cuando se generó uno nuevo en esa misma
+llamada (primera vez que se configura `url`, o `rotateSecret: true`) —
+guárdelo ahí mismo, no se puede volver a consultar después.
+
 ## Rutas
 
 | Método | Ruta | Permiso |
@@ -80,6 +98,8 @@ error: v1 seguirá funcionando mientras se corrige el permiso.
 | GET | `/postman.json` | Público |
 | GET | `/guide.md` | Público |
 | GET | `/capabilities` | `integrations:manage` |
+| GET | `/webhook` | `webhooks:manage` |
+| PATCH | `/webhook` | `webhooks:manage` |
 | PUT | `/contacts/{externalId}` | `contacts:write` |
 | POST | `/messages` | `messages:send` (+ `media:upload` si incluye `media`) |
 | POST | `/media/upload` | `media:upload` |
@@ -87,6 +107,7 @@ error: v1 seguirá funcionando mientras se corrige el permiso.
 | GET | `/channels` | `channels:read` |
 | GET | `/conversations` | `conversations:read` |
 | GET | `/messages/{messageId}/status` | `messages:read` |
+| POST | `/messages/{messageId}/read` | `messages:send` |
 | GET | `/templates` | `templates:read` |
 | GET | `/templates/{templateId}` | `templates:read` |
 | POST | `/templates` | `templates:write` |
@@ -196,6 +217,28 @@ curl -X POST "$BASE_URL/messages" \
 
 En los tres casos, `messageId` es el `data.id` de un mensaje propio de esta
 empresa (recibido o enviado) — no un identificador interno de WhatsApp.
+
+### Botones/lista interactiva y marcar como leído
+
+Solo canales WhatsApp Official. `buttons` (1 a 3) es obligatorio con
+`type: "button"`; `list` es obligatorio con `type: "list"` — nunca ambos.
+
+```bash
+curl -X POST "$BASE_URL/messages" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID" \
+  -H "Content-Type: application/json" \
+  -d '{"channelId":42,"recipient":"+56912345678","interactive":{"type":"button","body":"¿Confirmamos la cita?","buttons":[{"id":"yes","title":"Sí"},{"id":"no","title":"No"}]}}'
+```
+
+La respuesta del cliente llega como `message.received` con `data.button` o
+`data.list` (ver webhooks más abajo).
+
+```bash
+curl -X POST "$BASE_URL/messages/98765/read" \
+  -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID"
+```
+
+`messageId` debe ser un mensaje **recibido** (no enviado) de esta empresa.
 
 ### Crear una plantilla de WhatsApp
 

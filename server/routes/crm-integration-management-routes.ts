@@ -62,7 +62,13 @@ function isPublicId(value: unknown): value is string {
   return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
-async function parseWebhookUrl(value: unknown): Promise<string | null | undefined> {
+/**
+ * Exported so CRM API v2's self-service webhook config route
+ * (server/services/crm-webhook-config-service.ts) reuses this exact
+ * SSRF-validated parsing instead of a second implementation of the same
+ * security check.
+ */
+export async function parseWebhookUrl(value: unknown): Promise<string | null | undefined> {
   if (value === null || value === undefined || value === '') return null;
   if (typeof value !== 'string' || value.length > 2048) throw new Error('webhookUrl debe ser una URL HTTPS válida');
   let url: URL;

@@ -439,3 +439,129 @@ test('forwards replyToMessageId on a plain text send', async () => {
     request: { channelId: 44, to: '+56912345678', message: 'Sí, mañana a las 10', messageType: 'text', replyToMessageId: 501 },
   }]);
 });
+
+test('dispatches an owned CRM interactive button message and persists its CRM origin metadata', async () => {
+  const sent: unknown[] = [];
+  const updated: unknown[] = [];
+  const adapter = createCrmApiV2MessageAdapter({
+    crmIntegrationBelongsToCompany: async () => true,
+    getMessageById: async () => ({ id: 71, metadata: { existing: 'value' } }),
+    updateMessage: async (_id, updates) => { updated.push(updates); return { id: 71 }; },
+    sendMessage: async () => { throw new Error('must not be called'); },
+    sendMedia: async () => { throw new Error('must not be called'); },
+    sendTemplate: async () => { throw new Error('must not be called'); },
+    sendInteractiveMessage: async (companyId, request) => { sent.push({ companyId, request }); return { id: 71 }; },
+  });
+
+  const result = await adapter.sendInteractive({
+    companyId: 12,
+    integrationId: 3,
+    channelId: 44,
+    to: '+56912345678',
+    origin: 'crm',
+    interactiveType: 'button',
+    content: { body: { text: '¿Confirmamos la cita?' } },
+    options: { type: 'button', buttons: [{ id: 'yes', title: 'Sí' }, { id: 'no', title: 'No' }] },
+  });
+
+  assert.deepEqual(result, { id: 71 });
+  assert.deepEqual(sent, [{
+    companyId: 12,
+    request: {
+      channelId: 44,
+      to: '+56912345678',
+      interactiveType: 'button',
+      content: { body: { text: '¿Confirmamos la cita?' } },
+      options: { type: 'button', buttons: [{ id: 'yes', title: 'Sí' }, { id: 'no', title: 'No' }] },
+    },
+  }]);
+  assert.deepEqual(updated, [{ metadata: { existing: 'value', crm: { origin: 'crm', integrationId: 3 } } }]);
+});
+
+test('refuses interactive dispatch when the CRM integration does not belong to the company', async () => {
+  let sent = false;
+  const adapter = createCrmApiV2MessageAdapter({
+    crmIntegrationBelongsToCompany: async () => false,
+    getMessageById: async () => undefined,
+    updateMessage: async () => ({ id: 71 }),
+    sendMessage: async () => { throw new Error('must not be called'); },
+    sendMedia: async () => { throw new Error('must not be called'); },
+    sendTemplate: async () => { throw new Error('must not be called'); },
+    sendInteractiveMessage: async () => { sent = true; return { id: 71 }; },
+  });
+
+  await assert.rejects(
+    adapter.sendInteractive({ companyId: 12, integrationId: 3, channelId: 44, to: '+56912345678', origin: 'crm', interactiveType: 'button', content: { body: { text: 'x' } }, options: { type: 'button', buttons: [{ id: 'a', title: 'A' }] } }),
+    /Integration does not belong to this company/,
+  );
+  assert.equal(sent, false);
+});
+
+test('refuses an interactive send when the integration has no interactive sender configured', async () => {
+  const adapter = createCrmApiV2MessageAdapter({
+    crmIntegrationBelongsToCompany: async () => true,
+    getMessageById: async () => undefined,
+    updateMessage: async () => ({ id: 71 }),
+    sendMessage: async () => { throw new Error('must not be called'); },
+    sendMedia: async () => { throw new Error('must not be called'); },
+    sendTemplate: async () => { throw new Error('must not be called'); },
+  });
+
+  await assert.rejects(
+    adapter.sendInteractive({ companyId: 12, integrationId: 3, channelId: 44, to: '+56912345678', origin: 'crm', interactiveType: 'list', content: { body: { text: 'x' } }, options: { type: 'list', button: 'Ver opciones', sections: [{ rows: [{ id: 'a', title: 'A' }] }] } }),
+    /Interactive messages are not configured for this integration/,
+  );
+});
+
+test('marks a message as read for an owned integration', async () => {
+  const marked: unknown[] = [];
+  const adapter = createCrmApiV2MessageAdapter({
+    crmIntegrationBelongsToCompany: async () => true,
+    getMessageById: async () => undefined,
+    updateMessage: async () => ({ id: 1 }),
+    sendMessage: async () => { throw new Error('must not be called'); },
+    sendMedia: async () => { throw new Error('must not be called'); },
+    sendTemplate: async () => { throw new Error('must not be called'); },
+    markMessageAsRead: async (companyId, request) => { marked.push({ companyId, request }); return { id: request.messageId }; },
+  });
+
+  const result = await adapter.markAsRead({ companyId: 12, integrationId: 3, messageId: 501 });
+
+  assert.deepEqual(result, { id: 501 });
+  assert.deepEqual(marked, [{ companyId: 12, request: { messageId: 501 } }]);
+});
+
+test('refuses to mark as read when the CRM integration does not belong to the company', async () => {
+  let marked = false;
+  const adapter = createCrmApiV2MessageAdapter({
+    crmIntegrationBelongsToCompany: async () => false,
+    getMessageById: async () => undefined,
+    updateMessage: async () => ({ id: 1 }),
+    sendMessage: async () => { throw new Error('must not be called'); },
+    sendMedia: async () => { throw new Error('must not be called'); },
+    sendTemplate: async () => { throw new Error('must not be called'); },
+    markMessageAsRead: async () => { marked = true; return { id: 501 }; },
+  });
+
+  await assert.rejects(
+    adapter.markAsRead({ companyId: 12, integrationId: 3, messageId: 501 }),
+    /Integration does not belong to this company/,
+  );
+  assert.equal(marked, false);
+});
+
+test('refuses to mark as read when the integration has no mark-as-read sender configured', async () => {
+  const adapter = createCrmApiV2MessageAdapter({
+    crmIntegrationBelongsToCompany: async () => true,
+    getMessageById: async () => undefined,
+    updateMessage: async () => ({ id: 1 }),
+    sendMessage: async () => { throw new Error('must not be called'); },
+    sendMedia: async () => { throw new Error('must not be called'); },
+    sendTemplate: async () => { throw new Error('must not be called'); },
+  });
+
+  await assert.rejects(
+    adapter.markAsRead({ companyId: 12, integrationId: 3, messageId: 501 }),
+    /Marking a message as read is not configured for this integration/,
+  );
+});

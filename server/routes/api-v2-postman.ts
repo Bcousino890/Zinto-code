@@ -71,7 +71,18 @@ export function getApiV2PostmanCollection() {
       },
       {
         name: 'Administración de integración',
-        item: [item('Consultar capacidades y permisos', 'GET', '/capabilities', { description: 'Requiere integrations:manage.' })],
+        item: [
+          item('Consultar capacidades y permisos', 'GET', '/capabilities', { description: 'Requiere integrations:manage.' }),
+          item('Consultar configuración del webhook', 'GET', '/webhook', { description: 'Requiere webhooks:manage. Nunca devuelve el secreto en sí, solo si hay uno configurado.' }),
+          item('Configurar URL del webhook', 'PATCH', '/webhook', {
+            body: jsonBody({ url: 'https://smartbc.example.com/webhooks/zinto' }),
+            description: 'Requiere webhooks:manage. El secreto solo se devuelve cuando se genera uno nuevo (primera vez que se configura url, o rotateSecret: true) — guárdelo entonces.',
+          }),
+          item('Rotar el secreto del webhook', 'PATCH', '/webhook', {
+            body: jsonBody({ rotateSecret: true }),
+            description: 'Requiere webhooks:manage. Invalida el secreto anterior.',
+          }),
+        ],
       },
       {
         name: 'Contactos',
@@ -110,8 +121,25 @@ export function getApiV2PostmanCollection() {
           }),
           item('Responder citando un mensaje', 'POST', '/messages', {
             body: jsonBody({ channelId: 1, recipient: '+56912345678', text: 'Sí, mañana a las 10', context: { messageId: 98765 } }),
-            description: 'Requiere messages:send. Solo admitido junto con text (no con media/template/reaction/location) y solo en canales WhatsApp Official. messageId es el data.id del mensaje propio que se cita.',
+            description: 'Requiere messages:send. Solo admitido junto con text (no con media/template/reaction/location/interactive) y solo en canales WhatsApp Official. messageId es el data.id del mensaje propio que se cita.',
           }),
+          item('Enviar botones interactivos', 'POST', '/messages', {
+            body: jsonBody({ channelId: 1, recipient: '+56912345678', interactive: { type: 'button', body: '¿Confirmamos la cita?', buttons: [{ id: 'yes', title: 'Sí' }, { id: 'no', title: 'No' }] } }),
+            description: 'Requiere messages:send. Solo canales WhatsApp Official. buttons: 1 a 3 elementos.',
+          }),
+          item('Enviar lista interactiva', 'POST', '/messages', {
+            body: jsonBody({ channelId: 1, recipient: '+56912345678', interactive: { type: 'list', body: 'Elija un plan', list: { button: 'Ver planes', sections: [{ title: 'Planes', rows: [{ id: 'basic', title: 'Básico' }, { id: 'pro', title: 'Pro', description: 'Hasta 10 usuarios' }] }] } } }),
+            description: 'Requiere messages:send. Solo canales WhatsApp Official.',
+          }),
+          {
+            name: 'Marcar mensaje como leído',
+            request: {
+              method: 'POST',
+              header: authenticatedHeaders(true).filter((header) => header.key !== 'Content-Type'),
+              url: url('/messages/{messageId}/read'),
+              description: 'Requiere messages:send. Reemplace {messageId} por el data.id de un mensaje recibido (no enviado) de esta empresa. Solo canales WhatsApp Official.',
+            },
+          },
         ],
       },
       {

@@ -39,6 +39,17 @@ type CrmLocationMessageInput = Omit<CrmMessageInput, 'content' | 'replyToMessage
   location: { latitude: number; longitude: number; name?: string; address?: string };
 };
 
+type CrmInteractiveMessageInput = Omit<CrmMessageInput, 'content' | 'replyToMessageId'> & {
+  interactiveType: 'button' | 'list';
+  content: {
+    header?: { type: 'text' | 'image' | 'video' | 'document'; text?: string; mediaUrl?: string };
+    body: { text: string };
+    footer?: { text: string };
+  };
+  options: { type: 'button'; buttons: Array<{ id: string; title: string }> }
+    | { type: 'list'; button: string; sections: Array<{ title?: string; rows: Array<{ id: string; title: string; description?: string }> }> };
+};
+
 type StoredMessage = {
   metadata?: unknown;
 };
@@ -88,6 +99,19 @@ type MessageSender = {
     to: string;
     location: { latitude: number; longitude: number; name?: string; address?: string };
   }): Promise<{ id: string | number }>;
+  markMessageAsRead?(companyId: number, request: { messageId: number }): Promise<{ id: number }>;
+  sendInteractiveMessage?(companyId: number, request: {
+    channelId: number;
+    to: string;
+    interactiveType: 'button' | 'list';
+    content: {
+      header?: { type: 'text' | 'image' | 'video' | 'document'; text?: string; mediaUrl?: string };
+      body: { text: string };
+      footer?: { text: string };
+    };
+    options: { type: 'button'; buttons: Array<{ id: string; title: string }> }
+      | { type: 'list'; button: string; sections: Array<{ title?: string; rows: Array<{ id: string; title: string; description?: string }> }> };
+  }): Promise<{ id: string | number }>;
 };
 
 type MessageStorage = {
@@ -102,6 +126,8 @@ export type CrmApiV2MessageAdapter = {
   sendTemplate(input: CrmTemplateMessageInput): Promise<{ id: string | number }>;
   sendReaction(input: CrmReactionMessageInput): Promise<{ id: string | number }>;
   sendLocation(input: CrmLocationMessageInput): Promise<{ id: string | number }>;
+  markAsRead(input: { companyId: number; integrationId: number; messageId: number }): Promise<{ id: number }>;
+  sendInteractive(input: CrmInteractiveMessageInput): Promise<{ id: string | number }>;
 };
 
 function jsonValue(value: unknown): JsonValue | undefined {
@@ -128,7 +154,7 @@ function jsonObject(value: unknown): JsonObject {
   return normalized && !Array.isArray(normalized) && typeof normalized === 'object' ? normalized : {};
 }
 
-function crmMetadata(existingMetadata: unknown, input: CrmMessageInput | CrmMediaMessageInput | CrmTemplateMessageInput | CrmReactionMessageInput | CrmLocationMessageInput): JsonObject {
+function crmMetadata(existingMetadata: unknown, input: CrmMessageInput | CrmMediaMessageInput | CrmTemplateMessageInput | CrmReactionMessageInput | CrmLocationMessageInput | CrmInteractiveMessageInput): JsonObject {
   const existing = jsonObject(existingMetadata);
   const existingCrm = jsonObject(existing.crm);
   const legacyMetadata = jsonValue(existingMetadata);
@@ -275,6 +301,47 @@ export function createCrmApiV2MessageAdapter(
         channelId: input.channelId,
         to: input.to,
         location: input.location,
+      });
+
+      if (typeof result.id === 'number') {
+        const message = await dependencies.getMessageById(result.id);
+        if (message) {
+          await dependencies.updateMessage(result.id, {
+            metadata: crmMetadata(message.metadata, input),
+          });
+        }
+      }
+
+      return { id: result.id };
+    },
+
+    async markAsRead(input) {
+      if (!await dependencies.crmIntegrationBelongsToCompany(input.companyId, input.integrationId)) {
+        throw new Error('Integration does not belong to this company');
+      }
+
+      if (!dependencies.markMessageAsRead) {
+        throw new Error('Marking a message as read is not configured for this integration');
+      }
+
+      return dependencies.markMessageAsRead(input.companyId, { messageId: input.messageId });
+    },
+
+    async sendInteractive(input) {
+      if (!await dependencies.crmIntegrationBelongsToCompany(input.companyId, input.integrationId)) {
+        throw new Error('Integration does not belong to this company');
+      }
+
+      if (!dependencies.sendInteractiveMessage) {
+        throw new Error('Interactive messages are not configured for this integration');
+      }
+
+      const result = await dependencies.sendInteractiveMessage(input.companyId, {
+        channelId: input.channelId,
+        to: input.to,
+        interactiveType: input.interactiveType,
+        content: input.content,
+        options: input.options,
       });
 
       if (typeof result.id === 'number') {

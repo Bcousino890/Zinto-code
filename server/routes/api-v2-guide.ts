@@ -30,6 +30,21 @@ El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo 
 
 \`GET /capabilities\` solo requiere \`Authorization: Bearer TU_API_KEY\` y el permiso \`integrations:manage\`; el encabezado \`X-Zinto-Integration-Id\` es opcional en esta ruta. Las API Keys se vinculan al tenant de la empresa, no a un Integration ID individual: Zinto valida el UUID en las rutas de recursos y comprueba el scope en la API Key. Si recibe \`INSUFFICIENT_PERMISSIONS\`, edite la clave en **Configuración → Acceso API**, añada \`integrations:manage\` y repita la prueba sin activar v2.
 
+## Configurar el webhook desde la propia integración
+
+Alternativa self-service a hacerlo desde Configuración → Acceso API en el panel de Zinto: \`GET /webhook\` (requiere \`webhooks:manage\`) devuelve la URL configurada y si hay un secreto (\`secretConfigured\`) — nunca el secreto en sí. \`PATCH /webhook\` actualiza la URL (misma validación que al crearla: debe ser HTTPS pública, se rechaza cualquier destino privado/local/reservado) y/o rota el secreto con \`rotateSecret: true\`.
+
+~~~bash
+curl -X PATCH https://crm.zinto.app/api/v2/webhook \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
+  -H "Content-Type: application/json" \\
+  -d '{"url":"https://smartbc.example.com/webhooks/zinto"}'
+# {"data":{"url":"https://smartbc.example.com/webhooks/zinto","secretConfigured":true,"secret":"zinto_whsec_..."}}
+~~~
+
+El campo \`secret\` solo aparece en la respuesta cuando se generó uno nuevo en esa misma llamada (primera vez que se configura \`url\`, o \`rotateSecret: true\`) — guárdelo ahí, \`GET /webhook\` nunca lo vuelve a mostrar.
+
 ## Flujo bidireccional
 
 1. El CRM envía un mensaje a POST /messages.
@@ -47,6 +62,8 @@ El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo 
 | GET | /postman.json | Público |
 | GET | /guide.md | Público |
 | GET | /capabilities | integrations:manage |
+| GET | /webhook | webhooks:manage |
+| PATCH | /webhook | webhooks:manage |
 | PUT | /contacts/{externalId} | contacts:write |
 | POST | /messages | messages:send (+ media:upload si incluye \`media\`; \`template\` no requiere permiso adicional) |
 | POST | /media/upload | media:upload |
@@ -54,6 +71,7 @@ El ID pertenece a la empresa autenticada. Un ID de otra empresa, un ID inactivo 
 | GET | /channels | channels:read |
 | GET | /conversations | conversations:read |
 | GET | /messages/{messageId}/status | messages:read |
+| POST | /messages/{messageId}/read | messages:send |
 | GET | /templates | templates:read |
 | GET | /templates/{templateId} | templates:read |
 | POST | /templates | templates:write |
@@ -153,6 +171,30 @@ curl -X POST https://crm.zinto.app/api/v2/messages \\
   -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
   -H "Content-Type: application/json" \\
   -d '{"channelId":1,"recipient":"+56912345678","text":"Sí, mañana a las 10","context":{"messageId":98765}}'
+~~~
+
+## Botones y listas interactivas, y marcar un mensaje como leído
+
+Solo canales WhatsApp Official.
+
+**Enviar botones o una lista** — \`interactive: {type: 'button'|'list', body, header?, footer?, buttons?, list?}\`. \`buttons\` (1 a 3 elementos, cada uno \`{id, title}\`) es obligatorio cuando \`type\` es \`button\`; \`list\` (\`{button, sections}\`, cada sección con \`{title?, rows: [{id, title, description?}]}\`) es obligatorio cuando \`type\` es \`list\` — nunca ambos a la vez. No se admite junto con \`text\`.
+
+~~~bash
+curl -X POST https://crm.zinto.app/api/v2/messages \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION" \\
+  -H "Content-Type: application/json" \\
+  -d '{"channelId":1,"recipient":"+56912345678","interactive":{"type":"button","body":"¿Confirmamos la cita?","buttons":[{"id":"yes","title":"Sí"},{"id":"no","title":"No"}]}}'
+~~~
+
+La respuesta del cliente a un botón o lista llega como \`message.received\` con \`data.button\`/\`data.list\` (ver la sección de webhooks).
+
+**Marcar un mensaje como leído** — \`POST /messages/{messageId}/read\`, donde \`messageId\` es el \`data.id\` de un mensaje **recibido** (no enviado) de esta empresa.
+
+~~~bash
+curl -X POST https://crm.zinto.app/api/v2/messages/98765/read \\
+  -H "Authorization: Bearer TU_API_KEY" \\
+  -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION"
 ~~~
 
 ## Plantillas de WhatsApp: crear, listar y administrar

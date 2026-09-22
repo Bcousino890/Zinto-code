@@ -308,6 +308,33 @@ class ApiMessageService {
   }
 
   /**
+   * Marks a received message as read on WhatsApp. WhatsApp official channels only.
+   */
+  async markMessageAsRead(companyId: number, request: { messageId: number }): Promise<{ id: number }> {
+    const message = await storage.getMessageById(request.messageId);
+    const conversation = message ? await storage.getConversation(message.conversationId) : undefined;
+    const access = decideMessageExternalIdAccess(message, conversation, companyId);
+
+    if (!access.ok) {
+      throw new Error(access.reason === 'no_external_id'
+        ? 'This message has no WhatsApp message ID on file and cannot be marked as read'
+        : 'Message not found or access denied');
+    }
+    if (message!.direction !== 'inbound') {
+      throw new Error('Only a received message can be marked as read');
+    }
+    if (conversation!.channelType !== 'whatsapp_official') {
+      throw new Error('Marking a message as read is only supported on WhatsApp official channels');
+    }
+
+    const { markMessageAsRead: markAsReadOnWhatsApp } = await import('./channels/whatsapp-official');
+    await markAsReadOnWhatsApp(conversation!.channelId, access.externalId);
+    await storage.updateMessage(request.messageId, { readAt: new Date() });
+
+    return { id: request.messageId };
+  }
+
+  /**
    * Send batch messages
    */
   async sendBatchMessages(companyId: number, messages: SendMessageRequest[]): Promise<MessageResponse[]> {

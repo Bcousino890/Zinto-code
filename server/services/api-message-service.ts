@@ -45,6 +45,10 @@ export interface ChannelInfo {
   status: string;
   phoneNumber?: string;
   displayName?: string;
+  /** WhatsApp official channels only — Meta's own quality rating (green/yellow/red/unknown), refreshed periodically (see whatsapp-official-quality-rating-sync.ts). Omitted for every other channel type. */
+  qualityRating?: string;
+  /** WhatsApp official channels only — Meta's messaging_limit_tier (e.g. TIER_1K), same refresh as qualityRating. Omitted for every other channel type. */
+  messagingLimitTier?: string;
 }
 
 /**
@@ -68,7 +72,8 @@ class ApiMessageService {
         type: conn.channelType,
         status: conn.status || 'unknown',
         phoneNumber: this.extractPhoneNumber(conn),
-        displayName: this.extractDisplayName(conn)
+        displayName: this.extractDisplayName(conn),
+        ...this.extractQualityRating(conn),
       }));
     } catch (error) {
       console.error('Error getting channels for company:', error);
@@ -930,6 +935,23 @@ class ApiMessageService {
 
 
     return connection.accountName;
+  }
+
+  /**
+   * Quality rating / messaging tier — WhatsApp official channels only, kept
+   * up to date by whatsapp-official-quality-rating-sync.ts's periodic
+   * refresh (not fetched on demand here; this just reads whatever that job
+   * last stored in connectionData).
+   */
+  private extractQualityRating(connection: ChannelConnection): { qualityRating?: string; messagingLimitTier?: string } {
+    if (connection.channelType !== 'whatsapp_official' || !connection.connectionData || typeof connection.connectionData !== 'object') {
+      return {};
+    }
+    const data = connection.connectionData as any;
+    return {
+      ...(typeof data.qualityRating === 'string' ? { qualityRating: data.qualityRating } : {}),
+      ...(typeof data.messagingLimitTier === 'string' ? { messagingLimitTier: data.messagingLimitTier } : {}),
+    };
   }
 
   /**

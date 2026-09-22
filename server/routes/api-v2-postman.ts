@@ -179,7 +179,7 @@ export function getApiV2PostmanCollection() {
               method: 'GET',
               header: authenticatedHeaders(true).filter((header) => header.key !== 'Content-Type'),
               url: url('/channels'),
-              description: 'Requiere channels:read. Útil para descubrir el channelId usado en POST /messages y en el filtro channelId de GET /conversations.',
+              description: 'Requiere channels:read. Útil para descubrir el channelId usado en POST /messages y en el filtro channelId de GET /conversations. Canales WhatsApp Official incluyen además qualityRating y messagingLimitTier (refrescados cada hora).',
             },
           },
           {

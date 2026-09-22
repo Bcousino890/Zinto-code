@@ -21,6 +21,8 @@ type ChannelsSource = {
     status: string;
     phoneNumber?: string;
     displayName?: string;
+    qualityRating?: string;
+    messagingLimitTier?: string;
   }>>;
 };
 
@@ -35,6 +37,8 @@ export function createCrmChannelsReadAdapter(source: ChannelsSource): CrmChannel
         status: channel.status,
         phoneNumber: channel.phoneNumber,
         displayName: channel.displayName,
+        ...(channel.qualityRating ? { qualityRating: channel.qualityRating } : {}),
+        ...(channel.messagingLimitTier ? { messagingLimitTier: channel.messagingLimitTier } : {}),
       }));
     },
   };

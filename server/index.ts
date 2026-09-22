@@ -637,6 +637,15 @@ app.use((req, res, next) => {
           logger.error('template-status-sync', '❌ WhatsApp Template Status Sync failed to start:', error);
         }
 
+        logger.info('whatsapp-official-quality-rating-sync', 'Starting WhatsApp Official Quality Rating Sync...');
+        try {
+          const { startWhatsAppOfficialQualityRatingSync } = await import('./services/whatsapp-official-quality-rating-sync');
+          startWhatsAppOfficialQualityRatingSync();
+          logger.info('whatsapp-official-quality-rating-sync', '✅ WhatsApp Official Quality Rating Sync started successfully');
+        } catch (error) {
+          logger.error('whatsapp-official-quality-rating-sync', '❌ WhatsApp Official Quality Rating Sync failed to start:', error);
+        }
+
         logger.info('calendar-reconciliation', 'Starting Calendar Reconciliation Service...');
         try {
           const { calendarReconciliationService } = await import('./services/calendar-reconciliation');

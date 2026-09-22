@@ -23,6 +23,9 @@ export interface CrmChannelSummary {
   status: string;
   phoneNumber?: string;
   displayName?: string;
+  /** WhatsApp official channels only, refreshed hourly — see whatsapp-official-quality-rating-sync.ts. Omitted for every other channel type. */
+  qualityRating?: string;
+  messagingLimitTier?: string;
 }
 
 export interface CrmChannelsReadPort {

@@ -32,6 +32,22 @@ test('channels adapter forwards companyId to the source and maps the returned fi
   ]);
 });
 
+test('channels adapter passes through qualityRating/messagingLimitTier when present, and omits them entirely when absent', async () => {
+  const port = createCrmChannelsReadAdapter({
+    getChannels: async () => [
+      { id: 1, name: 'WhatsApp Ventas', type: 'whatsapp_official', status: 'active', qualityRating: 'green', messagingLimitTier: 'TIER_1K' },
+      { id: 2, name: 'Telegram soporte', type: 'telegram', status: 'active' },
+    ],
+  });
+
+  const channels = await port.listChannels(12);
+
+  assert.deepEqual(channels, [
+    { id: 1, name: 'WhatsApp Ventas', type: 'whatsapp_official', status: 'active', phoneNumber: undefined, displayName: undefined, qualityRating: 'green', messagingLimitTier: 'TIER_1K' },
+    { id: 2, name: 'Telegram soporte', type: 'telegram', status: 'active', phoneNumber: undefined, displayName: undefined },
+  ]);
+});
+
 // ---------------------------------------------------------------------------
 // Conversations
 // ---------------------------------------------------------------------------

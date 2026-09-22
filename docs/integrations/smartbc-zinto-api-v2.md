@@ -306,10 +306,11 @@ una entrega era mirar los eventos de webhook.
 ```bash
 curl "$BASE_URL/channels" \
   -H "Authorization: Bearer $API_KEY" -H "X-Zinto-Integration-Id: $INTEGRATION_ID"
-# {"data":[{"id":42,"name":"WhatsApp Ventas","type":"whatsapp_official","status":"active","phoneNumber":"+56912345678","displayName":"Ventas"}]}
+# {"data":[{"id":42,"name":"WhatsApp Ventas","type":"whatsapp_official","status":"active","phoneNumber":"+56912345678","displayName":"Ventas","qualityRating":"green","messagingLimitTier":"TIER_1K"}]}
 ```
 
-Requiere `channels:read`.
+Requiere `channels:read`. `qualityRating`/`messagingLimitTier` (según Meta,
+refrescados cada hora) solo aparecen en canales WhatsApp Official.
 
 ```bash
 curl "$BASE_URL/conversations?channelId=42&status=open&limit=20" \

@@ -221,13 +221,13 @@ curl -X POST https://crm.zinto.app/api/v2/templates \\
 
 v2 expone tres rutas de solo lectura, todas limitadas a la empresa de la API Key.
 
-\`GET /channels\` (requiere \`channels:read\`) lista los canales de mensajería de la empresa; es la forma de descubrir el \`channelId\` que se usa en \`POST /messages\` y en el filtro de \`GET /conversations\`.
+\`GET /channels\` (requiere \`channels:read\`) lista los canales de mensajería de la empresa; es la forma de descubrir el \`channelId\` que se usa en \`POST /messages\` y en el filtro de \`GET /conversations\`. Para canales WhatsApp Official incluye además \`qualityRating\` (\`green\`/\`yellow\`/\`red\`/\`unknown\`, según Meta) y \`messagingLimitTier\` (p. ej. \`TIER_1K\`), ambos refrescados cada hora — omitidos en otros tipos de canal.
 
 ~~~bash
 curl https://crm.zinto.app/api/v2/channels \\
   -H "Authorization: Bearer TU_API_KEY" \\
   -H "X-Zinto-Integration-Id: ID_DE_INTEGRACION"
-# {"data":[{"id":42,"name":"WhatsApp Ventas","type":"whatsapp_official","status":"active","phoneNumber":"+56912345678","displayName":"Ventas"}]}
+# {"data":[{"id":42,"name":"WhatsApp Ventas","type":"whatsapp_official","status":"active","phoneNumber":"+56912345678","displayName":"Ventas","qualityRating":"green","messagingLimitTier":"TIER_1K"}]}
 ~~~
 
 \`GET /conversations\` (requiere \`conversations:read\`) admite los filtros opcionales \`channelId\`, \`status\` e \`isGroup\` (\`true\`/\`false\`), y paginación \`page\`/\`limit\` (por defecto 20, máximo 100).

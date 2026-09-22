@@ -62,13 +62,24 @@ export function TikTokPlatformConfigForm({ isOpen, onClose, onSuccess }: Props) 
       if (response.ok) {
         const config = await response.json();
         setExistingConfig(config);
+        if (config.secretsNeedReentry) {
+          toast({
+            title: t('settings.tiktok_platform_config.toast.reencrypt_title', 'Reingresa el Client Secret'),
+            description: t(
+              'settings.tiktok_platform_config.toast.reencrypt_description',
+              'La clave de cifrado del servidor cambió y ya no puede leer el Client Secret guardado. Vuelve a introducirlo (y el Webhook Verify Token si lo tenías) y guarda para restaurarlo.'
+            ),
+            variant: 'destructive',
+          });
+        }
         setFormData({
           clientKey: config.partnerApiKey || '',
-          clientSecret:
-            (config.partnerSecret && String(config.partnerSecret).trim() !== '')
+          clientSecret: config.secretsNeedReentry
+            ? ''
+            : (config.partnerSecret && String(config.partnerSecret).trim() !== '')
               ? config.partnerSecret
               : config.partnerId || '',
-          webhookVerifyToken: config.webhookVerifyToken || '',
+          webhookVerifyToken: config.secretsNeedReentry ? '' : (config.webhookVerifyToken || ''),
         });
         const pp =
           config.publicProfile && typeof config.publicProfile === 'object'
@@ -100,6 +111,17 @@ export function TikTokPlatformConfigForm({ isOpen, onClose, onSuccess }: Props) 
           setOauthRedirectUri(buildCanonicalTikTokOAuthRedirectUriFromOrigin(window.location.origin));
         }
       } else {
+        if (response.status !== 404) {
+          console.error('Error loading TikTok platform configuration: HTTP', response.status);
+          toast({
+            title: t('settings.tiktok_platform_config.toast.error_title', 'Error'),
+            description: t(
+              'settings.tiktok_platform_config.toast.load_error',
+              'No se pudo cargar la configuración de TikTok existente. Revisa los logs del servidor.'
+            ),
+            variant: 'destructive',
+          });
+        }
         setExistingConfig(null);
         setFormData({ ...INITIAL_FORM_DATA });
         setOauthAuthorizationUrl('');

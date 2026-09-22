@@ -4849,9 +4849,23 @@ function registerAdminRoutes(app: Express) {
         return res.status(404).json({ error: 'TikTok partner configuration not found' });
       }
 
-      res.json(decryptTikTokPartnerConfigurationForAdminResponse(config));
+      try {
+        return res.json(decryptTikTokPartnerConfigurationForAdminResponse(config));
+      } catch (decryptError) {
+        // Stored secrets don't decrypt with the current ENCRYPTION_KEY (e.g. it was rotated
+        // without re-running server/scripts/reencrypt-tiktok-at-rest-secrets.ts). Degrade instead
+        // of 500ing so the admin UI can still load the record and prompt for re-entry via PUT.
+        console.error('Failed to decrypt TikTok partner configuration secrets (stale ENCRYPTION_KEY?):', decryptError);
+        return res.json({
+          ...config,
+          partnerSecret: '',
+          webhookVerifyToken: '',
+          accessToken: null,
+          secretsNeedReentry: true,
+        });
+      }
     } catch (error) {
-      // Error getting TikTok partner configuration
+      console.error('Error getting TikTok partner configuration:', error);
       res.status(500).json({ error: 'Failed to get TikTok partner configuration' });
     }
   });

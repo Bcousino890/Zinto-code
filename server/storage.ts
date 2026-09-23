@@ -656,6 +656,8 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User>;
   updateUserPassword(id: number, newPassword: string, isAlreadyHashed?: boolean): Promise<boolean>;
+  setTemporaryPassword(id: number, hashedTempPassword: string, expiresAt: Date): Promise<boolean>;
+  clearTemporaryPassword(id: number): Promise<boolean>;
   deleteUser(id: number): Promise<boolean>;
 
   getAllPlans(): Promise<Plan[]>;
@@ -4363,6 +4365,44 @@ export class DatabaseStorage implements IStorage {
       return !!updatedUser;
     } catch (error) {
       console.error("Error updating user password:", error);
+      return false;
+    }
+  }
+
+  async setTemporaryPassword(id: number, hashedTempPassword: string, expiresAt: Date): Promise<boolean> {
+    try {
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          tempPasswordHash: hashedTempPassword,
+          tempPasswordExpiresAt: expiresAt,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, id))
+        .returning();
+
+      return !!updatedUser;
+    } catch (error) {
+      console.error("Error setting temporary password:", error);
+      return false;
+    }
+  }
+
+  async clearTemporaryPassword(id: number): Promise<boolean> {
+    try {
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          tempPasswordHash: null,
+          tempPasswordExpiresAt: null,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, id))
+        .returning();
+
+      return !!updatedUser;
+    } catch (error) {
+      console.error("Error clearing temporary password:", error);
       return false;
     }
   }
